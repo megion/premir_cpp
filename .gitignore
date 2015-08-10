@@ -34,3 +34,7 @@
 *.iml
 
 build
+.idea
+.project
+.cproject
+
