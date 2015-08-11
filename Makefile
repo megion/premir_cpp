@@ -1,21 +1,17 @@
-#.SUFFIXES: .cpp .o
-#SOURCES=main.cpp hello.cpp factorial.cpp
-#OBJECTS=$(SOURCES:.cpp=.o)
-
-
-CFLAGS=-c -Wall -std=c++11
-
-#.cpp.o:
-#	$(CC) $(CFLAGS) -c -o $@ $<
-
+CC = g++
+CCFLAGS = -std=c++11
 SRCS = src/main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 primer: $(OBJS)
-	$(CC) -o primer $(OBJS) $(CFLAGS)
+	$(CC) -o primer $(OBJS) $(CCFLAGS)
 
 .cpp.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CCFLAGS) -c -o $@ $<
+	
+clean:
+	rm -rf $(OBJS) primer
+	
+print:
+	echo $(OBJS)
 
-#primer: .cpp.o 
-	#$(CC) $(LDFLAGS) $(OBJECTS) -o $@
