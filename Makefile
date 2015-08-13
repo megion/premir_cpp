@@ -14,6 +14,9 @@ CCFLAGS := -std=c++11
 #SRCS := $(wildcard src/*.cpp src/*/*.cpp)
 
 SRC_DIRS := src src/foo
+# если файлы сборки будут помещаться например в каталог release. Запуск командой:
+# make --directory=release --makefile=../Makefile
+SRC_DIRS := $(addprefix ../, $(SRC_DIRS))
 SRC_SEARCHES := $(addsuffix /*.cpp, $(SRC_DIRS))
 
 # список каталогов, где шаблонные правила будут искать зависимости
@@ -24,6 +27,8 @@ VPATH := $(SRC_DIRS)
 # получится список всех объектных файлов *.o разделенный пробелами
 #OBJS := $(SRCS:.cpp=.o)
 OBJS := $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SRC_SEARCHES))))
+
+all: primer
 
 # создание выполняемого файла
 primer: $(OBJS)

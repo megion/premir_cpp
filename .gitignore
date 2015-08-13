@@ -34,7 +34,8 @@
 *.md.html
 *.iml
 
-build
+release
+.settings
 .idea
 .project
 .cproject
