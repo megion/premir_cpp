@@ -1,42 +1,47 @@
-CC = g++
-CCFLAGS = -std=c++11
+# Справка
+# $@ имя цели правила
+# $< имя первой зависимости правила
+# $^ список всех зависимостей правила
+# 
+# <цели> : <зависмости>
+# 	<команда1>
+# 	<команда2>
+
+CC := g++
+CCFLAGS := -std=c++11
 
 # получить список всех файлов *.cpp
-SRCS := $(wildcard src/*.cpp src/*/*.cpp)
+#SRCS := $(wildcard src/*.cpp src/*/*.cpp)
 
 SRC_DIRS := src src/foo
-search_wildcards := $(addsuffix /*.cpp, $(SRC_DIRS))
+SRC_SEARCHES := $(addsuffix /*.cpp, $(SRC_DIRS))
 
 # список каталогов, где шаблонные правила будут искать зависимости
 VPATH := $(SRC_DIRS)
 
 # укороченный вызов функции patsubst $(имя_переменной:.старый_суффикс=.новый_суффикс)
 # полный вызов выглядит так: OBJS := $(patsubst   %.cpp, %.o, $(SRCS))
-# получится список файлов *.o разделенный пробелами
+# получится список всех объектных файлов *.o разделенный пробелами
 #OBJS := $(SRCS:.cpp=.o)
-OBJS := $(notdir $(patsubst %.cpp, %.o, $(wildcard $(search_wildcards))))
+OBJS := $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SRC_SEARCHES))))
 
+# создание выполняемого файла
 primer: $(OBJS)
 	$(CC) $(CCFLAGS) $^ -o $@
 
-# .cpp.o:
-#	$(CC) $(CCFLAGS) -c -o $@ $<
-
-var1 := $(addprefix -I, $(SRC_DIRS))
-
+# правило создания объектных файлов
+# флаг -I для того чтобы разрешить компилятору искать заголовочные файлы в указанных директориях
+# флаг -MMD для создания файлов *.d со списком зависимостей: сам исходный файл, и файлы, включаемые с помощью директивы #include "имя_файла"  
 %.o: %.cpp
-	echo $<
-	$(CC) $(CCFLAGS) -c -MD $(var1) $<
-# TextLine.o: TextLine.h - необходимо доработать зависисмость от *.h файлов
-	
-clean:
-	rm -rf $(OBJS) primer
-	
+	$(CC) $(CCFLAGS) -c -MMD $(addprefix -I, $(SRC_DIRS)) $<
+include $(wildcard *.d)
 
-src_files := $(wildcard src/*.cpp src/*/*.cpp)	
+# очистка	
+clean:
+	rm -rf $(OBJS) *.d primer
 
 print:
-	echo $(var1)
+	echo $(OBJS)
 	
 .PHONY: clean
 
