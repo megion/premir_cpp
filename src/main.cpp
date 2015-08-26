@@ -34,6 +34,22 @@ int main(int argc, char** argv) {
 
     std::cout << st2.size() << std::endl;
 
+    const int val6 = 7;
+    const int* pVal6 = &val6;
+    std::cout << *pVal6 << std::endl;
+
+    int val7 = 8;
+    pVal6 = &val7;
+
+    const int &ir = 1024;
+    double dval = 3.14;
+    const int &ir2 = dval;
+
+    const double mw = 9.6;
+    const double* pc = 0;
+    pc = &mw;
+    // *pc = 3.0; - нельзя ошибка т.к. pc - это указатель наобъект const double
+
 //	int sum = 0;
 //	int i;
 //	while (std::cin >> i) {

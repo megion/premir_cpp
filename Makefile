@@ -13,7 +13,7 @@ CCFLAGS := -std=c++11
 # получить список всех файлов *.cpp
 #SRCS := $(wildcard src/*.cpp src/*/*.cpp)
 
-SRC_DIRS := src src/foo
+SRC_DIRS := src src/foo src/utils
 
 # если файлы сборки будут помещаться например в каталог release.
 # Запуск командой: make --directory=release --makefile=../Makefile

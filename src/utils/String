@@ -1,0 +1,41 @@
+#ifndef UTILS_STRING_H
+#define UTILS_STRING_H
+
+#include <iostream>
+
+class String {
+
+public:
+	String() {
+		_size = 0;
+		_str = nullptr;
+	}
+	String(const wchar_t*);
+	String(const String&);
+
+	~String() {
+		delete[] _str;
+	}
+
+	String& operator =(const String&); // str1 = str2
+	String& operator =(const wchar_t*); // str3 = "my string";
+
+	bool operator ==(const String&);
+	bool operator ==(const wchar_t*);
+
+	char& operator [](int);
+
+	int size() {
+		return _size;
+	}
+
+	wchar_t* getStr() {
+		return _str;
+	}
+
+private:
+	int _size;
+	wchar_t* _str;
+};
+
+#endif

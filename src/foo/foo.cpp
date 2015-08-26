@@ -21,7 +21,7 @@ int stringLength(const wchar_t* st) {
 	const wchar_t* p = st;
 	if (st) {
 		while (*p) {
-			std::cout << p << std::endl;
+			//std::cout << p << std::endl;
 			++cnt;
 			p++;
 		}
