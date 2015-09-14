@@ -13,16 +13,13 @@ CCFLAGS := -std=c++11
 # получить список всех файлов *.cpp
 #SRCS := $(wildcard src/*.cpp src/*/*.cpp)
 
-#SRCS := src src/foo src/utils
+SRC_DIRS := src src/foo src/utils
 
 # если файлы сборки будут помещаться например в каталог release.
 # Запуск командой: make --directory=release --makefile=../Makefile
-SRC_DIRS := $(addprefix ../, $(SRCS))
+SRC_DIRS := $(addprefix ../, $(SRC_DIRS))
 
 SRC_SEARCHES := $(addsuffix /*.cpp, $(SRC_DIRS))
-
-# список каталогов, где шаблонные правила будут искать зависимости
-VPATH := $(SRC_DIRS)
 
 # Укороченный вызов функции patsubst
 # $(имя_переменной:.старый_суффикс=.новый_суффикс)
@@ -31,24 +28,28 @@ VPATH := $(SRC_DIRS)
 #OBJS := $(SRCS:.cpp=.o)
 OBJS := $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SRC_SEARCHES))))
 
-#all: primer
+all: primer
 
 # создание выполняемого файла
-#primer: $(OBJS)
-#	$(CC) $(CCFLAGS) $^ -o $@
+primer: $(OBJS)
+	$(CC) $(CCFLAGS) $^ -o $@
+	
+# список каталогов, где шаблонные правила будут искать зависимости
+VPATH := $(SRC_DIRS)
 
-# правило создания объектных файлов
+# шаблонное правило создания объектных файлов
 # флаг -I для того чтобы разрешить компилятору искать заголовочные файлы
 # в указанных директориях
 # флаг -MMD для создания файлов *.d со списком зависимостей: сам исходный файл,
 # и файлы, включаемые с помощью директивы #include "имя_файла"  
 %.o: %.cpp
 	$(CC) $(CCFLAGS) -c -MMD $(addprefix -I, $(SRC_DIRS)) $<
+	@printf "\e[36m$(CC)\e[90m %s\e[0m\n" $@
 include $(wildcard *.d)
 
 # очистка	
 clean:
-	rm -rf $(OBJS) *.d
+	rm -rf $(OBJS) *.d primer
 
 print:
 	echo $(OBJS)

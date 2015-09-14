@@ -1,5 +1,0 @@
-#!/bin/bash
-
-echo "Building app..."
-mkdir -p release
-make --directory=release --makefile=../Makefile

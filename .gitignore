@@ -3,6 +3,9 @@
 *.lo
 *.o
 *.obj
+build/*.o
+build/*.d
+build/primer
 
 # Precompiled Headers
 *.gch
@@ -34,11 +37,10 @@
 *.md.html
 *.iml
 
-release
 .settings
 .idea
 .project
 .cproject
 
-primer
+
 
