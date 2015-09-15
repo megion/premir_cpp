@@ -10,32 +10,37 @@
 CC := g++
 CCFLAGS := -std=c++11
 
-# получить список всех файлов *.cpp
-#SRCS := $(wildcard src/*.cpp src/*/*.cpp)
+# список каталогов с исходыми кодами
+SRC_DIRS := $(shell find ../src -type d)
+TEST_DIRS := $(shell find ../test -type d) $(SRC_DIRS)
 
-SRC_DIRS := src src/foo src/utils
-
-# если файлы сборки будут помещаться например в каталог release.
-# Запуск командой: make --directory=release --makefile=../Makefile
-SRC_DIRS := $(addprefix ../, $(SRC_DIRS))
-
-SRC_SEARCHES := $(addsuffix /*.cpp, $(SRC_DIRS))
+# список всех файлов *.cpp
+SRC := $(shell find ../src -name *.cpp)
+TEST_SRC := $(shell find {../test,../src} -name *.cpp | sed '/primer/d')
 
 # Укороченный вызов функции patsubst
 # $(имя_переменной:.старый_суффикс=.новый_суффикс)
 # полный вызов выглядит так: OBJS := $(patsubst   %.cpp, %.o, $(SRCS))
 # получится список всех объектных файлов *.o разделенный пробелами
 #OBJS := $(SRCS:.cpp=.o)
-OBJS := $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SRC_SEARCHES))))
+SRC_OBJS := $(notdir $(patsubst %.cpp, %.o, $(SRC)))
+TEST_OBJS := $(notdir $(patsubst %.cpp, %.o, $(TEST_SRC)))
 
-all: primer
+all: primer test_runner
 
-# создание выполняемого файла
-primer: $(OBJS)
+# создание выполняемого файла primer
+primer: $(SRC_OBJS)
 	$(CC) $(CCFLAGS) $^ -o $@
 	
+# создание выполняемого файла test
+test_runner: $(TEST_OBJS)
+	$(CC) $(CCFLAGS) $^ -o $@
+	
+test: test_runner
+	@./$<
+	
 # список каталогов, где шаблонные правила будут искать зависимости
-VPATH := $(SRC_DIRS)
+VPATH := $(TEST_DIRS)
 
 # шаблонное правило создания объектных файлов
 # флаг -I для того чтобы разрешить компилятору искать заголовочные файлы
@@ -43,16 +48,16 @@ VPATH := $(SRC_DIRS)
 # флаг -MMD для создания файлов *.d со списком зависимостей: сам исходный файл,
 # и файлы, включаемые с помощью директивы #include "имя_файла"  
 %.o: %.cpp
-	$(CC) $(CCFLAGS) -c -MMD $(addprefix -I, $(SRC_DIRS)) $<
+	$(CC) $(CCFLAGS) -c -MMD $(addprefix -I, $(TEST_DIRS)) $<
 	@printf "\e[36m$(CC)\e[90m %s\e[0m\n" $@
 include $(wildcard *.d)
 
 # очистка	
 clean:
-	rm -rf $(OBJS) *.d primer
+	rm -rf *.o *.d primer test_runner
 
 print:
-	echo $(OBJS)
+	echo $(TEST_DIRS)
 	
 .PHONY: clean
 

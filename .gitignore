@@ -6,6 +6,7 @@
 build/*.o
 build/*.d
 build/primer
+build/test_runner
 
 # Precompiled Headers
 *.gch
