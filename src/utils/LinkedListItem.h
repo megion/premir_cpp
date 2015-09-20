@@ -16,7 +16,7 @@ public:
 		_value = value;
 		_next = nullptr;
 	}
-	LinkedListItem(int value, LinkedListItem* toLinkItem = nullptr);
+	LinkedListItem(int value, LinkedListItem* toLinkItem);
 
 	~LinkedListItem();
 
