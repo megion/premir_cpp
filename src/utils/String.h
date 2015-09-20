@@ -1,5 +1,5 @@
-#ifndef UTILS_STRING_H
-#define UTILS_STRING_H
+#ifndef SRC_UTILS_STRING_H_
+#define SRC_UTILS_STRING_H_
 
 #include <iostream>
 #include <cstring>
