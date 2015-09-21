@@ -26,7 +26,14 @@ public:
 		return _size;
 	}
 
-	LinkedListItem* insert(int value, LinkedListItem* toLinkItem);
+//	LinkedListItem* insert(int value, LinkedListItem* toLinkItem);
+
+	LinkedListItem* push(int value);
+	LinkedListItem* unshift(int value);
+
+	LinkedListItem* insertAfter(int value, LinkedListItem* after);
+	LinkedListItem* insertBefore(int value, LinkedListItem* before);
+
 
 private:
 	// disable initialize constructor
@@ -42,9 +49,33 @@ private:
 
 };
 
-inline LinkedListItem* LinkedList::insert(int value, LinkedListItem* toLinkItem) {
-	LinkedListItem* item = new LinkedListItem(value, toLinkItem);
+//inline LinkedListItem* LinkedList::insert(int value, LinkedListItem* toLinkItem) {
+//	LinkedListItem* item = new LinkedListItem(value);
+//	_size++;
+//	return item;
+//}
+
+inline LinkedListItem* LinkedList::push(int value) {
+	LinkedListItem* item = new LinkedListItem(value);
+	if (!_first) {
+		_first = _last = item;
+	} else {
+		_last->setNext(item);
+		_last = item;
+	}
 	_size++;
+	return item;
+}
+
+inline LinkedListItem* LinkedList::unshift(int value) {
+	LinkedListItem* item = new LinkedListItem(value);
+//	if (!_first) {
+//		_first = _last = item;
+//	} else {
+//		_last->setNext(item);
+//		_last = item;
+//	}
+//	_size++;
 	return item;
 }
 

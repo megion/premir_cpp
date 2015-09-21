@@ -14,27 +14,25 @@ class LinkedListItem {
 public:
 	LinkedListItem(int value) {
 		_value = value;
-		_next = nullptr;
+			_next = nullptr;
 	}
-	LinkedListItem(int value, LinkedListItem* toLinkItem);
+	LinkedListItem(int value, LinkedListItem* next) {
+		_value = value;
+		_next = next;
+	}
 
 	~LinkedListItem();
+
+	void setNext(LinkedListItem* next) {
+		_next = next;
+	}
 
 private:
 	int _value;
 	LinkedListItem* _next;
 };
 
-/**
- * Create item inserted after toLinkItem
- */
-inline LinkedListItem::LinkedListItem(int value, LinkedListItem* toLinkItem) {
-	_value = value;
-
-	// this links with toLinkItem->_next
-	_next = toLinkItem->_next;
-	// toLinkItem links with this
-	toLinkItem->_next = this;
+inline LinkedListItem::~LinkedListItem() {
 }
 
 } /* namespace utils */
