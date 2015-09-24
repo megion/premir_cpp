@@ -14,7 +14,7 @@ class LinkedListItem {
 public:
 	LinkedListItem(int value) {
 		_value = value;
-			_next = nullptr;
+		_next = nullptr;
 	}
 	LinkedListItem(int value, LinkedListItem* next) {
 		_value = value;
@@ -25,6 +25,10 @@ public:
 
 	void setNext(LinkedListItem* next) {
 		_next = next;
+	}
+
+	LinkedListItem* getNext() {
+		return _next;
 	}
 
 private:
