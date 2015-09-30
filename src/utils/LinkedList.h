@@ -12,6 +12,7 @@
 
 namespace utils {
 
+template <typename T>
 class LinkedList {
 public:
 	LinkedList() {
@@ -20,21 +21,25 @@ public:
 		_last = nullptr;
 	}
 
-	~LinkedList();
+	virtual ~LinkedList();
 
 	int size() {
 		return _size;
 	}
 
-//	LinkedListItem* insert(int value, LinkedListItem* toLinkItem);
+	LinkedListItem<T>* push(T value); // insert to end
+	LinkedListItem<T>* shift(); // delete from begin
 
-	LinkedListItem* push(int value);
-	LinkedListItem* unshift(int value); // insert to begin
+	LinkedListItem<T>* unshift(T value); // insert to begin
+	LinkedListItem<T>* pop(); // delete from end
 
-	LinkedListItem* insertAfter(int value, LinkedListItem* after);
-	LinkedListItem* insertBefore(int value, LinkedListItem* before);
+	LinkedListItem<T>* insertAfter(T value, LinkedListItem<T>* after);
+	LinkedListItem<T>* insertBefore(T value, LinkedListItem<T>* before);
 
-	void remove(LinkedListItem* item);
+	void concat(const LinkedList& list);
+	void reverse(const LinkedList& list);
+
+	void remove(LinkedListItem<T>* item);
 	void removeAll();
 
 private:
@@ -44,10 +49,10 @@ private:
 	// disable = operator
 	LinkedList& operator=(const LinkedList&);
 
-	LinkedListItem* findPrev(LinkedListItem* item) {
-		LinkedListItem* p = _first;
+	LinkedListItem<T>* findPrev(LinkedListItem<T>* item) {
+		LinkedListItem<T>* p = _first;
 		while (p) {
-			LinkedListItem* next  = p->getNext();
+			LinkedListItem<T>* next  = p->getNext();
 			if (next && next==item) {
 				return p;
 			}
@@ -58,13 +63,14 @@ private:
 
 private:
 	int _size;
-	LinkedListItem* _first;
-	LinkedListItem* _last;
+	LinkedListItem<T>* _first;
+	LinkedListItem<T>* _last;
 
 };
 
-inline LinkedListItem* LinkedList::push(int value) {
-	LinkedListItem* item = new LinkedListItem(value);
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::push(T value) {
+	LinkedListItem<T>* item = new LinkedListItem<T>(value);
 	if (_first) {
 		_last->setNext(item);
 		_last = item;
@@ -75,8 +81,9 @@ inline LinkedListItem* LinkedList::push(int value) {
 	return item;
 }
 
-inline LinkedListItem* LinkedList::unshift(int value) {
-	LinkedListItem* item = new LinkedListItem(value);
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::unshift(T value) {
+	LinkedListItem<T>* item = new LinkedListItem<T>(value);
 	if (_first) {
 		item->setNext(_first);
 		_first = item;
@@ -87,9 +94,22 @@ inline LinkedListItem* LinkedList::unshift(int value) {
 	return item;
 }
 
-inline LinkedListItem* LinkedList::insertAfter(int value,
-		LinkedListItem* after) {
-	LinkedListItem* item = new LinkedListItem(value, after->getNext());
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::shift() {
+	// delete first item
+	return nullptr;
+}
+
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::pop() {
+	// delete end element
+	return nullptr;
+}
+
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::insertAfter(T value,
+		LinkedListItem<T>* after) {
+	LinkedListItem<T>* item = new LinkedListItem<T>(value, after->getNext());
 	after->setNext(item);
 	if (_last == after) {
 		_last = item;
@@ -98,13 +118,14 @@ inline LinkedListItem* LinkedList::insertAfter(int value,
 	return item;
 }
 
-inline LinkedListItem* LinkedList::insertBefore(int value,
-		LinkedListItem* before) {
-	LinkedListItem* item = new LinkedListItem(value, before);
+template <typename T>
+inline LinkedListItem<T>* LinkedList<T>::insertBefore(T value,
+		LinkedListItem<T>* before) {
+	LinkedListItem<T>* item = new LinkedListItem<T>(value, before);
 	if (_first == before) {
 		_first = item;
 	} else {
-		LinkedListItem* prev = findPrev(before);
+		LinkedListItem<T>* prev = findPrev(before);
 		// should not be null
 		prev->setNext(item);
 	}

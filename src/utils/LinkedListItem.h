@@ -10,18 +10,19 @@
 
 namespace utils {
 
+template <typename T>
 class LinkedListItem {
 public:
-	LinkedListItem(int value) {
+	LinkedListItem(T value) {
 		_value = value;
 		_next = nullptr;
 	}
-	LinkedListItem(int value, LinkedListItem* next) {
+	LinkedListItem(T value, LinkedListItem* next) {
 		_value = value;
 		_next = next;
 	}
 
-	~LinkedListItem();
+	virtual ~LinkedListItem();
 
 	void setNext(LinkedListItem* next) {
 		_next = next;
@@ -32,12 +33,12 @@ public:
 	}
 
 private:
-	int _value;
+	T _value;
 	LinkedListItem* _next;
 };
 
-inline LinkedListItem::~LinkedListItem() {
-}
+//inline LinkedListItem::~LinkedListItem() {
+//}
 
 } /* namespace utils */
 
