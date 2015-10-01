@@ -10,7 +10,7 @@
 
 namespace utils {
 
-template <typename T>
+template<typename T>
 class LinkedListItem {
 public:
 	LinkedListItem(T value) {
@@ -22,7 +22,7 @@ public:
 		_next = next;
 	}
 
-	virtual ~LinkedListItem();
+//	virtual ~LinkedListItem();
 
 	void setNext(LinkedListItem* next) {
 		_next = next;
@@ -30,6 +30,10 @@ public:
 
 	LinkedListItem* getNext() {
 		return _next;
+	}
+
+	T getValue() {
+		return _value;
 	}
 
 private:
