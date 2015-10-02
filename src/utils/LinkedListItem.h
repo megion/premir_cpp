@@ -32,7 +32,7 @@ public:
 		return _next;
 	}
 
-	T getValue() {
+	const T getValue() {
 		return _value;
 	}
 

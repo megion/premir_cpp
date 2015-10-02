@@ -19,11 +19,29 @@ static void test_linked_list_create() {
 	list.push(2);
 	assert(list.size() == 2);
 
-	const utils::LinkedList<int> list2;
+	utils::LinkedList<int> list2;
 	list2.push(3);
 
 	list.concat(list2);
-	assert(list.size() == 3);
+//	assert(list.size() == 3);
+}
+
+struct mstruct {
+	int v1;
+	int v2;
+	mstruct(int _v1, int _v2) {
+		v1 = _v1;
+		v2 = _v2;
+	}
+
+	int getV1() const {
+		return v1;
+	}
+};
+
+void mytest(const mstruct* msPtr) {
+	int v1 = msPtr->getV1();
+	std::cout<<"v1:"<< v1 << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -33,6 +51,10 @@ int main(int argc, char** argv) {
 
 	suite("LinkedList");
 	test(linked_list_create);
+
+	const mstruct ms(5,6);
+
+	mytest(&ms);
 
 //    buf = "Цена моей бутылки вина";
 //    std::cout << buf << std::endl;
