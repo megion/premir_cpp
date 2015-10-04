@@ -11,6 +11,8 @@
 #include "LinkedListItem.h"
 #include "LinkedListIterator.h"
 
+#include <iostream>
+
 namespace utils {
 
 template<typename T>
@@ -22,7 +24,10 @@ public:
 		_last = nullptr;
 	}
 
-//	virtual ~LinkedList();
+	// copy constructor
+	LinkedList(const LinkedList<T>& list) : _size(0), _first(0), _last(0) {
+		concat(list);
+	}
 
 	int size() {
 		return _size;
@@ -43,20 +48,16 @@ public:
 	LinkedListItem<T>* insertAfter(T value, LinkedListItem<T>* after);
 	LinkedListItem<T>* insertBefore(T value, LinkedListItem<T>* before);
 
-	void concat(LinkedList<T>& list);
+	void concat(const LinkedList<T>& list);
 	void reverse(const LinkedList<T>& list);
 
 	void remove(LinkedListItem<T>* item);
 	void removeAll();
 
 	// TODO: iterator methods
-	LinkedListIterator<T>* iterator();
-//	LinkedListIterator<T>* iterator(LinkedListItem<T>* start);
+	LinkedListIterator<T> iterator() const;
 
 private:
-	// disable initialize constructor
-//	LinkedList(const LinkedList<T>&);
-
 	// disable = operator
 	LinkedList& operator=(const LinkedList&);
 
@@ -172,24 +173,18 @@ inline LinkedListItem<T>* LinkedList<T>::insertBefore(T value,
 }
 
 template<typename T>
-LinkedListIterator<T>* LinkedList<T>::iterator() {
-	return new LinkedListIterator<T>(_first);
+LinkedListIterator<T> LinkedList<T>::iterator() const {
+	return LinkedListIterator<T>(_first);
 }
 
 template<typename T>
-inline void LinkedList<T>::concat(LinkedList<T>& list) {
-	LinkedListIterator<T>* iter = list.iterator();
-	while (iter->hasNext()) {
-		T value = iter->next();
-		push(value);
+inline void LinkedList<T>::concat(const LinkedList<T>& list) {
+	LinkedListItem<T>* pi = list._first;
+	while(pi) {
+		push(pi->getValue());
+		pi = pi->getNext();
 	}
-	delete iter;
 }
-
-//template<typename T>
-//inline LinkedListIterator<T>* LinkedList<T>::iterator(LinkedListItem<T>* start) {
-//	return new LinkedListIterator<T>(start);
-//}
 
 }
 

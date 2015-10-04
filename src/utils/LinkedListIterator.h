@@ -15,30 +15,22 @@ namespace utils {
 template<typename T>
 class LinkedListIterator {
 public:
-	LinkedListIterator(LinkedListItem<T>* current) {
-		_current = current;
+	LinkedListIterator(LinkedListItem<T>* next) {
+		nextItem = next;
 	}
-//	virtual ~LinkedListIterator();
 
 	bool hasNext() {
-		if (_current) {
-			if (_current->getNext()) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return false;
+		return nextItem?true:false;
 	}
 
-	T next() {
-		LinkedListItem<T>* next = _current->getNext();
-		_current = next;
-		return _current->getValue();
+	LinkedListItem<T>* next() {
+		LinkedListItem<T>* n = nextItem;
+		nextItem = nextItem->getNext();
+		return n;
 	}
 
 private:
-	LinkedListItem<T>* _current;
+	LinkedListItem<T>* nextItem;
 };
 
 }

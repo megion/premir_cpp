@@ -22,8 +22,6 @@ public:
 		_next = next;
 	}
 
-//	virtual ~LinkedListItem();
-
 	void setNext(LinkedListItem* next) {
 		_next = next;
 	}
@@ -41,8 +39,6 @@ private:
 	LinkedListItem* _next;
 };
 
-//inline LinkedListItem::~LinkedListItem() {
-//}
 
 } /* namespace utils */
 
