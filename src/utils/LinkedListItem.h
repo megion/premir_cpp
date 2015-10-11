@@ -13,11 +13,11 @@ namespace utils {
 template<typename T>
 class LinkedListItem {
 public:
-	LinkedListItem(T value) {
+	LinkedListItem(const T& value) {
 		_value = value;
 		_next = nullptr;
 	}
-	LinkedListItem(T value, LinkedListItem* next) {
+	LinkedListItem(const T& value, LinkedListItem* next) {
 		_value = value;
 		_next = next;
 	}

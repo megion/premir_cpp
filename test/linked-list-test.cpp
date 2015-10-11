@@ -25,7 +25,7 @@ void test_linked_list_iterator() {
 	list.push(30);
 	int i = 0;
 	// using while cycle
-	utils::LinkedListIterator<int> iter = list.iterator();
+	utils::LinkedList<int>::Iterator iter = list.iterator();
 	while(iter.hasNext()) {
 		i++;
 		utils::LinkedListItem<int>* item = iter.next();
@@ -34,7 +34,7 @@ void test_linked_list_iterator() {
 	assert(i == 3);
 
 	// using for cycle
-	utils::LinkedListIterator<int> iter2 = list.iterator();
+	utils::LinkedList<int>::Iterator iter2 = list.iterator();
 	i = 0;
 	for (;iter2.hasNext();) {
 		i++;
@@ -44,10 +44,29 @@ void test_linked_list_iterator() {
 	assert(i == 3);
 }
 
+void test_vector() {
+	std::vector<int> list1;
+	list1.push_back(10);
+	list1.push_back(20);
+
+	assert(list1.size() == 2);
+
+	int i = 0;
+	for(std::vector<int>::iterator iter = list1.begin(); iter!=list1.end(); ++iter) {
+
+		i++;
+	}
+
+	assert(i == 2);
+}
+
 void linked_list() {
 	suite("LinkedList");
 	test(linked_list_create);
 	test(linked_list_iterator);
+
+	suite("Vector");
+	test(vector);
 }
 
 

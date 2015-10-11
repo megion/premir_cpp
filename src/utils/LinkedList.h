@@ -9,7 +9,6 @@
 #define SRC_UTILS_LINKED_LIST_H_
 
 #include "LinkedListItem.h"
-#include "LinkedListIterator.h"
 
 #include <iostream>
 
@@ -25,7 +24,8 @@ public:
 	}
 
 	// copy constructor
-	LinkedList(const LinkedList<T>& list) : _size(0), _first(0), _last(0) {
+	LinkedList(const LinkedList<T>& list) :
+			_size(0), _first(0), _last(0) {
 		concat(list);
 	}
 
@@ -33,20 +33,20 @@ public:
 		return _size;
 	}
 
-	LinkedListItem<T>* push(T value); // insert to end
+	LinkedListItem<T>* push(const T& value); // insert to end
 	/**
 	 * Remove first item and return new first
 	 */
 	LinkedListItem<T>* shift(); // delete first
 
-	LinkedListItem<T>* unshift(T value); // insert to begin
+	LinkedListItem<T>* unshift(const T& value); // insert to begin
 	/**
 	 * Remove last item and return new last
 	 */
 	LinkedListItem<T>* pop(); // delete last
 
-	LinkedListItem<T>* insertAfter(T value, LinkedListItem<T>* after);
-	LinkedListItem<T>* insertBefore(T value, LinkedListItem<T>* before);
+	LinkedListItem<T>* insertAfter(const T& value, LinkedListItem<T>* after);
+	LinkedListItem<T>* insertBefore(const T& value, LinkedListItem<T>* before);
 
 	void concat(const LinkedList<T>& list);
 	void reverse(const LinkedList<T>& list);
@@ -54,8 +54,30 @@ public:
 	void remove(LinkedListItem<T>* item);
 	void removeAll();
 
+	class Iterator {
+	public:
+		Iterator(LinkedListItem<T>* _next) {
+			nextItem = _next;
+		}
+
+		bool hasNext() {
+			return nextItem ? true : false;
+		}
+
+		LinkedListItem<T>* next() {
+			LinkedListItem<T>* n = nextItem;
+			nextItem = nextItem->getNext();
+			return n;
+		}
+
+	private:
+		LinkedListItem<T>* nextItem;
+	};
+
 	// TODO: iterator methods
-	LinkedListIterator<T> iterator() const;
+	Iterator iterator() const {
+		return LinkedList<T>::Iterator(_first);
+	}
 
 private:
 	// disable = operator
@@ -81,7 +103,7 @@ private:
 };
 
 template<typename T>
-inline LinkedListItem<T>* LinkedList<T>::push(T value) {
+inline LinkedListItem<T>* LinkedList<T>::push(const T& value) {
 	LinkedListItem<T>* item = new LinkedListItem<T>(value);
 	if (_first) {
 		_last->setNext(item);
@@ -94,7 +116,7 @@ inline LinkedListItem<T>* LinkedList<T>::push(T value) {
 }
 
 template<typename T>
-inline LinkedListItem<T>* LinkedList<T>::unshift(T value) {
+inline LinkedListItem<T>* LinkedList<T>::unshift(const T& value) {
 	LinkedListItem<T>* item = new LinkedListItem<T>(value);
 	if (_first) {
 		item->setNext(_first);
@@ -146,7 +168,7 @@ inline LinkedListItem<T>* LinkedList<T>::pop() {
 }
 
 template<typename T>
-inline LinkedListItem<T>* LinkedList<T>::insertAfter(T value,
+inline LinkedListItem<T>* LinkedList<T>::insertAfter(const T& value,
 		LinkedListItem<T>* after) {
 	LinkedListItem<T>* item = new LinkedListItem<T>(value, after->getNext());
 	after->setNext(item);
@@ -158,7 +180,7 @@ inline LinkedListItem<T>* LinkedList<T>::insertAfter(T value,
 }
 
 template<typename T>
-inline LinkedListItem<T>* LinkedList<T>::insertBefore(T value,
+inline LinkedListItem<T>* LinkedList<T>::insertBefore(const T& value,
 		LinkedListItem<T>* before) {
 	LinkedListItem<T>* item = new LinkedListItem<T>(value, before);
 	if (_first == before) {
@@ -173,14 +195,9 @@ inline LinkedListItem<T>* LinkedList<T>::insertBefore(T value,
 }
 
 template<typename T>
-LinkedListIterator<T> LinkedList<T>::iterator() const {
-	return LinkedListIterator<T>(_first);
-}
-
-template<typename T>
 inline void LinkedList<T>::concat(const LinkedList<T>& list) {
 	LinkedListItem<T>* pi = list._first;
-	while(pi) {
+	while (pi) {
 		push(pi->getValue());
 		pi = pi->getNext();
 	}
