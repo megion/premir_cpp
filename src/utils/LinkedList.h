@@ -64,10 +64,10 @@ public:
 			return nextItem ? true : false;
 		}
 
-		LinkedListItem<T>* next() {
+		T& next() {
 			LinkedListItem<T>* n = nextItem;
 			nextItem = nextItem->getNext();
-			return n;
+			return n->getValue();
 		}
 
 	private:

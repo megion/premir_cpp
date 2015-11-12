@@ -9,3 +9,17 @@
 //void test_linked_list_iterator();
 
 void linked_list();
+
+struct Foo
+{
+    char ch;
+    char ch1;
+    short id;
+    int value;
+};
+
+class FooC
+{
+    bool bb;
+};
+

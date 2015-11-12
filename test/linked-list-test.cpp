@@ -1,4 +1,5 @@
 #include "linked-list-test.h"
+//#include <algorithm>
 
 void test_linked_list_create() {
 	utils::LinkedList<int> list;
@@ -28,7 +29,7 @@ void test_linked_list_iterator() {
 	utils::LinkedList<int>::Iterator iter = list.iterator();
 	while(iter.hasNext()) {
 		i++;
-		utils::LinkedListItem<int>* item = iter.next();
+		int item = iter.next();
 //		std::cout<<"item" << i << ": " << item->getValue() << std::endl;
 	}
 	assert(i == 3);
@@ -38,7 +39,7 @@ void test_linked_list_iterator() {
 	i = 0;
 	for (;iter2.hasNext();) {
 		i++;
-		utils::LinkedListItem<int>* item = iter2.next();
+		int item = iter2.next();
 //		std::cout<<"item2" << i << ": " << item->getValue() << std::endl;
 	}
 	assert(i == 3);
@@ -58,6 +59,13 @@ void test_vector() {
 	}
 
 	assert(i == 2);
+
+	std::cout<<"size char = " << sizeof(char) << std::endl;
+	std::cout<<"size int = " << sizeof(int) << std::endl;
+	std::cout<<"size Foo = " << sizeof(Foo) << std::endl;
+	std::cout<<"size FooC = " << sizeof(FooC) << std::endl;
+
+
 }
 
 void linked_list() {

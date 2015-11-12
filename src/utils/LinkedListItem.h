@@ -30,7 +30,7 @@ public:
 		return _next;
 	}
 
-	const T getValue() {
+	T& getValue() {
 		return _value;
 	}
 
