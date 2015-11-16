@@ -29,7 +29,7 @@ void test_linked_list_iterator() {
 	utils::LinkedList<int>::Iterator iter = list.iterator();
 	while(iter.hasNext()) {
 		i++;
-		int item = iter.next();
+		int item = iter.nextValue();
 //		std::cout<<"item" << i << ": " << item->getValue() << std::endl;
 	}
 	assert(i == 3);
@@ -39,7 +39,7 @@ void test_linked_list_iterator() {
 	i = 0;
 	for (;iter2.hasNext();) {
 		i++;
-		int item = iter2.next();
+		int item = iter2.nextValue();
 //		std::cout<<"item2" << i << ": " << item->getValue() << std::endl;
 	}
 	assert(i == 3);

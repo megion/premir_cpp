@@ -29,26 +29,129 @@ public:
 		concat(list);
 	}
 
-	int size() {
+	~LinkedList() {
+		std::cout << "Call destructor. Release linked items:" << std::endl;
+		// Release only links (linked items),
+		// but no released elements
+		LinkedListItem<T>* pi = _first;
+		while (pi) {
+			LinkedListItem<T>* prev = pi;
+			pi = pi->getNext();
+			std::cout << "Release linked item: " << prev << std::endl;
+			delete prev;
+		}
+	}
+
+	int size() const {
 		return _size;
 	}
 
-	LinkedListItem<T>* push(const T& value); // insert to end
+	/**
+	 * Insert to end
+	 */
+	LinkedListItem<T>* push(const T& value) {
+		LinkedListItem<T>* item = new LinkedListItem<T>(value);
+		if (_first) {
+			_last->setNext(item);
+			_last = item;
+		} else {
+			_first = _last = item;
+		}
+		_size++;
+		std::cout << "Push new item: " << item << std::endl;
+		return item;
+	}
+
 	/**
 	 * Remove first item and return new first
 	 */
-	LinkedListItem<T>* shift(); // delete first
+	LinkedListItem<T>* shift() {
+		// delete first item
+		if (_first) {
+			LinkedListItem<T>* next = _first->getNext();
+			delete _first;
+			_size--;
+			if (next) {
+				_first = next;
+			} else {
+				_first = _last = nullptr;
+			}
+			return _first;
+		} else {
+			// no items
+			return nullptr;
+		}
+	}
 
-	LinkedListItem<T>* unshift(const T& value); // insert to begin
+	/**
+	 * Insert to begin.
+	 */
+	LinkedListItem<T>* unshift(const T& value) {
+		LinkedListItem<T>* item = new LinkedListItem<T>(value);
+		if (_first) {
+			item->setNext(_first);
+			_first = item;
+		} else {
+			_first = _last = item;
+		}
+		_size++;
+		return item;
+	}
+
 	/**
 	 * Remove last item and return new last
 	 */
-	LinkedListItem<T>* pop(); // delete last
+	LinkedListItem<T>* pop() {
+		// delete last item
+		if (_last) {
+			LinkedListItem<T>* prev = findPrev(_last);
+			delete _last;
+			_size--;
+			if (prev) {
+				prev->setNext(nullptr);
+				_last = prev;
+			} else {
+				_last = _first = nullptr;
+			}
 
-	LinkedListItem<T>* insertAfter(const T& value, LinkedListItem<T>* after);
-	LinkedListItem<T>* insertBefore(const T& value, LinkedListItem<T>* before);
+			return _last;
+		} else {
+			return nullptr;
+		}
+	}
 
-	void concat(const LinkedList<T>& list);
+	LinkedListItem<T>* insertAfter(const T& value, LinkedListItem<T>* after) {
+		LinkedListItem<T>* item = new LinkedListItem<T>(value,
+				after->getNext());
+		after->setNext(item);
+		if (_last == after) {
+			_last = item;
+		}
+		_size++;
+		return item;
+	}
+
+	LinkedListItem<T>* insertBefore(const T& value, LinkedListItem<T>* before) {
+		LinkedListItem<T>* item = new LinkedListItem<T>(value, before);
+		if (_first == before) {
+			_first = item;
+		} else {
+			LinkedListItem<T>* prev = findPrev(before);
+			// should not be null
+			prev->setNext(item);
+		}
+		_size++;
+		return item;
+	}
+
+	void concat(const LinkedList<T>& list) {
+		LinkedListItem<T>* pi = list._first;
+		while (pi) {
+			push(pi->getValue());
+			pi = pi->getNext();
+		}
+	}
+
 	void reverse(const LinkedList<T>& list);
 
 	void remove(LinkedListItem<T>* item);
@@ -64,10 +167,14 @@ public:
 			return nextItem ? true : false;
 		}
 
-		T& next() {
+		LinkedListItem<T>* next() {
 			LinkedListItem<T>* n = nextItem;
 			nextItem = nextItem->getNext();
-			return n->getValue();
+			return n;
+		}
+
+		T& nextValue() {
+			return next()->getValue();
 		}
 
 	private:
