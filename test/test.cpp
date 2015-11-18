@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <LinkedListTest.h>
 #include "test.h"
 #include "utils/String.h"
-#include "linked-list-test.h"
 //#include "utils/LinkedList.h"
 //#include "utils/LinkedListIterator.h"
 
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 //	test(linked_list_create);
 //	test(linked_list_iterator);
 
-	linked_list();
+	linked_list_test();
 
 	return 0;
 
