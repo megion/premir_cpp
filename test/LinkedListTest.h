@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <list>
 #include <assert.h>
 
 #include "test.h"
@@ -13,8 +14,10 @@ struct Foo {
 	short id;
 	int value;
 
-	Foo() :
+	Foo(const Foo& f) :
 			ch(0), ch1(0), id(0), value(0) {
+
+		std::cout << "Foo: Run copy constructor" << std::endl;
 	}
 
 	Foo(char _ch, char _ch1, short _id, int _value) :

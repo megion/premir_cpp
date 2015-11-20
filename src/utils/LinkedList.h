@@ -20,10 +20,10 @@ class LinkedList {
 public:
 
 	LinkedList() :
-		_size(0), _first(nullptr), _last(nullptr) {
+			_size(0), _first(nullptr), _last(nullptr) {
 	}
 
-	// copy constructor
+	// copy constructor: LinkedList l1; LinkedList l2 = l1;
 	LinkedList(const LinkedList<T>& list) :
 			_size(0), _first(nullptr), _last(nullptr) {
 		concat(list);
@@ -38,12 +38,18 @@ public:
 	//////////////////////////////// Entry
 	class Entry {
 	public:
-		Entry(T* const value) :
-		_value(value), _next(nullptr) {
-			std::cout << "new entry: " << _value << std::endl;
+		Entry(const T& value) :
+				_value(value), _next(nullptr) {
+			//  TODO: _value(value) run copy constructor here. It need for store
+			// local values, for example in cycle:
+			// for (int i = 0; i < 100; ++i) {
+			//     Foo v = Foo('1', '2', i, i * 2);
+			//     list.push(v);
+			// }
+//			std::cout << "new entry address: " << &_value << std::endl;
 		}
-		Entry(T* const value, Entry* next) :
-			_value(&value), _next(next) {
+		Entry(const T& value, Entry* next) :
+				_value(value), _next(next) {
 		}
 
 		void setNext(Entry* next) {
@@ -54,13 +60,12 @@ public:
 			return _next;
 		}
 
-		T* getValue() const {
-			std::cout << "get entry val: " << _value << std::endl;
+		T& getValue() const {
 			return _value;
 		}
 
 	private:
-		T* const _value;
+		mutable T _value; // TODO: use mutable for delete const from getValue
 		Entry* _next;
 	};
 	/////////////////////////////////
@@ -90,7 +95,7 @@ public:
 	/**
 	 * Insert to end
 	 */
-	Entry* push(T* value);
+	Entry* push(const T& value);
 
 	/**
 	 * Remove first item and return new first
@@ -126,7 +131,7 @@ public:
 		return Iterator(_first);
 	}
 
-	// = operator
+	// = operator LinkedList l3; l3 = l2;
 	LinkedList<T>& operator=(const LinkedList<T>&);
 
 private:
@@ -154,6 +159,11 @@ private:
 
 template<typename T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& list) {
+	if (this == &list) {
+		//protect self assignment
+		return *this;
+	}
+
 	removeAll();
 	concat(list);
 	return *this;
@@ -180,7 +190,7 @@ LinkedList<T>::~LinkedList() {
 }
 
 template<typename T>
-typename LinkedList<T>::Entry* LinkedList<T>::push(T* value) {
+typename LinkedList<T>::Entry* LinkedList<T>::push(const T& value) {
 	Entry* item = new Entry(value);
 	if (_first) {
 		_last->setNext(item);
