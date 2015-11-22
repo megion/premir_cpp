@@ -1,22 +1,106 @@
 #include <LinkedListTest.h>
 
-void test_linked_list_create() {
-	utils::LinkedList<int> list;
-	int a = 1;
-	list.push(a);
-	list.push(a);
+void test_push_shift_pop_unshift() {
+	utils::LinkedList<Foo> list;
+	list.push(Foo('1', 2));
+	list.push(Foo('3', 4));
 	assert(list.size() == 2);
-
-	utils::LinkedList<int> list2;
-	list2.push(a);
-	assert(list2.size() == 1);
-
-	list.concat(list2);
-//	std::cout<<"size:"<< list.size() << std::endl;
+	list.unshift(Foo('5', 6));
 	assert(list.size() == 3);
 
-	utils::LinkedList<int> list3(list);
-	assert(list3.size() == 3);
+	// iterate by list3
+	utils::LinkedList<Foo>::Iterator iter = list.iterator();
+	int i = 0;
+	while (iter.hasNext()) {
+		utils::LinkedList<Foo>::Entry* e = iter.next();
+		Foo& fv = e->getValue();
+		if (i == 0) {
+			assert(fv.ch == '5');
+		} else if (i == 1) {
+			assert(fv.ch == '1');
+		} else if (i == 2) {
+			assert(fv.ch == '3');
+		}
+		i++;
+	}
+	assert(i == 3);
+
+	// test shift
+	utils::LinkedList<Foo>::Entry* newFirst = list.shift();
+	assert(newFirst->getValue().ch == '1');
+	assert(list.size() == 2);
+
+	iter = list.iterator();
+	i = 0;
+	while (iter.hasNext()) {
+		utils::LinkedList<Foo>::Entry* e = iter.next();
+		Foo& fv = e->getValue();
+		if (i == 0) {
+			assert(fv.ch == '1');
+		} else if (i == 1) {
+			assert(fv.ch == '3');
+		}
+		i++;
+	}
+	assert(i == 2);
+
+	// test pop
+	newFirst = list.pop();
+	assert(newFirst->getValue().ch == '1');
+	assert(list.size() == 1);
+
+	newFirst = list.pop();
+	assert(list.size() == 0);
+	assert(newFirst == nullptr);
+
+	// try shift empty list
+	newFirst = list.shift();
+	assert(list.size() == 0);
+	assert(newFirst == nullptr);
+}
+
+void test_concat_and_copy() {
+	utils::LinkedList<Foo> list;
+	list.push(Foo('1', 2));
+	list.push(Foo('3', 4));
+
+	utils::LinkedList<Foo> list2;
+	list2.push(Foo('5', 6));
+	list2.push(Foo('7', 8));
+
+	list.concat(list2);
+	assert(list.size() == 4);
+
+	// test copy construct
+	utils::LinkedList<Foo> list3(list);
+	assert(list3.size() == 4);
+
+	// test assign operator
+	utils::LinkedList<Foo> list4;
+	list4.push(Foo('9', 10));
+	assert(list4.size() == 1);
+
+	list4 = list3;
+	assert(list4.size() == 4);
+
+	// test list4 values
+	int i = 0;
+	utils::LinkedList<Foo>::Iterator iter = list4.iterator();
+	while (iter.hasNext()) {
+		utils::LinkedList<Foo>::Entry* e = iter.next();
+		Foo& fv = e->getValue();
+		if (i == 0) {
+			assert(fv.ch == '1');
+		} else if (i == 1) {
+			assert(fv.ch == '3');
+		} else if (i == 2) {
+			assert(fv.ch == '5');
+		} else if (i == 3) {
+			assert(fv.ch == '7');
+		}
+		i++;
+	}
+	assert(i == 4);
 }
 
 void test_linked_list_iterator() {
@@ -53,52 +137,16 @@ void test_linked_list_iterator() {
 	assert(list3.size() == 3);
 }
 
-void test_push_values() {
-	utils::LinkedList<Foo> list;
-
-	Foo f1 = Foo('1', '2', 12, 4);
-	Foo* fp1 = &f1;
-	std::cout << "fp1: " << fp1 << std::endl;
-	list.push(f1);
-	Foo f2 = Foo('5', '6', 7, 8);
-	Foo* fp2 = &f2;
-	std::cout << "fp2: " << fp2 << std::endl;
-	list.push(f2);
-
-	Foo& v = f1;
-	for (int i = 0; i < 100; ++i) {
-		v = Foo('1', '2', i, i * 2);
-//		std::cout << "&v: " << &v << std::endl;
-		list.push(v);
-	}
-
-	utils::LinkedList<Foo>::Iterator iter = list.iterator();
-	int i = 0;
-	while (iter.hasNext()) {
-		utils::LinkedList<Foo>::Entry* e = iter.next();
-		Foo& fv = e->getValue();
-		std::cout << "fv id " << &fv << i << ": " << fv.id << std::endl;
-//		std::cout << "fp new" << i << ": " << fv << std::endl;
-//		if (i == 0) {
-//			assert(fv == (fp1));
-//		} else if (i == 1) {
-//			assert(fv == (fp2));
-//		}
-		i++;
-
-	}
-}
-
 void test_vector() {
 	std::vector<int> list1;
 	list1.push_back(10);
 	list1.push_back(20);
 
 	std::vector<Foo*> list2;
-	Foo v0 = Foo('1', '2', -1, -2);
+	Foo v0 = Foo('1', -1);
 	list2.push_back(&v0);
 	for (int i = 0; i < 100; ++i) {
-		Foo v = Foo('1', '2', i, i * 2);
+		Foo v = Foo('1', i);
 		std::cout << "&v2: " << &v << std::endl;
 		list2.push_back(&v);
 	}
@@ -107,7 +155,7 @@ void test_vector() {
 
 //	int i = 0;
 	v0.id = -10;
-	v0.value = -20;
+
 	for (std::vector<Foo*>::iterator iter = list2.begin(); iter != list2.end();
 			++iter) {
 		std::cout << "(*iter).id: " << (*iter)->id << std::endl;
@@ -125,16 +173,15 @@ void test_vector() {
 
 void test_list() {
 	std::list<Foo> list2;
-	Foo v0 = Foo('1', '2', -1, -2);
+	Foo v0 = Foo('1', -1);
 	list2.push_back(v0);
 	for (int i = 0; i < 100; ++i) {
-		Foo v = Foo('1', '2', i, i * 2);
+		Foo v = Foo('1', i);
 		std::cout << "&v2: " << &v << std::endl;
 		list2.push_back(v);
 	}
 
 	v0.id = -10;
-	v0.value = -20;
 	for (std::list<Foo>::iterator iter = list2.begin(); iter != list2.end();
 			++iter) {
 		std::cout << "(*iter).id: " << (*iter).id << std::endl;
@@ -144,9 +191,9 @@ void test_list() {
 
 void linked_list_test() {
 	suite("LinkedList");
-	test(linked_list_create);
+	test(push_shift_pop_unshift);
+	test(concat_and_copy);
 	test(linked_list_iterator);
-	test(push_values);
 
 //	suite("Vector");
 //	test(vector);

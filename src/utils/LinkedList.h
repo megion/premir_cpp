@@ -60,12 +60,12 @@ public:
 			return _next;
 		}
 
-		T& getValue() const {
+		T& getValue() {
 			return _value;
 		}
 
 	private:
-		mutable T _value; // TODO: use mutable for delete const from getValue
+		T _value; // TODO: variable is copy
 		Entry* _next;
 	};
 	/////////////////////////////////
@@ -105,16 +105,16 @@ public:
 	/**
 	 * Insert to begin.
 	 */
-	Entry* unshift(T* value);
+	Entry* unshift(const T& value);
 
 	/**
 	 * Remove last item and return new last
 	 */
 	Entry* pop();
 
-	Entry* insertAfter(T* value, Entry* after);
+	Entry* insertAfter(const T& value, Entry* after);
 
-	Entry* insertBefore(T* value, Entry* before);
+	Entry* insertBefore(const T& value, Entry* before);
 
 	void concat(const LinkedList<T>& list);
 
@@ -124,8 +124,21 @@ public:
 	 */
 	void swap(Entry* a, Entry* b);
 
+	/**
+	 * Remove specified entry
+	 */
 	void remove(Entry* item);
+
+	/**
+	 * Remove all elements
+	 */
 	void removeAll();
+
+	/**
+	 * Remove all elements from list and destroy each.
+	 * Method must be call only if each element was created as dynamic (new ...)
+	 */
+	void removeAndDestroyAll();
 
 	Iterator iterator() const {
 		return Iterator(_first);
@@ -133,6 +146,9 @@ public:
 
 	// = operator LinkedList l3; l3 = l2;
 	LinkedList<T>& operator=(const LinkedList<T>&);
+
+	// [] index operator
+	Entry operator[](const int&);
 
 private:
 	/**
@@ -185,6 +201,22 @@ void LinkedList<T>::removeAll() {
 }
 
 template<typename T>
+void LinkedList<T>::removeAndDestroyAll() {
+	// Release only links (linked items),
+	// but no released elements
+	Entry* pi = _first;
+	while (pi) {
+		Entry* prev = pi;
+		pi = pi->getNext();
+		delete prev->getValue(); // destroy element
+		delete prev;
+	}
+	_first = nullptr;
+	_last = nullptr;
+	_size = 0;
+}
+
+template<typename T>
 LinkedList<T>::~LinkedList() {
 	removeAll();
 }
@@ -222,7 +254,7 @@ typename LinkedList<T>::Entry* LinkedList<T>::shift() {
 }
 
 template<typename T>
-typename LinkedList<T>::Entry* LinkedList<T>::unshift(T* value) {
+typename LinkedList<T>::Entry* LinkedList<T>::unshift(const T& value) {
 	Entry* item = new Entry(value);
 	if (_first) {
 		item->setNext(_first);
@@ -255,7 +287,7 @@ typename LinkedList<T>::Entry* LinkedList<T>::pop() {
 }
 
 template<typename T>
-typename LinkedList<T>::Entry* LinkedList<T>::insertAfter(T* value,
+typename LinkedList<T>::Entry* LinkedList<T>::insertAfter(const T& value,
 		Entry* after) {
 	Entry* item = new Entry(value, after->getNext());
 	after->setNext(item);
@@ -267,7 +299,7 @@ typename LinkedList<T>::Entry* LinkedList<T>::insertAfter(T* value,
 }
 
 template<typename T>
-typename LinkedList<T>::Entry* LinkedList<T>::insertBefore(T* value,
+typename LinkedList<T>::Entry* LinkedList<T>::insertBefore(const T& value,
 		Entry* before) {
 	Entry* item = new Entry(value, before);
 	if (_first == before) {
