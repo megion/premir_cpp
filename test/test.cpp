@@ -28,7 +28,10 @@ int main(int argc, char** argv) {
 	linked_list_test();
 
 //	xcbtest();
-	xcbtest2();
+//	xcbtest2();
+
+	suite("Chart");
+	test(chart);
 
 	return 0;
 

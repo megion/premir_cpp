@@ -7,6 +7,8 @@
 
 #include <X11/Xlib.h>
 
+#include "graphics/Chart.h"
+
 int xcbtest(void) {
 	xcb_connection_t *c;
 	xcb_screen_t *s;
@@ -16,7 +18,7 @@ int xcbtest(void) {
 	uint32_t mask;
 	uint32_t values[2];
 	int done = 0;
-	xcb_rectangle_t r = { 20, 20, 60, 60 };
+	xcb_rectangle_t r = { 20, 20, 160, 160 };
 
 	/* открыть соединение с сервером */
 	c = xcb_connect(NULL, NULL);
@@ -40,7 +42,7 @@ int xcbtest(void) {
 	mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 	values[0] = s->white_pixel;
 	values[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS;
-	xcb_create_window(c, s->root_depth, w, s->root, 10, 10, 100, 100, 1,
+	xcb_create_window(c, s->root_depth, w, s->root, 10, 10, 200, 200, 1,
 			XCB_WINDOW_CLASS_INPUT_OUTPUT, s->root_visual, mask, values);
 
 	/* отобразить окно */
@@ -168,4 +170,8 @@ int xcbtest2() {
 	XCloseDisplay(disp);
 
 	return 0;
+}
+
+void test_chart() {
+	graphics::Chart chart;
 }
