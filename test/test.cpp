@@ -4,6 +4,7 @@
 #include <LinkedListTest.h>
 #include "test.h"
 #include "utils/String.h"
+#include "myxcb.h"
 //#include "utils/LinkedList.h"
 //#include "utils/LinkedListIterator.h"
 
@@ -25,6 +26,9 @@ int main(int argc, char** argv) {
 //	test(linked_list_iterator);
 
 	linked_list_test();
+
+//	xcbtest();
+	xcbtest2();
 
 	return 0;
 
