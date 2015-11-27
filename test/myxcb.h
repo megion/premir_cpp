@@ -174,4 +174,5 @@ int xcbtest2() {
 
 void test_chart() {
 	graphics::Chart chart;
+	chart.runChart();
 }
