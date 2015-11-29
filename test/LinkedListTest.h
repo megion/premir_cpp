@@ -12,13 +12,19 @@ struct Foo {
 	char ch;
 	int id;
 
-//	Foo(const Foo& f) :
-//			ch(0), id(0) {
-//		std::cout << "Foo: Run copy constructor" << std::endl;
-//	}
+	Foo(const Foo& f) :
+			ch(f.ch), id(f.id) {
+		std::cout << "Foo: Run copy constructor" << std::endl;
+	}
+
+	Foo(Foo&& f) :
+			ch(f.ch), id(f.id) {
+		std::cout << "Foo: Run replace constructor" << std::endl;
+	}
 
 	Foo(char _ch, int _id) :
 			ch(_ch), id(_id) {
+		std::cout << "Foo: Run init constructor" << std::endl;
 	}
 };
 

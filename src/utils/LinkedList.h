@@ -9,6 +9,8 @@
 #define SRC_UTILS_LINKED_LIST_H_
 
 #include <iostream>
+//#include <utility>
+#include <bits/move.h>
 
 namespace utils {
 
@@ -46,7 +48,11 @@ public:
 			//     Foo v = Foo('1', '2', i, i * 2);
 			//     list.push(v);
 			// }
-//			std::cout << "new entry address: " << &_value << std::endl;
+			std::cout << "copy entry: " << &_value << std::endl;
+		}
+		Entry(T&& value) :
+				_value(std::move(value)), _next(nullptr) {
+			std::cout << "move entry: " << &_value << std::endl;
 		}
 		Entry(const T& value, Entry* next) :
 				_value(value), _next(next) {
@@ -96,6 +102,7 @@ public:
 	 * Insert to end
 	 */
 	Entry* push(const T& value);
+	Entry* push(T&& value);
 
 	/**
 	 * Remove first item and return new first
@@ -224,6 +231,18 @@ LinkedList<T>::~LinkedList() {
 template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::push(const T& value) {
 	Entry* item = new Entry(value);
+	if (_first) {
+		_last->setNext(item);
+		_last = item;
+	} else {
+		_first = _last = item;
+	}
+	_size++;
+	return item;
+}
+template<typename T>
+typename LinkedList<T>::Entry* LinkedList<T>::push(T&& value) {
+	Entry* item = new Entry(std::move(value));
 	if (_first) {
 		_last->setNext(item);
 		_last = item;
