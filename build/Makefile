@@ -10,7 +10,8 @@
 CC := g++
 # -lxcb for xcb lib
 # -lX11 for X11 lib
-CCFLAGS := -std=c++11 -lxcb -lX11
+# -g for include debugging symbols
+CCFLAGS := -std=c++11 -lxcb -lX11 -g
 
 # список каталогов с исходыми кодами
 SRC_DIRS := $(shell find ../src -type d)

@@ -8,9 +8,10 @@
 #ifndef SRC_UTILS_LINKED_LIST_H_
 #define SRC_UTILS_LINKED_LIST_H_
 
+// std::move
+#include <utility>
 #include <iostream>
-//#include <utility>
-#include <bits/move.h>
+
 
 namespace utils {
 
@@ -113,6 +114,7 @@ public:
 	 * Insert to begin.
 	 */
 	Entry* unshift(const T& value);
+	Entry* unshift(T&& value);
 
 	/**
 	 * Remove last item and return new last
@@ -120,8 +122,10 @@ public:
 	Entry* pop();
 
 	Entry* insertAfter(const T& value, Entry* after);
+	Entry* insertAfter(T&& value, Entry* after);
 
 	Entry* insertBefore(const T& value, Entry* before);
+	Entry* insertBefore(T&& value, Entry* before);
 
 	void concat(const LinkedList<T>& list);
 
@@ -171,6 +175,45 @@ private:
 			p = next;
 		}
 		return nullptr;
+	}
+
+	void pushEntry(Entry* item) {
+		if (_first) {
+			_last->setNext(item);
+			_last = item;
+		} else {
+			_first = _last = item;
+		}
+		_size++;
+	}
+
+	void unshiftEntry(Entry* item) {
+		if (_first) {
+			item->setNext(_first);
+			_first = item;
+		} else {
+			_first = _last = item;
+		}
+		_size++;
+	}
+
+	void insertEntryAfter(Entry* item, Entry* after) {
+		after->setNext(item);
+		if (_last == after) {
+			_last = item;
+		}
+		_size++;
+	}
+
+	void insertEntryBefore(Entry* item, Entry* before) {
+		if (_first == before) {
+			_first = item;
+		} else {
+			Entry* prev = findPrevious(before);
+			// should not be null
+			prev->setNext(item);
+		}
+		_size++;
 	}
 
 private:
@@ -231,25 +274,13 @@ LinkedList<T>::~LinkedList() {
 template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::push(const T& value) {
 	Entry* item = new Entry(value);
-	if (_first) {
-		_last->setNext(item);
-		_last = item;
-	} else {
-		_first = _last = item;
-	}
-	_size++;
+	pushEntry(item);
 	return item;
 }
 template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::push(T&& value) {
 	Entry* item = new Entry(std::move(value));
-	if (_first) {
-		_last->setNext(item);
-		_last = item;
-	} else {
-		_first = _last = item;
-	}
-	_size++;
+	pushEntry(item);
 	return item;
 }
 
@@ -275,13 +306,13 @@ typename LinkedList<T>::Entry* LinkedList<T>::shift() {
 template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::unshift(const T& value) {
 	Entry* item = new Entry(value);
-	if (_first) {
-		item->setNext(_first);
-		_first = item;
-	} else {
-		_first = _last = item;
-	}
-	_size++;
+	unshiftEntry(item);
+	return item;
+}
+template<typename T>
+typename LinkedList<T>::Entry* LinkedList<T>::unshift(T&& value) {
+	Entry* item = new Entry(std::move(value));
+	unshiftEntry(item);
 	return item;
 }
 
@@ -309,11 +340,14 @@ template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::insertAfter(const T& value,
 		Entry* after) {
 	Entry* item = new Entry(value, after->getNext());
-	after->setNext(item);
-	if (_last == after) {
-		_last = item;
-	}
-	_size++;
+	insertEntryAfter(item, after);
+	return item;
+}
+template<typename T>
+typename LinkedList<T>::Entry* LinkedList<T>::insertAfter(T&& value,
+		Entry* after) {
+	Entry* item = new Entry(std::move(value), after->getNext());
+	insertEntryAfter(item, after);
 	return item;
 }
 
@@ -321,14 +355,14 @@ template<typename T>
 typename LinkedList<T>::Entry* LinkedList<T>::insertBefore(const T& value,
 		Entry* before) {
 	Entry* item = new Entry(value, before);
-	if (_first == before) {
-		_first = item;
-	} else {
-		Entry* prev = findPrevious(before);
-		// should not be null
-		prev->setNext(item);
-	}
-	_size++;
+	insertEntryBefore(item, before);
+	return item;
+}
+template<typename T>
+typename LinkedList<T>::Entry* LinkedList<T>::insertBefore(T&& value,
+		Entry* before) {
+	Entry* item = new Entry(std::move(value), before);
+	insertEntryBefore(item, before);
 	return item;
 }
 

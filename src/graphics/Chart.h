@@ -4,6 +4,9 @@
 #include <xcb/xcb.h>
 #include <exception>
 #include <stdexcept>
+#include <iostream>
+
+#include "ChartColormap.h"
 
 namespace graphics {
 
@@ -25,6 +28,8 @@ public:
 
 		// get the first screen
 		screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
+
+		colormap = new ChartColormap(connection, screen, window);
 
 		createBackgroundContext();
 		createPointsContext();
@@ -48,6 +53,7 @@ public:
 		std::cout << "call disconnect: " << std::endl;
 		backgroundContext = 0;
 		screen = nullptr;
+		delete colormap;
 		xcb_disconnect(connection);
 	}
 
@@ -70,7 +76,7 @@ private:
 	void createPointsContext() {
 		pointsContext = xcb_generate_id(connection);
 		uint32_t mask = XCB_GC_FOREGROUND;
-		uint32_t values[] = { screen->white_pixel };
+		uint32_t values[] = { colormap->getGreen()->pixel };
 		xcb_create_gc(connection, pointsContext, screen->root, mask, values);
 	}
 
@@ -81,6 +87,8 @@ private:
 	xcb_connection_t* connection;
 	xcb_screen_t* screen;
 	xcb_window_t window;
+
+	ChartColormap* colormap;
 
 	xcb_gcontext_t backgroundContext;
 	xcb_gcontext_t pointsContext;

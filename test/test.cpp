@@ -30,8 +30,8 @@ int main(int argc, char** argv) {
 //	xcbtest();
 //	xcbtest2();
 
-//	suite("Chart");
-//	test(chart);
+	suite("Chart");
+	test(chart);
 
 	return 0;
 
