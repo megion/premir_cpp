@@ -12,7 +12,6 @@
 #include <utility>
 #include <iostream>
 
-
 namespace utils {
 
 /**
@@ -30,6 +29,14 @@ public:
 	LinkedList(const LinkedList<T>& list) :
 			_size(0), _first(nullptr), _last(nullptr) {
 		concat(list);
+	}
+
+	// replace constructor: LinkedList l1; LinkedList l2(std::move(l1));
+	LinkedList(LinkedList<T>&& list) :
+			_size(list._size), _first(list._first), _last(list._last) {
+		list._size = 0;
+		list._first = nullptr;
+		list._first = nullptr;
 	}
 
 	~LinkedList();
@@ -155,8 +162,10 @@ public:
 		return Iterator(_first);
 	}
 
-	// = operator LinkedList l3; l3 = l2;
+	// = assign operator: LinkedList l3; l3 = l2;
 	LinkedList<T>& operator=(const LinkedList<T>&);
+	// = replacement operator: LinkedList l3; l3 = std::move(l2);
+	LinkedList<T>& operator=(LinkedList<T>&&) = delete; //
 
 	// [] index operator
 	Entry operator[](const int&);

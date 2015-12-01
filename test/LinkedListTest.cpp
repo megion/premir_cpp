@@ -127,12 +127,21 @@ void test_vector() {
 	list2.push_back(Foo('2', -2));
 	list2.push_back(Foo('3', -3));
 
+	std::list<Foo> list22(std::move(list2));
+	std::cout << "list2 size1: " << list2.size() << std::endl;
+	std::cout << "list22 size: " << list22.size() << std::endl;
+	list2.push_back(Foo('4', -4));
+	std::cout << "list2 size2: " << list2.size() << std::endl;
+
 	std::cout << "MY: " << std::endl;
 
 	utils::LinkedList<Foo> list3;
 	list3.push(Foo('1', -1));
 	list3.push(Foo('2', -2));
 	list3.push(Foo('3', -3));
+	// delete test
+//	utils::LinkedList<Foo> list33;
+//	list33 = std::move(list3);
 	utils::LinkedList<Foo>::Iterator iter = list3.iterator();
 	while (iter.hasNext()) {
 		utils::LinkedList<Foo>::Entry* e = iter.next();

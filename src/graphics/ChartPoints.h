@@ -1,6 +1,7 @@
 #ifndef SRC_GRAPHICS_CHARTPOINTS_H_
 #define SRC_GRAPHICS_CHARTPOINTS_H_
 
+#include <xcb/xcb.h>
 #include "utils/LinkedList.h"
 
 namespace graphics {
