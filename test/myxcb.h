@@ -175,4 +175,7 @@ int xcbtest2() {
 void test_chart() {
 	graphics::Chart chart;
 	chart.runChart();
+	chart.addPoint(0.0, 0.0);
+	chart.addPoint(4.0, 4.0);
+	chart.addPoint(6.0, 6.0);
 }

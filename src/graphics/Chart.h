@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "ChartColormap.h"
+#include "ChartPoints.h"
 
 namespace graphics {
 
@@ -30,6 +31,7 @@ public:
 		screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
 
 		colormap = new ChartColormap(connection, screen, window);
+		points = new ChartPoints(rectangle);
 
 		createBackgroundContext();
 		createPointsContext();
@@ -54,6 +56,7 @@ public:
 		backgroundContext = 0;
 		screen = nullptr;
 		delete colormap;
+		delete points;
 		xcb_disconnect(connection);
 	}
 
@@ -61,6 +64,7 @@ public:
 	 * Show chart and run chart event loop in other thread
 	 */
 	void runChart();
+	void addPoint(double x, double y);
 
 private:
 
@@ -89,6 +93,7 @@ private:
 	xcb_window_t window;
 
 	ChartColormap* colormap;
+	ChartPoints* points;
 
 	xcb_gcontext_t backgroundContext;
 	xcb_gcontext_t pointsContext;
@@ -144,6 +149,9 @@ void Chart::setWindowTitle(const char* title, const char* iconTitle) {
 			iconTitle);
 }
 
+void Chart::addPoint(double x, double y) {
+	points->addPoint(x,y);
+}
 }
 
 #endif /* SRC_GRAPHICS_CHART_H_ */
