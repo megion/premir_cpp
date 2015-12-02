@@ -2,6 +2,7 @@
 #define SRC_GRAPHICS_CHARTPOINTS_H_
 
 #include <xcb/xcb.h>
+#include <stdio.h>
 #include "utils/LinkedList.h"
 
 namespace graphics {
@@ -14,12 +15,15 @@ class ChartPoints {
 public:
 	ChartPoints(const xcb_rectangle_t& _boundRect) :
 			boundRect(_boundRect), xRatio(1), yRatio(1), inrange(
-					{ 0, 0, 0, 0 }) {
-		outpoints = new utils::LinkedList<Point>();
+					{ 0, 0, 0, 0 }), outpoints(nullptr) {
+		inpoints = new utils::LinkedList<Point>();
 	}
 
 	~ChartPoints() {
-		delete outpoints;
+		delete inpoints;
+		if (outpoints) {
+			free(outpoints);
+		}
 	}
 
 	struct Point {
@@ -37,7 +41,8 @@ public:
 	void addPoint(double x, double y);
 
 private:
-	utils::LinkedList<Point>* outpoints;
+	utils::LinkedList<Point>* inpoints;
+	xcb_point_t* outpoints;
 	xcb_rectangle_t boundRect;
 
 	Range inrange;
@@ -45,9 +50,6 @@ private:
 	// compression ratio
 	double xRatio; // boundRect.width/(inrange.xMax-inrange.xMin)
 	double yRatio;
-
-	bool calculateRange(const double& x, const double& y);
-	void calculateRatio();
 
 };
 

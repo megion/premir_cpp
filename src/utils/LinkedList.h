@@ -56,7 +56,7 @@ public:
 			//     Foo v = Foo('1', '2', i, i * 2);
 			//     list.push(v);
 			// }
-			std::cout << "copy entry: " << &_value << std::endl;
+//			std::cout << "copy entry: " << &_value << std::endl;
 		}
 		Entry(T&& value) :
 				_value(std::move(value)), _next(nullptr) {
