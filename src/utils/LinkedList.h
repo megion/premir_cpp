@@ -41,7 +41,7 @@ public:
 
 	~LinkedList();
 
-	int size() const {
+	size_t size() const {
 		return _size;
 	}
 
@@ -226,7 +226,7 @@ private:
 	}
 
 private:
-	int _size;
+	size_t _size;
 	Entry* _first;
 	Entry* _last;
 

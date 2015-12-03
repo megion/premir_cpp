@@ -40,15 +40,32 @@ void ChartPoints::addPoint(double x, double y) {
 
 	// 4. copy out point array to new array
 	// use memcpy for best performance
-//	int size = inpoints->size();
-//	if (outpoints) {
-//		xcb_point_t* newOutpoints = malloc(size * sizeof(xcb_point_t));
-//		memcpy(outpoints, newOutpoints, size * sizeof(xcb_point_t));
-//		free(outpoints); // remove old
-//		outpoints = newOutpoints;
-//	} else {
-//		outpoints = malloc(sizeof(xcb_point_t));
-//	}
+	size_t amount = inpoints->size() * sizeof(struct xcb_point_t);
+	if (outpoints) {
+		xcb_point_t* newOutpoints = (struct xcb_point_t*) realloc(outpoints,
+				amount);
+		if (newOutpoints == NULL) {
+			throw std::runtime_error(strerror(errno));
+		}
+		outpoints = newOutpoints;
+	} else {
+		outpoints = (struct xcb_point_t*) malloc(amount);
+		if (outpoints == NULL) {
+			throw std::runtime_error(strerror(errno));
+		}
+	}
+
+	// 5. update outpoints array
+	utils::LinkedList<Point>::Iterator iter = inpoints->iterator();
+	size_t  i = 0;
+	while (iter.hasNext()) {
+		utils::LinkedList<Point>::Entry* e = iter.next();
+		Point& inp = e->getValue();
+		std::cout << "outp.x: " << inp.x << std::endl;
+		outpoints[i].x = (int)inp.x;
+		outpoints[i].y = (int)inp.y;
+		++i;
+	}
 
 }
 

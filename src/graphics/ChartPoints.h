@@ -3,6 +3,10 @@
 
 #include <xcb/xcb.h>
 #include <stdio.h>
+#include <string.h>
+#include <exception>
+#include <stdexcept>
+#include <errno.h>
 #include "utils/LinkedList.h"
 
 namespace graphics {
@@ -21,9 +25,7 @@ public:
 
 	~ChartPoints() {
 		delete inpoints;
-		if (outpoints) {
-			free(outpoints);
-		}
+		free(outpoints);
 	}
 
 	struct Point {
