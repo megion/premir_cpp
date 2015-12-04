@@ -31,7 +31,13 @@ public:
 		screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
 
 		colormap = new ChartColormap(connection, screen, window);
-		points = new ChartPoints(rectangle);
+
+		int16_t xr2 = xr + 10;
+		int16_t yr2 = yr + 10;
+		uint16_t wr2 = wr - 20;
+		uint16_t hr2 = hr - 20;
+		xcb_rectangle_t rectanglePoints = { xr2, yr2, wr2, hr2 };
+		points = new ChartPoints(rectanglePoints);
 
 		createBackgroundContext();
 		createPointsContext();
@@ -65,6 +71,7 @@ public:
 	 */
 	void runChart();
 	void addPoint(double x, double y);
+	void printPoints();
 
 private:
 
@@ -84,7 +91,7 @@ private:
 		xcb_create_gc(connection, pointsContext, screen->root, mask, values);
 	}
 
-	void drawPoints(const xcb_point_t *points, uint32_t points_len);
+	void drawPoints();
 
 	void setWindowTitle(const char* title, const char* iconTitle);
 
@@ -108,7 +115,7 @@ void Chart::runChart() {
 	xcb_map_window(connection, window);
 	xcb_flush(connection);
 
-	xcb_point_t points[] = { { 100, 100 }, { 101, 100 }, { 102, 100 } };
+//	xcb_point_t points[] = { { 100, 100 }, { 101, 100 }, { 102, 100 } };
 
 	// TODO: should be run in other thread
 	int done = 0;
@@ -121,7 +128,7 @@ void Chart::runChart() {
 
 			xcb_poly_fill_rectangle(connection, window, backgroundContext, 1,
 					&rectangle);
-			drawPoints(points, 3);
+			drawPoints();
 
 			xcb_flush(connection);
 			break;
@@ -133,9 +140,9 @@ void Chart::runChart() {
 	}
 }
 
-void Chart::drawPoints(const xcb_point_t *points, uint32_t points_len) {
+void Chart::drawPoints() {
 	xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext,
-			points_len, points);
+			points->size(), points->getOutpoints());
 }
 
 void Chart::setWindowTitle(const char* title, const char* iconTitle) {
@@ -150,8 +157,13 @@ void Chart::setWindowTitle(const char* title, const char* iconTitle) {
 }
 
 void Chart::addPoint(double x, double y) {
-	points->addPoint(x,y);
+	points->addPoint(x, y);
 }
+
+void Chart::printPoints() {
+	points->printPoints();
+}
+
 }
 
 #endif /* SRC_GRAPHICS_CHART_H_ */

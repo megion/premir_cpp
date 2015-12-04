@@ -3,6 +3,7 @@
 
 #include <xcb/xcb.h>
 #include <stdio.h>
+#include <cmath>
 #include <string.h>
 #include <exception>
 #include <stdexcept>
@@ -40,7 +41,16 @@ public:
 		double yMin;
 	};
 
+	xcb_point_t* getOutpoints() {
+		return outpoints;
+	}
+
+	size_t size() {
+		return inpoints->size();
+	}
+
 	void addPoint(double x, double y);
+	void printPoints();
 
 private:
 	utils::LinkedList<Point>* inpoints;
@@ -52,6 +62,13 @@ private:
 	// compression ratio
 	double xRatio; // boundRect.width/(inrange.xMax-inrange.xMin)
 	double yRatio;
+
+	/**
+	 * Calculate value by formula (line) out = a*value + b
+	 */
+	int line(double a, double b, double value) {
+		return std::round(a * value + b);
+	}
 
 };
 
