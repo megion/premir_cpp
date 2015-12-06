@@ -1,8 +1,8 @@
-#include "ChartPoints.h"
+#include <ChartData.h>
 
 namespace graphics {
 
-void ChartPoints::addPoint(double x, double y) {
+void ChartData::addPoint(double x, double y) {
 	// 1. add point
 	Point p = { x, y };
 	inpoints->push(p);
@@ -123,7 +123,7 @@ void ChartPoints::addPoint(double x, double y) {
 
 }
 
-void ChartPoints::printPoints() {
+void ChartData::printPoints() {
 	for (size_t i = 0; i < inpoints->size(); ++i) {
 		std::cout << "outp.x: " << outpoints[i].x << " outp.y: "
 				<< outpoints[i].y << std::endl;

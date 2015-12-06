@@ -5,9 +5,10 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <thread>
 
 #include "ChartColormap.h"
-#include "ChartPoints.h"
+#include "ChartData.h"
 
 namespace graphics {
 
@@ -37,10 +38,9 @@ public:
 		uint16_t wr2 = wr - 20;
 		uint16_t hr2 = hr - 20;
 		xcb_rectangle_t rectanglePoints = { xr2, yr2, wr2, hr2 };
-		points = new ChartPoints(rectanglePoints);
+		data = new ChartData(rectanglePoints);
 
-		createBackgroundContext();
-		createPointsContext();
+		createContexts();
 
 		// create window
 		window = xcb_generate_id(connection);
@@ -62,37 +62,60 @@ public:
 		backgroundContext = 0;
 		screen = nullptr;
 		delete colormap;
-		delete points;
+		delete data;
 		xcb_disconnect(connection);
+	}
+
+	ChartData* getData() {
+		return data;
 	}
 
 	/**
 	 * Show chart and run chart event loop in other thread
 	 */
-	void runChart();
-	void addPoint(double x, double y);
-	void printPoints();
+	void runChart() const;
+	void draw() const;
+
+	/**
+	 * 1. draw clean current points
+	 * 2. add new points and update all points position
+	 * 3. draw updated current points
+	 */
+	void redrawNewPoints(double x, double y) const;
+
+	void flush() const {
+		xcb_flush(connection);
+	}
+
+	void drawPoints() const {
+		if (data->getOutpoints()) {
+			xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
+					pointsContext, data->size(), data->getOutpoints());
+		}
+	}
+
+	void drawCleanPoints() const {
+		if (data->getOutpoints()) {
+			xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
+					cleanPointsContext, data->size(), data->getOutpoints());
+		}
+	}
+
+	void drawAxis() const {
+		if (data->getOutpoints()) {
+			xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window,
+					axisContext, data->size(), data->getOutpoints());
+		}
+	}
+
+	void drawBackground() const {
+		xcb_poly_fill_rectangle(connection, window, backgroundContext, 1,
+				&rectangle);
+	}
 
 private:
 
-	void createBackgroundContext() {
-		// create black graphics context
-		backgroundContext = xcb_generate_id(connection);
-		uint32_t mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
-		uint32_t values[] = { screen->black_pixel, 0 };
-		xcb_create_gc(connection, backgroundContext, screen->root, mask,
-				values);
-	}
-
-	void createPointsContext() {
-		pointsContext = xcb_generate_id(connection);
-		uint32_t mask = XCB_GC_FOREGROUND;
-		uint32_t values[] = { colormap->getGreen()->pixel };
-		xcb_create_gc(connection, pointsContext, screen->root, mask, values);
-	}
-
-	void drawPoints();
-
+	void createContexts();
 	void setWindowTitle(const char* title, const char* iconTitle);
 
 	xcb_connection_t* connection;
@@ -100,24 +123,23 @@ private:
 	xcb_window_t window;
 
 	ChartColormap* colormap;
-	ChartPoints* points;
+	ChartData* data;
 
 	xcb_gcontext_t backgroundContext;
 	xcb_gcontext_t pointsContext;
+	xcb_gcontext_t cleanPointsContext;
+	xcb_gcontext_t axisContext;
 
 	uint16_t width;
 	uint16_t height;
 	xcb_rectangle_t rectangle;
 };
 
-void Chart::runChart() {
+void Chart::runChart() const {
 	// show window
 	xcb_map_window(connection, window);
 	xcb_flush(connection);
 
-//	xcb_point_t points[] = { { 100, 100 }, { 101, 100 }, { 102, 100 } };
-
-	// TODO: should be run in other thread
 	int done = 0;
 	xcb_generic_event_t *e;
 	/* event loop */
@@ -126,9 +148,7 @@ void Chart::runChart() {
 		case XCB_EXPOSE: /* отрисовать или перерисовать окно */
 			std::cout << "XCB_EXPOSE event" << std::endl;
 
-			xcb_poly_fill_rectangle(connection, window, backgroundContext, 1,
-					&rectangle);
-			drawPoints();
+			draw();
 
 			xcb_flush(connection);
 			break;
@@ -138,11 +158,19 @@ void Chart::runChart() {
 		}
 		free(e);
 	}
+	std::cout << "chart closed" << std::endl;
 }
 
-void Chart::drawPoints() {
-	xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext,
-			points->size(), points->getOutpoints());
+void Chart::draw() const {
+	drawBackground();
+	drawAxis();
+	drawPoints();
+}
+
+void Chart::redrawNewPoints(double x, double y) const {
+	drawCleanPoints();
+	data->addPoint(x, y);
+	drawPoints();
 }
 
 void Chart::setWindowTitle(const char* title, const char* iconTitle) {
@@ -156,12 +184,28 @@ void Chart::setWindowTitle(const char* title, const char* iconTitle) {
 			iconTitle);
 }
 
-void Chart::addPoint(double x, double y) {
-	points->addPoint(x, y);
-}
+void Chart::createContexts() {
+	// black background context
+	backgroundContext = xcb_generate_id(connection);
+	uint32_t mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
+	uint32_t values[] = { screen->black_pixel, 0 };
+	xcb_create_gc(connection, backgroundContext, screen->root, mask, values);
 
-void Chart::printPoints() {
-	points->printPoints();
+	// points context
+	pointsContext = xcb_generate_id(connection);
+	mask = XCB_GC_FOREGROUND;
+	uint32_t values2[] = { colormap->getGreen()->pixel };
+	xcb_create_gc(connection, pointsContext, screen->root, mask, values2);
+
+	// clean points context
+	cleanPointsContext = xcb_generate_id(connection);
+	uint32_t values22[] = { screen->black_pixel };
+	xcb_create_gc(connection, cleanPointsContext, screen->root, mask, values22);
+
+	// axis context
+	axisContext = xcb_generate_id(connection);
+	uint32_t values3[] = { colormap->getGray()->pixel };
+	xcb_create_gc(connection, axisContext, screen->root, mask, values3);
 }
 
 }

@@ -17,7 +17,9 @@ public:
 
 		xcb_generic_error_t* error = NULL;
 		green = xcb_alloc_color_reply(connection,
-				xcb_alloc_color(connection, colormapId, 0, 65535, 0),
+				xcb_alloc_color(connection, colormapId, 0, 65535, 0), &error);
+		gray = xcb_alloc_color_reply(connection,
+				xcb_alloc_color(connection, colormapId, 32767, 32767, 32767),
 				&error);
 		if (error) {
 			throw std::runtime_error("Cannot create colormap");
@@ -26,10 +28,15 @@ public:
 
 	~ChartColormap() {
 		free(green);
+		free(gray);
 	}
 
 	xcb_alloc_color_reply_t* getGreen() {
 		return green;
+	}
+
+	xcb_alloc_color_reply_t* getGray() {
+		return gray;
 	}
 
 private:
@@ -40,6 +47,7 @@ private:
 	xcb_colormap_t colormapId;
 
 	xcb_alloc_color_reply_t* green;
+	xcb_alloc_color_reply_t* gray;
 };
 
 }

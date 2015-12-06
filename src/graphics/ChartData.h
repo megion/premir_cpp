@@ -1,5 +1,5 @@
-#ifndef SRC_GRAPHICS_CHARTPOINTS_H_
-#define SRC_GRAPHICS_CHARTPOINTS_H_
+#ifndef SRC_GRAPHICS_CHARTDATA_H_
+#define SRC_GRAPHICS_CHARTDATA_H_
 
 #include <xcb/xcb.h>
 #include <stdio.h>
@@ -8,6 +8,7 @@
 #include <exception>
 #include <stdexcept>
 #include <errno.h>
+#include <iostream>
 #include "utils/LinkedList.h"
 
 namespace graphics {
@@ -16,17 +17,21 @@ namespace graphics {
  * Points chart container.
  * Transform each input point {double, double} to output ploter coordinates
  */
-class ChartPoints {
+class ChartData {
 public:
-	ChartPoints(const xcb_rectangle_t& _boundRect) :
+	ChartData(const xcb_rectangle_t& _boundRect) :
 			boundRect(_boundRect), xRatio(1), yRatio(1), inrange(
 					{ 0, 0, 0, 0 }), outpoints(nullptr) {
 		inpoints = new utils::LinkedList<Point>();
+		std::cout << "Create chart data " << std::endl;
 	}
 
-	~ChartPoints() {
+	~ChartData() {
 		delete inpoints;
-		free(outpoints);
+		if (outpoints) {
+			free(outpoints);
+			outpoints = nullptr;
+		}
 	}
 
 	struct Point {
@@ -74,4 +79,4 @@ private:
 
 } /* namespace graphics */
 
-#endif /* SRC_GRAPHICS_CHARTPOINTS_H_ */
+#endif /* SRC_GRAPHICS_CHARTDATA_H_ */
