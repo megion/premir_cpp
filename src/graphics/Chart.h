@@ -75,6 +75,8 @@ public:
 	 */
 	void runChart() const;
 	void draw() const;
+	void drawAxes() const;
+	void drawAxis(const ChartData::Axis& axis) const;
 
 	/**
 	 * 1. draw clean current points
@@ -101,13 +103,6 @@ public:
 		}
 	}
 
-	void drawAxis() const {
-		if (data->getOutpoints()) {
-			xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window,
-					axisContext, data->size(), data->getOutpoints());
-		}
-	}
-
 	void drawBackground() const {
 		xcb_poly_fill_rectangle(connection, window, backgroundContext, 1,
 				&rectangle);
@@ -117,6 +112,8 @@ private:
 
 	void createContexts();
 	void setWindowTitle(const char* title, const char* iconTitle);
+	void testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
+			const char* errMessage);
 
 	xcb_connection_t* connection;
 	xcb_screen_t* screen;
@@ -129,6 +126,7 @@ private:
 	xcb_gcontext_t pointsContext;
 	xcb_gcontext_t cleanPointsContext;
 	xcb_gcontext_t axisContext;
+	xcb_gcontext_t axisFontContext;
 
 	uint16_t width;
 	uint16_t height;
@@ -163,13 +161,14 @@ void Chart::runChart() const {
 
 void Chart::draw() const {
 	drawBackground();
-	drawAxis();
+	drawAxes();
 	drawPoints();
 }
 
 void Chart::redrawNewPoints(double x, double y) const {
 	drawCleanPoints();
 	data->addPoint(x, y);
+	drawAxes(); // because after clean some points are cleaned
 	drawPoints();
 }
 
@@ -206,6 +205,65 @@ void Chart::createContexts() {
 	axisContext = xcb_generate_id(connection);
 	uint32_t values3[] = { colormap->getGray()->pixel };
 	xcb_create_gc(connection, axisContext, screen->root, mask, values3);
+
+	// axis labels font context
+	const char* fontName = "fixed";
+	xcb_font_t axisFont = xcb_generate_id(connection);
+	xcb_void_cookie_t fontCookie = xcb_open_font_checked(connection, axisFont,
+			strlen(fontName), fontName);
+	testCookie(fontCookie, connection, "can't open font");
+	/* create graphics context */
+	axisFontContext = xcb_generate_id(connection);
+	mask = XCB_GC_FOREGROUND | XCB_GC_FONT;
+	uint32_t values4[3] = { screen->white_pixel, axisFont };
+	xcb_void_cookie_t gcCookie = xcb_create_gc_checked(connection,
+			axisFontContext, screen->root, mask, values4);
+	testCookie(gcCookie, connection, "can't create gc");
+	/* close font */
+	fontCookie = xcb_close_font_checked(connection, axisFont);
+	testCookie(fontCookie, connection, "can't close font");
+}
+
+void Chart::testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
+		const char* errMessage) {
+	xcb_generic_error_t* error = xcb_request_check(connection, cookie);
+	if (error) {
+		std::cout << "ERROR: " << errMessage << " code : " << error->error_code
+				<< std::endl;
+		free(error);
+		throw std::runtime_error("XCB cookie error");
+	}
+}
+
+void Chart::drawAxes() const {
+	utils::LinkedList<ChartData::Axis>* axes = data->getXAxes();
+	utils::LinkedList<ChartData::Axis>::Iterator iter = axes->iterator();
+
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		drawAxis(p);
+	}
+
+	axes = data->getYAxes();
+	iter = axes->iterator();
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		drawAxis(p);
+	}
+}
+
+void Chart::drawAxis(const ChartData::Axis& axis) const {
+	xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window, axisContext, 2,
+			axis.line);
+
+	if (!axis.hideLabel) {
+		char buffer[32];
+		snprintf(buffer, sizeof(buffer), "%g", axis.labelValue);
+		xcb_image_text_8(connection, strlen(buffer), window, axisFontContext,
+				axis.labelPoint.x, axis.labelPoint.y, buffer);
+	}
 }
 
 }

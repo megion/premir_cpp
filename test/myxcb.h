@@ -20,14 +20,14 @@ double get_time(void) {
 #define PI 3.14159265
 
 void test_chart() {
-	graphics::ChartThread chart(460, 360);
+	graphics::ChartThread chart(860, 660);
 
 //	double param, result;
 //	param = 30.0;
 
 	graphics::ChartData* chartData = chart.getChart().getData();
 
-	for (double i = -100; i <= 100.0; i = i + 0.05) {
+	for (double i = -100; i <= 100.0; i = i + 0.5) {
 		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
 		if (!isnan(result)) {
 //			std::cout << "result: " << result << std::endl;

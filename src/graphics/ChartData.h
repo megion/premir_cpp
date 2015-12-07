@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <errno.h>
 #include <iostream>
+#include <limits>
+
 #include "utils/LinkedList.h"
 
 namespace graphics {
@@ -23,11 +25,18 @@ public:
 			boundRect(_boundRect), xRatio(1), yRatio(1), inrange(
 					{ 0, 0, 0, 0 }), outpoints(nullptr) {
 		inpoints = new utils::LinkedList<Point>();
+
 		std::cout << "Create chart data " << std::endl;
+		xAxes = new utils::LinkedList<Axis>();
+		yAxes = new utils::LinkedList<Axis>();
+
+		createAxesPoints();
 	}
 
 	~ChartData() {
 		delete inpoints;
+		delete xAxes;
+		delete yAxes;
 		if (outpoints) {
 			free(outpoints);
 			outpoints = nullptr;
@@ -37,6 +46,13 @@ public:
 	struct Point {
 		double x;
 		double y;
+	};
+
+	struct Axis {
+		xcb_point_t line[2];
+		xcb_point_t labelPoint;
+		double labelValue;
+		bool hideLabel;
 	};
 
 	struct Range {
@@ -50,6 +66,14 @@ public:
 		return outpoints;
 	}
 
+	utils::LinkedList<Axis>* getXAxes() {
+		return xAxes;
+	}
+
+	utils::LinkedList<Axis>* getYAxes() {
+		return yAxes;
+	}
+
 	size_t size() {
 		return inpoints->size();
 	}
@@ -59,6 +83,9 @@ public:
 
 private:
 	utils::LinkedList<Point>* inpoints;
+	// TODO axis replace to ArrayList with const size
+	utils::LinkedList<Axis>* yAxes;
+	utils::LinkedList<Axis>* xAxes;
 	xcb_point_t* outpoints;
 	xcb_rectangle_t boundRect;
 
@@ -74,6 +101,8 @@ private:
 	int line(double a, double b, double value) {
 		return std::round(a * value + b);
 	}
+
+	void createAxesPoints();
 
 };
 

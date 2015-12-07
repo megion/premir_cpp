@@ -2,6 +2,7 @@
 #define SRC_UTILS_STRING_H_
 
 #include <iostream>
+//#include <stdio.h>
 #include <cstring>
 #include <iomanip>
 
@@ -10,11 +11,27 @@ namespace utils {
 class String {
 
 public:
-	String();
-	String(const char*);
-	String(const String&);
+	String() :
+			length(0), str(nullptr) {
+	}
 
-	~String();
+	String(const char* _str) :
+			length(std::strlen(_str)), str(nullptr) {
+		str = new char[length + 1];
+		std::strncpy(str, _str, length);
+	}
+
+	String(const String& rhs) : length(rhs.length), str(nullptr) {
+		if (rhs.str) {
+			str = new char[length + 1];
+			std::strncpy(str, rhs.str, length);
+		}
+	}
+
+	~String() {
+		length = 0;
+		delete[] str;
+	}
 
 	String& operator =(const String&); // str1 = str2
 	String& operator =(const char*); // str3 = "my string";
@@ -24,93 +41,55 @@ public:
 
 	char& operator [](int);
 
-	int size() {
-		return _size;
+	size_t size() {
+		return length;
 	}
 
-	const char* getStr() {
-		return _str;
-	}
-
-private:
-	void initializeNull() {
-		_size = 0;
-		_str = nullptr;
+	const char* getChars() {
+		return str;
 	}
 
 private:
-	int _size;
+	size_t length;
 	/**
 	 * UTF8 это многобайтная кодировка символов элементами в 1 байт,
 	 * а UTF16 элементами размером в 2 байта.
 	 * UTF-8 1-4 байт на символ.
 	 * UTF-16 2-4 байт на символ.
 	 */
-	char* _str;
+	char* str;
 };
-
-// constructors
-inline String::String() {
-	initializeNull();
-}
-inline String::String(const char* str) {
-	if (!str) {
-		initializeNull();
-		return;
-	}
-
-	_size = std::strlen(str);
-	_str = new char[_size + 1];
-	std::strcpy(_str, str);
-}
-inline String::String(const String& rhs) {
-	_size = rhs._size;
-	if (rhs._str) {
-		_str = nullptr;
-	} else {
-		_str = new char[_size + 1];
-		std::strcpy(_str, rhs._str);
-	}
-
-}
-
-// destructor
-inline String::~String() {
-	delete[] _str;
-}
 
 // comparators
 inline bool String::operator==(const String& rhs) {
-	if (_size != rhs._size) {
+	if (length != rhs.length) {
 		return false;
 	}
-	return std::strcmp(_str, rhs._str) ? false : true;
+	return std::strcmp(str, rhs.str) ? false : true;
 }
 inline bool String::operator==(const char* s) {
-	return std::strcmp(_str, s) ? false : true;
+	return std::strcmp(str, s) ? false : true;
 }
 
 // = operator
 inline String& String::operator=(const char* s) {
-	delete[] _str;
+	length = 0;
+	delete[] str;
 	if (s) {
-		_size = std::strlen(s);
-		_str = new char[_size + 1];
-		std::strcpy(_str, s);
-	} else {
-		initializeNull();
+		length = strlen(s);
+		str = new char[length + 1];
+		std::strncpy(str, s, length);
 	}
 	return *this;
 }
 inline String& String::operator=(const String& rhs) {
 	if (this != &rhs) { // check itself object
-		delete[] _str;
-		if (rhs._str) {
-			_size = rhs._size;
-			_str = new char[_size + 1];
-			std::strcpy(_str, rhs._str);
-		} else {
-			initializeNull();
+		length = 0;
+		delete[] str;
+		if (rhs.str) {
+			length = rhs.length;
+			str = new char[length + 1];
+			std::strncpy(str, rhs.str, length);
 		}
 	}
 	return *this;
@@ -118,7 +97,7 @@ inline String& String::operator=(const String& rhs) {
 
 // [] operator
 inline char& String::operator[](int ind) {
-	return _str[ind];
+	return str[ind];
 }
 
 // >> operator
@@ -132,7 +111,7 @@ inline std::istream& operator>>(std::istream& is, String& s) {
 
 // << operator
 inline std::ostream& operator<<(std::ostream& os, String& s) {
-	return os << s.getStr();
+	return os << s.getChars();
 }
 
 }

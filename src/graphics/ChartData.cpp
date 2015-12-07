@@ -87,8 +87,7 @@ void ChartData::addPoint(double x, double y) {
 		// ay = -h0/(ymax-ymin); by = (y0+h0) - ay*ymin
 		double ydiff = inrange.yMax - inrange.yMin;
 		ay = -((double) boundRect.height) / ydiff;
-		by = ((double)(boundRect.y + boundRect.height))
-				- ay * inrange.yMin;
+		by = ((double) (boundRect.y + boundRect.height)) - ay * inrange.yMin;
 	}
 
 	if (xIsConst && yIsConst) {
@@ -111,10 +110,10 @@ void ChartData::addPoint(double x, double y) {
 			utils::LinkedList<Point>::Entry* e = iter.next();
 			Point& inp = e->getValue();
 			// recalculate all if IsDirty else only last is recalculate
-			if (!xIsConst && (xIsDirty || (i==lastIndex))) {
+			if (!xIsConst && (xIsDirty || (i == lastIndex))) {
 				outpoints[i].x = line(ax, bx, inp.x);
 			}
-			if (!yIsConst && (yIsDirty || (i==lastIndex))) {
+			if (!yIsConst && (yIsDirty || (i == lastIndex))) {
 				outpoints[i].y = line(ay, by, inp.y);
 			}
 			++i;
@@ -127,6 +126,34 @@ void ChartData::printPoints() {
 	for (size_t i = 0; i < inpoints->size(); ++i) {
 		std::cout << "outp.x: " << outpoints[i].x << " outp.y: "
 				<< outpoints[i].y << std::endl;
+	}
+}
+
+void ChartData::createAxesPoints() {
+	// 1. create vertical axis
+	int16_t step = 40;
+
+	// vertical
+	int16_t verCount = boundRect.width / step;
+	int16_t ybottom = boundRect.y + boundRect.height;
+	int16_t ytop = boundRect.y;
+	for (int16_t i = 1; i <= verCount; ++i) {
+		int16_t x = i * step + boundRect.x;
+		bool hideLabel = ((i-1)%3!=0);
+		Axis ax = { { { x, ytop }, { x, ybottom } }, { x, ybottom },
+				0.0, hideLabel };
+		xAxes->push(ax);
+	}
+
+	// horizontal
+	int16_t horCount = boundRect.height / step;
+	int16_t xleft = boundRect.x;
+	int16_t xright = boundRect.x + boundRect.width;
+	for (int16_t i = 1; i <= horCount; ++i) {
+		int16_t y = boundRect.y + boundRect.height - i * step;
+		Axis ax = { { { xleft, y }, { xright, y } }, { xleft, y },
+				0.0, i%2==0 };
+		yAxes->push(ax);
 	}
 }
 
