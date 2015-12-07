@@ -79,6 +79,7 @@ public:
 	}
 
 	void addPoint(double x, double y);
+	void updateAxesLabel(double ax, double bx, double ay, double by);
 	void printPoints();
 
 private:
@@ -98,8 +99,11 @@ private:
 	/**
 	 * Calculate value by formula (line) out = a*value + b
 	 */
-	int line(double a, double b, double value) {
-		return std::round(a * value + b);
+	int transformToOut(double a, double b, double inValue) {
+		return std::round(a * inValue + b);
+	}
+	double transformToIn(double a, double b, int16_t outValue) {
+		return ((double)(outValue) - b)/a;
 	}
 
 	void createAxesPoints();

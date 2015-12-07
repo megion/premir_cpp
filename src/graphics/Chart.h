@@ -108,6 +108,23 @@ public:
 				&rectangle);
 	}
 
+	void cleanAxesText() const {
+		uint32_t mask = XCB_GC_FOREGROUND;
+		uint32_t value[] = { screen->black_pixel };
+		xcb_change_gc(connection, axisFontContext, mask, value);
+	}
+	void revetAxesText() const {
+		const char* fontName = "fixed";
+		xcb_font_t axisFont = xcb_generate_id(connection);
+		xcb_open_font_checked(connection, axisFont, strlen(fontName), fontName);
+
+		uint32_t mask = XCB_GC_FOREGROUND | XCB_GC_FONT;
+		uint32_t value[] = { screen->white_pixel, axisFont };
+		xcb_change_gc(connection, axisFontContext, mask, value);
+
+		xcb_close_font_checked(connection, axisFont);
+	}
+
 private:
 
 	void createContexts();
@@ -166,10 +183,13 @@ void Chart::draw() const {
 }
 
 void Chart::redrawNewPoints(double x, double y) const {
+
 	drawCleanPoints();
 	data->addPoint(x, y);
 	drawAxes(); // because after clean some points are cleaned
+//	revetAxesText();
 	drawPoints();
+//	cleanAxesText();
 }
 
 void Chart::setWindowTitle(const char* title, const char* iconTitle) {

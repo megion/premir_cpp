@@ -62,8 +62,8 @@ void ChartData::addPoint(double x, double y) {
 
 	// 4. calculate line
 	size_t lastIndex = inpoints->size() - 1;
-	double ax = 0, bx = 0;
-	double ay = 0, by = 0;
+	double ax = 0.0, bx = 0.0;
+	double ay = 0.0, by = 0.0;
 	bool xIsConst = false;
 	if (inrange.xMax == inrange.xMin) {
 		// x has not ever been change, set to x0
@@ -98,10 +98,10 @@ void ChartData::addPoint(double x, double y) {
 	if (!xIsDirty && !yIsDirty) {
 		// range input values no changes so calculate only current point
 		if (!xIsConst) {
-			outpoints[lastIndex].x = line(ax, bx, x);
+			outpoints[lastIndex].x = transformToOut(ax, bx, x);
 		}
 		if (!yIsConst) {
-			outpoints[lastIndex].y = line(ay, by, y);
+			outpoints[lastIndex].y = transformToOut(ay, by, y);
 		}
 	} else {
 		utils::LinkedList<Point>::Iterator iter = inpoints->iterator();
@@ -111,13 +111,15 @@ void ChartData::addPoint(double x, double y) {
 			Point& inp = e->getValue();
 			// recalculate all if IsDirty else only last is recalculate
 			if (!xIsConst && (xIsDirty || (i == lastIndex))) {
-				outpoints[i].x = line(ax, bx, inp.x);
+				outpoints[i].x = transformToOut(ax, bx, inp.x);
 			}
 			if (!yIsConst && (yIsDirty || (i == lastIndex))) {
-				outpoints[i].y = line(ay, by, inp.y);
+				outpoints[i].y = transformToOut(ay, by, inp.y);
 			}
 			++i;
 		}
+
+		updateAxesLabel(ax, bx, ay, by);
 	}
 
 }
@@ -130,7 +132,7 @@ void ChartData::printPoints() {
 }
 
 void ChartData::createAxesPoints() {
-	// 1. create vertical axis
+	// axis step
 	int16_t step = 40;
 
 	// vertical
@@ -139,9 +141,7 @@ void ChartData::createAxesPoints() {
 	int16_t ytop = boundRect.y;
 	for (int16_t i = 1; i <= verCount; ++i) {
 		int16_t x = i * step + boundRect.x;
-		bool hideLabel = ((i-1)%3!=0);
-		Axis ax = { { { x, ytop }, { x, ybottom } }, { x, ybottom },
-				0.0, hideLabel };
+		Axis ax = { { { x, ytop }, { x, ybottom } }, { x, ybottom }, 0.0, true };
 		xAxes->push(ax);
 	}
 
@@ -151,9 +151,32 @@ void ChartData::createAxesPoints() {
 	int16_t xright = boundRect.x + boundRect.width;
 	for (int16_t i = 1; i <= horCount; ++i) {
 		int16_t y = boundRect.y + boundRect.height - i * step;
-		Axis ax = { { { xleft, y }, { xright, y } }, { xleft, y },
-				0.0, i%2==0 };
+		Axis ax = { { { xleft, y }, { xright, y } }, { xleft, y }, 0.0, true };
 		yAxes->push(ax);
+	}
+}
+
+void ChartData::updateAxesLabel(double ax, double bx, double ay, double by) {
+	utils::LinkedList<Axis>::Iterator iter = xAxes->iterator();
+	int16_t i = 1;
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		p.labelValue = transformToIn(ax, bx, p.line[0].x);
+		bool hideLabel = ((i - 1) % 3 != 0);
+		p.hideLabel = hideLabel;
+		++i;
+	}
+
+	i = 1;
+	iter = yAxes->iterator();
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		p.labelValue = transformToIn(ay, by, p.line[0].y);
+		bool hideLabel = i % 2 == 0;
+		p.hideLabel = hideLabel;
+		++i;
 	}
 }
 

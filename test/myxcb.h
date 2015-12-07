@@ -27,8 +27,8 @@ void test_chart() {
 
 	graphics::ChartData* chartData = chart.getChart().getData();
 
-	for (double i = -100; i <= 100.0; i = i + 0.5) {
-		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+	for (double i = 0; i <= 1000.0; i = i + 0.5) {
+		double result = sin(i * PI / 180);//pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
 		if (!isnan(result)) {
 //			std::cout << "result: " << result << std::endl;
 //			chartData->addPoint(i, result);
@@ -38,11 +38,11 @@ void test_chart() {
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
 			chart.getChart().redrawNewPoints(i, result);
-//			chart.getChart().flush();
-//			chart.getChart().redrawNewPoints(i, -result);
 			chart.getChart().flush();
+//			chart.getChart().redrawNewPoints(i, -result);
+//			chart.getChart().flush();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 //			chart.getChart().drawBackground();
 
 		}
