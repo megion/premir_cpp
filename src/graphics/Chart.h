@@ -76,7 +76,9 @@ public:
 	void runChart() const;
 	void draw() const;
 	void drawAxes() const;
+	void drawAxesLabels() const;
 	void drawAxis(const ChartData::Axis& axis) const;
+	void drawAxisLabel(const ChartData::Axis& axis) const;
 
 	/**
 	 * 1. draw clean current points
@@ -108,23 +110,6 @@ public:
 				&rectangle);
 	}
 
-	void cleanAxesText() const {
-		uint32_t mask = XCB_GC_FOREGROUND;
-		uint32_t value[] = { screen->black_pixel };
-		xcb_change_gc(connection, axisFontContext, mask, value);
-	}
-	void revetAxesText() const {
-		const char* fontName = "fixed";
-		xcb_font_t axisFont = xcb_generate_id(connection);
-		xcb_open_font_checked(connection, axisFont, strlen(fontName), fontName);
-
-		uint32_t mask = XCB_GC_FOREGROUND | XCB_GC_FONT;
-		uint32_t value[] = { screen->white_pixel, axisFont };
-		xcb_change_gc(connection, axisFontContext, mask, value);
-
-		xcb_close_font_checked(connection, axisFont);
-	}
-
 private:
 
 	void createContexts();
@@ -144,6 +129,7 @@ private:
 	xcb_gcontext_t cleanPointsContext;
 	xcb_gcontext_t axisContext;
 	xcb_gcontext_t axisFontContext;
+	xcb_gcontext_t cleanAxesLabelContext;
 
 	uint16_t width;
 	uint16_t height;
@@ -179,17 +165,17 @@ void Chart::runChart() const {
 void Chart::draw() const {
 	drawBackground();
 	drawAxes();
+	drawAxesLabels();
 	drawPoints();
 }
 
 void Chart::redrawNewPoints(double x, double y) const {
-
 	drawCleanPoints();
 	data->addPoint(x, y);
 	drawAxes(); // because after clean some points are cleaned
-//	revetAxesText();
+	drawAxesLabels();
 	drawPoints();
-//	cleanAxesText();
+
 }
 
 void Chart::setWindowTitle(const char* title, const char* iconTitle) {
@@ -242,6 +228,13 @@ void Chart::createContexts() {
 	/* close font */
 	fontCookie = xcb_close_font_checked(connection, axisFont);
 	testCookie(fontCookie, connection, "can't close font");
+
+	// clean axes label context
+	cleanAxesLabelContext = xcb_generate_id(connection);
+	mask = XCB_GC_FOREGROUND;
+	uint32_t values5[] = { screen->black_pixel };
+	xcb_create_gc(connection, cleanAxesLabelContext, screen->root, mask,
+			values5);
 }
 
 void Chart::testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
@@ -256,7 +249,8 @@ void Chart::testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
 }
 
 void Chart::drawAxes() const {
-	utils::LinkedList<ChartData::Axis>* axes = data->getXAxes();
+	// vertical lines
+	utils::LinkedList<ChartData::Axis>* axes = data->getYAxes();
 	utils::LinkedList<ChartData::Axis>::Iterator iter = axes->iterator();
 
 	while (iter.hasNext()) {
@@ -265,7 +259,8 @@ void Chart::drawAxes() const {
 		drawAxis(p);
 	}
 
-	axes = data->getYAxes();
+	// horizontal lines
+	axes = data->getXAxes();
 	iter = axes->iterator();
 	while (iter.hasNext()) {
 		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
@@ -274,11 +269,43 @@ void Chart::drawAxes() const {
 	}
 }
 
+void Chart::drawAxesLabels() const {
+	// vertical labels
+	utils::LinkedList<ChartData::Axis>* axes = data->getYAxes();
+	utils::LinkedList<ChartData::Axis>::Iterator iter = axes->iterator();
+
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		drawAxisLabel(p);
+	}
+
+	// horizontal labels
+	axes = data->getXAxes();
+	iter = axes->iterator();
+	while (iter.hasNext()) {
+		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
+		ChartData::Axis& p = e->getValue();
+		drawAxisLabel(p);
+	}
+}
+
 void Chart::drawAxis(const ChartData::Axis& axis) const {
+	// 1. clean text labels - draw black rectangle
 	xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window, axisContext, 2,
 			axis.line);
+}
 
+void Chart::drawAxisLabel(const ChartData::Axis& axis) const {
+	// 1. clean text labels - draw black rectangle
 	if (!axis.hideLabel) {
+		uint16_t labelHeight = 16;
+		uint16_t labelWidth = 80;
+		int16_t labelRectTop = axis.labelPoint.y - labelHeight;
+		xcb_rectangle_t labelRect = { axis.labelPoint.x, labelRectTop,
+				labelWidth, labelHeight };
+		xcb_poly_fill_rectangle(connection, window, cleanAxesLabelContext, 1,
+				&labelRect);
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%g", axis.labelValue);
 		xcb_image_text_8(connection, strlen(buffer), window, axisFontContext,

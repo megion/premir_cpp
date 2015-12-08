@@ -27,8 +27,9 @@ void test_chart() {
 
 	graphics::ChartData* chartData = chart.getChart().getData();
 
-	for (double i = 0; i <= 1000.0; i = i + 0.5) {
+	for (double i = -200; i <= 200.0; i = i + 1) {
 		double result = sin(i * PI / 180);//pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+//		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
 		if (!isnan(result)) {
 //			std::cout << "result: " << result << std::endl;
 //			chartData->addPoint(i, result);
