@@ -50,6 +50,12 @@ void test_push_shift_pop_unshift() {
 	newFirst = list.pop();
 	assert(newFirst->getValue().ch == '1');
 	assert(list.size() == 1);
+	list.unshift(Foo('8', 10));
+	assert(list.size() == 2);
+	newFirst = list.shift();
+	assert(list.size() == 1);
+	std::cout << "newFirst->getValue().ch: "<< newFirst->getValue().ch << std::endl;
+	assert(newFirst->getValue().ch == '1');
 
 	newFirst = list.pop();
 	assert(list.size() == 0);
@@ -184,8 +190,8 @@ void test_list() {
 }
 
 void linked_list_test() {
-//	suite("LinkedList");
-//	test(push_shift_pop_unshift);
+	suite("LinkedList");
+	test(push_shift_pop_unshift);
 //	test(concat_and_copy);
 //	test(push_temp_values);
 

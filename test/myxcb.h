@@ -3,11 +3,13 @@
 #include <string.h>
 #include <sys/time.h>
 #include <math.h>
+#include <random>
 #include <chrono>         // std::chrono::seconds
 
 #include <xcb/xcb.h>
 
 #include "graphics/ChartThread.h"
+#include "ml/DigitalFilter.h"
 
 double get_time(void) {
 	struct timeval timev;
@@ -21,25 +23,45 @@ double get_time(void) {
 
 void test_chart() {
 	graphics::ChartThread chart(860, 660);
+	graphics::ChartThread chart2(860, 660);
 
 //	double param, result;
 //	param = 30.0;
 
-	graphics::ChartData* chartData = chart.getChart().getData();
+	ml::DigitalFilter df(100);
 
-	for (double i = -200; i <= 200.0; i = i + 1) {
-		double result = sin(i * PI / 180);//pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
-//		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+	std::default_random_engine generator;
+	std::normal_distribution<double> distribution(0.0,0.3);
+
+	graphics::ChartData* chartData = chart.getChart().getData();
+	graphics::ChartData* chartData2 = chart2.getChart().getData();
+
+
+
+	for (double i = 0; i < 1000.0; i = i + 0.1) {
+		double x = sin(i * PI / 180);//pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+		double n = distribution(generator);
+		//		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+		double result = cos(i * PI / 280)*n + x;
+
+
 		if (!isnan(result)) {
 //			std::cout << "result: " << result << std::endl;
-//			chartData->addPoint(i, result);
-//			chartData->addPoint(i, -result);
+
+
+			df.addInput(result);
+			double s = df.calculateSum();
+
+//			chartData->addPoint(i, s);
 
 //			chart.getChart().drawAxis();
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
-			chart.getChart().redrawNewPoints(i, result);
+//
+			chart.getChart().redrawNewPoints(i, s);
 			chart.getChart().flush();
+			chart2.getChart().redrawNewPoints(i, result);
+						chart2.getChart().flush();
 //			chart.getChart().redrawNewPoints(i, -result);
 //			chart.getChart().flush();
 
@@ -51,6 +73,8 @@ void test_chart() {
 
 	chart.getChart().draw();
 	chart.getChart().flush();
+	chart2.getChart().draw();
+		chart2.getChart().flush();
 
 //	graphics::ChartThread chart2(560, 460);
 //
