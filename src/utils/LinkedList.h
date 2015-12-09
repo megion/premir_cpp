@@ -32,7 +32,7 @@ public:
 	}
 
 	// replace constructor: LinkedList l1; LinkedList l2(std::move(l1));
-	LinkedList(LinkedList<T>&& list) :
+	LinkedList(LinkedList<T> && list) :
 			_size(list._size), _first(list._first), _last(list._last) {
 		list._size = 0;
 		list._first = nullptr;
@@ -165,10 +165,10 @@ public:
 	// = assign operator: LinkedList l3; l3 = l2;
 	LinkedList<T>& operator=(const LinkedList<T>&);
 	// = replacement operator: LinkedList l3; l3 = std::move(l2);
-	LinkedList<T>& operator=(LinkedList<T>&&) = delete; //
+	LinkedList<T>& operator=(LinkedList<T> &&) = delete; //
 
 	// [] index operator
-	Entry operator[](const int&);
+	Entry* operator[](const size_t& index);
 
 private:
 	/**
@@ -242,6 +242,21 @@ LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& list) {
 	removeAll();
 	concat(list);
 	return *this;
+}
+
+template<typename T>
+typename LinkedList<T>::Entry* LinkedList<T>::operator[](const size_t& index) {
+	Entry* pi = _first;
+	size_t i = 0;
+	while (pi) {
+		if (i == index) {
+			return pi;
+		}
+		pi = pi->getNext();
+		++i;
+	}
+
+	return nullptr;
 }
 
 template<typename T>

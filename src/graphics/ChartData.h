@@ -81,6 +81,7 @@ public:
 	void addPoint(double x, double y);
 	void updateAxesLabel(double ax, double bx, double ay, double by);
 	void printPoints();
+	void removeData();
 
 private:
 	utils::LinkedList<Point>* inpoints;

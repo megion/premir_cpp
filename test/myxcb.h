@@ -10,6 +10,7 @@
 
 #include "graphics/ChartThread.h"
 #include "ml/DigitalFilter.h"
+#include "utils/LinkedList.h"
 
 double get_time(void) {
 	struct timeval timev;
@@ -22,35 +23,43 @@ double get_time(void) {
 #define PI 3.14159265
 
 void test_chart() {
-	graphics::ChartThread chart(860, 660);
-	graphics::ChartThread chart2(860, 660);
+	graphics::ChartThread chartSignalTemplate(680, 460);
+	graphics::ChartThread chartSignalIn(680, 460);
+	graphics::ChartThread chartSignalOut(680, 460);
+	graphics::ChartThread chartFilterWeights(680, 460);
+
+	chartSignalTemplate.getChart().setWindowTitle("Signal template",
+			"Signal template");
+	chartSignalIn.getChart().setWindowTitle("Signal+noise", "Signal+noise");
+	chartSignalOut.getChart().setWindowTitle("Signal out", "Signal out");
+	chartFilterWeights.getChart().setWindowTitle("FilterWeights",
+			"FilterWeights");
 
 //	double param, result;
 //	param = 30.0;
 
-	ml::DigitalFilter df(100);
+	ml::DigitalFilter df(400, 0.0001);
 
 	std::default_random_engine generator;
-	std::normal_distribution<double> distribution(0.0,0.3);
+	std::normal_distribution<double> distribution(0.0, 0.3);
 
-	graphics::ChartData* chartData = chart.getChart().getData();
-	graphics::ChartData* chartData2 = chart2.getChart().getData();
-
-
-
-	for (double i = 0; i < 1000.0; i = i + 0.1) {
-		double x = sin(i * PI / 180);//pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
-		double n = distribution(generator);
+	for (double i = 0; i < 10000.0; i = i + 1) {
+//		double noise = sin(30 * i * PI / 180); //pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+		double noise = distribution(generator);
 		//		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
-		double result = cos(i * PI / 280)*n + x;
+//		double noise = (double)(((int)i)%33);
 
+		double signal = 5 * cos(i * PI / 180);
 
-		if (!isnan(result)) {
+		double signalAndNoise = signal + noise;
+
+		if (!isnan(signalAndNoise)) {
 //			std::cout << "result: " << result << std::endl;
 
-
-			df.addInput(result);
-			double s = df.calculateSum();
+			df.addInput(noise);
+			double noiseEval = df.calculateFilterOutSum(); // оценка шума
+			double signalEval = df.updateFilterWeightsByLeastSquaresAlgorithm(
+					signalAndNoise, noiseEval);
 
 //			chartData->addPoint(i, s);
 
@@ -58,10 +67,34 @@ void test_chart() {
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
 //
-			chart.getChart().redrawNewPoints(i, s);
-			chart.getChart().flush();
-			chart2.getChart().redrawNewPoints(i, result);
-						chart2.getChart().flush();
+			chartSignalTemplate.getChart().redrawNewPoints(i, signal);
+			chartSignalTemplate.getChart().flush();
+
+			chartSignalIn.getChart().redrawNewPoints(i, signalAndNoise);
+			chartSignalIn.getChart().flush();
+
+			chartSignalOut.getChart().redrawNewPoints(i, signalEval);
+			chartSignalOut.getChart().flush();
+
+			chartFilterWeights.getChart().getData()->removeData();
+			utils::LinkedList<ml::DigitalFilter::Sample>* samplesQueue =
+					df.getSamplesQueue();
+			utils::LinkedList<ml::DigitalFilter::Sample>::Iterator iter =
+					samplesQueue->iterator();
+			double k = 0.0;
+			while (iter.hasNext()) {
+				utils::LinkedList<ml::DigitalFilter::Sample>::Entry* e =
+						iter.next();
+				ml::DigitalFilter::Sample& s = e->getValue();
+				chartFilterWeights.getChart().getData()->addPoint(k, s.weight);
+				++k;
+			}
+			chartFilterWeights.getChart().drawBackground();
+			chartFilterWeights.getChart().drawAxes();
+			chartFilterWeights.getChart().drawAxesLabels();
+			chartFilterWeights.getChart().drawPoints();
+			chartFilterWeights.getChart().flush();
+
 //			chart.getChart().redrawNewPoints(i, -result);
 //			chart.getChart().flush();
 
@@ -71,10 +104,11 @@ void test_chart() {
 		}
 	}
 
-	chart.getChart().draw();
-	chart.getChart().flush();
-	chart2.getChart().draw();
-		chart2.getChart().flush();
+//	chartSignalIn.getChart().draw();
+//	chartSignalIn.getChart().flush();
+//
+//	chart2.getChart().draw();
+//	chart2.getChart().flush();
 
 //	graphics::ChartThread chart2(560, 460);
 //

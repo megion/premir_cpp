@@ -110,10 +110,11 @@ public:
 				&rectangle);
 	}
 
+	void setWindowTitle(const char* title, const char* iconTitle);
+
 private:
 
 	void createContexts();
-	void setWindowTitle(const char* title, const char* iconTitle);
 	void testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
 			const char* errMessage);
 

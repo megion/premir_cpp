@@ -180,5 +180,13 @@ void ChartData::updateAxesLabel(double ax, double bx, double ay, double by) {
 	}
 }
 
+void ChartData::removeData() {
+	inpoints->removeAll();
+	if (outpoints) {
+		free(outpoints);
+		outpoints = nullptr;
+	}
+}
+
 }
 

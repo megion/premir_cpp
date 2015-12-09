@@ -111,6 +111,19 @@ void test_concat_and_copy() {
 	assert(i == 4);
 }
 
+void test_index_operator() {
+	utils::LinkedList<Foo> list;
+	assert(list[0] == nullptr);
+	assert(list[1] == nullptr);
+
+	list.push(Foo('1', 2));
+	list.push(Foo('3', 4));
+	assert(list[2] == nullptr);
+
+	assert(list[0]->getValue().ch == '1');
+	assert(list[1]->getValue().ch == '3');
+}
+
 void test_push_temp_values() {
 	utils::LinkedList<Foo> list;
 	for (int i = 0; i < 12; ++i) {
@@ -192,6 +205,7 @@ void test_list() {
 void linked_list_test() {
 	suite("LinkedList");
 	test(push_shift_pop_unshift);
+	test(index_operator);
 //	test(concat_and_copy);
 //	test(push_temp_values);
 
