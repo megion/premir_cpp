@@ -38,15 +38,15 @@ void test_chart() {
 //	double param, result;
 //	param = 30.0;
 
-	ml::DigitalFilter df(400, 0.0001);
+	ml::DigitalFilter df(800, 0.00001);
 
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(0.0, 0.3);
 
 	for (double i = 0; i < 10000.0; i = i + 1) {
-//		double noise = sin(30 * i * PI / 180); //pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
-		double noise = distribution(generator);
-		//		double result = pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+		double noise = 5*cos((i+180) * PI / 180); //pow(i, 4) + 100*pow(i, 3) + pow(i,2) + i;
+//		double noise = distribution(generator);
+//				double noise = pow(i, 4) + pow(i, 3) + pow(i,2) + i;
 //		double noise = (double)(((int)i)%33);
 
 		double signal = 5 * cos(i * PI / 180);
@@ -77,16 +77,16 @@ void test_chart() {
 			chartSignalOut.getChart().flush();
 
 			chartFilterWeights.getChart().getData()->removeData();
-			utils::LinkedList<ml::DigitalFilter::Sample>* samplesQueue =
-					df.getSamplesQueue();
-			utils::LinkedList<ml::DigitalFilter::Sample>::Iterator iter =
-					samplesQueue->iterator();
+			utils::LinkedList<double>* weightsArray =
+					df.getWeightsArray();
+			utils::LinkedList<double>::Iterator iter =
+					weightsArray->iterator();
 			double k = 0.0;
 			while (iter.hasNext()) {
-				utils::LinkedList<ml::DigitalFilter::Sample>::Entry* e =
+				utils::LinkedList<double>::Entry* e =
 						iter.next();
-				ml::DigitalFilter::Sample& s = e->getValue();
-				chartFilterWeights.getChart().getData()->addPoint(k, s.weight);
+				double& w = e->getValue();
+				chartFilterWeights.getChart().getData()->addPoint(k, w);
 				++k;
 			}
 			chartFilterWeights.getChart().drawBackground();

@@ -21,20 +21,19 @@ class DigitalFilter {
 public:
 	DigitalFilter(size_t _dimension, double _speedStability) :
 			dimension(_dimension), speedStability(_speedStability) {
-		samplesQueue = new utils::LinkedList<Sample>();
+		inputsQueue = new utils::LinkedList<double>();
+		weightsArray = new utils::LinkedList<double>();
 	}
 	~DigitalFilter() {
-		delete samplesQueue;
+		delete inputsQueue;
+		delete weightsArray;
 	}
 
-	// filter sample
-	struct Sample {
-		double input; // input value
-		double weight; // weight
-	};
-
-	utils::LinkedList<Sample>* getSamplesQueue() {
-		return samplesQueue;
+	utils::LinkedList<double>* getInputsQueue() {
+		return inputsQueue;
+	}
+	utils::LinkedList<double>* getWeightsArray() {
+		return weightsArray;
 	}
 
 	void addInput(double input);
@@ -57,27 +56,33 @@ private:
 	size_t dimension;
 	// параметр определяющий скорость и устойчивость процесса адаптации
 	double speedStability;
-	utils::LinkedList<Sample>* samplesQueue;
+	utils::LinkedList<double>* inputsQueue; // очередь входов x2,x1,x0
+	utils::LinkedList<double>* weightsArray; // массив весов w0,w1,w2
 
 };
 
 void DigitalFilter::addInput(double input) {
-	Sample s = { input, 1.0 }; // default weight = 0.0
-	samplesQueue->unshift(s); // add to start
+	double defaultWeight = 0.0; // default weight = 0.0
+	inputsQueue->unshift(input); // add to start
+	weightsArray->push(defaultWeight);
 	// check dimension
-	if (samplesQueue->size() > dimension) {
-		// delete last
-		samplesQueue->pop();
+	if (inputsQueue->size() > dimension) {
+		inputsQueue->pop(); // delete last
+		weightsArray->shift(); // delete first
 	}
 }
 
 double DigitalFilter::calculateFilterOutSum() {
 	double sum = 0.0;
-	utils::LinkedList<Sample>::Iterator iter = samplesQueue->iterator();
-	while (iter.hasNext()) {
-		utils::LinkedList<Sample>::Entry* e = iter.next();
-		Sample& s = e->getValue();
-		sum = sum + s.input * s.weight;
+	utils::LinkedList<double>::Iterator inputsIter = inputsQueue->iterator();
+	utils::LinkedList<double>::Iterator weightsIter = weightsArray->iterator();
+	while (inputsIter.hasNext()) {
+		// iterators have same sizes
+		utils::LinkedList<double>::Entry* inputsEntry = inputsIter.next();
+		utils::LinkedList<double>::Entry* weightsEntry = weightsIter.next();
+		double& input = inputsEntry->getValue();
+		double& weight = weightsEntry->getValue();
+		sum = sum + input * weight;
 	}
 	return sum;
 }
@@ -86,14 +91,20 @@ double DigitalFilter::updateFilterWeightsByLeastSquaresAlgorithm(
 		double signalAndNoise, double filterOutSum) {
 	double evaluationError = signalAndNoise - filterOutSum;
 
-	utils::LinkedList<Sample>::Iterator iter = samplesQueue->iterator();
-	while (iter.hasNext()) {
-		utils::LinkedList<Sample>::Entry* e = iter.next();
-		Sample& s = e->getValue();
+	utils::LinkedList<double>::Iterator inputsIter = inputsQueue->iterator();
+	utils::LinkedList<double>::Iterator weightsIter = weightsArray->iterator();
+	double gk = 2.0 * speedStability * evaluationError;
+	while (inputsIter.hasNext()) {
+		// iterators have same sizes
+		utils::LinkedList<double>::Entry* inputsEntry = inputsIter.next();
+		utils::LinkedList<double>::Entry* weightsEntry = weightsIter.next();
+		double& input = inputsEntry->getValue();
+		double& weight = weightsEntry->getValue();
 
 		// алгоритм наименьших квадратов Уидроу-Хоффа
 		// W(k+1) = W(k) + 2*u*e*s.input
-		s.weight = s.weight + 2.0 * speedStability * evaluationError * s.input;
+		double wk = weight + gk * input;
+		weight = wk; // update value ref
 	}
 	return evaluationError;
 }
