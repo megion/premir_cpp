@@ -25,27 +25,28 @@ double get_time(void) {
 void test_chart() {
 	graphics::ChartThread chartSignalTemplate(680, 460);
 	graphics::ChartThread chartSignalIn(680, 460);
-	graphics::ChartThread chartNoise(680, 460);
+//	graphics::ChartThread chartNoise(680, 460);
 	graphics::ChartThread chartNoiseEval(680, 460);
 	graphics::ChartThread chartSignalOut(680, 460);
 	graphics::ChartThread chartFilterWeights(680, 460);
 
 	chartSignalTemplate.getChart().setWindowTitle("Signal template");
 	chartSignalIn.getChart().setWindowTitle("Signal+noise");
-	chartNoise.getChart().setWindowTitle("Noise");
+//	chartNoise.getChart().setWindowTitle("Noise");
 	chartNoiseEval.getChart().setWindowTitle("Noise eval");
 	chartSignalOut.getChart().setWindowTitle("Signal out");
 	chartFilterWeights.getChart().setWindowTitle("Weights");
 
-	double TN = 600.0; // кол-во точек на период
+	double TN = 500.0; // кол-во точек на период
+	size_t N = 1200; // размеры
 	double sampleStep = 2*M_PI/TN;
-	double speed = 1.0/(12000.0*36*10.0);
+	double speed = 1.0/(N*36.0*10.0);
 
-	ml::DigitalFilter df(12000, speed, 0.0);
+	ml::DigitalFilter df(N, speed, 0.0);
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(0.0, 0.1);
 
-	for (double i = 0.0; i <= 2*M_PI*40.0; i = i + sampleStep) {
+	for (double i = 0.0; i <= 2*M_PI*10.0; i = i + sampleStep) {
 //		double noise = distribution(generator)
 //				+ 2.0 * cos(8.0 * i * PI / 180.0);
 		double noise = 2.0 * cos(4.0 * i);
@@ -72,44 +73,42 @@ void test_chart() {
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
 //
-//			chartSignalTemplate.getChart().redrawNewPoints(i, signal);
-//			chartNoiseEval.getChart().redrawNewPoints(i, noiseEval);
-//			chartSignalIn.getChart().redrawNewPoints(i, signalAndNoise);
+			chartSignalTemplate.getChart().redrawNewPoints(i, signal);
+			chartNoiseEval.getChart().redrawNewPoints(i, noiseEval);
+			chartSignalIn.getChart().redrawNewPoints(i, signalAndNoise);
 //			chartNoise.getChart().redrawNewPoints(i, noise);
-//			chartSignalOut.getChart().redrawNewPoints(i, signalEval);
-//
-//			chartSignalTemplate.getChart().flush();
-//			chartNoiseEval.getChart().flush();
-//			chartSignalIn.getChart().flush();
+			chartSignalOut.getChart().redrawNewPoints(i, signalEval);
+
+			chartSignalTemplate.getChart().flush();
+			chartNoiseEval.getChart().flush();
+			chartSignalIn.getChart().flush();
 //			chartNoise.getChart().flush();
-//			chartSignalOut.getChart().flush();
+			chartSignalOut.getChart().flush();
 
-			chartSignalTemplate.getChart().getData()->addPoint(i, signal);
-			chartNoiseEval.getChart().getData()->addPoint(i, noiseEval);
-			chartSignalIn.getChart().getData()->addPoint(i, signalAndNoise);
-			chartNoise.getChart().getData()->addPoint(i, noise);
-			chartSignalOut.getChart().getData()->addPoint(i, signalEval);
+//			chartSignalTemplate.getChart().getData()->addPoint(i, signal);
+//			chartNoiseEval.getChart().getData()->addPoint(i, noiseEval);
+//			chartSignalIn.getChart().getData()->addPoint(i, signalAndNoise);
+//			chartNoise.getChart().getData()->addPoint(i, noise);
+//			chartSignalOut.getChart().getData()->addPoint(i, signalEval);
 
-//			chartFilterWeights.getChart().getData()->removeData();
-//			utils::LinkedList<double>* weightsArray = df.getWeightsArray();
-//			utils::LinkedList<double>::Iterator iter = weightsArray->iterator();
-//			double k = 0.0;
-//			while (iter.hasNext()) {
-//				utils::LinkedList<double>::Entry* e = iter.next();
-//				double& w = e->getValue();
-//				chartFilterWeights.getChart().getData()->addPoint(k, w);
-//				++k;
-//			}
-//			chartFilterWeights.getChart().drawBackground();
-//			chartFilterWeights.getChart().drawAxes();
-//			chartFilterWeights.getChart().drawAxesLabels();
-//			chartFilterWeights.getChart().drawPoints();
-//			chartFilterWeights.getChart().flush();
+			chartFilterWeights.getChart().getData()->removeData();
+			utils::LinkedList<double>* weightsArray = df.getWeightsArray();
+			utils::LinkedList<double>::Iterator iter = weightsArray->iterator();
+			double k = 0.0;
+			while (iter.hasNext()) {
+				utils::LinkedList<double>::Entry* e = iter.next();
+				double& w = e->getValue();
+				chartFilterWeights.getChart().getData()->addPoint(k, w);
+				++k;
+			}
+			chartFilterWeights.getChart().drawBackground();
+			chartFilterWeights.getChart().drawAxes();
+			chartFilterWeights.getChart().drawAxesLabels();
+			chartFilterWeights.getChart().drawPoints();
+			chartFilterWeights.getChart().flush();
 
-//			chart.getChart().redrawNewPoints(i, -result);
-//			chart.getChart().flush();
 
-//			std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 //			chart.getChart().drawBackground();
 
 		}
@@ -118,13 +117,13 @@ void test_chart() {
 	chartSignalTemplate.getChart().draw();
 	chartNoiseEval.getChart().draw();
 	chartSignalIn.getChart().draw();
-	chartNoise.getChart().draw();
+//	chartNoise.getChart().draw();
 	chartSignalOut.getChart().draw();
 
 	chartSignalTemplate.getChart().flush();
 	chartNoiseEval.getChart().flush();
 	chartSignalIn.getChart().flush();
-	chartNoise.getChart().flush();
+//	chartNoise.getChart().flush();
 	chartSignalOut.getChart().flush();
 
 //	chartSignalIn.getChart().draw();

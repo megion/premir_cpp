@@ -65,13 +65,13 @@ private:
 
 void DigitalFilter::addInput(double input) {
 	inputsQueue->unshift(input); // add to start
-	weightsArray->push(defaultWeight); // add to end
 	// check dimension
-	if (inputsQueue->size() > dimension) {
-		// TODO: should fixed because error work
+	if (dimension > inputsQueue->size()) {
+		weightsArray->push(defaultWeight); // add to end
+	} else {
 		inputsQueue->pop(); // delete last
-		weightsArray->shift(); // delete first
 	}
+
 }
 
 double DigitalFilter::calculateFilterOutSum() {
@@ -104,7 +104,7 @@ double DigitalFilter::updateFilterWeightsByLeastSquaresAlgorithm(
 		double& weight = weightsEntry->getValue();
 
 		// алгоритм наименьших квадратов Уидроу-Хоффа
-		// W(k+1) = W(k) + 2*u*e*s.input
+		// W(k+1) = W(k) + 2*u*e*x(k-i)
 		double wk = weight + gk * input;
 		weight = wk; // update value ref
 	}
