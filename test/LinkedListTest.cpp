@@ -2,7 +2,7 @@
 #include <LinkedListTest.h>
 #include <iterator>
 
-void test_push_shift_pop_unshift() {
+void test_push_shift_unshift() {
 	utils::LinkedList<Foo> list;
 	list.push(Foo('1', 2));
 	list.push(Foo('3', 4));
@@ -46,25 +46,26 @@ void test_push_shift_pop_unshift() {
 	}
 	assert(i == 2);
 
-	// test pop
-	newFirst = list.pop();
-	assert(newFirst->getValue().ch == '1');
-	assert(list.size() == 1);
-	list.unshift(Foo('8', 10));
-	assert(list.size() == 2);
-	newFirst = list.shift();
-	assert(list.size() == 1);
-	std::cout << "newFirst->getValue().ch: "<< newFirst->getValue().ch << std::endl;
-	assert(newFirst->getValue().ch == '1');
-
-	newFirst = list.pop();
-	assert(list.size() == 0);
-	assert(newFirst == nullptr);
+//	// test pop
+//	newFirst = list.pop();
+//	assert(newFirst->getValue().ch == '1');
+//	assert(list.size() == 1);
+//	list.unshift(Foo('8', 10));
+//	assert(list.size() == 2);
+//	newFirst = list.shift();
+//	assert(list.size() == 1);
+//	std::cout << "newFirst->getValue().ch: " << newFirst->getValue().ch
+//			<< std::endl;
+//	assert(newFirst->getValue().ch == '1');
+//
+//	newFirst = list.pop();
+//	assert(list.size() == 0);
+//	assert(newFirst == nullptr);
 
 	// try shift empty list
-	newFirst = list.shift();
-	assert(list.size() == 0);
-	assert(newFirst == nullptr);
+//	newFirst = list.shift();
+//	assert(list.size() == 0);
+//	assert(newFirst == nullptr);
 }
 
 void test_concat_and_copy() {
@@ -122,6 +123,26 @@ void test_index_operator() {
 
 	assert(list[0]->getValue().ch == '1');
 	assert(list[1]->getValue().ch == '3');
+}
+
+void test_pop() {
+	utils::LinkedList<Foo> list;
+
+	utils::LinkedList<Foo>::Entry* newlast = list.pop();
+	assert(newlast == nullptr);
+	assert(list.size() == 0);
+
+	list.push(Foo('1', 2));
+	list.pop();
+	assert(list.size() == 0);
+
+	list.push(Foo('3', 4));
+	list.push(Foo('5', 6));
+	list.push(Foo('7', 8));
+	newlast = list.pop();
+	assert(list.size() == 2);
+	assert(newlast->getValue().ch == '5');
+	assert(list[list.size()-1]->getValue().ch == '5');
 }
 
 void test_push_temp_values() {
@@ -204,8 +225,9 @@ void test_list() {
 
 void linked_list_test() {
 	suite("LinkedList");
-	test(push_shift_pop_unshift);
+	test(push_shift_unshift);
 	test(index_operator);
+	test(pop);
 //	test(concat_and_copy);
 //	test(push_temp_values);
 

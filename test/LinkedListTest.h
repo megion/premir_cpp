@@ -14,17 +14,17 @@ struct Foo {
 
 	Foo(const Foo& f) :
 			ch(f.ch), id(f.id) {
-		std::cout << "Foo: Run copy constructor" << std::endl;
+//		std::cout << "Foo: Run copy constructor" << std::endl;
 	}
 
 	Foo(Foo&& f) :
 			ch(f.ch), id(f.id) {
-		std::cout << "Foo: Run replace constructor" << std::endl;
+//		std::cout << "Foo: Run replace constructor" << std::endl;
 	}
 
 	Foo(char _ch, int _id) :
 			ch(_ch), id(_id) {
-		std::cout << "Foo: Run init constructor" << std::endl;
+//		std::cout << "Foo: Run init constructor" << std::endl;
 	}
 };
 

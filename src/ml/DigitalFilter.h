@@ -19,8 +19,10 @@ namespace ml {
 
 class DigitalFilter {
 public:
-	DigitalFilter(size_t _dimension, double _speedStability) :
-			dimension(_dimension), speedStability(_speedStability) {
+	DigitalFilter(size_t _dimension, double _speedStability,
+			double _defaultWeight = 0.0) :
+			dimension(_dimension), speedStability(_speedStability), defaultWeight(
+					_defaultWeight) {
 		inputsQueue = new utils::LinkedList<double>();
 		weightsArray = new utils::LinkedList<double>();
 	}
@@ -51,7 +53,7 @@ public:
 			double filterOutSum);
 
 private:
-
+	double defaultWeight = 0.0; // default weight = 0.0
 	// filter dimension
 	size_t dimension;
 	// параметр определяющий скорость и устойчивость процесса адаптации
@@ -62,11 +64,11 @@ private:
 };
 
 void DigitalFilter::addInput(double input) {
-	double defaultWeight = 0.0; // default weight = 0.0
 	inputsQueue->unshift(input); // add to start
-	weightsArray->push(defaultWeight);
+	weightsArray->push(defaultWeight); // add to end
 	// check dimension
 	if (inputsQueue->size() > dimension) {
+		// TODO: should fixed because error work
 		inputsQueue->pop(); // delete last
 		weightsArray->shift(); // delete first
 	}

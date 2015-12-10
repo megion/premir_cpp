@@ -54,7 +54,7 @@ public:
 				XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK, values);
 
 		// set title
-		setWindowTitle("Chart", "Chart");
+		setWindowTitle("Chart");
 	}
 
 	~Chart() {
@@ -110,7 +110,7 @@ public:
 				&rectangle);
 	}
 
-	void setWindowTitle(const char* title, const char* iconTitle);
+	void setWindowTitle(const char* title);
 
 private:
 
@@ -179,15 +179,15 @@ void Chart::redrawNewPoints(double x, double y) const {
 
 }
 
-void Chart::setWindowTitle(const char* title, const char* iconTitle) {
+void Chart::setWindowTitle(const char* title) {
 	/* set the title of the window */
 	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
 			XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(title), title);
 
 	/* set the title of the window icon */
 	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
-			XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8, strlen(iconTitle),
-			iconTitle);
+			XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8, strlen(title),
+			title);
 }
 
 void Chart::createContexts() {

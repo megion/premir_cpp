@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 //	xcbtest2();
 
 	suite("Chart");
-	test(chart);
+//	test(chart);
 
 	return 0;
 

@@ -60,7 +60,7 @@ public:
 		}
 		Entry(T&& value) :
 				_value(std::move(value)), _next(nullptr) {
-			std::cout << "move entry: " << &_value << std::endl;
+//			std::cout << "move entry: " << &_value << std::endl;
 		}
 		Entry(const T& value, Entry* next) :
 				_value(value), _next(next) {
