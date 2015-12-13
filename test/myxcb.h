@@ -11,6 +11,7 @@
 #include "graphics/ChartThread.h"
 #include "ml/DigitalFilter.h"
 #include "utils/LinkedList.h"
+#include "utils/CArrayList.h"
 
 double get_time(void) {
 	struct timeval timev;
@@ -79,11 +80,11 @@ void test_chart() {
 //			chartNoise.getChart().redrawNewPoints(i, noise);
 			chartSignalOut.getChart().redrawNewPoints(i, signalEval);
 
-			chartSignalTemplate.getChart().flush();
-			chartNoiseEval.getChart().flush();
-			chartSignalIn.getChart().flush();
-//			chartNoise.getChart().flush();
-			chartSignalOut.getChart().flush();
+//			chartSignalTemplate.getChart().flush();
+//			chartNoiseEval.getChart().flush();
+//			chartSignalIn.getChart().flush();
+////			chartNoise.getChart().flush();
+//			chartSignalOut.getChart().flush();
 
 //			chartSignalTemplate.getChart().getData()->addPoint(i, signal);
 //			chartNoiseEval.getChart().getData()->addPoint(i, noiseEval);
@@ -91,22 +92,20 @@ void test_chart() {
 //			chartNoise.getChart().getData()->addPoint(i, noise);
 //			chartSignalOut.getChart().getData()->addPoint(i, signalEval);
 
+			///////// draw filter weight
 			chartFilterWeights.getChart().getData()->removeData();
-			utils::LinkedList<double>* weightsArray = df.getWeightsArray();
-			utils::LinkedList<double>::Iterator iter = weightsArray->iterator();
 			double k = 0.0;
-			while (iter.hasNext()) {
-				utils::LinkedList<double>::Entry* e = iter.next();
-				double& w = e->getValue();
+			for (double& w : (*df.getWeightsArray())) {
 				chartFilterWeights.getChart().getData()->addPoint(k, w);
 				++k;
+
 			}
 			chartFilterWeights.getChart().drawBackground();
 			chartFilterWeights.getChart().drawAxes();
 			chartFilterWeights.getChart().drawAxesLabels();
 			chartFilterWeights.getChart().drawPoints();
 			chartFilterWeights.getChart().flush();
-
+			/////////
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 //			chart.getChart().drawBackground();

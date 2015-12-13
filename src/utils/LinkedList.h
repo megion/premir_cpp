@@ -1,10 +1,3 @@
-/*
- * LinkedList.h
- *
- *  Created on: Sep 19, 2015
- *      Author: ilya
- */
-
 #ifndef SRC_UTILS_LINKED_LIST_H_
 #define SRC_UTILS_LINKED_LIST_H_
 
@@ -15,7 +8,7 @@
 namespace utils {
 
 /**
- * Simple and very fast linked list realization of list.
+ * Simple linked list.
  */
 template<typename T>
 class LinkedList {
@@ -401,4 +394,4 @@ void LinkedList<T>::concat(const LinkedList<T>& list) {
 
 }
 
-#endif /* SRC_UTILS_LINKEDLIST_H_ */
+#endif

@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
-#include <LinkedListTest.h>
+#include <CArrayListTest.h>
+
+
 #include "test.h"
+#include "LinkedListTest.h"
 #include "utils/String.h"
 #include "myxcb.h"
-//#include "utils/LinkedList.h"
-//#include "utils/LinkedListIterator.h"
+
 
 //using namespace std;
 //using std::wstring;
@@ -25,7 +27,8 @@ int main(int argc, char** argv) {
 //	test(linked_list_create);
 //	test(linked_list_iterator);
 
-	linked_list_test();
+	linkedList_test();
+	cArrayList_test();
 
 //	xcbtest();
 //	xcbtest2();

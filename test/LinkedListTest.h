@@ -1,3 +1,6 @@
+#ifndef TEST_LINKED_LIST_TEST_H_
+#define TEST_LINKED_LIST_TEST_H_
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -6,7 +9,7 @@
 #include "test.h"
 #include "utils/LinkedList.h"
 
-void linked_list_test();
+void linkedList_test();
 
 struct Foo {
 	char ch;
@@ -31,4 +34,6 @@ struct Foo {
 class FooC {
 	bool bb;
 };
+
+#endif
 

@@ -14,6 +14,7 @@
 #include <math.h>
 
 #include "utils/LinkedList.h"
+#include "utils/CArrayList.h"
 
 namespace ml {
 
@@ -24,7 +25,7 @@ public:
 			dimension(_dimension), speedStability(_speedStability), defaultWeight(
 					_defaultWeight) {
 		inputsQueue = new utils::LinkedList<double>();
-		weightsArray = new utils::LinkedList<double>();
+		weightsArray = new utils::CArrayList<double>(dimension);
 	}
 	~DigitalFilter() {
 		delete inputsQueue;
@@ -34,7 +35,7 @@ public:
 	utils::LinkedList<double>* getInputsQueue() {
 		return inputsQueue;
 	}
-	utils::LinkedList<double>* getWeightsArray() {
+	utils::CArrayList<double>* getWeightsArray() {
 		return weightsArray;
 	}
 
@@ -59,7 +60,7 @@ private:
 	// параметр определяющий скорость и устойчивость процесса адаптации
 	double speedStability;
 	utils::LinkedList<double>* inputsQueue; // очередь входов x2,x1,x0
-	utils::LinkedList<double>* weightsArray; // массив весов w0,w1,w2
+	utils::CArrayList<double>* weightsArray; // массив весов w0,w1,w2
 
 };
 
@@ -77,14 +78,14 @@ void DigitalFilter::addInput(double input) {
 double DigitalFilter::calculateFilterOutSum() {
 	double sum = 0.0;
 	utils::LinkedList<double>::Iterator inputsIter = inputsQueue->iterator();
-	utils::LinkedList<double>::Iterator weightsIter = weightsArray->iterator();
+	size_t i = 0;
 	while (inputsIter.hasNext()) {
 		// iterators have same sizes
 		utils::LinkedList<double>::Entry* inputsEntry = inputsIter.next();
-		utils::LinkedList<double>::Entry* weightsEntry = weightsIter.next();
 		double& input = inputsEntry->getValue();
-		double& weight = weightsEntry->getValue();
+		double& weight = (*weightsArray)[i];
 		sum = sum + input * weight;
+		++i;
 	}
 	return sum;
 }
@@ -94,19 +95,19 @@ double DigitalFilter::updateFilterWeightsByLeastSquaresAlgorithm(
 	double evaluationError = signalAndNoise - filterOutSum;
 
 	utils::LinkedList<double>::Iterator inputsIter = inputsQueue->iterator();
-	utils::LinkedList<double>::Iterator weightsIter = weightsArray->iterator();
+	size_t i = 0;
 	double gk = 2.0 * speedStability * evaluationError;
 	while (inputsIter.hasNext()) {
 		// iterators have same sizes
 		utils::LinkedList<double>::Entry* inputsEntry = inputsIter.next();
-		utils::LinkedList<double>::Entry* weightsEntry = weightsIter.next();
 		double& input = inputsEntry->getValue();
-		double& weight = weightsEntry->getValue();
+		double& weight = (*weightsArray)[i];
 
 		// алгоритм наименьших квадратов Уидроу-Хоффа
 		// W(k+1) = W(k) + 2*u*e*x(k-i)
 		double wk = weight + gk * input;
 		weight = wk; // update value ref
+		++i;
 	}
 	return evaluationError;
 }

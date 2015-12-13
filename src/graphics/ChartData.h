@@ -1,5 +1,5 @@
-#ifndef SRC_GRAPHICS_CHARTDATA_H_
-#define SRC_GRAPHICS_CHARTDATA_H_
+#ifndef SRC_GRAPHICS_CHART_DATA_H_
+#define SRC_GRAPHICS_CHART_DATA_H_
 
 #include <xcb/xcb.h>
 #include <stdio.h>
@@ -11,25 +11,21 @@
 #include <iostream>
 #include <limits>
 
-#include "utils/LinkedList.h"
+#include "utils/CArrayList.h"
 
 namespace graphics {
 
 /**
- * Points chart container.
+ * Data chart container.
  * Transform each input point {double, double} to output ploter coordinates
  */
 class ChartData {
 public:
 	ChartData(const xcb_rectangle_t& _boundRect) :
-			boundRect(_boundRect), xRatio(1), yRatio(1), inrange(
-					{ 0, 0, 0, 0 }), outpoints(nullptr) {
-		inpoints = new utils::LinkedList<Point>();
-
-		std::cout << "Create chart data " << std::endl;
-		xAxes = new utils::LinkedList<Axis>();
-		yAxes = new utils::LinkedList<Axis>();
-
+			boundRect(_boundRect), inrange({ 0, 0, 0, 0 }), //
+			outpoints(nullptr) {
+		inpoints = new utils::CArrayList<Point>(0, 40);
+		outpoints = new utils::CArrayList<xcb_point_t>(0, 40);
 		createAxesPoints();
 	}
 
@@ -37,10 +33,7 @@ public:
 		delete inpoints;
 		delete xAxes;
 		delete yAxes;
-		if (outpoints) {
-			free(outpoints);
-			outpoints = nullptr;
-		}
+		delete outpoints;
 	}
 
 	struct Point {
@@ -62,15 +55,15 @@ public:
 		double yMin;
 	};
 
-	xcb_point_t* getOutpoints() {
+	utils::CArrayList<xcb_point_t>* getOutpoints() {
 		return outpoints;
 	}
 
-	utils::LinkedList<Axis>* getXAxes() {
+	utils::CArrayList<Axis>* getXAxes() {
 		return xAxes;
 	}
 
-	utils::LinkedList<Axis>* getYAxes() {
+	utils::CArrayList<Axis>* getYAxes() {
 		return yAxes;
 	}
 
@@ -84,18 +77,13 @@ public:
 	void removeData();
 
 private:
-	utils::LinkedList<Point>* inpoints;
-	// TODO axis replace to ArrayList with const size
-	utils::LinkedList<Axis>* yAxes;
-	utils::LinkedList<Axis>* xAxes;
-	xcb_point_t* outpoints;
+	utils::CArrayList<Point>* inpoints;
+	utils::CArrayList<Axis>* yAxes;
+	utils::CArrayList<Axis>* xAxes;
+	utils::CArrayList<xcb_point_t>* outpoints;
 	xcb_rectangle_t boundRect;
 
 	Range inrange;
-
-	// compression ratio
-	double xRatio; // boundRect.width/(inrange.xMax-inrange.xMin)
-	double yRatio;
 
 	/**
 	 * Calculate value by formula (line) out = a*value + b
@@ -113,4 +101,4 @@ private:
 
 } /* namespace graphics */
 
-#endif /* SRC_GRAPHICS_CHARTDATA_H_ */
+#endif

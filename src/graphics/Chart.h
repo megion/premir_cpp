@@ -92,17 +92,14 @@ public:
 	}
 
 	void drawPoints() const {
-		if (data->getOutpoints()) {
-			xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
-					pointsContext, data->size(), data->getOutpoints());
-		}
+		xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext,
+				data->size(), data->getOutpoints()->getArray());
 	}
 
 	void drawCleanPoints() const {
-		if (data->getOutpoints()) {
-			xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
-					cleanPointsContext, data->size(), data->getOutpoints());
-		}
+		xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
+				cleanPointsContext, data->size(),
+				data->getOutpoints()->getArray());
 	}
 
 	void drawBackground() const {
@@ -148,7 +145,7 @@ void Chart::runChart() const {
 	while (!done && (e = xcb_wait_for_event(connection))) {
 		switch (e->response_type & ~0x80) {
 		case XCB_EXPOSE: /* отрисовать или перерисовать окно */
-			std::cout << "XCB_EXPOSE event" << std::endl;
+//			std::cout << "XCB_EXPOSE event" << std::endl;
 
 			draw();
 
@@ -173,9 +170,17 @@ void Chart::draw() const {
 void Chart::redrawNewPoints(double x, double y) const {
 	drawCleanPoints();
 	data->addPoint(x, y);
-	drawAxes(); // because after clean some points are cleaned
-	drawAxesLabels();
 	drawPoints();
+
+	if (data->size() % 36 == 0) { // каждую третью
+		drawAxes();
+		drawAxesLabels();
+//			drawPoints();
+	}
+
+	xcb_flush(connection);
+
+//	drawCleanPoints();
 
 }
 
@@ -186,8 +191,7 @@ void Chart::setWindowTitle(const char* title) {
 
 	/* set the title of the window icon */
 	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
-			XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8, strlen(title),
-			title);
+			XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8, strlen(title), title);
 }
 
 void Chart::createContexts() {
@@ -251,43 +255,25 @@ void Chart::testCookie(xcb_void_cookie_t cookie, xcb_connection_t* connection,
 
 void Chart::drawAxes() const {
 	// vertical lines
-	utils::LinkedList<ChartData::Axis>* axes = data->getYAxes();
-	utils::LinkedList<ChartData::Axis>::Iterator iter = axes->iterator();
-
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		drawAxis(p);
+	for (ChartData::Axis& axis : (*data->getYAxes())) {
+		drawAxis(axis);
 	}
 
 	// horizontal lines
-	axes = data->getXAxes();
-	iter = axes->iterator();
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		drawAxis(p);
+	for (ChartData::Axis& axis : (*data->getXAxes())) {
+		drawAxis(axis);
 	}
 }
 
 void Chart::drawAxesLabels() const {
 	// vertical labels
-	utils::LinkedList<ChartData::Axis>* axes = data->getYAxes();
-	utils::LinkedList<ChartData::Axis>::Iterator iter = axes->iterator();
-
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		drawAxisLabel(p);
+	for (ChartData::Axis& axis : (*data->getYAxes())) {
+		drawAxisLabel(axis);
 	}
 
 	// horizontal labels
-	axes = data->getXAxes();
-	iter = axes->iterator();
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		drawAxisLabel(p);
+	for (ChartData::Axis& axis : (*data->getXAxes())) {
+		drawAxisLabel(axis);
 	}
 }
 

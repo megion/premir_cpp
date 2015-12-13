@@ -1,45 +1,92 @@
-/*
- * LinkedList.h
- *
- *  Created on: Sep 19, 2015
- *      Author: ilya
- */
+#ifndef SRC_UTILS_ARRAY_LIST_H_
+#define SRC_UTILS_ARRAY_LIST_H_
 
-#ifndef SRC_UTILS_LINKED_LIST_H_
-#define SRC_UTILS_LINKED_LIST_H_
-
-// std::move
 #include <utility>
 #include <iostream>
 
 namespace utils {
 
 /**
- * Simple and very fast linked list realization of list.
+ * Simple array list.
  */
 template<typename T>
 class ArrayList {
 public:
 
 	ArrayList() :
-			size(0) {
+			length(0), capacity(0), array(nullptr) {
 	}
 
-	// copy constructor: LinkedList l1; LinkedList l2 = l1;
+	ArrayList(size_t _capacity) :
+			length(0), capacity(_capacity) {
+		if (capacity == 0) {
+			array = nullptr;
+		} else {
+			array = new T[capacity];
+		}
+	}
+
+	// copy constructor: List l1; List l2 = l1;
 	ArrayList(const ArrayList<T>& list) :
-			size(0){
-		concat(list);
+			length(0), capacity(list.length) {
+		if (capacity == 0) {
+			array = nullptr;
+		} else {
+			array = new T[capacity];
+			concat(list);
+		}
 	}
 
-	// replace constructor: LinkedList l1; LinkedList l2(std::move(l1));
-	ArrayList(ArrayList<T> && list) {
+	// replace constructor: List l1; List l2(std::move(l1));
+	ArrayList(ArrayList<T> && list) :
+		length(list.length), capacity(list.capacity), array(list.array){
+		list.length = 0;
+		list.capacity = 0;
+		list.array = nullptr;
 	}
 
-	~ArrayList();
+	~ArrayList() {
+		if (array) {
+			delete[] array;
+		}
+		array = nullptr;
+		length = 0;
+		capacity = 0;
+	}
 
 	size_t size() const {
-		return size;
+		return length;
 	}
+
+	//////////////////////////////// Entry
+//	class Entry {
+//	public:
+//		Entry(const T& _value) :
+//				value(_value) {
+//			// TODO: value(_value) run copy constructor here.
+//			 std::cout << "copy entry: " << &_value << std::endl;
+//		}
+//		Entry(T&& _value) :
+//				value(std::move(_value)) {
+//			 std::cout << "move entry: " << &_value << std::endl;
+//		}
+//
+//		// copy operator
+//		Entry& operator=(const Entry& other) {
+////			value(other.value);
+//			return *this;
+//		}
+//		// replacement operator
+//		Entry& operator=(Entry&&) = delete;
+//
+//		T& getValue() {
+//			return value;
+//		}
+//
+//	private:
+//		T value; // TODO: variable is copy
+//	};
+	/////////////////////////////////
 
 	/**
 	 * Insert to end
@@ -48,18 +95,7 @@ public:
 	void push(T&& value);
 
 	/**
-	 * Remove first item and return new first
-	 */
-	void shift();
-
-	/**
-	 * Insert to begin.
-	 */
-	void unshift(const T& value);
-	void unshift(T&& value);
-
-	/**
-	 * Remove last item and return new last
+	 * Remove last
 	 */
 	void pop();
 
@@ -78,22 +114,32 @@ public:
 	 */
 	void removeAndDestroyAll();
 
-	// = assign operator: LinkedList l3; l3 = l2;
-	ArrayList<T>& operator=(const LinkedList<T>&);
-	// = replacement operator: LinkedList l3; l3 = std::move(l2);
-	LinkedList<T>& operator=(LinkedList<T> &&) = delete; //
+	// = assign operator: List l3; l3 = l2;
+	ArrayList<T>& operator=(const ArrayList<T>&);
+	// = replacement operator: List l3; l3 = std::move(l2);
+	ArrayList<T>& operator=(ArrayList<T> &&) = delete; //
 
 	// [] index operator
 	T& operator[](const size_t& index);
 
 private:
-
-
-private:
-	size_t size;
+	T* array;
+	size_t length; // current list size (is number contained elements)
+	size_t capacity; // list capacity or max size
 
 };
 
+template<typename T>
+void ArrayList<T>::push(const T& value) {
+	if (capacity > length) {
+
+	} else {
+		// increase array and capacity by one
+	}
+
+	return;
 }
 
-#endif /* SRC_UTILS_LINKEDLIST_H_ */
+}
+
+#endif

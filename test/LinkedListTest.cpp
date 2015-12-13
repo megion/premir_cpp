@@ -1,6 +1,4 @@
-#include <LinkedList.h>
 #include <LinkedListTest.h>
-#include <iterator>
 
 void test_push_shift_unshift() {
 	utils::LinkedList<Foo> list;
@@ -223,7 +221,7 @@ void test_list() {
 
 }
 
-void linked_list_test() {
+void linkedList_test() {
 	suite("LinkedList");
 	test(push_shift_unshift);
 	test(index_operator);

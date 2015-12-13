@@ -7,26 +7,8 @@ void ChartData::addPoint(double x, double y) {
 	Point p = { x, y };
 	inpoints->push(p);
 
-	// 2. copy out point array to new array
-	// use memcpy for best performance
-	size_t amount = inpoints->size() * sizeof(struct xcb_point_t);
-	if (outpoints) {
-		xcb_point_t* newOutpoints = (struct xcb_point_t*) realloc(outpoints,
-				amount);
-		if (newOutpoints == NULL) {
-			throw std::runtime_error(strerror(errno));
-		}
-		outpoints = newOutpoints;
-	} else {
-		outpoints = (struct xcb_point_t*) malloc(amount);
-		if (outpoints == NULL) {
-			throw std::runtime_error(strerror(errno));
-		}
-	}
-
 	// 3. calculate range
 	// start coordinate point apply left-down corner = (x0, y0 + h0)
-
 	if (inpoints->size() == 1) {
 		// first point so simple do initialize
 		inrange.xMax = x;
@@ -35,10 +17,12 @@ void ChartData::addPoint(double x, double y) {
 		inrange.yMin = y;
 
 		// start coordinates (x0, y0 + h0)
-		outpoints[0].x = boundRect.x;
-		outpoints[0].y = boundRect.y + boundRect.height;
+		outpoints->push(
+				{ boundRect.x, (int16_t) (boundRect.y + boundRect.height) });
 		return;
 	}
+
+	outpoints->push( { 0, 0 });
 
 	// if isDirty = true then should recalculate all points
 	bool xIsDirty = false;
@@ -67,7 +51,7 @@ void ChartData::addPoint(double x, double y) {
 	bool xIsConst = false;
 	if (inrange.xMax == inrange.xMin) {
 		// x has not ever been change, set to x0
-		outpoints[lastIndex].x = boundRect.x;
+		(*outpoints)[lastIndex].x = boundRect.x;
 		xIsConst = true;
 	} else {
 		// x line: xout = ax*xin + bx
@@ -80,7 +64,7 @@ void ChartData::addPoint(double x, double y) {
 	bool yIsConst = false;
 	if (inrange.yMax == inrange.yMin) {
 		// y has not ever been change, set to y0 + h0
-		outpoints[lastIndex].y = boundRect.y + boundRect.height;
+		(*outpoints)[lastIndex].y = boundRect.y + boundRect.height;
 		yIsConst = true;
 	} else {
 		// y line: yout = ay*yin + by
@@ -98,36 +82,30 @@ void ChartData::addPoint(double x, double y) {
 	if (!xIsDirty && !yIsDirty) {
 		// range input values no changes so calculate only current point
 		if (!xIsConst) {
-			outpoints[lastIndex].x = transformToOut(ax, bx, x);
+			(*outpoints)[lastIndex].x = transformToOut(ax, bx, x);
 		}
 		if (!yIsConst) {
-			outpoints[lastIndex].y = transformToOut(ay, by, y);
+			(*outpoints)[lastIndex].y = transformToOut(ay, by, y);
 		}
 	} else {
-		utils::LinkedList<Point>::Iterator iter = inpoints->iterator();
-		size_t i = 0;
-		while (iter.hasNext()) {
-			utils::LinkedList<Point>::Entry* e = iter.next();
-			Point& inp = e->getValue();
+		for (size_t i = 0; i < inpoints->size(); ++i) {
+			Point& inp = (*inpoints)[i];
 			// recalculate all if IsDirty else only last is recalculate
 			if (!xIsConst && (xIsDirty || (i == lastIndex))) {
-				outpoints[i].x = transformToOut(ax, bx, inp.x);
+				(*outpoints)[i].x = transformToOut(ax, bx, inp.x);
 			}
 			if (!yIsConst && (yIsDirty || (i == lastIndex))) {
-				outpoints[i].y = transformToOut(ay, by, inp.y);
+				(*outpoints)[i].y = transformToOut(ay, by, inp.y);
 			}
-			++i;
 		}
-
 		updateAxesLabel(ax, bx, ay, by);
 	}
 
 }
 
 void ChartData::printPoints() {
-	for (size_t i = 0; i < inpoints->size(); ++i) {
-		std::cout << "outp.x: " << outpoints[i].x << " outp.y: "
-				<< outpoints[i].y << std::endl;
+	for (xcb_point_t& p : (*outpoints)) {
+		std::cout << "outp.x: " << p.x << " outp.y: " << p.y << std::endl;
 	}
 }
 
@@ -137,6 +115,7 @@ void ChartData::createAxesPoints() {
 
 	// vertical
 	int16_t verCount = boundRect.width / step;
+	xAxes = new utils::CArrayList<Axis>(verCount);
 	int16_t ybottom = boundRect.y + boundRect.height;
 	int16_t ytop = boundRect.y;
 	for (int16_t i = 1; i <= verCount; ++i) {
@@ -147,6 +126,7 @@ void ChartData::createAxesPoints() {
 
 	// horizontal
 	int16_t horCount = boundRect.height / step;
+	yAxes = new utils::CArrayList<Axis>(horCount);
 	int16_t xleft = boundRect.x;
 	int16_t xright = boundRect.x + boundRect.width;
 	for (int16_t i = 1; i <= horCount; ++i) {
@@ -157,35 +137,24 @@ void ChartData::createAxesPoints() {
 }
 
 void ChartData::updateAxesLabel(double ax, double bx, double ay, double by) {
-	utils::LinkedList<Axis>::Iterator iter = xAxes->iterator();
-	int16_t i = 1;
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		p.labelValue = transformToIn(ax, bx, p.line[0].x);
-		bool hideLabel = ((i - 1) % 3 != 0);
-		p.hideLabel = hideLabel;
-		++i;
+	for (int i = 0; i < xAxes->size(); ++i) {
+		Axis& axis = (*xAxes)[i];
+		axis.labelValue = transformToIn(ax, bx, axis.line[0].x);
+		bool hideLabel = (i % 3 != 0);
+		axis.hideLabel = hideLabel;
 	}
 
-	i = 1;
-	iter = yAxes->iterator();
-	while (iter.hasNext()) {
-		utils::LinkedList<ChartData::Axis>::Entry* e = iter.next();
-		ChartData::Axis& p = e->getValue();
-		p.labelValue = transformToIn(ay, by, p.line[0].y);
-		bool hideLabel = i % 2 == 0;
-		p.hideLabel = hideLabel;
-		++i;
+	for (int i = 0; i < yAxes->size(); ++i) {
+		Axis& axis = (*yAxes)[i];
+		axis.labelValue = transformToIn(ay, by, axis.line[0].y);
+		bool hideLabel = (i + 1) % 2 == 0;
+		axis.hideLabel = hideLabel;
 	}
 }
 
 void ChartData::removeData() {
 	inpoints->removeAll();
-	if (outpoints) {
-		free(outpoints);
-		outpoints = nullptr;
-	}
+	outpoints->removeAll();
 }
 
 }
