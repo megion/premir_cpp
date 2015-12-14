@@ -22,27 +22,31 @@ public:
 		delete matrix;
 	}
 
-//	// iterator implementation for use in C++11 range-based for loops
-//	class Iterator {
-//	public:
-//		Iterator(T* _arr, size_t _pos) :
-//				arr(_arr), pos(_pos) {
-//		}
-//		bool operator!=(const Iterator& other) const {
-//			return pos != other.pos;
-//		}
-//		T& operator*() const {
-//			return arr[pos];
-//		}
-//		const Iterator& operator++() {
-//			++pos;
-//			return *this;
-//		}
-//
-//	private:
-//		size_t pos;
-//		T* arr;
-//	};
+	// iterator implementation for use in C++11 range-based for loops
+	class SliceIterator {
+	public:
+		SliceIterator(T* _arr, size_t _start, size_t _step) :
+				arr(_arr), start(_start), step(_step), pos(_start), counter(0) {
+		}
+		bool operator!=(const SliceIterator& other) const {
+			return pos != other.pos;
+		}
+		T& operator*() const {
+			return arr[pos];
+		}
+		const SliceIterator& operator++() {
+			++counter;
+			pos = start + counter * step;
+			return *this;
+		}
+
+	private:
+		size_t start;
+		size_t step;
+		size_t counter;
+		size_t pos;
+		T* arr;
+	};
 //	// begin method range-based for loop
 //	Iterator begin() const {
 //		return Iterator(array, 0);
@@ -51,7 +55,8 @@ public:
 //	Iterator end() const {
 //		return Iterator(array, length);
 //	}
-	/////////////////////////////////
+
+	///////////////////////////////
 
 private:
 	CArrayList<T>* matrix;

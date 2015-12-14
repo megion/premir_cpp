@@ -24,12 +24,12 @@ double get_time(void) {
 #define PI 3.14159265
 
 void test_chart() {
-	graphics::ChartThread chartSignalTemplate(680, 460);
-	graphics::ChartThread chartSignalIn(680, 460);
+	graphics::ChartThread chartSignalTemplate(710, 460);
+	graphics::ChartThread chartSignalIn(710, 460);
 //	graphics::ChartThread chartNoise(680, 460);
-	graphics::ChartThread chartNoiseEval(680, 460);
-	graphics::ChartThread chartSignalOut(680, 460);
-	graphics::ChartThread chartFilterWeights(680, 460);
+	graphics::ChartThread chartNoiseEval(710, 460);
+	graphics::ChartThread chartSignalOut(710, 460);
+	graphics::ChartThread chartFilterWeights(710, 460);
 
 	chartSignalTemplate.getChart().setWindowTitle("Signal template");
 	chartSignalIn.getChart().setWindowTitle("Signal+noise");
