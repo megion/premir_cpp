@@ -47,16 +47,29 @@ public:
 		size_t pos;
 		T* arr;
 	};
-//	// begin method range-based for loop
-//	Iterator begin() const {
-//		return Iterator(array, 0);
-//	}
-//	// begin method range-based for loop
-//	Iterator end() const {
-//		return Iterator(array, length);
-//	}
 
-	///////////////////////////////
+//	class RangeIterator {
+//	public:
+//		RangeIterator(T* _arr, size_t _dim1, size_t _dim2) :
+//				arr(_arr), dim1(_dim1), dim2(_dim2) {
+//		}
+//		//	// begin method range-based for loop
+//		SliceIterator begin() const {
+//			return SliceIterator(arr, 0);
+//		}
+//		// begin method range-based for loop
+//		SliceIterator end() const {
+//			return SliceIterator(arr, length);
+//		}
+//
+//	private:
+//		size_t dim1;
+//		size_t dim2;
+//		T* arr;
+//	};
+
+
+///////////////////////////////
 
 private:
 	CArrayList<T>* matrix;
