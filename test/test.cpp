@@ -1,11 +1,12 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
-#include <CArrayListTest.h>
 
 
 #include "test.h"
 #include "LinkedListTest.h"
+#include "CArrayListTest.h"
+#include "CMatrixTest.h"
 #include "utils/String.h"
 #include "myxcb.h"
 
@@ -29,12 +30,13 @@ int main(int argc, char** argv) {
 
 	linkedList_test();
 	cArrayList_test();
+	cMatrix_test();
 
 //	xcbtest();
 //	xcbtest2();
 
 	suite("Chart");
-	test(chart);
+//	test(chart);
 
 	return 0;
 
