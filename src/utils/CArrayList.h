@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <string>
 #include <cstring>
 
 #include <exception>

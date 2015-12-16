@@ -2,6 +2,7 @@
 #define SRC_UTILS_STRING_H_
 
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <iomanip>
 
