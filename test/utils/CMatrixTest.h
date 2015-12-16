@@ -1,12 +1,10 @@
-#ifndef TEST_C_MATRIX_TEST_H_
-#define TEST_C_MATRIX_TEST_H_
-
-#include "../src/utils/CMatrix.h"
+#ifndef TEST_UTILS_C_MATRIX_TEST_H_
+#define TEST_UTILS_C_MATRIX_TEST_H_
 
 #include <iostream>
-#include <assert.h>
 
 #include "test.h"
+#include "utils/CMatrix.h"
 
 void cMatrix_test();
 

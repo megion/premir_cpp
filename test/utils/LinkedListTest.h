@@ -1,12 +1,12 @@
-#ifndef TEST_LINKED_LIST_TEST_H_
-#define TEST_LINKED_LIST_TEST_H_
+#ifndef TEST_UTILS_LINKED_LIST_TEST_H_
+#define TEST_UTILS_LINKED_LIST_TEST_H_
 
 #include <iostream>
-#include <vector>
-#include <list>
+//#include <vector>
+//#include <list>
 
 #include "test.h"
-#include "../src/utils/LinkedList.h"
+#include "utils/LinkedList.h"
 
 void linkedList_test();
 

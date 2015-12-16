@@ -1,16 +1,8 @@
-/*
- * test.h
- *
- *  Created on: Sep 15, 2015
- *      Author: ilya
- */
-
 #ifndef TEST_TEST_H_
 #define TEST_TEST_H_
 
 #include <stdio.h>
 #include <assert.h>
-//#include <cstdlib>
 
 /*
  * Test the given `fn`.

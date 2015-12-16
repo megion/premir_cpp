@@ -5,7 +5,6 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
-#include <thread>
 
 #include "ChartColormap.h"
 #include "ChartData.h"

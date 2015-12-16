@@ -1,22 +1,6 @@
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <sys/time.h>
+#include "DigitalFilterTest.h"
 
-#include <cmath>
-#include <random>
-#include <chrono>         // std::chrono::seconds
-
-#include <xcb/xcb.h>
-
-#include "graphics/ChartThread.h"
-#include "ml/DigitalFilter.h"
-#include "utils/LinkedList.h"
-#include "utils/CArrayList.h"
-
-# define MY_PI		3.14159265358979323846	/* pi */
-
-
-void test_chart() {
+void test_filter_charts() {
 	graphics::ChartThread chartSignalTemplate(710, 460);
 	graphics::ChartThread chartSignalIn(710, 460);
 //	graphics::ChartThread chartNoise(680, 460);
@@ -142,5 +126,11 @@ void test_chart() {
 //	chart.addPoint(1000, 1000);
 //	chart.printPoints();
 //	chart.runChart();
+
+}
+
+void digitalFilter1_test() {
+	suite("charts");
+	test(filter_charts);
 
 }

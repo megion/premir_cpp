@@ -99,6 +99,6 @@ private:
 
 };
 
-} /* namespace graphics */
+}
 
 #endif

@@ -1,21 +1,11 @@
 
 #include <iostream>
 
-#include "test.h"
-#include "LinkedListTest.h"
-#include "CArrayListTest.h"
-#include "CMatrixTest.h"
-//#include "utils/String.h"
-#include "myxcb.h"
-
-
-//using namespace std;
-//using std::wstring;
-
-//static void test_size_string() {
-//	utils::String buf = "123456";
-//	assert(buf.size() == 6);
-//}
+//#include "test.h"
+#include "utils/LinkedListTest.h"
+#include "utils/CArrayListTest.h"
+#include "utils/CMatrixTest.h"
+#include "ml/DigitalFilterTest.h"
 
 int main(int argc, char** argv) {
 
@@ -29,8 +19,8 @@ int main(int argc, char** argv) {
 	linkedList_test();
 	cArrayList_test();
 	cMatrix_test();
+	digitalFilter1_test();
 
-	suite("Chart");
 //	test(chart);
 
 	return 0;

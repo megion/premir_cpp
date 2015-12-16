@@ -1,17 +1,7 @@
-/*
- * DigitalFilter.h
- *
- * Implementation of digital filter
- *
- *  Created on: Dec 8, 2015
- *      Author: ilya
- */
-
-#ifndef SRC_ML_DIGITALFILTER_H_
-#define SRC_ML_DIGITALFILTER_H_
+#ifndef SRC_ML_DIGITAL_FILTER_H_
+#define SRC_ML_DIGITAL_FILTER_H_
 
 #include <iostream>
-#include <math.h>
 
 #include "utils/LinkedList.h"
 #include "utils/CArrayList.h"
@@ -22,8 +12,8 @@ class DigitalFilter {
 public:
 	DigitalFilter(size_t _dimension, double _speedStability,
 			double _defaultWeight = 0.0) :
-			dimension(_dimension), speedStability(_speedStability), defaultWeight(
-					_defaultWeight) {
+			dimension(_dimension), speedStability(_speedStability), //
+			defaultWeight(_defaultWeight) {
 		inputsQueue = new utils::LinkedList<double>();
 		weightsArray = new utils::CArrayList<double>(dimension);
 	}
@@ -112,6 +102,6 @@ double DigitalFilter::updateFilterWeightsByLeastSquaresAlgorithm(
 	return evaluationError;
 }
 
-} /* namespace ml */
+}
 
-#endif /* SRC_ML_DIGITALFILTER_H_ */
+#endif /* SRC_ML_DIGITAL_FILTER_H_ */

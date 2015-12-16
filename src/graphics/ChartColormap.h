@@ -1,5 +1,5 @@
-#ifndef SRC_GRAPHICS_CHARTCOLORMAP_H_
-#define SRC_GRAPHICS_CHARTCOLORMAP_H_
+#ifndef SRC_GRAPHICS_CHART_COLORMAP_H_
+#define SRC_GRAPHICS_CHART_COLORMAP_H_
 
 #include <xcb/xcb.h>
 #include <iostream>
@@ -52,4 +52,4 @@ private:
 
 }
 
-#endif /* SRC_GRAPHICS_CHARTCOLORMAP_H_ */
+#endif

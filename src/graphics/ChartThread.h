@@ -1,12 +1,5 @@
-/*
- * ChartThread.h
- *
- *  Created on: Dec 5, 2015
- *      Author: ilya
- */
-
-#ifndef SRC_GRAPHICS_CHARTTHREAD_H_
-#define SRC_GRAPHICS_CHARTTHREAD_H_
+#ifndef SRC_GRAPHICS_CHART_THREAD_H_
+#define SRC_GRAPHICS_CHART_THREAD_H_
 
 #include <thread>
 #include <iostream>
@@ -38,6 +31,6 @@ private:
 
 };
 
-} /* namespace graphics */
+}
 
-#endif /* SRC_GRAPHICS_CHARTTHREAD_H_ */
+#endif
