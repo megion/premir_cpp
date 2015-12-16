@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <string>
-#include <cstring>
+//#include <cstring>
 
 #include <exception>
 #include <stdexcept>
@@ -42,7 +42,7 @@ public:
 			size_t amount = capacity * typeSizeof;
 			array = (T*) std::malloc(amount);
 			if (array == NULL) {
-				throw std::runtime_error(std::strerror(errno));
+				throw std::runtime_error(strerror(errno));
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public:
 			}
 
 			// copy all array
-			std::memcpy(array, list.array, capacity * typeSizeof);
+			memcpy(array, list.array, capacity * typeSizeof);
 		}
 	}
 
@@ -177,7 +177,7 @@ void CArrayList<T>::push(const T* values, size_t valuesSize) {
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(std::strerror(errno));
+			throw std::runtime_error(strerror(errno));
 		}
 		array = newArray;
 	}
@@ -202,7 +202,7 @@ void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(std::strerror(errno));
+			throw std::runtime_error(strerror(errno));
 		}
 		array = newArray;
 	} else if (newLength > length) { // simple update length
