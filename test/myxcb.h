@@ -13,6 +13,8 @@
 #include "utils/LinkedList.h"
 #include "utils/CArrayList.h"
 
+# define MY_PI		3.14159265358979323846	/* pi */
+
 
 void test_chart() {
 	graphics::ChartThread chartSignalTemplate(710, 460);
@@ -31,14 +33,14 @@ void test_chart() {
 
 	double TN = 500.0; // кол-во точек на период
 	size_t N = 1200; // размеры
-	double sampleStep = 2*M_PI/TN;
+	double sampleStep = 2*MY_PI/TN;
 	double speed = 1.0/(N*36.0*10.0);
 
 	ml::DigitalFilter df(N, speed, 0.0);
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(0.0, 0.1);
 
-	for (double i = 0.0; i <= 2*M_PI*10.0; i = i + sampleStep) {
+	for (double i = 0.0; i <= 2*MY_PI*10.0; i = i + sampleStep) {
 //		double noise = distribution(generator)
 //				+ 2.0 * cos(8.0 * i * PI / 180.0);
 		double noise = 2.0 * cos(4.0 * i);
