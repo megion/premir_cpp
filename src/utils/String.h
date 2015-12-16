@@ -75,7 +75,7 @@ inline String& String::operator=(const char* s) {
 	length = 0;
 	delete[] str;
 	if (s) {
-		length = strlen(s);
+		length = std::strlen(s);
 		str = new char[length + 1];
 		std::strncpy(str, s, length);
 	}
