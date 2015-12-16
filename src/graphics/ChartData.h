@@ -2,12 +2,11 @@
 #define SRC_GRAPHICS_CHART_DATA_H_
 
 #include <xcb/xcb.h>
-#include <stdio.h>
+#include <cstdio>
 #include <cmath>
-#include <string.h>
 #include <exception>
 #include <stdexcept>
-#include <errno.h>
+#include <cerrno>
 #include <iostream>
 #include <limits>
 

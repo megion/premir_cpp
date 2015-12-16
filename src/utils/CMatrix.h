@@ -20,7 +20,7 @@ public:
 
 	CMatrix() = delete;
 	CMatrix(const CMatrix<T>&) = delete;
-	CMatrix<T>& operator=(const CMatrix<T>&) = delete;// assign operator
+	CMatrix<T>& operator=(const CMatrix<T>&) = delete; // assign operator
 	CMatrix<T>& operator=(CMatrix<T> &&) = delete; // replacement operator
 
 	~CMatrix() {
@@ -109,12 +109,12 @@ public:
 	}
 
 	T& operator()(size_t r, size_t c) {
-		return (*matrix)[r*colSize + c];
+		return (*matrix)[r * colSize + c];
 	}
 
-	Coordinate getColIndex(size_t index) const {
-		size_t r = index / colSize;
-		size_t c = index - r*colSize;
+	Coordinate getCoordinate(size_t position) const {
+		size_t r = position / colSize;
+		size_t c = position - r * colSize;
 		return {r, c};
 	}
 
@@ -122,15 +122,28 @@ public:
 		return matrix;
 	}
 
-	void push(size_t r, size_t c, const T& value) {
-		(*this)(r, c);
+	void writeRow(size_t rowIndex, const T* values) {
+		size_t start = rowIndex * colSize;
+		matrix->write(start, values, colSize);
 	}
+
+	void printMatrix();
 
 private:
 	CArrayList<T>* matrix;
 	size_t rowSize;
 	size_t colSize;
 };
+
+template<typename T>
+void CMatrix<T>::printMatrix() {
+	for(size_t r=0; r<rowSize; ++r) {
+		for (size_t c=0; c<colSize; ++c) {
+			std::cout << (*this)(r, c) << ", ";
+		}
+		std::cout << std::endl;
+	}
+}
 
 }
 

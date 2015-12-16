@@ -46,7 +46,7 @@ public:
 
 	// copy constructor: List l1; List l2 = l1;
 	CArrayList(const CArrayList<T>& list) :
-			length(0), capacity(list.length), //
+			length(list.length), capacity(list.capacity), //
 			capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)) {
 		if (capacity == 0) {
 			array = nullptr;
@@ -56,27 +56,24 @@ public:
 			if (array == NULL) {
 				throw std::runtime_error(strerror(errno));
 			}
-			concat(list);
+
+			// copy all array
+			memcpy(array, list.array, capacity * typeSizeof);
 		}
 	}
 
 	// replace constructor: List l1; List l2(std::move(l1));
 	CArrayList(CArrayList<T> && list) :
 			length(list.length), capacity(list.capacity), //
-			capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)), array(
-					list.array) {
+			capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)), //
+			array(list.array) {
 		list.length = 0;
 		list.capacity = 0;
 		list.array = nullptr;
 	}
 
 	~CArrayList() {
-		if (array) {
-			free(array);
-		}
-		array = nullptr;
-		length = 0;
-		capacity = 0;
+		removeAll();
 	}
 
 	size_t size() const {
@@ -92,15 +89,11 @@ public:
 	 */
 	void push(const T& value);
 	void push(const T* values, size_t valuesSize);
-
 	/**
-	 * Remove last
+	 * Save copy values begin with specified position
 	 */
-	void pop();
-
-	void concat(const CArrayList<T>& list);
-
-	void reverse();
+	void write(size_t position, const T& values);
+	void write(size_t position, const T* values, size_t valuesSize);
 
 	/**
 	 * Remove all elements
@@ -173,7 +166,13 @@ void CArrayList<T>::push(const T* values, size_t valuesSize) {
 		}
 
 		size_t amount = capacity * typeSizeof;
-		T* newArray = (T*) realloc(array, amount);
+		T* newArray;
+		if (array) {
+			newArray = (T*) realloc(array, amount);
+		} else {
+			newArray = (T*) malloc(amount);
+		}
+
 		if (newArray == NULL) {
 			throw std::runtime_error(strerror(errno));
 		}
@@ -187,9 +186,44 @@ void CArrayList<T>::push(const T* values, size_t valuesSize) {
 }
 
 template<typename T>
+void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
+	size_t newLength = position + valuesSize;
+	if (newLength > capacity) { // need increase capacity
+		capacity = newLength;
+		size_t amount = capacity * typeSizeof;
+		T* newArray;
+		if (array) {
+			newArray = (T*) realloc(array, amount);
+		} else {
+			newArray = (T*) malloc(amount);
+		}
+
+		if (newArray == NULL) {
+			throw std::runtime_error(strerror(errno));
+		}
+		array = newArray;
+	} else if (newLength > length) { // simple update length
+		length = newLength;
+	}
+
+	// copy value as bytes. Copy constructor not call.
+	T* last = array + position;
+	memcpy(last, values, valuesSize * typeSizeof);
+}
+
+template<typename T>
+void CArrayList<T>::write(size_t position, const T& value) {
+	write(position, &value, 1);
+}
+
+template<typename T>
 void CArrayList<T>::removeAll() {
-	// real no elements deleted, simple set length = 0.
+	if (array) {
+		free(array);
+	}
+	array = nullptr;
 	length = 0;
+	capacity = 0;
 }
 
 }

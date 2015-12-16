@@ -32,9 +32,6 @@ int main(int argc, char** argv) {
 	cArrayList_test();
 	cMatrix_test();
 
-//	xcbtest();
-//	xcbtest2();
-
 	suite("Chart");
 //	test(chart);
 
