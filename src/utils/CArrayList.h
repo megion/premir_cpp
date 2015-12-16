@@ -1,10 +1,12 @@
 #ifndef SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 #define SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 
-#include <stdlib.h>
-#include <errno.h>
-//#include <cstring>
-#include <string.h>
+extern "C" {
+	#include <stdlib.h>
+	#include <errno.h>
+	#include <string.h>
+}
+
 #include <exception>
 #include <stdexcept>
 #include <iostream>
