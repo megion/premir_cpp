@@ -1,4 +1,4 @@
-#include <CMatrixTest.h>
+#include "CMatrixTest.h"
 
 void test_set_value() {
 	size_t rowSize = 4;

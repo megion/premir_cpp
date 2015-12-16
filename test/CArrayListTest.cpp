@@ -1,4 +1,4 @@
-#include <CArrayListTest.h>
+#include "CArrayListTest.h"
 
 void test_push() {
 	utils::CArrayList<Foo2> list;

@@ -2,8 +2,9 @@
 #define SRC_GRAPHICS_CHART_DATA_H_
 
 #include <xcb/xcb.h>
+#include <math.h>
+
 #include <cstdio>
-#include <cmath>
 #include <exception>
 #include <stdexcept>
 #include <cerrno>
@@ -88,7 +89,7 @@ private:
 	 * Calculate value by formula (line) out = a*value + b
 	 */
 	int transformToOut(double a, double b, double inValue) {
-		return std::round(a * inValue + b);
+		return round(a * inValue + b);
 	}
 	double transformToIn(double a, double b, int16_t outValue) {
 		return ((double)(outValue) - b)/a;
