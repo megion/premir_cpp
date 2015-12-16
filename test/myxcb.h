@@ -1,7 +1,8 @@
 //#include <stdlib.h>
 //#include <stdio.h>
 //#include <sys/time.h>
-#include <math.h>
+
+#include <cmath>
 #include <random>
 #include <chrono>         // std::chrono::seconds
 
@@ -50,7 +51,7 @@ void test_chart() {
 
 		double signalAndNoise = signal + noise;
 
-		if (!isnan(signalAndNoise)) {
+		if (!std::isnan(signalAndNoise)) {
 //			std::cout << "result: " << result << std::endl;
 
 			df.addInput(noise);

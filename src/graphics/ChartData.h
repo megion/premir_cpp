@@ -4,12 +4,12 @@
 #include <xcb/xcb.h>
 #include <math.h>
 
-#include <cstdio>
-#include <exception>
-#include <stdexcept>
-#include <cerrno>
+//#include <cstdio>
+//#include <exception>
+//#include <stdexcept>
+//#include <cerrno>
 #include <iostream>
-#include <limits>
+//#include <limits>
 
 #include "utils/CArrayList.h"
 
