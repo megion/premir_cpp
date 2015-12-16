@@ -1,7 +1,6 @@
 #ifndef SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 #define SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 
-//#include <cstdio>
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
@@ -40,7 +39,7 @@ public:
 			size_t amount = capacity * typeSizeof;
 			array = (T*) malloc(amount);
 			if (array == NULL) {
-				throw std::runtime_error(strerror(errno));
+				throw std::runtime_error(std::strerror(errno));
 			}
 		}
 	}
@@ -55,7 +54,7 @@ public:
 			size_t amount = capacity * typeSizeof;
 			array = (T*) malloc(amount);
 			if (array == NULL) {
-				throw std::runtime_error(strerror(errno));
+				throw std::runtime_error(std::strerror(errno));
 			}
 
 			// copy all array
@@ -175,14 +174,14 @@ void CArrayList<T>::push(const T* values, size_t valuesSize) {
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(strerror(errno));
+			throw std::runtime_error(std::strerror(errno));
 		}
 		array = newArray;
 	}
 
 	// copy value as bytes. Copy constructor not call.
 	T* last = array + length;
-	memcpy(last, values, valuesSize * typeSizeof);
+	std::memcpy(last, values, valuesSize * typeSizeof);
 	length = newLength;
 }
 
@@ -200,7 +199,7 @@ void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(strerror(errno));
+			throw std::runtime_error(std::strerror(errno));
 		}
 		array = newArray;
 	} else if (newLength > length) { // simple update length
@@ -209,7 +208,7 @@ void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
 
 	// copy value as bytes. Copy constructor not call.
 	T* last = array + position;
-	memcpy(last, values, valuesSize * typeSizeof);
+	std::memcpy(last, values, valuesSize * typeSizeof);
 }
 
 template<typename T>
@@ -220,7 +219,7 @@ void CArrayList<T>::write(size_t position, const T& value) {
 template<typename T>
 void CArrayList<T>::removeAll() {
 	if (array) {
-		free(array);
+		std::free(array);
 	}
 	array = nullptr;
 	length = 0;
