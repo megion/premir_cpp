@@ -1,7 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
+//#include <stdlib.h>
+//#include <stdio.h>
+//#include <sys/time.h>
 #include <math.h>
 #include <random>
 #include <chrono>         // std::chrono::seconds
@@ -13,15 +12,6 @@
 #include "utils/LinkedList.h"
 #include "utils/CArrayList.h"
 
-double get_time(void) {
-	struct timeval timev;
-
-	gettimeofday(&timev, NULL);
-
-	return (double) timev.tv_sec + (((double) timev.tv_usec) / 1000000);
-}
-
-#define PI 3.14159265
 
 void test_chart() {
 	graphics::ChartThread chartSignalTemplate(710, 460);

@@ -4,10 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <assert.h>
 
 #include "test.h"
-#include "utils/LinkedList.h"
+#include "../src/utils/LinkedList.h"
 
 void linkedList_test();
 

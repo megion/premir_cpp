@@ -9,6 +9,7 @@
 #define TEST_TEST_H_
 
 #include <stdio.h>
+#include <assert.h>
 //#include <cstdlib>
 
 /*
