@@ -1,7 +1,8 @@
 #ifndef SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 #define SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 
-#include <cstdio>
+//#include <cstdio>
+#include <cstdlib>
 #include <cerrno>
 #include <cstring>
 #include <exception>
