@@ -4,7 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include "string.h"
 #include <string>
+
 //#include <cstring>
 
 #include <exception>
