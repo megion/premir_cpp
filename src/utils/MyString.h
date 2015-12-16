@@ -1,5 +1,5 @@
-#ifndef SRC_UTILS_STRING_H_
-#define SRC_UTILS_STRING_H_
+#ifndef SRC_UTILS_MYSTRING_H_
+#define SRC_UTILS_MYSTRING_H_
 
 #include <iostream>
 #include <string>

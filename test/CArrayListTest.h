@@ -1,10 +1,12 @@
 #ifndef TEST_C_ARRAY_LIST_TEST_H_
 #define TEST_C_ARRAY_LIST_TEST_H_
 
-#include "../src/utils/CArrayList.h"
+
 
 #include <iostream>
 #include <assert.h>
+
+#include "../src/utils/CArrayList.h"
 
 #include "test.h"
 
