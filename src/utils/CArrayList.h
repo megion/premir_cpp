@@ -1,11 +1,10 @@
 #ifndef SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 #define SRC_UTILS_SIMPLE_TYPE_ARRAY_LIST_H_
 
-extern "C" {
-	#include <stdlib.h>
-	#include <errno.h>
-	#include <string.h>
-}
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
+#include <cstring>
 
 #include <exception>
 #include <stdexcept>
@@ -40,9 +39,9 @@ public:
 			array = nullptr;
 		} else {
 			size_t amount = capacity * typeSizeof;
-			array = (T*) malloc(amount);
+			array = (T*) std::malloc(amount);
 			if (array == NULL) {
-				throw std::runtime_error(strerror(errno));
+				throw std::runtime_error(std::strerror(errno));
 			}
 		}
 	}
@@ -55,13 +54,13 @@ public:
 			array = nullptr;
 		} else {
 			size_t amount = capacity * typeSizeof;
-			array = (T*) malloc(amount);
+			array = (T*) std::malloc(amount);
 			if (array == NULL) {
 				throw std::runtime_error(strerror(errno));
 			}
 
 			// copy all array
-			memcpy(array, list.array, capacity * typeSizeof);
+			std::memcpy(array, list.array, capacity * typeSizeof);
 		}
 	}
 
@@ -171,13 +170,13 @@ void CArrayList<T>::push(const T* values, size_t valuesSize) {
 		size_t amount = capacity * typeSizeof;
 		T* newArray;
 		if (array) {
-			newArray = (T*) realloc(array, amount);
+			newArray = (T*) std::realloc(array, amount);
 		} else {
-			newArray = (T*) malloc(amount);
+			newArray = (T*) std::malloc(amount);
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(strerror(errno));
+			throw std::runtime_error(std::strerror(errno));
 		}
 		array = newArray;
 	}
@@ -196,13 +195,13 @@ void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
 		size_t amount = capacity * typeSizeof;
 		T* newArray;
 		if (array) {
-			newArray = (T*) realloc(array, amount);
+			newArray = (T*) std::realloc(array, amount);
 		} else {
-			newArray = (T*) malloc(amount);
+			newArray = (T*) std::malloc(amount);
 		}
 
 		if (newArray == NULL) {
-			throw std::runtime_error(strerror(errno));
+			throw std::runtime_error(std::strerror(errno));
 		}
 		array = newArray;
 	} else if (newLength > length) { // simple update length
@@ -222,7 +221,7 @@ void CArrayList<T>::write(size_t position, const T& value) {
 template<typename T>
 void CArrayList<T>::removeAll() {
 	if (array) {
-		free(array);
+		std::free(array);
 	}
 	array = nullptr;
 	length = 0;
