@@ -6,10 +6,10 @@
  */
 #include "matrix_utils.h"
 
-template<typename T>
-utils::CMatrix<T>* inverseMatrix(const utils::CMatrix<T>& matrix) {
-
-}
+//template<typename T>
+//utils::CMatrix<T>* inverseMatrix(const utils::CMatrix<T>& matrix) {
+//
+//}
 
 
 
