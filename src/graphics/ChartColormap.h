@@ -3,6 +3,7 @@
 
 #include <xcb/xcb.h>
 #include <iostream>
+#include <stdlib.h>
 
 namespace graphics {
 
