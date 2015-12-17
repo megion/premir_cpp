@@ -16,6 +16,6 @@
 
 # define MY_PI		3.14159265358979323846	/* pi */
 
-void digitalFilter1_test();
+void digitalFilter_test();
 
 #endif

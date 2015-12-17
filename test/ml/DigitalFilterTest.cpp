@@ -129,7 +129,7 @@ void test_filter_charts() {
 
 }
 
-void digitalFilter1_test() {
+void digitalFilter_test() {
 	suite("charts");
 	test(filter_charts);
 
