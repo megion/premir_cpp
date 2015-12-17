@@ -4,10 +4,10 @@
 #	cd build; make
 	
 all:
-	cd build; make test
+	cd mybuild; make test
 
 clean:
-	cd build; make clean
+	cd mybuild; make clean
 	
 	
 .PHONY: clean

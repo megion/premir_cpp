@@ -3,11 +3,11 @@
 *.lo
 *.o
 *.obj
-build/*.o
-build/*.d
-build/primer
-build/test_runner
-cbuild
+mybuild/*.o
+mybuild/*.d
+mybuild/primer
+mybuild/test_runner
+build
 
 # Precompiled Headers
 *.gch
