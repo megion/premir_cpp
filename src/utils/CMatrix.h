@@ -127,23 +127,20 @@ public:
 		matrix->write(start, values, colSize);
 	}
 
-	void printMatrix();
+	void printMatrix() {
+		for(size_t r=0; r<rowSize; ++r) {
+			for (size_t c=0; c<colSize; ++c) {
+				std::cout << (*this)(r, c) << ", ";
+			}
+			std::cout << std::endl;
+		}
+	}
 
 private:
 	CArrayList<T>* matrix;
 	size_t rowSize;
 	size_t colSize;
 };
-
-template<typename T>
-void CMatrix<T>::printMatrix() {
-	for(size_t r=0; r<rowSize; ++r) {
-		for (size_t c=0; c<colSize; ++c) {
-			std::cout << (*this)(r, c) << ", ";
-		}
-		std::cout << std::endl;
-	}
-}
 
 }
 

@@ -7,18 +7,12 @@
 # 	<команда1>
 # 	<команда2>
 
-#X11 := /usr/X11R6
-#X11_INC_DIR := $(X11)/include
-#XLIBDIR := $(X11)/lib 
-XLIB_INC_DIR := /usr/include/X11
-XCB_INC_DIR := /usr/include/xcb
-
 CC := g++
 # -lxcb for xcb lib
 # -lX11 for X11 lib
 # -g for include debugging symbols
 # -pthread enable multithreading
-CCFLAGS := -std=c++11 -lxcb -g -pthread -I$(X11_INC_DIR) -I$(XCB_INC_DIR)
+CCFLAGS := -std=c++11 -lxcb -g -pthread
 
 # список каталогов с исходыми кодами
 SRC_DIRS := $(shell find ../src -type d)
