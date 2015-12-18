@@ -108,8 +108,30 @@ public:
 		return RowIterator(matrix, rowSize, colSize, i);
 	}
 
-	T& operator()(size_t r, size_t c) {
+	T& operator()(const size_t& r, const size_t& c) const {
 		return (*matrix)[r * colSize + c];
+	}
+
+	bool operator==(const CMatrix<T>& other) const {
+		if (other.getRowSize() != rowSize) {
+			return false;
+		}
+		if (other.getColSize() != colSize) {
+			return false;
+		}
+		for(size_t r=0; r<rowSize; ++r) {
+			for (size_t c=0; c<colSize; ++c) {
+				if(!((*this)(r, c) == other(r,c))) {
+					return false;
+				} // compare each element
+			}
+		}
+		std::cout << std::endl;
+		return true;
+	}
+
+	bool operator!=(const CMatrix<T>& other) const {
+		return !((*this)==other);
 	}
 
 	Coordinate getCoordinate(size_t position) const {
@@ -120,6 +142,14 @@ public:
 
 	CArrayList<T>* getMatrix() {
 		return matrix;
+	}
+
+	size_t getRowSize() const {
+		return rowSize;
+	}
+
+	size_t getColSize() const {
+		return colSize;
 	}
 
 	void writeRow(size_t rowIndex, const T* values) {
