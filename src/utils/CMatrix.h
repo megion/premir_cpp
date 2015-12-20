@@ -101,11 +101,11 @@ public:
 	///////////////////////////////
 
 	ColIterator col(size_t i) {
-		return ColIterator(matrix, rowSize, colSize, i);
+		return ColIterator(matrix->getArray(), rowSize, colSize, i);
 	}
 
 	RowIterator row(size_t i) {
-		return RowIterator(matrix, rowSize, colSize, i);
+		return RowIterator(matrix->getArray(), rowSize, colSize, i);
 	}
 
 	T& operator()(const size_t& r, const size_t& c) const {
@@ -121,7 +121,7 @@ public:
 		}
 		for(size_t r=0; r<rowSize; ++r) {
 			for (size_t c=0; c<colSize; ++c) {
-				if(!((*this)(r, c) == other(r,c))) {
+				if((*this)(r, c) != other(r,c)) {
 					return false;
 				} // compare each element
 			}
@@ -157,6 +157,11 @@ public:
 		matrix->write(start, values, colSize);
 	}
 
+	void pushRow(const T* values) {
+		writeRow(rowSize, values);
+		++rowSize;
+	}
+
 	void printMatrix() {
 		for(size_t r=0; r<rowSize; ++r) {
 			for (size_t c=0; c<colSize; ++c) {
@@ -166,6 +171,8 @@ public:
 		}
 	}
 
+
+
 private:
 	CArrayList<T>* matrix;
 	size_t rowSize;
@@ -174,4 +181,4 @@ private:
 
 }
 
-#endif /* SRC_UTILS_CMATRIX_H_ */
+#endif

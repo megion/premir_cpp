@@ -61,7 +61,7 @@ public:
 			}
 
 			// copy all array
-			std::memcpy(array, list.array, capacity * typeSizeof);
+			std::memcpy(array, list.array, amount);
 		}
 	}
 

@@ -38,7 +38,54 @@ void test_multiply_matrix() {
     delete matrixC; // do not remember delete resource
 }
 
+void test_scalar_multiply_vectors() {
+    int arrA[] = {1,2,3};
+    utils::CArrayList<int> vectorA;
+    vectorA.push(arrA, 3);
+    int arrB[] = {3,2,4};
+    utils::CArrayList<int> vectorB;
+    vectorB.push(arrB, 3);
+    int res = utils::scalarMultiplyVectors(vectorA, vectorB);
+
+    assert(res == 19);
+}
+
+void test_distance_vectors() {
+    int arrA[] = {1,2,1};
+    utils::CArrayList<int> vectorA;
+    vectorA.push(arrA, 3);
+    int arrB[] = {3,4,0};
+    utils::CArrayList<int> vectorB;
+    vectorB.push(arrB, 3);
+    double res = utils::distanceVectors(vectorA, vectorB);
+
+    assert(res == 3.0);
+}
+
+void test_norm_vector() {
+    int arrA[] = {1,2,2};
+    utils::CArrayList<int> vectorA;
+    vectorA.push(arrA, 3);
+    double res = utils::normVector(vectorA);
+    assert(res == 3);
+}
+
+void test_cos_angel_vectors() {
+    int arrA[] = {1,2,1};
+    utils::CArrayList<int> vectorA;
+    vectorA.push(arrA, 3);
+    int arrB[] = {3,4,0};
+    utils::CArrayList<int> vectorB;
+    vectorB.push(arrB, 3);
+    double res = utils::cosAngelVectors(vectorA, vectorB);
+    assert(res == 3);
+}
+
 void matrix_utils_test() {
     suite("matrix_utils");
     test(multiply_matrix);
+    test(scalar_multiply_vectors);
+    test(distance_vectors);
+//    test(cos_angel_vectors);
+    test(norm_vector);
 }
