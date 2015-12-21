@@ -24,210 +24,245 @@ namespace utils {
  * а для ее освобождения free.
  * Класс сконструирован исключительно в интересах производительности.
  */
-template<typename T>
-class CArrayList {
-public:
+    template<typename T>
+    class CArrayList {
+    public:
 
-	CArrayList() :
-			length(0), capacity(0), capacityIncrease(1), //
-			typeSizeof(sizeof(T)), array(nullptr) {
-	}
+        CArrayList() :
+                length(0), capacity(0), capacityIncrease(1), //
+                typeSizeof(sizeof(T)), array(nullptr) {
+        }
 
-	CArrayList(size_t _capacity, size_t _capacityIncrease = 1) :
-			length(0), capacity(_capacity), //
-			capacityIncrease(_capacityIncrease), typeSizeof(sizeof(T)) {
-		if (capacity == 0) {
-			array = nullptr;
-		} else {
-			size_t amount = capacity * typeSizeof;
-			array = (T*) std::malloc(amount);
-			if (array == NULL) {
-				throw std::runtime_error(std::strerror(errno));
-			}
-		}
-	}
+        CArrayList(size_t _capacity, size_t _capacityIncrease = 1) :
+                length(0), capacity(_capacity), //
+                capacityIncrease(_capacityIncrease), typeSizeof(sizeof(T)) {
+            if (capacity == 0) {
+                array = nullptr;
+            } else {
+                size_t amount = capacity * typeSizeof;
+                array = (T *) std::malloc(amount);
+                if (array == NULL) {
+                    throw std::runtime_error(std::strerror(errno));
+                }
+            }
+        }
 
-	// copy constructor: List l1; List l2 = l1;
-	CArrayList(const CArrayList<T>& list) :
-			length(list.length), capacity(list.capacity), //
-			capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)) {
-		if (capacity == 0) {
-			array = nullptr;
-		} else {
-			size_t amount = capacity * typeSizeof;
-			array = (T*) std::malloc(amount);
-			if (array == NULL) {
-				throw std::runtime_error(std::strerror(errno));
-			}
+        // copy constructor: List l1; List l2 = l1;
+        CArrayList(const CArrayList<T> &list) :
+                length(list.length), capacity(list.capacity), //
+                capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)) {
+            if (capacity == 0) {
+                array = nullptr;
+            } else {
+                size_t amount = capacity * typeSizeof;
+                array = (T *) std::malloc(amount);
+                if (array == NULL) {
+                    throw std::runtime_error(std::strerror(errno));
+                }
 
-			// copy all array
-			std::memcpy(array, list.array, amount);
-		}
-	}
+                // copy all array
+                std::memcpy(array, list.array, amount);
+            }
+        }
 
-	// replace constructor: List l1; List l2(std::move(l1));
-	CArrayList(CArrayList<T> && list) :
-			length(list.length), capacity(list.capacity), //
-			capacityIncrease(list.capacityIncrease), typeSizeof(sizeof(T)), //
-			array(list.array) {
-		list.length = 0;
-		list.capacity = 0;
-		list.array = nullptr;
-	}
+        // replace constructor: List l1; List l2(std::move(l1));
+        CArrayList(CArrayList<T> &&list) :
+                length(list.length), capacity(list.capacity), //
+                capacityIncrease(list.capacityIncrease),
+                typeSizeof(sizeof(T)), //
+                array(list.array) {
+            list.length = 0;
+            list.capacity = 0;
+            list.array = nullptr;
+        }
 
-	~CArrayList() {
-		removeAll();
-	}
+        ~CArrayList() {
+            removeAll();
+        }
 
-	size_t size() const {
-		return length;
-	}
+        size_t size() const {
+            return length;
+        }
 
-	T* getArray() const {
-		return array;
-	}
+        T *getArray() const {
+            return array;
+        }
 
-	/**
-	 * Insert to end
-	 */
-	void push(const T& value);
-	void push(const T* values, size_t valuesSize);
-	/**
-	 * Save copy values begin with specified position
-	 */
-	void write(size_t position, const T& values);
-	void write(size_t position, const T* values, size_t valuesSize);
+        /**
+         * Insert to end
+         */
+        void push(const T &value);
 
-	/**
-	 * Remove all elements
-	 */
-	void removeAll();
+        void push(const T *values, size_t valuesSize);
 
-	// = assign operator: List l3; l3 = l2;
-	CArrayList<T>& operator=(const CArrayList<T>&) = delete;
-	// = replacement operator: List l3; l3 = std::move(l2);
-	CArrayList<T>& operator=(CArrayList<T> &&) = delete; //
+        /**
+         * Save copy values begin with specified position
+         */
+        void write(size_t position, const T &values);
 
-	// [] index operator
-	T& operator[](const size_t& index) const {
-		return array[index];
-	}
+        void write(size_t position, const T *values, size_t valuesSize);
 
-	// iterator implementation for use in C++11 range-based for loops
-	class Iterator {
-	public:
-		Iterator(T* _arr, size_t _pos) :
-				arr(_arr), pos(_pos) {
-		}
-		bool operator!=(const Iterator& other) const {
-			return pos != other.pos;
-		}
-		T& operator*() const {
-			return arr[pos];
-		}
-		const Iterator& operator++() {
-			++pos;
-			return *this;
-		}
+        /**
+         * Remove all elements
+         */
+        void removeAll();
 
-	private:
-		size_t pos;
-		T* arr;
-	};
-	// begin method range-based for loop
-	Iterator begin() const {
-		return Iterator(array, 0);
-	}
-	// begin method range-based for loop
-	Iterator end() const {
-		return Iterator(array, length);
-	}
-	/////////////////////////////////
+        // = assign operator: List l3; l3 = l2;
+        CArrayList<T> &operator=(const CArrayList<T> &) = delete;
 
-private:
-	T* array;
-	size_t length; // current list size (is number contained elements)
-	size_t capacity; // list capacity or max size
-	size_t typeSizeof; // saved value sizeof
-	size_t capacityIncrease; // increase capacity value, default is 1
+        // = replacement operator: List l3; l3 = std::move(l2);
+        CArrayList<T> &operator=(CArrayList<T> &&) = delete; //
 
-};
+        // [] index operator
+        T &operator[](const size_t &index) const {
+            return array[index];
+        }
 
-template<typename T>
-void CArrayList<T>::push(const T& value) {
-	push(&value, 1);
-}
+        // + sum operator: a = a + b
+        CArrayList<T> &operator+(const CArrayList<T> &b) {
+            for (size_t i = 0; i < length; ++i) {
+                array[i] = array[i] + b.array[i];
+            }
+            return (*this);
+        }
 
-template<typename T>
-void CArrayList<T>::push(const T* values, size_t valuesSize) {
-	size_t newLength = length + valuesSize;
-	if (newLength > capacity) { // need increase capacity
-		if (newLength > (capacity + capacityIncrease)) {
-			capacity = newLength;
-		} else {
-			capacity = capacity + capacityIncrease;
-		}
+        // a = b - a
+        CArrayList<T>& reverseMinus(const T* b) {
+            for (size_t i = 0; i < length; ++i) {
+                array[i] = b[i] - array[i];
+            }
+            return (*this);
+        }
 
-		size_t amount = capacity * typeSizeof;
-		T* newArray;
-		if (array) {
-			newArray = (T*) std::realloc(array, amount);
-		} else {
-			newArray = (T*) std::malloc(amount);
-		}
+        // * multiply operator: a = a * b
+        CArrayList<T> &operator*(const double &b) {
+            for (size_t i = 0; i < length; ++i) {
+                array[i] = array[i] * b;
+            }
+            return (*this);
+        }
 
-		if (newArray == NULL) {
-			throw std::runtime_error(std::strerror(errno));
-		}
-		array = newArray;
-	}
+        // iterator implementation for use in C++11 range-based for loops
+        class Iterator {
+        public:
+            Iterator(T *_arr, size_t _pos) :
+                    arr(_arr), pos(_pos) {
+            }
 
-	// copy value as bytes. Copy constructor not call.
-	T* last = array + length;
-	memcpy(last, values, valuesSize * typeSizeof);
-	length = newLength;
-}
+            bool operator!=(const Iterator &other) const {
+                return pos != other.pos;
+            }
 
-template<typename T>
-void CArrayList<T>::write(size_t position, const T* values, size_t valuesSize) {
-	size_t newLength = position + valuesSize;
-	if (newLength > capacity) { // need increase capacity
-		capacity = newLength;
-		size_t amount = capacity * typeSizeof;
-		T* newArray;
-		if (array) {
-			newArray = (T*) std::realloc(array, amount);
-		} else {
-			newArray = (T*) std::malloc(amount);
-		}
+            T &operator*() const {
+                return arr[pos];
+            }
 
-		if (newArray == NULL) {
-			throw std::runtime_error(std::strerror(errno));
-		}
-		array = newArray;
-	} else if (newLength > length) { // simple update length
-		length = newLength;
-	}
+            const Iterator &operator++() {
+                ++pos;
+                return *this;
+            }
 
-	// copy value as bytes. Copy constructor not call.
-	T* last = array + position;
-	memcpy(last, values, valuesSize * typeSizeof);
-}
+        private:
+            size_t pos;
+            T *arr;
+        };
 
-template<typename T>
-void CArrayList<T>::write(size_t position, const T& value) {
-	write(position, &value, 1);
-}
+        // begin method range-based for loop
+        Iterator begin() const {
+            return Iterator(array, 0);
+        }
 
-template<typename T>
-void CArrayList<T>::removeAll() {
-	if (array) {
-		std::free(array);
-	}
-	array = nullptr;
-	length = 0;
-	capacity = 0;
-}
+        // begin method range-based for loop
+        Iterator end() const {
+            return Iterator(array, length);
+        }
+        /////////////////////////////////
+
+    private:
+        T *array;
+        size_t length; // current list size (is number contained elements)
+        size_t capacity; // list capacity or max size
+        size_t typeSizeof; // saved value sizeof
+        size_t capacityIncrease; // increase capacity value, default is 1
+
+    };
+
+    template<typename T>
+    void CArrayList<T>::push(const T &value) {
+        push(&value, 1);
+    }
+
+    template<typename T>
+    void CArrayList<T>::push(const T *values, size_t valuesSize) {
+        size_t newLength = length + valuesSize;
+        if (newLength > capacity) { // need increase capacity
+            if (newLength > (capacity + capacityIncrease)) {
+                capacity = newLength;
+            } else {
+                capacity = capacity + capacityIncrease;
+            }
+
+            size_t amount = capacity * typeSizeof;
+            T *newArray;
+            if (array) {
+                newArray = (T *) std::realloc(array, amount);
+            } else {
+                newArray = (T *) std::malloc(amount);
+            }
+
+            if (newArray == NULL) {
+                throw std::runtime_error(std::strerror(errno));
+            }
+            array = newArray;
+        }
+
+        // copy value as bytes. Copy constructor not call.
+        T *last = array + length;
+        memcpy(last, values, valuesSize * typeSizeof);
+        length = newLength;
+    }
+
+    template<typename T>
+    void CArrayList<T>::write(size_t position, const T *values,
+                              size_t valuesSize) {
+        size_t newLength = position + valuesSize;
+        if (newLength > capacity) { // need increase capacity
+            capacity = newLength;
+            size_t amount = capacity * typeSizeof;
+            T *newArray;
+            if (array) {
+                newArray = (T *) std::realloc(array, amount);
+            } else {
+                newArray = (T *) std::malloc(amount);
+            }
+
+            if (newArray == NULL) {
+                throw std::runtime_error(std::strerror(errno));
+            }
+            array = newArray;
+        } else if (newLength > length) { // simple update length
+            length = newLength;
+        }
+
+        // copy value as bytes. Copy constructor not call.
+        T *last = array + position;
+        memcpy(last, values, valuesSize * typeSizeof);
+    }
+
+    template<typename T>
+    void CArrayList<T>::write(size_t position, const T &value) {
+        write(position, &value, 1);
+    }
+
+    template<typename T>
+    void CArrayList<T>::removeAll() {
+        if (array) {
+            std::free(array);
+        }
+        array = nullptr;
+        length = 0;
+        capacity = 0;
+    }
 
 }
 

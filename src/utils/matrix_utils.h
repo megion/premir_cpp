@@ -115,10 +115,25 @@ namespace utils {
     }
 
     /**
-     * Расстояние между векторами A и B. Размеры векторов должны совпадать.
-     * Если не совпадают то можно задать дипазон для кажого из вектора.
+     * Расстояние между массивами A и B.
      *
      * result = pow(sum(pow(a(i)-b(i), 2)), 0.5) where i = 0...N-1
+     */
+    template<typename T>
+    double distanceArrays(
+            const T *a, const T *b, size_t sizeArray, size_t startA = 0,
+            size_t startB = 0) {
+        double res = 0.0;
+        for (size_t i = 0; i < sizeArray; ++i) {
+            double diff = *(a + i + startA) - *(b + i + startB);
+            res = res + diff * diff;
+        }
+        return pow(res, 0.5);
+    }
+
+    /**
+     * Расстояние между векторами A и B. Размеры векторов должны совпадать.
+     * Если не совпадают то можно задать дипазон для кажого из вектора.
      */
     template<typename T>
     double distanceVectors(
@@ -136,20 +151,26 @@ namespace utils {
         if (sizeA != sizeB) {
             throw std::logic_error("size A != size B");
         }
+        return distanceArrays(a.getArray(), b.getArray(), sizeA, startA,
+                              startB);
+    }
 
-        double res = 0;
-        for (size_t i = 0; i < sizeA; ++i) {
-            T &ai = a[i + startA];
-            T &bi = b[i + startB];
-            T diff = ai - bi;
-            res = res + diff * diff;
+    /**
+     * Вычисление нормы массива
+     * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
+     */
+    template<typename T>
+    double normArray(const T *a, size_t sizeArray, size_t startIndex = 0) {
+        double res = 0.0;
+        for (size_t i = 0; i < sizeArray; ++i) {
+            const T &ai = *(a + i + startIndex);
+            res = res + ai * ai;
         }
         return pow(res, 0.5);
     }
 
     /**
      * Вычисление нормы вектора
-     * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
      */
     template<typename T>
     double normVector(const utils::CArrayList<T> &a, size_t startVec = 0,
@@ -158,13 +179,9 @@ namespace utils {
         if (sizeVec == 0) {
             sizeVec = a.size();
         }
-        double res = 0.0;
-        for (size_t i = 0; i < sizeVec; ++i) {
-            T &ai = a[i + startVec];
-            res = res + ai * ai;
-        }
-        return pow(res, 0.5);
+        return normArray(a.getArray(), sizeVec, startVec);
     }
+
 
     /**
      * Расстояние между векторами A и B. Размеры векторов должны совпадать.
@@ -188,17 +205,17 @@ namespace utils {
      * (последовательность векторов h(i)) в соответствии с рекурсивным
      * правилом
      * h(i) = x(i) - sum(distance(x(i), h(j)) * h(j) / (pow(|h(j)|, 2)))
-     * where j = 0 ... i
+     * where j = 0 ... i-1
      *
      */
     template<typename T>
     utils::CMatrix<T> *orthogonalVectorBasis(const utils::CMatrix<T> &a,
-                                      size_t startRow = 0,
-                                      size_t startCol = 0,
-                                      size_t rowSize = 0, size_t colSize = 0) {
-
-        if (a.getRowSize()==0) {
-            throw std::logic_error("Row size B == 0");
+                                             size_t startRow = 0,
+                                             size_t startCol = 0,
+                                             size_t rowSize = 0,
+                                             size_t colSize = 0) {
+        if (a.getRowSize() == 0) {
+            throw std::logic_error("Row size == 0");
         }
 
         // set default size
@@ -212,18 +229,48 @@ namespace utils {
         // ортогональные вектора в виде матрицы где вектора расположены
         // по строкам
         utils::CMatrix<T> *vectors = new utils::CMatrix<T>(0, colSize);
+        utils::CArrayList<double> rowNormos = utils::CArrayList<double>(
+                rowSize);
 
-
+        size_t rowIndex = 0;
         for (size_t i = 0; i < rowSize; ++i) {
-            for (size_t j = 0; j < colSize; ++j) {
-                T res = 0;
+            const T *x = a.getRowArray(i + startRow) + startCol;
+            double normH = normArray(x, colSize);
+            if (normH != 0) {
+                // добавляем и обрабатываем только если норма вектора != 0
+                rowNormos.push(normH);
+                if (rowIndex == 0) {
+                    // начальное значение ортогонального вектора инициализуется
+                    // первым вектором норма которого !=0
+                    vectors->pushRow(x);
+                } else {
+                    // вычисление по предыдущим ортогональным векторам
+                    utils::CArrayList<T> tempSum = utils::CArrayList<T>(
+                            colSize);
+                    for (size_t vectorIndex = 0;
+                         vectorIndex < vectors->getRowSize(); ++vectorIndex) {
+                        const T *h = vectors->getRowArray(vectorIndex);
+                        double norm = rowNormos[vectorIndex];
+                        double dist = distanceArrays(x, h, colSize);
+                        double kk = dist / (norm * norm);
 
-//                for (size_t r = 0; r < sizeN; ++r) {
-//                    T &air = a(i + startRowA, r + startColA);
-//                    T &brj = b((r + startRowB), (j + startColB));
-//                    res = res + air * brj;
-//                }
-//                (*c)(i, j) = res;
+                        std::cout << "k [" << rowIndex << "]: "<< kk << std::endl;
+
+                        utils::CArrayList<T> temp = utils::CArrayList<T>(
+                                colSize);
+                        temp.write(0, h, colSize);
+                        temp * (kk);
+                        if (vectorIndex == 0) {
+                            tempSum.write(0, temp.getArray(), colSize); // init
+                        } else {
+                            tempSum + temp; // sum
+                        }
+                    }
+
+                    tempSum.reverseMinus(x);
+                    vectors->pushRow(tempSum.getArray());
+                }
+                ++rowIndex;
             }
         }
 

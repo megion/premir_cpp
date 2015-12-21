@@ -126,7 +126,6 @@ public:
 				} // compare each element
 			}
 		}
-		std::cout << std::endl;
 		return true;
 	}
 
@@ -140,8 +139,12 @@ public:
 		return {r, c};
 	}
 
-	CArrayList<T>* getMatrix() {
+	CArrayList<T>* getMatrix() const {
 		return matrix;
+	}
+
+	T* getRowArray(size_t r) const {
+		return matrix->getArray() + r*colSize;
 	}
 
 	size_t getRowSize() const {
