@@ -174,8 +174,6 @@ public:
 		}
 	}
 
-
-
 private:
 	CArrayList<T>* matrix;
 	size_t rowSize;

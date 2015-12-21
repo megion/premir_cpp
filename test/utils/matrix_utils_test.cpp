@@ -71,7 +71,7 @@ void test_norm_vector() {
 }
 
 
-void test_orthogonal_vector_basis() {
+void test_gram_schmidt_vector_basis() {
     utils::CMatrix<double> matrix(0, 3);
 //    for (size_t r = 0; r < 10; ++r) {
 //        for (size_t c = 0; c < 20; ++c) {
@@ -86,7 +86,7 @@ void test_orthogonal_vector_basis() {
     double d2[] = {1,1,2};
     matrix.pushRow(d2);
     matrix.printMatrix();
-    utils::CMatrix<double> *res = utils::orthogonalVectorBasis(matrix);
+    utils::CMatrix<double> *res = utils::gramSchmidtVectorBasis(matrix);
     res->printMatrix();
 //    assert(res->getRowSize() == 3);
 //    assert(res->getColSize() == 3);
@@ -111,5 +111,5 @@ void matrix_utils_test() {
     test(distance_vectors);
 //    test(cos_angel_vectors);
     test(norm_vector);
-    test(orthogonal_vector_basis);
+    test(gram_schmidt_vector_basis);
 }

@@ -119,27 +119,27 @@ namespace utils {
         }
 
         // + sum operator: a = a + b
-        CArrayList<T> &operator+(const CArrayList<T> &b) {
+        CArrayList<T> sum(const CArrayList<T> &b) {
             for (size_t i = 0; i < length; ++i) {
                 array[i] = array[i] + b.array[i];
             }
-            return (*this);
+            return *this;
         }
 
         // a = b - a
-        CArrayList<T>& reverseMinus(const T* b) {
+        CArrayList<T> &reverseMinus(const T *b) {
             for (size_t i = 0; i < length; ++i) {
                 array[i] = b[i] - array[i];
             }
-            return (*this);
+            return *this;
         }
 
         // * multiply operator: a = a * b
-        CArrayList<T> &operator*(const double &b) {
+        CArrayList<T> &multiply(const double &b) {
             for (size_t i = 0; i < length; ++i) {
                 array[i] = array[i] * b;
             }
-            return (*this);
+            return *this;
         }
 
         // iterator implementation for use in C++11 range-based for loops
@@ -177,6 +177,13 @@ namespace utils {
             return Iterator(array, length);
         }
         /////////////////////////////////
+
+        void print() {
+            for(size_t i=0; i<length; ++i) {
+                std::cout << array[i] << ", ";
+            }
+            std::cout << std::endl;
+        }
 
     private:
         T *array;

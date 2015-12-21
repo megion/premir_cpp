@@ -201,7 +201,7 @@ namespace utils {
     }
 
     /**
-     * Нахождение ортигонального векторного базиса
+     * Нахождение ортигонального векторного базиса по методу Грама — Шмидта
      * (последовательность векторов h(i)) в соответствии с рекурсивным
      * правилом
      * h(i) = x(i) - sum(distance(x(i), h(j)) * h(j) / (pow(|h(j)|, 2)))
@@ -209,7 +209,7 @@ namespace utils {
      *
      */
     template<typename T>
-    utils::CMatrix<T> *orthogonalVectorBasis(const utils::CMatrix<T> &a,
+    utils::CMatrix<T> *gramSchmidtVectorBasis(const utils::CMatrix<T> &a,
                                              size_t startRow = 0,
                                              size_t startCol = 0,
                                              size_t rowSize = 0,
@@ -252,22 +252,25 @@ namespace utils {
                         const T *h = vectors->getRowArray(vectorIndex);
                         double norm = rowNormos[vectorIndex];
                         double dist = distanceArrays(x, h, colSize);
-                        double kk = dist / (norm * norm);
+                        double k = dist / (norm * norm);
 
-                        std::cout << "k [" << rowIndex << "]: "<< kk << std::endl;
+                        std::cout << "k [" << rowIndex << "]: "<< k << std::endl;
 
                         utils::CArrayList<T> temp = utils::CArrayList<T>(
                                 colSize);
                         temp.write(0, h, colSize);
-                        temp * (kk);
+                        temp.multiply(k);
                         if (vectorIndex == 0) {
                             tempSum.write(0, temp.getArray(), colSize); // init
                         } else {
-                            tempSum + temp; // sum
+                            tempSum.sum(temp); // sum
                         }
                     }
 
                     tempSum.reverseMinus(x);
+                    std::cout << "tempSum" << std::endl;
+                    tempSum.print();
+
                     vectors->pushRow(tempSum.getArray());
                 }
                 ++rowIndex;
