@@ -3,33 +3,33 @@
 void test_multiply_matrix() {
 
 //    size_t nSize = 3;
-    utils::CMatrix<int> matrixA(4, 3);
+    utils::CMatrix<double> matrixA(4, 3);
 
     // set values to A
-    int row0[] = {0, 1, 2};
+    double row0[] = {0, 1, 2};
     matrixA.writeRow(0, row0);
-    int row1[] = {3, 4, 5};
+    double row1[] = {3, 4, 5};
     matrixA.writeRow(1, row1);
-    int row2[] = {6, 7, 8};
+    double row2[] = {6, 7, 8};
     matrixA.writeRow(2, row2);
-    int row3[] = {9, 10, 11};
+    double row3[] = {9, 10, 11};
     matrixA.writeRow(3, row3);
 
-    utils::CMatrix<int> matrixB(3, 4);
-    int rowB0[] = {0, 1, 2, 3};
+    utils::CMatrix<double> matrixB(3, 4);
+    double rowB0[] = {0, 1, 2, 3};
     matrixB.writeRow(0, rowB0);
-    int rowB1[] = {4, 5, 6, 7};
+    double rowB1[] = {4, 5, 6, 7};
     matrixB.writeRow(1, rowB1);
-    int rowB2[] = {8, 9, 10, 11};
+    double rowB2[] = {8, 9, 10, 11};
     matrixB.writeRow(2, rowB2);
 
-    utils::CMatrix<int> *matrixC = utils::multiplyMatrix(matrixA, matrixB, 1, 1,
+    utils::CMatrix<double> *matrixC = utils::multiplyMatrix(matrixA, matrixB, 1, 1,
                                                          1, 1, 2, 2, 2, 2);
 
-    utils::CMatrix<int> matrixCheck(2, 2);
-    int rowCheck0[] = {65, 74};
+    utils::CMatrix<double> matrixCheck(2, 2);
+    double rowCheck0[] = {65, 74};
     matrixCheck.writeRow(0, rowCheck0);
-    int rowCheck1[] = {107, 122};
+    double rowCheck1[] = {107, 122};
     matrixCheck.writeRow(1, rowCheck1);
 
     assert(matrixCheck == (*matrixC));
@@ -39,34 +39,34 @@ void test_multiply_matrix() {
 }
 
 void test_scalar_multiply_vectors() {
-    int arrA[] = {1, 2, 3};
-    utils::CArrayList<int> vectorA;
+    double arrA[] = {1, 2, 3};
+    utils::CArrayList<double> vectorA;
     vectorA.push(arrA, 3);
-    int arrB[] = {3, 2, 4};
-    utils::CArrayList<int> vectorB;
+    double arrB[] = {3, 2, 4};
+    utils::CArrayList<double> vectorB;
     vectorB.push(arrB, 3);
-    int res = utils::scalarMultiplyVectors(vectorA, vectorB);
+    double res = utils::multiplyArrays(vectorA.getArray(), vectorB.getArray(), vectorA.size());
 
     assert(res == 19);
 }
 
 void test_distance_vectors() {
-    int arrA[] = {1, 2, 1};
-    utils::CArrayList<int> vectorA;
+    double arrA[] = {1, 2, 1};
+    utils::CArrayList<double> vectorA;
     vectorA.push(arrA, 3);
-    int arrB[] = {3, 4, 0};
-    utils::CArrayList<int> vectorB;
+    double arrB[] = {3, 4, 0};
+    utils::CArrayList<double> vectorB;
     vectorB.push(arrB, 3);
-    double res = utils::distanceVectors(vectorA, vectorB);
+    double res = utils::distanceArrays(vectorA.getArray(), vectorB.getArray(), vectorA.size());
 
     assert(res == 3.0);
 }
 
 void test_norm_euclidean_vector() {
-    int arrA[] = {1, 2, 2};
-    utils::CArrayList<int> vectorA;
+    double arrA[] = {1, 2, 2};
+    utils::CArrayList<double> vectorA;
     vectorA.push(arrA, 3);
-    double res = utils::normEuclideanVector(vectorA);
+    double res = utils::euclideanNorm(vectorA.getArray(), vectorA.size());
     assert(res == 3);
 }
 
@@ -98,16 +98,16 @@ void test_gram_schmidt_vector_basis() {
 //    delete res;
 }
 
-void test_cos_angel_vectors() {
-    int arrA[] = {1, 2, 1};
-    utils::CArrayList<int> vectorA;
-    vectorA.push(arrA, 3);
-    int arrB[] = {3, 4, 0};
-    utils::CArrayList<int> vectorB;
-    vectorB.push(arrB, 3);
-    double res = utils::cosAngelVectors(vectorA, vectorB);
-    assert(res == 3);
-}
+//void test_cos_angel_vectors() {
+//    double arrA[] = {1, 2, 1};
+//    utils::CArrayList<double> vectorA;
+//    vectorA.push(arrA, 3);
+//    double arrB[] = {3, 4, 0};
+//    utils::CArrayList<double> vectorB;
+//    vectorB.push(arrB, 3);
+//    double res = utils::cosAngelVectors(vectorA, vectorB);
+//    assert(res == 3);
+//}
 
 void matrix_utils_test() {
     suite("matrix_utils");

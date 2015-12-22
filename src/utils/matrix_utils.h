@@ -33,93 +33,54 @@ namespace utils {
  * строчек и колонок по которым будет происходить вычисление
  * (эти параметры опциональны).
  */
-    template<typename T>
-    utils::CMatrix<T> *multiplyMatrix(const utils::CMatrix<T> &a,
-                                      const utils::CMatrix<T> &b,
-                                      size_t startRowA = 0,
-                                      size_t startColA = 0,
-                                      size_t startRowB = 0,
-                                      size_t startColB = 0,
-                                      size_t rowSizeA = 0, size_t colSizeA = 0,
-                                      size_t rowSizeB = 0,
-                                      size_t colSizeB = 0);
+//    template<typename T>
+    utils::CMatrix<double> *multiplyMatrix(const utils::CMatrix<double> &a,
+                                           const utils::CMatrix<double> &b,
+                                           size_t startRowA,
+                                           size_t startColA,
+                                           size_t startRowB,
+                                           size_t startColB,
+                                           size_t rowSizeA,
+                                           size_t colSizeA,
+                                           size_t rowSizeB,
+                                           size_t colSizeB);
 
     /**
      * Скаларное произведение массивов A и B.
      * result = sum(a(i)*b(i)) where i = 0...N-1
      */
-    template<typename T>
-    T multiplyArrays(
-            const T *a, const T *b, size_t sizeArray,
-            size_t startA = 0, size_t startB = 0);
-
-    /**
-     * Скаларное произведение вектров A и B. Размеры векторов должны совпадать.
-     * Если не совпадают то можно задать дипазон для кажого из вектора.
-     */
-    template<typename T>
-    T scalarMultiplyVectors(
-            const utils::CArrayList<T> &a, const utils::CArrayList<T> &b,
-            size_t startA = 0, size_t startB = 0, size_t sizeA = 0,
-            size_t sizeB = 0);
+//    template<typename T>
+    double multiplyArrays(
+            const double *a, const double *b, size_t sizeArray);
 
     /**
      * Расстояние между массивами A и B.
      *
      * result = pow(sum(pow(a(i)-b(i), 2)), 0.5) where i = 0...N-1
      */
-    template<typename T>
-    double distanceArrays(
-            const T *a, const T *b, size_t sizeArray, size_t startA = 0,
-            size_t startB = 0);
-
-    /**
-     * Расстояние между векторами A и B. Размеры векторов должны совпадать.
-     * Если не совпадают то можно задать дипазон для кажого из вектора.
-     */
-    template<typename T>
-    double distanceVectors(
-            const utils::CArrayList<T> &a, const utils::CArrayList<T> &b,
-            size_t startA = 0, size_t startB = 0, size_t sizeA = 0,
-            size_t sizeB = 0);
+//    template<typename T>
+    double distanceArrays(const double *a, const double *b, size_t sizeArray);
 
     /**
      * Вычисление нормы массива
      * result = sum(|a(i)|) where i = 0...N-1
      */
-    template<typename T>
-    T normArray(const T *a, size_t sizeArray, size_t startIndex = 0);
+//    template<typename T>
+    double normArray(const double *a, size_t sizeArray);
 
     /**
      * Вычисление квадрата евклидовой нормы массива
      * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
      */
-    template<typename T>
-    double euclideanSquaredNorm(const T *a, size_t sizeArray,
-                                size_t startIndex = 0);
+//    template<typename T>
+    double euclideanSquaredNorm(const double *a, size_t sizeArray);
 
     /**
      * Вычисление евклидовой нормы массива
      * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
      */
-    template<typename T>
-    double euclideanNorm(const T *a, size_t sizeArray, size_t startIndex = 0);
-
-
-    /**
-     * Вычисление евклидовой нормы вектора
-     */
-    template<typename T>
-    double normEuclideanVector(const utils::CArrayList<T> &a,
-                               size_t startVec = 0,
-                               size_t sizeVec = 0);
-
-    /**
-     * Вычисление нормы вектора
-     */
-    template<typename T>
-    T normVector(const utils::CArrayList<T> &a, size_t startVec = 0,
-                 size_t sizeVec = 0);
+//    template<typename T>
+    double euclideanNorm(const double *a, size_t sizeArray);
 
 
     /**
@@ -128,20 +89,14 @@ namespace utils {
      *
      * result = distance(x,y)/(|x|*|y|)
      */
-    template<typename T>
-    double cosAngelVectors(
-            const utils::CArrayList<T> &a, const utils::CArrayList<T> &b,
-            size_t startA = 0, size_t startB = 0, size_t sizeA = 0,
-            size_t sizeB = 0);
+//    template<typename T>
+//    double cosAngelVectors(
+//            const utils::CArrayList<double> &a,
+//            const utils::CArrayList<double> &b,
+//            size_t startA = 0, size_t startB = 0, size_t sizeA = 0,
+//            size_t sizeB = 0);
 
-    /**
-     * Нахождение ортигонального векторного базиса по методу Грама — Шмидта
-     * (последовательность векторов h(i)) в соответствии с рекурсивным
-     * правилом
-     * h(i) = x(i) - sum(distance(x(i), h(j)) * h(j) / (pow(|h(j)|, 2)))
-     * where j = 0 ... i-1
-     *
-     */
+
 //    template<typename T>
 //    utils::CMatrix<T> *gramSchmidtVectorBasis(const utils::CMatrix<T> &a,
 //                                             size_t startRow = 0,

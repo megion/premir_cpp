@@ -12,6 +12,14 @@
 
 namespace ml {
 
+    /**
+     * Нахождение ортигонального векторного базиса по методу Грама — Шмидта
+     * (последовательность векторов h(i)) в соответствии с рекурсивным
+     * правилом
+     * h(i) = x(i) - sum( ((x(i) * h(j)) / (pow(|h(j)|, 2))) * h(j) )
+     * where j = 0 ... i-1
+     *
+     */
     class GramSchmidtBasis {
     public:
         GramSchmidtBasis(size_t _inVectorSize) :
@@ -39,6 +47,5 @@ namespace ml {
     };
 
 }
-
 
 #endif
