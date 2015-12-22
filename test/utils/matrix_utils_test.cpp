@@ -62,35 +62,40 @@ void test_distance_vectors() {
     assert(res == 3.0);
 }
 
-void test_norm_vector() {
+void test_norm_euclidean_vector() {
     int arrA[] = {1, 2, 2};
     utils::CArrayList<int> vectorA;
     vectorA.push(arrA, 3);
-    double res = utils::normVector(vectorA);
+    double res = utils::normEuclideanVector(vectorA);
     assert(res == 3);
 }
 
 
 void test_gram_schmidt_vector_basis() {
-    utils::CMatrix<double> matrix(0, 3);
+//    utils::CMatrix<double> matrix(0, 3);
+    ml::GramSchmidtBasis basis(3);
 //    for (size_t r = 0; r < 10; ++r) {
 //        for (size_t c = 0; c < 20; ++c) {
 //            matrix(r, c) = r * 20 + c;
 //        }
 //    }
 //    (1−11)(101)(112)
+    // [-2,1,0],[-2,0,1],[-0.5,-1,1]
     double d[] = {1,-1,1};
-    matrix.pushRow(d);
+//    matrix.pushRow(d);
+    basis.pushInVector(d);
     double d1[] = {1,0,1};
-    matrix.pushRow(d1);
+//    matrix.pushRow(d1);
+    basis.pushInVector(d1);
     double d2[] = {1,1,2};
-    matrix.pushRow(d2);
-    matrix.printMatrix();
-    utils::CMatrix<double> *res = utils::gramSchmidtVectorBasis(matrix);
-    res->printMatrix();
+    basis.pushInVector(d2);
+//    matrix.pushRow(d2);
+    basis.getOutVectors()->printMatrix();
+//    utils::CMatrix<double> *res = utils::gramSchmidtVectorBasis(matrix);
+//    res->printMatrix();
 //    assert(res->getRowSize() == 3);
 //    assert(res->getColSize() == 3);
-    delete res;
+//    delete res;
 }
 
 void test_cos_angel_vectors() {
@@ -110,6 +115,6 @@ void matrix_utils_test() {
     test(scalar_multiply_vectors);
     test(distance_vectors);
 //    test(cos_angel_vectors);
-    test(norm_vector);
+    test(norm_euclidean_vector);
     test(gram_schmidt_vector_basis);
 }
