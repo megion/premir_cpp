@@ -158,6 +158,24 @@ void test_swap_rows() {
     assert(a(2,4) == 10);
 }
 
+void test_make_identity() {
+    utils::CMatrix<int> a(4, 4);
+
+    a.makeIdentity();
+
+    utils::CMatrix<int> b(4, 4);
+    int row0[] = {1, 0, 0, 0};
+    b.writeRow(0, row0);
+    int row1[] = {0, 1, 0, 0};
+    b.writeRow(1, row1);
+    int row2[] = {0, 0, 1, 0};
+    b.writeRow(2, row2);
+    int row3[] = {0, 0, 0, 1};
+    b.writeRow(3, row3);
+
+    assert(a == b);
+}
+
 void cMatrix_test() {
     suite("CMatrix");
     test(set_value);
@@ -167,4 +185,5 @@ void cMatrix_test() {
     test(row_iterator);
     test(create_clone);
     test(swap_rows);
+    test(make_identity);
 }

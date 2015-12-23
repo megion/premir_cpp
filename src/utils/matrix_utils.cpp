@@ -9,10 +9,25 @@
 namespace utils {
 
     CMatrix<double> *inverseMatrix(const CMatrix<double> &matrix) {
-        CMatrix<double> *c = matrix.createClone();
+        CMatrix<double> *aM = matrix.createClone();
+        CMatrix<double> *iM = new CMatrix<double>(aM->getRowSize(),
+                                                  aM->getColSize());
+        iM->makeIdentity();
 
         // поиском по столбцам найдем первый отличный от 0 элемент
-        return c;
+        for (size_t c = 0; c < aM->getColSize(); ++c) {
+            for (size_t r = 0; r < aM->getRowSize(); ++r) {
+                double &val = (*aM)(r, c);
+                if (val != 0) {
+                    // найден не нулевой элемент столбца
+                    if (r != 0) {
+                        // if not first row then swap rows
+                        aM->swapRows(0, r);
+                    }
+                }
+            }
+        }
+        return iM;
     }
 
     CMatrix<double> *multiplyMatrix(const CMatrix<double> &a,

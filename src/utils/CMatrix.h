@@ -204,6 +204,22 @@ namespace utils {
             }
         }
 
+		/**
+		 * Make matrix as identity (I)
+		 */
+		void makeIdentity() {
+			for (size_t r = 0; r < rowSize; ++r) {
+				for (size_t c = 0; c < colSize; ++c) {
+					T& v = (*this)(r, c);
+					if (r==c) { // main diagonal
+						v = 1;
+					} else {
+						v = 0;
+					}
+				}
+			}
+		}
+
         CMatrix<T> *createClone(size_t startRow, size_t startCol,
                                 size_t sizeRow, size_t sizeCol) const {
             CMatrix<T> *cop = new CMatrix<T>(sizeRow, sizeCol);
