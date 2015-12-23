@@ -60,6 +60,27 @@ void test_comparison() {
     assert(a != c);
 }
 
+void test_comparison_with_error() {
+    utils::CMatrix<int> a(2, 2);
+    utils::CMatrix<int> c(2, 2);
+
+    int row0[] = {1, 2};
+    a.writeRow(0, row0);
+    c.writeRow(0, row0);
+
+    int row1[] = {5, 6};
+    a.writeRow(1, row1);
+    c.writeRow(1, row1);
+
+    assert(a.equalsWithError(c, 1));
+    assert(a.equalsWithError(c, 0));
+    assert(!a.equalsWithError(c, -1));
+
+    c(1,1) = 8;
+    assert(!a.equalsWithError(c, 1));
+    assert(a.equalsWithError(c, 2));
+}
+
 void test_push_row() {
     utils::CMatrix<int> a(2, 2);
     assert(a.getRowSize() == 2);
@@ -82,11 +103,68 @@ void test_push_row() {
     assert(i == 2);
 }
 
+void test_create_clone() {
+    utils::CMatrix<int> a(4, 5);
+
+    int row0[] = {1, 2, 3, 4, 5};
+    a.writeRow(0, row0);
+    int row1[] = {6, 7, 8, 9, 10};
+    a.writeRow(1, row1);
+    int row2[] = {11, 12, 13, 14, 15};
+    a.writeRow(2, row2);
+    int row3[] = {16, 17, 18, 19, 20};
+    a.writeRow(3, row3);
+
+    utils::CMatrix<int>* cl1 = a.createClone(1, 1, 2, 3);
+    assert(cl1->getRowSize() == 2);
+    assert(cl1->getColSize() == 3);
+    assert((*cl1)(0,0) == 7);
+    assert((*cl1)(0,2) == 9);
+    assert((*cl1)(1,0) == 12);
+    assert((*cl1)(1,2) == 14);
+
+    utils::CMatrix<int>* cl2 = a.createClone(1, 3);
+    assert(cl2->getRowSize() == 3);
+    assert(cl2->getColSize() == 2);
+    assert((*cl2)(0,0) == 9);
+
+    utils::CMatrix<int>* cl3 = a.createClone(); // full copy
+    assert(cl3->getRowSize() == 4);
+    assert(cl3->getColSize() == 5);
+    assert((*cl3)(0,0) == 1);
+
+    delete cl1;
+    delete cl2;
+    delete cl3;
+}
+
+void test_swap_rows() {
+    utils::CMatrix<int> a(4, 5);
+
+    int row0[] = {1, 2, 3, 4, 5};
+    a.writeRow(0, row0);
+    int row1[] = {6, 7, 8, 9, 10};
+    a.writeRow(1, row1);
+    int row2[] = {11, 12, 13, 14, 15};
+    a.writeRow(2, row2);
+    int row3[] = {16, 17, 18, 19, 20};
+    a.writeRow(3, row3);
+
+    a.swapRows(1, 2);
+
+    assert(a(1,0) == 11);
+    assert(a(1,4) == 15);
+    assert(a(2,0) == 6);
+    assert(a(2,4) == 10);
+}
+
 void cMatrix_test() {
     suite("CMatrix");
     test(set_value);
     test(comparison);
+    test(comparison_with_error);
     test(push_row);
     test(row_iterator);
-
+    test(create_clone);
+    test(swap_rows);
 }

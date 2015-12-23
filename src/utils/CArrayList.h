@@ -88,6 +88,10 @@ namespace utils {
             return array;
         }
 
+        size_t getTypeSizeof() const {
+            return typeSizeof;
+        }
+
         /**
          * Insert to end
          */

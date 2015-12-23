@@ -23,8 +23,9 @@ void test_multiply_matrix() {
     double rowB2[] = {8, 9, 10, 11};
     matrixB.writeRow(2, rowB2);
 
-    utils::CMatrix<double> *matrixC = utils::multiplyMatrix(matrixA, matrixB, 1, 1,
-                                                         1, 1, 2, 2, 2, 2);
+    utils::CMatrix<double> *matrixC = utils::multiplyMatrix(matrixA, matrixB, 1,
+                                                            1,
+                                                            1, 1, 2, 2, 2, 2);
 
     utils::CMatrix<double> matrixCheck(2, 2);
     double rowCheck0[] = {65, 74};
@@ -45,7 +46,8 @@ void test_scalar_multiply_vectors() {
     double arrB[] = {3, 2, 4};
     utils::CArrayList<double> vectorB;
     vectorB.push(arrB, 3);
-    double res = utils::multiplyArrays(vectorA.getArray(), vectorB.getArray(), vectorA.size());
+    double res = utils::multiplyArrays(vectorA.getArray(), vectorB.getArray(),
+                                       vectorA.size());
 
     assert(res == 19);
 }
@@ -57,7 +59,8 @@ void test_distance_vectors() {
     double arrB[] = {3, 4, 0};
     utils::CArrayList<double> vectorB;
     vectorB.push(arrB, 3);
-    double res = utils::distanceArrays(vectorA.getArray(), vectorB.getArray(), vectorA.size());
+    double res = utils::distanceArrays(vectorA.getArray(), vectorB.getArray(),
+                                       vectorA.size());
 
     assert(res == 3.0);
 }
@@ -72,30 +75,25 @@ void test_norm_euclidean_vector() {
 
 
 void test_gram_schmidt_vector_basis() {
-//    utils::CMatrix<double> matrix(0, 3);
     ml::GramSchmidtBasis basis(3);
-//    for (size_t r = 0; r < 10; ++r) {
-//        for (size_t c = 0; c < 20; ++c) {
-//            matrix(r, c) = r * 20 + c;
-//        }
-//    }
-//    (1−11)(101)(112)
-    // [-2,1,0],[-2,0,1],[-0.5,-1,1]
-    double d[] = {1,-1,1};
-//    matrix.pushRow(d);
+    // [1,-1,1],[1,0,1],[1,1,2]
+    double d[] = {1, -1, 1};
     basis.pushInVector(d);
-    double d1[] = {1,0,1};
-//    matrix.pushRow(d1);
+    double d1[] = {1, 0, 1};
     basis.pushInVector(d1);
-    double d2[] = {1,1,2};
+    double d2[] = {1, 1, 2};
     basis.pushInVector(d2);
-//    matrix.pushRow(d2);
-    basis.getOutVectors()->printMatrix();
-//    utils::CMatrix<double> *res = utils::gramSchmidtVectorBasis(matrix);
-//    res->printMatrix();
-//    assert(res->getRowSize() == 3);
-//    assert(res->getColSize() == 3);
-//    delete res;
+
+    utils::CMatrix<double> matrixCheck(3, 3);
+    double rowCheck0[] = {1, -1, 1};
+    matrixCheck.writeRow(0, rowCheck0);
+    double rowCheck1[] = {1.0/3.0, 2.0/3.0, 1.0/3.0};
+    matrixCheck.writeRow(1, rowCheck1);
+    double rowCheck2[] = {-0.5, 0, 0.5};
+    matrixCheck.writeRow(2, rowCheck2);
+
+    // test with error
+    assert(basis.getOutVectors()->equalsWithError(matrixCheck, 0.00001));
 }
 
 //void test_cos_angel_vectors() {

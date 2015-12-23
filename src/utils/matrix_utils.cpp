@@ -6,21 +6,24 @@
  */
 #include "matrix_utils.h"
 
-//template<typename T>
-//utils::CMatrix<T>* inverseMatrix(const utils::CMatrix<T>& matrix) {
-//
-//}
 namespace utils {
-//    template<typename T>
-    utils::CMatrix<double> *multiplyMatrix(const utils::CMatrix<double> &a,
-                                           const utils::CMatrix<double> &b,
-                                           size_t startRowA,
-                                           size_t startColA,
-                                           size_t startRowB,
-                                           size_t startColB,
-                                           size_t rowSizeA, size_t colSizeA,
-                                           size_t rowSizeB,
-                                           size_t colSizeB) {
+
+    CMatrix<double> *inverseMatrix(const CMatrix<double> &matrix) {
+        CMatrix<double> *c = matrix.createClone();
+
+        // поиском по столбцам найдем первый отличный от 0 элемент
+        return c;
+    }
+
+    CMatrix<double> *multiplyMatrix(const CMatrix<double> &a,
+                                    const CMatrix<double> &b,
+                                    size_t startRowA,
+                                    size_t startColA,
+                                    size_t startRowB,
+                                    size_t startColB,
+                                    size_t rowSizeA, size_t colSizeA,
+                                    size_t rowSizeB,
+                                    size_t colSizeB) {
 
         // set default size
         if (rowSizeA == 0) {
@@ -43,8 +46,7 @@ namespace utils {
 
         size_t rowSizeC = rowSizeA;
         size_t colSizeC = colSizeB;
-        utils::CMatrix<double> *c = new utils::CMatrix<double>(rowSizeC,
-                                                               colSizeC);
+        CMatrix<double> *c = new CMatrix<double>(rowSizeC, colSizeC);
 
         // c(i,j) = sum(a(i,r)*b(r,j)) where r=0,1...(N-1)
         for (size_t i = 0; i < rowSizeC; ++i) {
@@ -62,7 +64,6 @@ namespace utils {
         return c;
     }
 
-//    template<typename T>
     double multiplyArrays(
             const double *a, const double *b, size_t sizeArray) {
         double res = 0;
@@ -82,7 +83,6 @@ namespace utils {
         return pow(res, 0.5);
     }
 
-//    template<typename T>
     double normArray(const double *a, size_t sizeArray) {
         double res = 0;
         for (size_t i = 0; i < sizeArray; ++i) {
@@ -92,7 +92,6 @@ namespace utils {
         return res;
     }
 
-//    template<typename T>
     double euclideanSquaredNorm(const double *a, size_t sizeArray) {
         double res = 0;
         for (size_t i = 0; i < sizeArray; ++i) {
@@ -105,7 +104,6 @@ namespace utils {
     double euclideanNorm(const double *a, size_t sizeArray) {
         return pow(euclideanSquaredNorm(a, sizeArray), 0.5);
     }
-
 
 //    template<typename T>
 //    double cosAngelVectors(
