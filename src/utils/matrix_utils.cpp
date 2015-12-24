@@ -15,15 +15,24 @@ namespace utils {
         iM->makeIdentity();
 
         // поиском по столбцам найдем первый отличный от 0 элемент
+        size_t curRow = 0;
         for (size_t c = 0; c < aM->getColSize(); ++c) {
-            for (size_t r = 0; r < aM->getRowSize(); ++r) {
+            for (size_t r = curRow; r < aM->getRowSize(); ++r) {
                 double &val = (*aM)(r, c);
                 if (val != 0) {
                     // найден не нулевой элемент столбца
-                    if (r != 0) {
+                    if (r != curRow) {
                         // if not first row then swap rows
-                        aM->swapRows(0, r);
+                        aM->swapRows(curRow, r);
                     }
+
+                    // Элементы строки curRow делят на элемент выбранного
+                    // столбца val
+                    size_t startPos = curRow * aM->getColSize() + c;
+                    multiplyArrayOnScalar(
+                            (aM->getMatrix()->getArray()) + startPos, 1.0 / val,
+                            aM->getColSize() - c);
+
                 }
             }
         }
@@ -86,6 +95,13 @@ namespace utils {
             res = res + a[i] * b[i];
         }
         return res;
+    }
+
+    void multiplyArrayOnScalar(double *a, const double scalar,
+                               size_t sizeArray) {
+        for (size_t i = 0; i < sizeArray; ++i) {
+            a[i] = a[i] * scalar;
+        }
     }
 
     double distanceArrays(

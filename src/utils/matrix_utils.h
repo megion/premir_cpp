@@ -46,6 +46,12 @@ namespace utils {
             const double *a, const double *b, size_t sizeArray);
 
     /**
+     * Скалярное произведение массива на число
+     */
+    void multiplyArrayOnScalar(double *a, const double scalar,
+                               size_t sizeArray);
+
+    /**
      * Расстояние между массивами A и B.
      *
      * result = pow(sum(pow(a(i)-b(i), 2)), 0.5) where i = 0...N-1
