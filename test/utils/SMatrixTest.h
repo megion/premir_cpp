@@ -1,5 +1,5 @@
-#ifndef TEST_UTILS_S_MATRIX_TEST_H_
-#define TEST_UTILS_S_MATRIX_TEST_H_
+#ifndef TEST_UTILS_S_MATRIX_TEST_H
+#define TEST_UTILS_S_MATRIX_TEST_H
 
 #include <iostream>
 
@@ -7,7 +7,7 @@
 #include "utils/SMatrix.h"
 
 namespace test {
-    namespace smatrix {
+    namespace utils_smatrix {
 
         void sMatrix_test();
     }

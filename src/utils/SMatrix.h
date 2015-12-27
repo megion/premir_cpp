@@ -2,8 +2,8 @@
  * Simple matrix for store values as T**
  */
 
-#ifndef SRC_UTILS_SMATRIX_H_
-#define SRC_UTILS_SMATRIX_H_
+#ifndef SRC_UTILS_SMATRIX_H
+#define SRC_UTILS_SMATRIX_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -20,14 +20,14 @@ namespace utils {
     class SMatrix {
     public:
 
-        SMatrix(size_t _rowSize, size_t _colSize) :
+        SMatrix(const size_t &_rowSize, const size_t &_colSize) :
                 rowSize(_rowSize), colSize(_colSize), matrix(nullptr),
-                typeSizeof(sizeof(T)), ptypeSizeof(sizeof(T*)) {
+                typeSizeof(sizeof(T)), ptypeSizeof(sizeof(T *)) {
             if (rowSize > 0) {
                 initializeRowMemory(rowSize);
-                size_t cAmount = typeSizeof*colSize;
+                size_t cAmount = typeSizeof * colSize;
                 for (size_t r = 0; r < rowSize; ++r) {
-                    T* rowArray = (T *) std::malloc(cAmount);
+                    T *rowArray = (T *) std::malloc(cAmount);
                     if (rowArray == NULL) {
                         throw std::runtime_error(std::strerror(errno));
                     }
@@ -56,7 +56,11 @@ namespace utils {
         }
 
         T &operator()(const size_t &r, const size_t &c) const {
-            return *(*(matrix + r) + c);
+            return matrix[r][c];//*(*(matrix + r) + c);
+        }
+
+        T* operator[](const size_t &r) const {
+            return matrix[r];
         }
 
         bool operator==(const SMatrix<T> &other) const {
@@ -68,7 +72,7 @@ namespace utils {
             }
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < colSize; ++c) {
-                    if ((*this)(r, c) != other(r, c)) {
+                    if (matrix[r][c] != other(r, c)) {
                         return false;
                     } // compare each element
                 }
@@ -80,7 +84,8 @@ namespace utils {
             return !((*this) == other);
         }
 
-        bool equalsWithError(const SMatrix<T> &other, double error) const {
+        bool equalsWithError(const SMatrix<T> &other,
+                             const double &error) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
@@ -109,16 +114,24 @@ namespace utils {
             return colSize;
         }
 
+        T **getMatrix() const {
+            return matrix;
+        }
+
+        T *getRow(const size_t &r) const {
+            return matrix[r];
+        }
+
         void writeRow(size_t rowIndex, const T *values) {
-            if ( !(rowIndex < rowSize) ) {
+            if (!(rowIndex < rowSize)) {
                 // re-initialize row memory
                 size_t newRowSize = rowIndex + 1;
                 initializeRowMemory(newRowSize);
 
 
-                size_t cAmount = typeSizeof*colSize;
+                size_t cAmount = typeSizeof * colSize;
                 for (size_t r = rowSize; r < newRowSize; ++r) {
-                    T* rowArray = (T *) std::malloc(cAmount);
+                    T *rowArray = (T *) std::malloc(cAmount);
                     if (rowArray == NULL) {
                         throw std::runtime_error(std::strerror(errno));
                     }
@@ -135,17 +148,35 @@ namespace utils {
 
         void swapRows(const size_t &r1, const size_t &r2) {
             // copy r1 row to temp
-            T* temp = *(matrix + r1);
+            T *temp = *(matrix + r1);
             // copy r2 row to r1
             *(matrix + r1) = *(matrix + r2);
             // copy temp to r2
             *(matrix + r2) = temp;
         }
 
-        void print() {
+        SMatrix<T> *createClone(size_t startRow, size_t startCol,
+                                size_t sizeRow, size_t sizeCol) const {
+            SMatrix<T> *clone = new SMatrix<T>(sizeRow, sizeCol);
+            for (size_t r = 0; r < sizeRow; ++r) {
+                clone->writeRow(r, matrix[r + startRow] + startCol);
+            }
+            return clone;
+        }
+
+        SMatrix<T> *createClone(size_t startRow, size_t startCol) const {
+            return createClone(startRow, startCol, rowSize - startRow,
+                               colSize - startCol);
+        }
+
+        SMatrix<T> *createClone() const {
+            return createClone(0, 0, rowSize, colSize);
+        }
+
+        void print() const {
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < colSize; ++c) {
-                    std::cout << (*this)(r,c) << ", ";
+                    std::cout << matrix[r][c] << ", ";
                 }
                 std::cout << std::endl;
             }
@@ -159,7 +190,7 @@ namespace utils {
         size_t ptypeSizeof; // saved value sizeof T*
 
         void initializeRowMemory(size_t _rowSize) {
-            size_t rAmount = ptypeSizeof*_rowSize;
+            size_t rAmount = ptypeSizeof * _rowSize;
             T **newMatrix;
             if (matrix) {
                 newMatrix = (T **) std::realloc(matrix, rAmount);

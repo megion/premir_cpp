@@ -14,6 +14,7 @@ add_executable(dummy_executable
   test/utils/CMatrixTest.cpp
   test/utils/SMatrixTest.cpp
   test/utils/matrix_utils_test.cpp
+  test/matrix/DeterminantTest.cpp
   test/ml/DigitalFilterTest.cpp
   src/ml/GramSchmidtBasis.cpp
   src/graphics/ChartData.cpp

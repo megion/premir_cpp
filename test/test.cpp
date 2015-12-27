@@ -3,17 +3,19 @@
 #include "utils/CMatrixTest.h"
 #include "utils/SMatrixTest.h"
 #include "utils/matrix_utils_test.h"
+#include "matrix/DeterminantTest.h"
 //#include "ml/DigitalFilterTest.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 
-	linkedList_test();
-	cArrayList_test();
-	cMatrix_test();
-	test::smatrix::sMatrix_test();
-	matrix_utils_test();
+    linkedList_test();
+    cArrayList_test();
+    cMatrix_test();
+    test::utils_smatrix::sMatrix_test();
+    test::matrix_determinant::determinant_test();
+    matrix_utils_test();
 //	digitalFilter_test();
 
-	return 0;
+    return 0;
 
 }
