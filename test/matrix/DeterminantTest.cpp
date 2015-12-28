@@ -35,10 +35,32 @@ namespace test {
             assert(v==45);
         }
 
+        void test_by_hilbert_matrix() {
+            utils::SMatrix<double> a(5, 5);
+            for (size_t i = 0; i<5; ++i) {
+                for (size_t j = 0; j<5; ++j) {
+                    a(i,j) = 1.0/ (double)(i + j + 1.0);
+                }
+            }
+
+            utils::SMatrix<double>* b = a.createClone();
+
+            matrix::Determinant<double, double> d;
+            double v1 = d.bareissDeterminant(a);
+            std::cout.precision(3000);
+            std::cout<< "b: " << 1.0/v1 << std::endl;
+
+
+            double v2 = d.gaussDeterminant(*b);
+            std::cout<< "g: " << 1.0/v2 << std::endl;
+//            assert(v==45);
+        }
+
         void determinant_test() {
             suite("determinant_test");
             test(gauss_determinant);
             test(bareiss_determinant);
+            test(by_hilbert_matrix);
         }
     }
 }
