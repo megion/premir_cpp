@@ -146,7 +146,7 @@ namespace utils {
             writeRow(rowSize, values);
         }
 
-        void swapRows(const size_t &r1, const size_t &r2) {
+        void swapRows(size_t r1, size_t r2) {
             // copy r1 row to temp
             T *temp = *(matrix + r1);
             // copy r2 row to r1

@@ -1,5 +1,5 @@
-#ifndef SRC_UTILS_CMATRIX_H_
-#define SRC_UTILS_CMATRIX_H_
+#ifndef SRC_UTILS_CMATRIX_H
+#define SRC_UTILS_CMATRIX_H
 
 #include "CArrayList.h"
 
