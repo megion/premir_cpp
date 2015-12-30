@@ -5,6 +5,7 @@
 
 #include "test.h"
 #include "utils/SMatrix.h"
+#include "utils/IntBitSet.h"
 
 namespace test {
     namespace utils_smatrix {
