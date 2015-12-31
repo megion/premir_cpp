@@ -140,13 +140,6 @@ namespace test {
             delete cl3;
         }
 
-        void test_bit_set() {
-            utils::IntBitSet<int> a;
-
-            a.add(200);
-            a.print();
-        }
-
         void sMatrix_test() {
             suite("SMatrix");
             test(push_row);
@@ -154,7 +147,6 @@ namespace test {
             test(comparison);
             test(comparison_with_error);
             test(create_clone);
-            test(bit_set);
         }
     }
 }
