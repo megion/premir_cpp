@@ -1,0 +1,88 @@
+##
+## Learning Vector Quantization Program Package
+##
+##    makefile for Borland C++ Version 3.1 in MS-DOS
+##
+##    copy this file to the name makefile before executing the make command
+##
+## version 3.0 March 1995
+#*                                                                      *
+#*  NOTE: This program package is copyrighted in the sense that it      *
+#*  may be used for scientific purposes. The package as a whole, or     *
+#*  parts thereof, cannot be included or used in any commercial         *
+#*  application without written permission granted by its producents.   *
+#*  No programs contained in this package may be copied for commercial  *
+#*  distribution.                                                       *
+#*                                                                      *
+#*  All comments concerning this program package may be sent to the     *
+#*  e-mail address 'lvq@cochlea.hut.fi'.                                *
+#*                                                                      *
+
+## platform specific definitions:
+
+CC = bcc
+CFLAGS = -ml -a -f -O1
+LDFLAGS =
+LDLIBS =
+
+###
+
+TARGETS = accuracy.exe knntest.exe pick.exe setlabel.exe lvqtrain.exe \
+	  lvq1.exe lvq2.exe lvq3.exe olvq1.exe \
+	  eveninit.exe propinit.exe sammon.exe showlabs.exe mindist.exe \
+	  mcnemar.exe classify.exe lvq_run.exe \
+	  cmatr.exe elimin.exe balance.exe stddev.exe
+
+ROUTINES = lvq_pak.obj lvq_rout.obj fileio.obj labels.obj \
+	   version.obj datafile.obj 
+
+HEADERS = targets.rsp lvq_pak.h datafile.h fileio.h labels.h lvq_rout.h
+
+all : $(TARGETS)
+
+.c.obj :
+	$(CC) $(CFLAGS) -c $&.c
+
+.c.exe :
+	$(CC) $(CFLAGS) $(LDFLAGS) -e$& $&.c @targets.rsp $(LDLIBS)
+
+targets.rsp  :
+         echo $(ROUTINES) > targets.rsp
+
+lvq_pak.obj  : lvq_pak.c  $(HEADERS) makefile
+lvq_rout.obj : lvq_rout.c $(HEADERS) makefile
+
+accuracy.exe    : accuracy.c     $(ROUTINES)
+knntest.exe     : knntest.c $(ROUTINES)
+pick.exe        : pick.c   $(ROUTINES)
+lvqtrain.exe    : lvqtrain.c     $(ROUTINES)
+setlabel.exe    : setlabel.c     $(ROUTINES)
+eveninit.exe    : eveninit.c $(ROUTINES)
+showlabs.exe    : showlabs.c   $(ROUTINES)
+sammon.exe      : sammon.c   $(ROUTINES)
+mindist.exe     : mindist.c    $(ROUTINES)
+mcnemar.exe     : mcnemar.c    $(ROUTINES)
+cmatr.exe       : cmatr.c    $(ROUTINES)
+elimin.exe      : elimin.c    $(ROUTINES)
+balance.exe     : balance.c    $(ROUTINES)
+stddev.exe      : stddev.c    $(ROUTINES)
+classify.exe    : classify.c    $(ROUTINES)
+lvq_run.exe     : lvq_run.c    $(ROUTINES)
+
+lvq1.exe        : lvqtrain.c    $(ROUTINES)
+		  copy lvqtrain.exe lvq1.exe
+lvq2.exe        : lvqtrain.c    $(ROUTINES)
+		  copy lvqtrain.exe lvq2.exe
+lvq3.exe        : lvqtrain.c    $(ROUTINES)
+		  copy lvqtrain.exe lvq3.exe
+olvq1.exe       : lvqtrain.c    $(ROUTINES)
+		  copy lvqtrain.exe olvq1.exe
+propinit.exe    : eveninit.c    $(ROUTINES)
+		  copy eveninit.exe propinit.exe
+
+example :
+	.\eveninit -din ex1.dat  -cout ex1e.cod -noc 200
+	.\mindist  -cin ex1e.cod
+	.\balance  -din ex1.dat  -cin ex1e.cod  -cout ex1b.cod
+	.\olvq1    -din ex1.dat  -cin ex1b.cod  -cout ex1o.cod -rlen 5000
+	.\accuracy -din ex2.dat  -cin ex1o.cod

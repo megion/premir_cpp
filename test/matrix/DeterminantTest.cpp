@@ -16,7 +16,8 @@ namespace test {
             matrix::Determinant<double, double> d;
             double v = d.gaussDeterminant(a);
 
-            assert( (45-0.1 < v) && (v < 45+0.1));
+            assert_range(v, 45, 0.1);
+
         }
 
         void test_bareiss_determinant() {
@@ -47,13 +48,10 @@ namespace test {
 
             matrix::Determinant<double, double> d;
             double v1 = d.bareissDeterminant(a);
-            std::cout.precision(3000);
-            std::cout<< "b: " << 1.0/v1 << std::endl;
-
+            assert_range(1.0/v1, 266716800000, 1);
 
             double v2 = d.gaussDeterminant(*b);
-            std::cout<< "g: " << 1.0/v2 << std::endl;
-//            assert(v==45);
+            assert_range(1.0/v2, 266716800000, 1);
         }
 
         void determinant_test() {

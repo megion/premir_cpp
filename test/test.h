@@ -26,5 +26,8 @@
 #define print_size(type) \
   printf("\n  \e[90m%s: %ld bytes\e[0m\n", #type, sizeof(type));
 
+#define assert_range(val, middle, offset) \
+  assert( (middle-offset < val) && (val < middle+offset));
+
 
 #endif /* TEST_TEST_H_ */
