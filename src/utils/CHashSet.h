@@ -30,14 +30,22 @@ namespace utils {
             hashEngine.setIndexSize(tableSize);
         }
 
-        CHashSet<T, H>(const CHashSet<T, H> &) = delete; // disable copy constructor
-        CHashSet<T, H> &operator=(const CHashSet<T, H> &) = delete; // assign operator
-        CHashSet<T, H> &operator=(CHashSet<T, H> &&) = delete; // replacement operator
+        // copy constructor
+        CHashSet(const CHashSet<T, H> &) = delete;
+
+        // replace constructor
+        CHashSet(CHashSet<T, H> &&) = delete;
+
+        // assign operator
+        CHashSet<T, H> &operator=(const CHashSet<T, H> &) = delete;
+
+        // replacement operator
+        CHashSet<T, H> &operator=(CHashSet<T, H> &&) = delete;
 
         ~CHashSet() {
         }
 
-        size_t hash(const T& value) const {
+        size_t hash(const T &value) const {
             return hashEngine.hashCode(value);
         }
 

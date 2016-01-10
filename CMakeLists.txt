@@ -17,6 +17,7 @@ add_executable(dummy_executable
   test/utils/CHashSetTest.cpp
   test/utils/matrix_utils_test.cpp
   test/matrix/DeterminantTest.cpp
+  test/file/FileReaderTest.cpp
   test/ml/DigitalFilterTest.cpp
   src/ml/GramSchmidtBasis.cpp
   src/graphics/ChartData.cpp

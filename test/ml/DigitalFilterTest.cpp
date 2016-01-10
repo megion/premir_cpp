@@ -131,6 +131,6 @@ void test_filter_charts() {
 
 void digitalFilter_test() {
 	suite("charts");
-	test(filter_charts);
+//	test(filter_charts);
 
 }

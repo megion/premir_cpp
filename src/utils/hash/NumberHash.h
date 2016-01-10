@@ -24,7 +24,7 @@ namespace utils {
             }
 
             size_t hashCode(const T& value) const {
-                return value % indexSize;
+                return ((size_t)value) % indexSize;
             }
 
         private:

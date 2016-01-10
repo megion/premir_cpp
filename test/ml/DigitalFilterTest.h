@@ -5,12 +5,8 @@
 #include <random>
 #include <chrono>         // std::chrono::seconds
 
-//#include <xcb/xcb.h>
-
 #include "graphics/ChartThread.h"
 #include "ml/DigitalFilter.h"
-#include "utils/LinkedList.h"
-#include "utils/CArrayList.h"
 
 #include "test.h"
 

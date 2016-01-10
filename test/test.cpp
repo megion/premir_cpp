@@ -6,7 +6,8 @@
 #include "utils/CHashSetTest.h"
 #include "utils/matrix_utils_test.h"
 #include "matrix/DeterminantTest.h"
-//#include "ml/DigitalFilterTest.h"
+#include "file/FileReaderTest.h"
+#include "ml/DigitalFilterTest.h"
 
 int main(int argc, char **argv) {
 
@@ -21,8 +22,9 @@ int main(int argc, char **argv) {
     test::matrix_determinant::determinant_test();
     test::utils_intBitSet::intBitSet_test();
     test::utils_cHashSet::cHashSet_test();
+    test::file_reader::file_reader_test();
     matrix_utils_test();
-//	digitalFilter_test();
+	digitalFilter_test();
 
     return 0;
 
