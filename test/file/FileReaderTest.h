@@ -5,6 +5,7 @@
 
 #include "test.h"
 #include "file/FileReader.h"
+#include "file/CsvFileReader.h"
 
 namespace test {
     namespace file_reader {
