@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "test.h"
-#include "file/FileReader.h"
+#include "file/LineFileReader.h"
 #include "file/CsvFileReader.h"
 
 namespace test {

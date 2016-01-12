@@ -33,9 +33,9 @@ namespace file {
             }
         }
 
-        CsvFileReader(const FileReader<Ch> &) = delete;
+        CsvFileReader(const CsvFileReader<Ch> &) = delete;
 
-        CsvFileReader(FileReader<Ch> &&) = delete;
+        CsvFileReader(CsvFileReader<Ch> &&) = delete;
 
         CsvFileReader<Ch> &operator=(const CsvFileReader<Ch> &) = delete;
 
@@ -66,14 +66,6 @@ namespace file {
             return emptyRead;
         }
 
-        CsvFileReader &operator>>(double &v) {
-            Ch buffer[1100];
-            *buffer = '\0';
-            nextValue(buffer, 1100);
-            v = std::atof(buffer);
-            return *this;
-        }
-
         void toEndLine() {
             int ch;
             for (; ;) {
@@ -94,6 +86,35 @@ namespace file {
                     return;
                 }
             }
+        }
+
+        CsvFileReader &read(double &v) {
+            Ch buffer[1100];
+            *buffer = '\0';
+            nextValue(buffer, 1100);
+            v = std::atof(buffer);
+            return *this;
+        }
+
+        CsvFileReader &read(size_t &v) {
+            Ch buffer[1100];
+            *buffer = '\0';
+            nextValue(buffer, 1100);
+            v = std::atol(buffer);
+            return *this;
+        }
+
+        CsvFileReader &read(char &v) {
+            Ch buffer[2];
+            *buffer = '\0';
+            nextValue(buffer, 2);
+            v = buffer[0];
+            return *this;
+        }
+
+        CsvFileReader &read(char* v, size_t len) {
+            nextValue(v, len);
+            return *this;
         }
 
     private:
@@ -117,7 +138,7 @@ namespace file {
                         danger_text("error: some error occurs");
                         throw std::runtime_error(std::strerror(errno));
                     }
-                    if (i==0) {
+                    if (i == 0) {
                         // end of file and has NO data for reading
                         emptyRead = true;
                     }
