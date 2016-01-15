@@ -16,6 +16,8 @@ namespace test {
             matrix::Determinant<double, double> d;
             double v = d.gaussDeterminant(a);
 
+            a.print();
+
             assert_range(v, 45, 0.1);
 
         }

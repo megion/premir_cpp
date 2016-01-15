@@ -142,6 +142,8 @@ int main(int argc, char **argv)
   
   /* set options for data file */
   set_buffer(data, buffer);
+
+  printf("data->dimension %d\n", data->dimension);
       
   init_random(randomize);
 

@@ -47,8 +47,8 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-            test(read_sspy_data_file_by_line);
-            test(csv_parse_sspy_data_file);
+//            test(read_sspy_data_file_by_line);
+//            test(csv_parse_sspy_data_file);
         }
     }
 }

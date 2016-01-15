@@ -1,5 +1,7 @@
 /**
  * Simple matrix for store values as T**
+ * Matrix disigned for store only simple types
+ * (no new or malloc operation in type).
  */
 
 #ifndef SRC_UTILS_SMATRIX_H
