@@ -176,6 +176,7 @@ namespace utils {
         }
 
         void print() const {
+            std::cout << "Matrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < colSize; ++c) {
                     std::cout << matrix[r][c] << ", ";

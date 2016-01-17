@@ -244,13 +244,17 @@ struct data_entry *find_eigenvectors(struct entries *data)
   for (k=0; ptr != NULL; k++, ptr=next_entry(&p))
     {
       mask = ptr->mask;
+//        printf("num %d: ", k);
       for (i=0; i<n; i++)
 	if ((!mask) || (mask && (mask[i] == 0)))
 	  {
+//        printf("%f, ", ptr->points[i]);
 	    m[i]+=ptr->points[i]; /* masked components have the value 0 so they
 				     don't affect the sum */
 	    k2[i]++;
 	  }
+
+//    printf("\n");
     }
 
   if (k<3) goto everror;
@@ -282,9 +286,19 @@ struct data_entry *find_eigenvectors(struct entries *data)
 	}
     }
 
+  for (i=0; i<n; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", r[j*n+i]);
+    }
+    printf("\n");
+  }
+
   for (i=0; i<n; i++)
     for (j=i; j<n; j++)
       r[j*n+i]=r[i*n+j]/=k;
+
+
+
 
   for (i=0; i<2; i++) {
     for (j=0; j<n; j++) u[i*n+j]=orand()/16384.0-1.0;

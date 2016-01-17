@@ -23,11 +23,6 @@ namespace matrix {
          * Найти собственные вектора произвольной матрицы
          */
         utils::SMatrix<R>* findEigenVectors(utils::SMatrix<T>& inMatrix) {
-            size_t matrixSize = matrix.getColSize();
-            size_t swapCount = 0;
-            R determinant = 1;
-
-
         }
 
     };

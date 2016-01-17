@@ -19,6 +19,7 @@ add_executable(dummy_executable
   test/matrix/DeterminantTest.cpp
   test/file/FileReaderTest.cpp
   test/ml/DigitalFilterTest.cpp
+  test/kohonen/NetworkInitializerTest.cpp
   src/ml/GramSchmidtBasis.cpp
   src/graphics/ChartData.cpp
   src/graphics/Chart.cpp
