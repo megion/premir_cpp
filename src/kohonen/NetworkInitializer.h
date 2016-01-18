@@ -18,6 +18,7 @@
 #include <math.h>
 
 #include "utils/SMatrix.h"
+#include "RandomGenerator.h"
 
 namespace kohonen {
 
@@ -46,6 +47,8 @@ namespace kohonen {
          *
          */
         utils::SMatrix<R> *lineInitialization(utils::SMatrix<T> &inMatrix) {
+
+            RandomGenerator::initGenerator();
 
             findEigenVectors(inMatrix);
 
@@ -124,6 +127,9 @@ namespace kohonen {
                     squareMatrix(j, i) = squareMatrix(i, j);
                 }
             }
+            
+            int gv = RandomGenerator::generate();
+            std::cout<< "gv: " << gv << std::endl;
 
             squareMatrix.print();
 
