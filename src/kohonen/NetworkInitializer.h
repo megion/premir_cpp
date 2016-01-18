@@ -29,6 +29,13 @@ namespace kohonen {
         }
 
         /**
+         * Случайная инициализация нейронной сети.
+         */
+        utils::SMatrix<R> *randomInitialization(utils::SMatrix<T> &inMatrix) {
+            return nullptr;
+        }
+
+        /**
          * Линейная инициализация нейронной сети.
          * Вначале определяются два собственных вектора с наибольшими
          * собствннными значениями. Затем определяется двумерная матрица
@@ -38,67 +45,93 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<R>* lineInitialization(utils::SMatrix<T>& inMatrix) {
-            size_t n = inMatrix.getColSize();
+        utils::SMatrix<R> *lineInitialization(utils::SMatrix<T> &inMatrix) {
 
-            R u[2*n];
-            R v[2*n];
-            R mu[2];
-
-            R r[n*n];
-            for (size_t i=0; i<n*n; ++i) {
-                r[i]=0;
-            }
-
-            R m[n];
-            for (size_t i=0; i<n; ++i) {
-                m[i]=0;
-            }
-
-            long k2[n];
-            for (size_t i=0; i<n; ++i) {
-                k2[i]=0;
-            }
-
-            // iterate by all input matrix elements
-            for (size_t k = 0; k<inMatrix.getRowSize(); ++k) {
-                T* row = inMatrix.getRow(k);
-                for (size_t i=0; i<n; ++i) {
-                    m[i]+=row[i];
-                    k2[i]++;
-                }
-            }
-
-            for (size_t i=0; i<n; ++i) {
-                m[i]/=k2[i];
-            }
-
-            // iterate by all input matrix elements
-            for (size_t k = 0; k<inMatrix.getRowSize(); ++k) {
-                T* row = inMatrix.getRow(k);
-                for (size_t i=0; i<n; ++i) {
-                    for (size_t j=i; j<n; j++) {
-                        r[i*n+j]+=(row[i]-m[i])*(row[j]-m[j]);
-                    }
-                }
-            }
+            findEigenVectors(inMatrix);
 
             return nullptr;
-        }
-
-        /**
-         * Случайная инициализация нейронной сети.
-         */
-        utils::SMatrix<R>* randomInitialization(utils::SMatrix<T>& inMatrix) {
-
         }
 
 
     private:
 
+        /**
+         * Найти два собственных вектора с наибольшими
+         * собствннными значениями.
+         */
+        utils::SMatrix<R> *findEigenVectors(utils::SMatrix<T> &inMatrix) {
+            size_t n = inMatrix.getColSize();
+
+            R u[2 * n];
+            R v[2 * n];
+            R mu[2];
+
+            // квадратная матрица
+            utils::SMatrix<R> squareMatrix(n, n);
+            for (size_t row = 0; row < squareMatrix.getRowSize(); ++row) {
+                for (size_t col = 0; col < squareMatrix.getColSize(); ++col) {
+                    squareMatrix(row, col) = 0;
+                }
+            }
+
+            // colMedians среднее значение по каждой колонке
+            R colMedians[n];
+            for (size_t i = 0; i < n; ++i) {
+                colMedians[i] = 0;
+            }
+
+            size_t k2[n];
+            for (size_t i = 0; i < n; ++i) {
+                k2[i] = 0;
+            }
+
+            // iterate by all input matrix elements
+            // после этой итерации k2 будет содержать число строк,
+            // т.е. одинаковым для каждого столбца. Однако оно может быть
+            // различным если внедрить подсчет не каждого значения столбца.
+            // (пока такое не реализовано)
+            for (size_t k = 0; k < inMatrix.getRowSize(); ++k) {
+                T *row = inMatrix.getRow(k);
+                for (size_t i = 0; i < n; ++i) {
+                    colMedians[i] += row[i];
+                    k2[i]++;
+                }
+            }
+
+            for (size_t i = 0; i < n; ++i) {
+                colMedians[i] = colMedians[i] / k2[i];
+            }
+
+            // iterate by all input matrix elements
+            // получение треугольной квадратной матрицы
+            for (size_t k = 0; k < inMatrix.getRowSize(); ++k) {
+                T *row = inMatrix.getRow(k);
+                for (size_t i = 0; i < n; ++i) {
+                    for (size_t j = i; j < n; j++) {
+                        squareMatrix(i, j) = squareMatrix(i, j) +
+                                             (row[i] - colMedians[i]) *
+                                             (row[j] - colMedians[j]);
+                    }
+                }
+            }
+
+            // поллучить симметричную матрицу, при этом разделим на
+            // число строк входной матрицы
+            size_t inRowSize = inMatrix.getRowSize();
+            for (size_t i = 0; i < n; i++) {
+                for (size_t j = i; j < n; j++) {
+                    squareMatrix(i, j) /= inRowSize;
+                    squareMatrix(j, i) = squareMatrix(i, j);
+                }
+            }
+
+            squareMatrix.print();
+
+            return nullptr;
+        }
+
     };
 }
-
 
 
 #endif

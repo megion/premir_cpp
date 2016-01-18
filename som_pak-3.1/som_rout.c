@@ -270,6 +270,7 @@ struct data_entry *find_eigenvectors(struct entries *data)
       goto everror;
     }
 
+  // triangular matrix
   for (; ptr != NULL; ptr=next_entry(&p))
     {
       mask = ptr->mask;
@@ -286,16 +287,19 @@ struct data_entry *find_eigenvectors(struct entries *data)
 	}
     }
 
-  for (i=0; i<n; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", r[j*n+i]);
-    }
-    printf("\n");
-  }
+
 
   for (i=0; i<n; i++)
     for (j=i; j<n; j++)
       r[j*n+i]=r[i*n+j]/=k;
+
+
+  for (i=0; i<n; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", r[i*n+j]);
+    }
+    printf("\n");
+  }
 
 
 

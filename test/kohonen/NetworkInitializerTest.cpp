@@ -6,10 +6,10 @@ namespace test {
         void test_line_initialization() {
             file::CsvFileReader<char> reader(
                     "../test/datafiles/kohonen/ex.dat", ' ');
-            utils::SMatrix<double> dataMatrix(0, 5);
+            utils::SMatrix<float> dataMatrix(0, 5);
             reader.toEndLine();
             while (reader.hasNext()) {
-                double row[5];
+                float row[5];
                 reader.read(row[0]);
                 reader.read(row[1]);
                 reader.read(row[2]);
@@ -28,7 +28,21 @@ namespace test {
                 }
             }
 
-            dataMatrix.print();
+
+//            std::cout << "std::numeric_limits<double>::digits: " <<
+//            std::numeric_limits<unsigned long long int>::digits << std::endl;
+//            std::cout << "std::numeric_limits<double>::digits10: " <<
+//            std::numeric_limits<double>::digits10 << std::endl;
+//            std::cout << "std::numeric_limits<double>::max_digits10: " <<
+//            std::numeric_limits<double>::max_digits10 << std::endl;
+
+            kohonen::NetworkInitializer<float, double> initializer;
+
+            std::cout.precision(std::numeric_limits<double>::digits10);
+
+            initializer.lineInitialization(dataMatrix);
+
+//            dataMatrix.print();
         }
 
         void network_initializer_test() {

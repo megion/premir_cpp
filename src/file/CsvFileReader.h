@@ -14,6 +14,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 
 #include "utils/console_colors.h"
 
@@ -89,17 +90,25 @@ namespace file {
         }
 
         CsvFileReader &read(double &v) {
-            Ch buffer[1100];
+            Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 1100);
+            nextValue(buffer, 64);
+            v = std::atof(buffer);
+            return *this;
+        }
+
+        CsvFileReader &read(float &v) {
+            Ch buffer[64];
+            *buffer = '\0';
+            nextValue(buffer, 64);
             v = std::atof(buffer);
             return *this;
         }
 
         CsvFileReader &read(size_t &v) {
-            Ch buffer[1100];
+            Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 1100);
+            nextValue(buffer, 64);
             v = std::atol(buffer);
             return *this;
         }
