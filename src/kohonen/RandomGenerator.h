@@ -11,12 +11,13 @@
 
 namespace kohonen {
 
-    static unsigned long nextValue;
-
     class RandomGenerator {
     public:
 
         RandomGenerator() {
+        }
+
+        ~RandomGenerator() {
         }
 
         static int generate() {
@@ -30,6 +31,7 @@ namespace kohonen {
 
     private:
         const static long RANDOM_MAX_VALUE = 32767L;
+        static unsigned long nextValue;
     };
 }
 
