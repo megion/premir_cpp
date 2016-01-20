@@ -294,20 +294,19 @@ struct data_entry *find_eigenvectors(struct entries *data)
       r[j*n+i]=r[i*n+j]/=k;
 
 
-  for (i=0; i<n; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", r[i*n+j]);
-    }
-    printf("\n");
-  }
-
-
 
 
   for (i=0; i<2; i++) {
     for (j=0; j<n; j++) u[i*n+j]=orand()/16384.0-1.0;
     normalize(u+i*n, n);
     mu[i]=1.0;
+  }
+
+  for (i=0; i<2; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", u[i*n+j]);
+    }
+    printf("\n");
   }
 
   for (k=0; k<10; k++) {

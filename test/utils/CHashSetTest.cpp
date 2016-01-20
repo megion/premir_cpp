@@ -29,14 +29,14 @@ namespace test {
             utils::CHashSet<char *, utils::hash::StringHash<char *>> s1;
             char ch1[] = "test";
             size_t h = s1.hash(ch1);
-            std::cout << "hash: " << h << std::endl;
+//            std::cout << "hash: " << h << std::endl;
 
             utils::hash::FloatHash<double> hash2(1.2, 1.6);
             utils::CHashSet<double, utils::hash::FloatHash<double>> s2(hash2);
             size_t h2 = s2.hash(1.22222);
-            std::cout << "hash2: " << h2 << std::endl;
+//            std::cout << "hash2: " << h2 << std::endl;
             size_t h3 = s2.hash(1.233);
-            std::cout << "hash2: " << h3 << std::endl;
+//            std::cout << "hash2: " << h3 << std::endl;
         }
 
         void test_number_hash_charts() {

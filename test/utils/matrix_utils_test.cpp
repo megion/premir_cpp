@@ -39,19 +39,6 @@ void test_multiply_matrix() {
     delete matrixC; // do not remember delete resource
 }
 
-void test_scalar_multiply_vectors() {
-    double arrA[] = {1, 2, 3};
-    utils::CArrayList<double> vectorA;
-    vectorA.push(arrA, 3);
-    double arrB[] = {3, 2, 4};
-    utils::CArrayList<double> vectorB;
-    vectorB.push(arrB, 3);
-    double res = utils::multiplyArrays(vectorA.getArray(), vectorB.getArray(),
-                                       vectorA.size());
-
-    assert(res == 19);
-}
-
 void test_distance_vectors() {
     double arrA[] = {1, 2, 1};
     utils::CArrayList<double> vectorA;
@@ -65,26 +52,26 @@ void test_distance_vectors() {
     assert(res == 3.0);
 }
 
-void test_norm_euclidean_vector() {
-    double arrA[] = {1, 2, 2};
-    utils::CArrayList<double> vectorA;
-    vectorA.push(arrA, 3);
-    double res = utils::euclideanNorm(vectorA.getArray(), vectorA.size());
-    assert(res == 3);
-}
-
 
 void test_gram_schmidt_vector_basis() {
-    ml::GramSchmidtBasis basis(3);
-    // [1,-1,1],[1,0,1],[1,1,2]
-    double d[] = {1, -1, 1};
-    basis.pushInVector(d);
-    double d1[] = {1, 0, 1};
-    basis.pushInVector(d1);
-    double d2[] = {1, 1, 2};
-    basis.pushInVector(d2);
 
-    utils::CMatrix<double> matrixCheck(3, 3);
+    // [1,-1,1],[1,0,1],[1,1,2]
+    utils::SMatrix<double> dataMatrix(0, 3);
+    double d[] = {1, -1, 1};
+    dataMatrix.pushRow(d);
+    double d1[] = {1, 0, 1};
+    dataMatrix.pushRow(d1);
+    double d2[] = {1, 1, 2};
+    dataMatrix.pushRow(d2);
+    dataMatrix.print();
+
+    ml::GramSchmidtBasis<double, double> basis(3);
+    for (size_t r=0; r<dataMatrix.getRowSize(); ++r) {
+        double* row = dataMatrix.getRow(r);
+        basis.pushInVector(row);
+    }
+
+    utils::SMatrix<double> matrixCheck(3, 3);
     double rowCheck0[] = {1, -1, 1};
     matrixCheck.writeRow(0, rowCheck0);
     double rowCheck1[] = {1.0/3.0, 2.0/3.0, 1.0/3.0};
@@ -92,8 +79,15 @@ void test_gram_schmidt_vector_basis() {
     double rowCheck2[] = {-0.5, 0, 0.5};
     matrixCheck.writeRow(2, rowCheck2);
 
+    basis.getOutVectors()->print();
+
     // test with error
     assert(basis.getOutVectors()->equalsWithError(matrixCheck, 0.00001));
+
+    dataMatrix.print();
+    basis.gram_schmidt2(dataMatrix);
+    dataMatrix.print();
+
 }
 
 //void test_cos_angel_vectors() {
@@ -110,9 +104,7 @@ void test_gram_schmidt_vector_basis() {
 void matrix_utils_test() {
     suite("matrix_utils");
     test(multiply_matrix);
-    test(scalar_multiply_vectors);
     test(distance_vectors);
 //    test(cos_angel_vectors);
-    test(norm_euclidean_vector);
     test(gram_schmidt_vector_basis);
 }

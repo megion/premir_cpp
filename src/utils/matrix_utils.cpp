@@ -88,15 +88,6 @@ namespace utils {
         return c;
     }
 
-    double multiplyArrays(
-            const double *a, const double *b, size_t sizeArray) {
-        double res = 0;
-        for (size_t i = 0; i < sizeArray; ++i) {
-            res = res + a[i] * b[i];
-        }
-        return res;
-    }
-
     void multiplyArrayOnScalar(double *a, const double scalar,
                                size_t sizeArray) {
         for (size_t i = 0; i < sizeArray; ++i) {
@@ -123,18 +114,18 @@ namespace utils {
         return res;
     }
 
-    double euclideanSquaredNorm(const double *a, size_t sizeArray) {
-        double res = 0;
-        for (size_t i = 0; i < sizeArray; ++i) {
-            const double &ai = *(a + i);
-            res = res + ai * ai;
-        }
-        return res;
-    }
-
-    double euclideanNorm(const double *a, size_t sizeArray) {
-        return pow(euclideanSquaredNorm(a, sizeArray), 0.5);
-    }
+//    double euclideanSquaredNorm(const double *a, size_t sizeArray) {
+//        double res = 0;
+//        for (size_t i = 0; i < sizeArray; ++i) {
+//            const double &ai = *(a + i);
+//            res = res + ai * ai;
+//        }
+//        return res;
+//    }
+//
+//    double euclideanNorm(const double *a, size_t sizeArray) {
+//        return pow(euclideanSquaredNorm(a, sizeArray), 0.5);
+//    }
 
 //    template<typename T>
 //    double cosAngelVectors(

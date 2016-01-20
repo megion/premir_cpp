@@ -13,6 +13,7 @@ add_executable(dummy_executable
   test/utils/CArrayListTest.cpp
   test/utils/CMatrixTest.cpp
   test/utils/SMatrixTest.cpp
+  test/utils/ArrayUtilsTest.cpp
   test/utils/IntBitSetTest.cpp
   test/utils/CHashSetTest.cpp
   test/utils/matrix_utils_test.cpp
@@ -20,7 +21,6 @@ add_executable(dummy_executable
   test/file/FileReaderTest.cpp
   test/ml/DigitalFilterTest.cpp
   test/kohonen/NetworkInitializerTest.cpp
-  src/ml/GramSchmidtBasis.cpp
   src/graphics/ChartData.cpp
   src/graphics/Chart.cpp
   src/ml/DigitalFilter.cpp

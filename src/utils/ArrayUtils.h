@@ -5,14 +5,13 @@
 #ifndef SRC_UTILS_VECTORUTILS_H
 #define SRC_UTILS_VECTORUTILS_H
 
-#include <math.h>
-
-#include "utils/SMatrix.h"
-#include "utils/console_colors.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 namespace utils {
 
-    template<typename T, typename R>
+    template<typename InA, typename InB, typename Out>
     class ArrayUtils {
 
     public:
@@ -22,19 +21,58 @@ namespace utils {
         ~ArrayUtils() {
         }
 
-        static void normalization(const T* a, size_t sizeArray) {
-            T sum=0;
-            for (size_t i=0; i<sizeArray; i++) {
-                sum+=a[i]*a[i];
+        static void normalization(InA *a, size_t sizeArray) {
+            InA sum = 0;
+            for (size_t i = 0; i < sizeArray; i++) {
+                sum += a[i] * a[i];
             }
-            sum=sqrt(sum);
-            for (size_t i=0; i<n; ++i) {
+            sum = sqrt(sum);
+            for (size_t i = 0; i < sizeArray; ++i) {
                 a[i] /= sum;
             }
         }
 
-//        utils::SMatrix<R>* findEigenVectors(utils::SMatrix<T>& inMatrix) {
-//        }
+        /**
+         * Вычисление квадрата евклидовой нормы массива
+         * result = sum(pow(a(i), 2)) where i = 0...N-1
+         */
+        static Out euclideanSquaredNorm(const InA *a, size_t sizeArray) {
+            Out res = 0;
+            for (size_t i = 0; i < sizeArray; ++i) {
+                const InA &ai = *(a + i);
+                res = res + ai * ai;
+            }
+            return res;
+        }
+
+        /**
+         * Вычисление евклидовой нормы массива
+         * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
+         */
+        static Out euclideanNorm(const InA *a, size_t sizeArray) {
+            return std::pow(ArrayUtils<InA, InB, Out>::
+                    euclideanSquaredNorm(a, sizeArray), 0.5);
+        }
+
+        /**
+         * Скаларное произведение массивов A и B.
+         * result = sum(a(i)*b(i)) where i = 0...N-1
+         */
+        static Out scalarMultiplication(
+                const InA *a, const InB *b, size_t sizeArray) {
+            Out res = 0;
+            for (size_t i = 0; i < sizeArray; ++i) {
+                res = res + a[i] * b[i];
+            }
+            return res;
+        }
+
+        // a = b - a
+        static void reverseMinus(InA *a, const InB *b, size_t sizeArray) {
+            for (size_t i = 0; i < sizeArray; ++i) {
+                a[i] = b[i] - a[i];
+            }
+        }
 
 
 //        double normArray(const double *a, size_t sizeArray) {

@@ -42,8 +42,8 @@ namespace utils {
      * Скаларное произведение массивов A и B.
      * result = sum(a(i)*b(i)) where i = 0...N-1
      */
-    double multiplyArrays(
-            const double *a, const double *b, size_t sizeArray);
+//    double multiplyArrays(
+//            const double *a, const double *b, size_t sizeArray);
 
     /**
      * Скалярное произведение массива на число
@@ -68,13 +68,13 @@ namespace utils {
      * Вычисление квадрата евклидовой нормы массива
      * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
      */
-    double euclideanSquaredNorm(const double *a, size_t sizeArray);
+//    double euclideanSquaredNorm(const double *a, size_t sizeArray);
 
     /**
      * Вычисление евклидовой нормы массива
      * result = pow(sum(pow(a(i), 2)), 0.5) where i = 0...N-1
      */
-    double euclideanNorm(const double *a, size_t sizeArray);
+//    double euclideanNorm(const double *a, size_t sizeArray);
 
 
     /**

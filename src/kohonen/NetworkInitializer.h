@@ -18,6 +18,7 @@
 #include <math.h>
 
 #include "utils/SMatrix.h"
+#include "utils/ArrayUtils.h"
 #include "RandomGenerator.h"
 
 namespace kohonen {
@@ -65,9 +66,7 @@ namespace kohonen {
         utils::SMatrix<R> *findEigenVectors(utils::SMatrix<T> &inMatrix) {
             size_t n = inMatrix.getColSize();
 
-            R u[2 * n];
             R v[2 * n];
-            R mu[2];
 
             // квадратная матрица
             utils::SMatrix<R> squareMatrix(n, n);
@@ -127,11 +126,32 @@ namespace kohonen {
                     squareMatrix(j, i) = squareMatrix(i, j);
                 }
             }
-            
-            int gv = RandomGenerator::generate();
-            std::cout<< "gv: " << gv << std::endl;
 
-            squareMatrix.print();
+            // матрица из двух векторов заполненая случайными нормализованными
+            // значениями
+            utils::SMatrix<R> uVectors(2, n);
+            R mu[2]; // два собственных значения
+            for (size_t i = 0; i < uVectors.getRowSize(); ++i) {
+                R *row = uVectors.getRow(i);
+                for (size_t j = 0; j < uVectors.getColSize(); ++j) {
+                    row[j] = RandomGenerator::generate() / 16384.0 - 1.0;
+                }
+                utils::ArrayUtils<R, R, R>::
+                normalization(row, uVectors.getColSize());
+                mu[i] = 1;
+            }
+
+            uVectors.print();
+
+//            for (size_t i = 0; i < 2; i++) {
+//                for (size_t j = 0; j < n; j++) {
+//                    printf("%f, ", u[i * n + j]);
+//                }
+//                printf("\n");
+//            }
+
+
+//            squareMatrix.print();
 
             return nullptr;
         }
