@@ -302,12 +302,32 @@ struct data_entry *find_eigenvectors(struct entries *data)
     mu[i]=1.0;
   }
 
-  for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", u[i*n+j]);
-    }
-    printf("\n");
-  }
+//  for (i=0; i<2; i++) {
+//    for (j=0; j<n; j++) {
+//      printf("%f, ", u[i*n+j]);
+//    }
+//    printf("\n");
+//  }
+
+  // [1,-1,1],[1,0,1],[1,1,2]
+//  float v2[9];
+//  v2[0] = 1.0;
+//  v2[1] = -1.0;
+//  v2[2] = 1.0;
+//  v2[3] = 1.0;
+//  v2[4] = 0.0;
+//  v2[5] = 1.0;
+//  v2[6] = 1.0;
+//  v2[7] = 1.0;
+//  v2[8] = 2.0;
+//  gram_schmidt(v2, 3, 3);
+//  for (i=0; i<3; i++) {
+//    for (j=0; j<3; j++) {
+//      printf("%f, ", v2[i*3+j]);
+//    }
+//    printf("\n");
+//  }
+
 
   for (k=0; k<10; k++) {
     for (i=0; i<2; i++)

@@ -63,7 +63,6 @@ void test_gram_schmidt_vector_basis() {
     dataMatrix.pushRow(d1);
     double d2[] = {1, 1, 2};
     dataMatrix.pushRow(d2);
-    dataMatrix.print();
 
     ml::GramSchmidtBasis<double, double> basis(3);
     for (size_t r=0; r<dataMatrix.getRowSize(); ++r) {
@@ -79,14 +78,10 @@ void test_gram_schmidt_vector_basis() {
     double rowCheck2[] = {-0.5, 0, 0.5};
     matrixCheck.writeRow(2, rowCheck2);
 
-    basis.getOutVectors()->print();
+//    basis.getOutVectors()->print();
 
     // test with error
     assert(basis.getOutVectors()->equalsWithError(matrixCheck, 0.00001));
-
-    dataMatrix.print();
-    basis.gram_schmidt2(dataMatrix);
-    dataMatrix.print();
 
 }
 
