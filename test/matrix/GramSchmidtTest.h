@@ -6,6 +6,7 @@
 #include "test.h"
 #include "matrix/GramSchmidtNormalized.h"
 #include "matrix/GramSchmidtStream.h"
+#include "matrix/MatrixUtils.h"
 
 namespace test {
     namespace matrix_gramSchmidt {

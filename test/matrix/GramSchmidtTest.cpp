@@ -4,7 +4,6 @@ namespace test {
     namespace matrix_gramSchmidt {
 
         void test_gram_schmidt_strteam() {
-
             // [1,-1,1],[1,0,1],[1,1,2]
             utils::SMatrix<double> dataMatrix(0, 3);
             double d[] = {1, -1, 1};
@@ -29,8 +28,6 @@ namespace test {
             double rowCheck2[] = {-0.5, 0, 0.5};
             matrixCheck.writeRow(2, rowCheck2);
 
-            basis.getOutVectors()->print();
-
             // test with error
             assert(basis.getOutVectors()->equalsWithError(matrixCheck,
                                                           0.00001));
@@ -46,14 +43,44 @@ namespace test {
             double d2[] = {1, 1, 2};
             dataMatrix.writeRow(2, d2);
 
+            utils::SMatrix<double> *dataClone = dataMatrix.createClone();
+
             matrix::GramSchmidtNormalized<double, double> basis;
-            basis.gramSchmidt(dataMatrix);
+            utils::SMatrix<double> outMatrix(3, 3);
+            basis.gramSchmidt(dataMatrix, outMatrix);
 
-//            0.577350, -0.577350, 0.577350,
-//                    0.408248, 0.816497, 0.408248,
-//                    -0.707107, -0.000000, 0.707106
+            // проверка что данные не изменились
+            assert(dataMatrix == *dataClone);
 
-            dataMatrix.print();
+            utils::SMatrix<double> checkMatrix(3, 3);
+            double rowCheck0[] = {0.577350, -0.577350, 0.577350};
+            checkMatrix.writeRow(0, rowCheck0);
+            double rowCheck1[] = {0.408248, 0.816497, 0.408248};
+            checkMatrix.writeRow(1, rowCheck1);
+            double rowCheck2[] = {-0.707107, 0.0, 0.707106};
+            checkMatrix.writeRow(2, rowCheck2);
+
+            assert(outMatrix.equalsWithError(checkMatrix, 0.00001));
+
+            // высчитать и записать результат в dataClone
+            basis.gramSchmidt(*dataClone);
+            assert(dataClone->equalsWithError(checkMatrix, 0.00001));
+
+            // высчитаем вторым способом (потоковый) и сравним результаты
+            matrix::GramSchmidtStream<double, double> basis2(3);
+            for (size_t r = 0; r < dataMatrix.getRowSize(); ++r) {
+                double *row = dataMatrix.getRow(r);
+                basis2.nextVector(row);
+            }
+            matrix::MatrixUtils<double, double, double>::
+            normalizationMatrixRows(*basis2.getOutVectors());
+
+            assert(basis2.getOutVectors()->equalsWithError(checkMatrix,
+                                                           0.00001));
+            // данные матрицы должны быть практически идентичными
+            assert(dataClone->equalsWithError(*basis2.getOutVectors(),
+                                              0.000000001));
+            delete dataClone;
         }
 
         void gramSchmidt_test() {

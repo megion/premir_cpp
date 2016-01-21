@@ -19,9 +19,9 @@ namespace matrix {
         /**
          * Нормализация векторов-строчек указанной матрицы
          */
-        void normalizationMatrixRows(utils::SMatrix<InA> &inMatrix) {
+        static void normalizationMatrixRows(utils::SMatrix<InA> &inMatrix) {
             for (size_t r = 0; r < inMatrix.getRowSize(); ++r) {
-                T *row = inMatrix.getRow(r);
+                InA *row = inMatrix.getRow(r);
                 utils::ArrayUtils<InA, InA, InA>::
                 normalization(row,
                               inMatrix.getColSize());
