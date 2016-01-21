@@ -57,7 +57,7 @@ namespace test {
         }
 
         void determinant_test() {
-            suite("determinant_test");
+            suite("Determinant");
             test(gauss_determinant);
             test(bareiss_determinant);
             test(by_hilbert_matrix);

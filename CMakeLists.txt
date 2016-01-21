@@ -18,6 +18,7 @@ add_executable(dummy_executable
   test/utils/CHashSetTest.cpp
   test/utils/matrix_utils_test.cpp
   test/matrix/DeterminantTest.cpp
+  test/matrix/GramSchmidtTest.cpp
   test/file/FileReaderTest.cpp
   test/ml/DigitalFilterTest.cpp
   test/kohonen/NetworkInitializerTest.cpp

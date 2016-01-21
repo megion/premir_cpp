@@ -7,6 +7,7 @@
 #include "utils/CHashSetTest.h"
 #include "utils/matrix_utils_test.h"
 #include "matrix/DeterminantTest.h"
+#include "matrix/GramSchmidtTest.h"
 #include "file/FileReaderTest.h"
 #include "sspy/SspyTest.h"
 #include "kohonen/NetworkInitializerTest.h"
@@ -26,6 +27,7 @@ int main(int argc, char **argv) {
     test::utils_intBitSet::intBitSet_test();
     test::utils_cHashSet::cHashSet_test();
     test::matrix_determinant::determinant_test();
+    test::matrix_gramSchmidt::gramSchmidt_test();
     test::file_reader::file_reader_test();
     test::sspy::sspy_data_read_test();
     test::kohonen_initializer::network_initializer_test();

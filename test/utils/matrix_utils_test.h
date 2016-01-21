@@ -5,7 +5,6 @@
 
 #include "test.h"
 #include "utils/matrix_utils.h"
-#include "ml/GramSchmidtBasis.h"
 
 void matrix_utils_test();
 

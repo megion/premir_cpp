@@ -53,37 +53,7 @@ void test_distance_vectors() {
 }
 
 
-void test_gram_schmidt_vector_basis() {
 
-    // [1,-1,1],[1,0,1],[1,1,2]
-    utils::SMatrix<double> dataMatrix(0, 3);
-    double d[] = {1, -1, 1};
-    dataMatrix.pushRow(d);
-    double d1[] = {1, 0, 1};
-    dataMatrix.pushRow(d1);
-    double d2[] = {1, 1, 2};
-    dataMatrix.pushRow(d2);
-
-    ml::GramSchmidtBasis<double, double> basis(3);
-    for (size_t r=0; r<dataMatrix.getRowSize(); ++r) {
-        double* row = dataMatrix.getRow(r);
-        basis.pushInVector(row);
-    }
-
-    utils::SMatrix<double> matrixCheck(3, 3);
-    double rowCheck0[] = {1, -1, 1};
-    matrixCheck.writeRow(0, rowCheck0);
-    double rowCheck1[] = {1.0/3.0, 2.0/3.0, 1.0/3.0};
-    matrixCheck.writeRow(1, rowCheck1);
-    double rowCheck2[] = {-0.5, 0, 0.5};
-    matrixCheck.writeRow(2, rowCheck2);
-
-//    basis.getOutVectors()->print();
-
-    // test with error
-    assert(basis.getOutVectors()->equalsWithError(matrixCheck, 0.00001));
-
-}
 
 //void test_cos_angel_vectors() {
 //    double arrA[] = {1, 2, 1};
@@ -100,6 +70,4 @@ void matrix_utils_test() {
     suite("matrix_utils");
     test(multiply_matrix);
     test(distance_vectors);
-//    test(cos_angel_vectors);
-    test(gram_schmidt_vector_basis);
 }

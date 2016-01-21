@@ -105,6 +105,23 @@ namespace test {
             }
         }
 
+        void test_copy_to() {
+            utils::SMatrix<int> a(2, 4);
+            int row0[] = {1, 1, 1, 1};
+            a.writeRow(0, row0);
+            a.writeRow(1, row0);
+
+            utils::SMatrix<int> b(2, 4);
+            int rowB0[] = {2, 2, 2, 2};
+            b.writeRow(0, rowB0);
+
+            assert(a!=b);
+
+            a.copyTo(b);
+
+            assert(a==b);
+        }
+
         void test_create_clone() {
             utils::SMatrix<int> a(4, 5);
 
@@ -147,6 +164,8 @@ namespace test {
             test(comparison);
             test(comparison_with_error);
             test(create_clone);
+            test(copy_to);
+            test(get_row);
         }
     }
 }

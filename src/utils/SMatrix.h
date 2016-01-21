@@ -175,6 +175,15 @@ namespace utils {
             return createClone(0, 0, rowSize, colSize);
         }
 
+        /**
+         * Скопировать значения в матрицу destination
+         */
+        void copyTo(SMatrix<T>& destination) const {
+            for (size_t r = 0; r < rowSize; ++r) {
+                destination.writeRow(r, matrix[r]);
+            }
+        }
+
         void print() const {
             std::cout << "Matrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
             for (size_t r = 0; r < rowSize; ++r) {

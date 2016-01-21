@@ -14,11 +14,11 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
-
-#include <math.h>
+#include <cmath>
 
 #include "utils/SMatrix.h"
 #include "utils/ArrayUtils.h"
+#include "matrix/GramSchmidtNormalized.h"
 #include "RandomGenerator.h"
 
 namespace kohonen {
@@ -90,6 +90,7 @@ namespace kohonen {
             // т.е. одинаковым для каждого столбца. Однако оно может быть
             // различным если внедрить подсчет не каждого значения столбца.
             // (пока такое не реализовано)
+            // TODO:
             for (size_t k = 0; k < inMatrix.getRowSize(); ++k) {
                 T *row = inMatrix.getRow(k);
                 for (size_t i = 0; i < n; ++i) {
@@ -125,6 +126,8 @@ namespace kohonen {
                 }
             }
 
+//            squareMatrix.print();
+
             // матрица из двух векторов заполненая случайными нормализованными
             // значениями
             utils::SMatrix<R> uVectors(2, n);
@@ -151,6 +154,7 @@ namespace kohonen {
 
 //            squareMatrix.print();
 
+            matrix::GramSchmidtNormalized<R, R> gramSchmidtCalc;
             utils::SMatrix<R> vVectors(2, n);
             for (int s=0; s<10; ++s) {
                 for (size_t i=0; i<vVectors.getRowSize(); ++i) {
@@ -163,56 +167,25 @@ namespace kohonen {
                 }
 
 
-                gramSchmidt2(vVectors);
+                gramSchmidtCalc.gramSchmidt(vVectors);
 
-//                sum=0.0;
-//                for (i=0; i<2; i++) {
-//                    for (j=0; j<n; j++)
-//                        sum+=fabs(v[i*n+j]/dotprod(r+j*n, v+i*n, n));
-//
-//                    mu[i]=sum/n;
-//                }
-//
+                R sum=0;
+                for (size_t i=0; i<vVectors.getRowSize(); ++i) {
+                    for (size_t j=0; j<n; ++j) {
+                        R su = utils::ArrayUtils<R, R, R>::
+                        scalarMultiplication(squareMatrix.getRow(j),
+                                             vVectors.getRow(i), n);
+                        sum += std::abs(vVectors(i,j) / su);
+                    }
+                    mu[i]=sum/n;
+                }
+
+
+
 //                memcpy(u, v, 2*n*sizeof(float));
             }
 
             return nullptr;
-        }
-
-        /**
-         * Вычисление ортогональных векторов для указанной матрицы dataMatrix.
-         * Это подобие ортогонализации Грамма-Шмитда, но не является ей.
-         * Для настоящей ортогонализации нужно использовать GramSchmidtBasis.
-         * findEigenVectors - использует gramSchmidt2 ровно также как
-         * и оригинальный код SOM_PAK. Чем это обусловлено - неизвестно.
-         */
-        void gramSchmidt2(utils::SMatrix<R> &dataMatrix) {
-            size_t rowSize = dataMatrix.getRowSize();
-            size_t colSize = dataMatrix.getColSize();
-            utils::SMatrix<R> wMatrix(rowSize, colSize);
-
-            for (size_t r = 0; r < rowSize; ++r) {
-                for (size_t c = 0; c < colSize; ++c) {
-                    R sum = dataMatrix(r, c);
-
-                    for (size_t j = 0; j < r; ++j) {
-                        for (size_t p = 0; p < colSize; ++p) {
-                            sum -= wMatrix(j, c) * wMatrix(j, p) *
-                                   dataMatrix(r, p);
-                        }
-                    }
-
-                    wMatrix(r, c) = sum;
-                }
-
-                utils::ArrayUtils<R, R, R>::normalization(wMatrix.getRow(r),
-                                                          colSize);
-            }
-
-            // copy result to dataMatrix
-            for (size_t r = 0; r < rowSize; ++r) {
-                dataMatrix.writeRow(r, wMatrix.getRow(r));
-            }
         }
 
     };
