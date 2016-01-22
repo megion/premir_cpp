@@ -40,9 +40,11 @@ namespace test {
 
             std::cout.precision(std::numeric_limits<double>::digits10);
 
-            initializer.lineInitialization(dataMatrix);
+            utils::SMatrix<double> *resultsMatrix = initializer.lineInitialization(dataMatrix, 16, 12);
 
-//            dataMatrix.print();
+            resultsMatrix->print();
+
+            delete resultsMatrix;
         }
 
         void network_initializer_test() {

@@ -302,31 +302,44 @@ struct data_entry *find_eigenvectors(struct entries *data)
     mu[i]=1.0;
   }
 
-//  for (i=0; i<2; i++) {
-//    for (j=0; j<n; j++) {
-//      printf("%f, ", u[i*n+j]);
-//    }
-//    printf("\n");
-//  }
+//  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
+//          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
+  u[0] = -0.521141;
+  u[1] = 0.748481;
+  u[2] = -0.110109;
+  u[3] = -0.184878;
+  u[4] = 0.349120;
+  u[5] = 0.019565;
+  u[6] = 0.369049;
+  u[7] = 0.620548;
+  u[8] = 0.384337;
+  u[9] = -0.575001;
 
-//   [1,-1,1],[1,0,1],[1,1,2]
-  float v2[9];
-  v2[0] = 1.0;
-  v2[1] = -1.0;
-  v2[2] = 1.0;
-  v2[3] = 1.0;
-  v2[4] = 0.0;
-  v2[5] = 1.0;
-  v2[6] = 1.0;
-  v2[7] = 1.0;
-  v2[8] = 2.0;
-  gram_schmidt(v2, 3, 3);
-  for (i=0; i<3; i++) {
-    for (j=0; j<3; j++) {
-      printf("%f, ", v2[i*3+j]);
+  for (i=0; i<2; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", u[i*n+j]);
     }
     printf("\n");
   }
+
+//   [1,-1,1],[1,0,1],[1,1,2]
+//  float v2[9];
+//  v2[0] = 1.0;
+//  v2[1] = -1.0;
+//  v2[2] = 1.0;
+//  v2[3] = 1.0;
+//  v2[4] = 0.0;
+//  v2[5] = 1.0;
+//  v2[6] = 1.0;
+//  v2[7] = 1.0;
+//  v2[8] = 2.0;
+//  gram_schmidt(v2, 3, 3);
+//  for (i=0; i<3; i++) {
+//    for (j=0; j<3; j++) {
+//      printf("%f, ", v2[i*3+j]);
+//    }
+//    printf("\n");
+//  }
 
 
   for (k=0; k<10; k++) {
@@ -393,6 +406,11 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
 
   number_of_codes = xdim * ydim;
 
+  printf("xdim %d, ", xdim);
+  printf("ydim %d, ", ydim);
+  printf("number_of_codes %d, ", number_of_codes);
+  printf("\n");
+
   if ((codes = alloc_entries()) == NULL)
     {
       fprintf(stderr, "Can't allocate memory for codes\n");
@@ -458,7 +476,9 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
 
     entr = next_entry(&p);
     index++;
+    printf("index %d, ", index);
   }
+  printf("\n");
 
   free_entrys(mean);
 

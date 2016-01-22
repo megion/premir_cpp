@@ -20,6 +20,7 @@
 #include "utils/ArrayUtils.h"
 #include "matrix/GramSchmidtNormalized.h"
 #include "RandomGenerator.h"
+#include "utils/console_colors.h"
 
 namespace kohonen {
 
@@ -47,13 +48,30 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<R> *lineInitialization(utils::SMatrix<T> &inMatrix) {
+        utils::SMatrix<R> *lineInitialization(utils::SMatrix<T> &inMatrix,
+                                              size_t xdim, size_t ydim) {
 
             RandomGenerator::initGenerator();
 
-            findEigenVectors(inMatrix);
+            utils::SMatrix<R> *means = findEigenVectors(inMatrix, 2);
+            R *eigen1 = means->getRow(0);
+            R *eigen2 = means->getRow(1);
 
-            return nullptr;
+            size_t neuralNumber = xdim * ydim;
+            utils::SMatrix<R> *resultsMatrix = new utils::SMatrix<R>(
+                    neuralNumber, inMatrix.getColSize());
+            for (size_t r = 0; r < resultsMatrix->getRowSize(); ++r) {
+                R xf = 4.0 * (R) (r % xdim) / (xdim - 1.0) - 2.0;
+                R yf = 4.0 * (R) (r / xdim) / (ydim - 1.0) - 2.0;
+
+                for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
+                    (*resultsMatrix)(r, c) =
+                            eigen1[c] + xf * eigen1[c] + yf * eigen2[c];
+                }
+            }
+
+            delete means;
+            return resultsMatrix;
         }
 
 
@@ -63,7 +81,8 @@ namespace kohonen {
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<R> *findEigenVectors(utils::SMatrix<T> &inMatrix) {
+        utils::SMatrix<R> *findEigenVectors(utils::SMatrix<T> &inMatrix,
+                                            size_t eigenVectorsCount) {
             size_t n = inMatrix.getColSize();
 
             // квадратная матрица
@@ -76,12 +95,10 @@ namespace kohonen {
 
             // colMedians среднее значение по каждой колонке
             R colMedians[n];
-            for (size_t i = 0; i < n; ++i) {
-                colMedians[i] = 0;
-            }
-
+            // хранит число считаемых результатов по каждому столбцу
             size_t k2[n];
             for (size_t i = 0; i < n; ++i) {
+                colMedians[i] = 0;
                 k2[i] = 0;
             }
 
@@ -127,12 +144,10 @@ namespace kohonen {
                 }
             }
 
-//            squareMatrix.print();
-
             // матрица из двух векторов заполненая случайными нормализованными
             // значениями
-            utils::SMatrix<R> uVectors(2, n);
-            R mu[2]; // два собственных значения
+            utils::SMatrix<R> uVectors(eigenVectorsCount, n);
+            R mu[eigenVectorsCount]; // два собственных значения
             for (size_t i = 0; i < uVectors.getRowSize(); ++i) {
                 R *row = uVectors.getRow(i);
                 for (size_t j = 0; j < uVectors.getColSize(); ++j) {
@@ -142,6 +157,20 @@ namespace kohonen {
                 normalization(row, uVectors.getColSize());
                 mu[i] = 1;
             }
+
+            //  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
+//          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
+            uVectors(0,0) = -0.521141;
+            uVectors(0,1) = 0.748481;
+            uVectors(0,2) = -0.110109;
+            uVectors(0,3) = -0.184878;
+            uVectors(0,4) = 0.349120;
+
+            uVectors(1,0) = 0.019565;
+            uVectors(1,1) = 0.369049;
+            uVectors(1,2) = 0.620548;
+            uVectors(1,3) = 0.384337;
+            uVectors(1,4) = -0.575001;
 
 //            uVectors.print();
 
@@ -156,10 +185,10 @@ namespace kohonen {
 //            squareMatrix.print();
 
             matrix::GramSchmidtNormalized<R, R> gramSchmidtCalc;
-            utils::SMatrix<R> vVectors(2, n);
-            for (int s=0; s<10; ++s) {
-                for (size_t i=0; i<vVectors.getRowSize(); ++i) {
-                    for (size_t j=0; j<n; ++j) {
+            utils::SMatrix<R> vVectors(eigenVectorsCount, n);
+            for (int s = 0; s < 10; ++s) {
+                for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
+                    for (size_t j = 0; j < n; ++j) {
                         R su = utils::ArrayUtils<R, R, R>::
                         scalarMultiplication(squareMatrix.getRow(j),
                                              uVectors.getRow(i), n);
@@ -167,26 +196,43 @@ namespace kohonen {
                     }
                 }
 
-
                 gramSchmidtCalc.gramSchmidt(vVectors);
 
-                R sum=0;
-                for (size_t i=0; i<vVectors.getRowSize(); ++i) {
-                    for (size_t j=0; j<n; ++j) {
+                R sum = 0;
+                for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
+                    for (size_t j = 0; j < n; ++j) {
                         R su = utils::ArrayUtils<R, R, R>::
                         scalarMultiplication(squareMatrix.getRow(j),
                                              vVectors.getRow(i), n);
-                        sum += std::abs(vVectors(i,j) / su);
+                        sum += std::abs(vVectors(i, j) / su);
                     }
-                    mu[i]=sum/n;
+                    mu[i] = sum / n;
                 }
 
-
-
-//                memcpy(u, v, 2*n*sizeof(float));
+                // скопировать значения vVectors в uVectors
+                vVectors.copyTo(uVectors);
             }
 
-            return nullptr;
+            if (mu[0] == 0 || mu[1] == 0) {
+                // ошибка
+                danger_text("error findEigenVectors: mu[0]==0 || mu[1]==0");
+                throw std::
+                logic_error("error findEigenVectors: mu[0]==0 || mu[1]==0");
+            }
+
+            utils::SMatrix<R> *result = new utils::SMatrix<R>(eigenVectorsCount,
+                                                              n);
+            // поделим каждое значение uVectors на mu[i] и запишем результат
+            // в матрицу результатов
+            for (size_t i = 0; i < eigenVectorsCount; ++i) {
+                R *row = uVectors.getRow(i);
+                for (size_t j = 0; j < n; ++j) {
+                    row[j] /= std::sqrt(mu[i]);
+                }
+                result->writeRow(i, row);
+            }
+
+            return result;
         }
 
     };
