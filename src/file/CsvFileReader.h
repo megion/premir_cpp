@@ -93,9 +93,7 @@ namespace file {
          * Установить в начало текущее положение файла.
          */
         void rewindReader() {
-            if (rewind(fp)!=0) {
-                throw std::runtime_error(std::strerror(errno));
-            }
+            rewind(fp);
             lineNumber = 0;
             isEnd = false;
             emptyRead = false;
