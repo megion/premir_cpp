@@ -40,7 +40,8 @@ namespace test {
 
             std::cout.precision(std::numeric_limits<double>::digits10);
 
-            utils::SMatrix<double> *resultsMatrix = initializer.lineInitialization(dataMatrix, 16, 12);
+            utils::SMatrix<double> *resultsMatrix =
+                    initializer.lineInitialization(dataMatrix, 16, 12);
 
             resultsMatrix->print();
 

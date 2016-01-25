@@ -89,6 +89,18 @@ namespace file {
             }
         }
 
+        /**
+         * Установить в начало текущее положение файла.
+         */
+        void rewindReader() {
+            if (rewind(fp)!=0) {
+                throw std::runtime_error(std::strerror(errno));
+            }
+            lineNumber = 0;
+            isEnd = false;
+            emptyRead = false;
+        }
+
         CsvFileReader &read(double &v) {
             Ch buffer[64];
             *buffer = '\0';

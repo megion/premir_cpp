@@ -315,12 +315,12 @@ struct data_entry *find_eigenvectors(struct entries *data)
   u[8] = 0.384337;
   u[9] = -0.575001;
 
-  for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", u[i*n+j]);
-    }
-    printf("\n");
-  }
+//  for (i=0; i<2; i++) {
+//    for (j=0; j<n; j++) {
+//      printf("%f, ", u[i*n+j]);
+//    }
+//    printf("\n");
+//  }
 
 //   [1,-1,1],[1,0,1],[1,1,2]
 //  float v2[9];
@@ -336,7 +336,7 @@ struct data_entry *find_eigenvectors(struct entries *data)
 //  gram_schmidt(v2, 3, 3);
 //  for (i=0; i<3; i++) {
 //    for (j=0; j<3; j++) {
-//      printf("%f, ", v2[i*3+j]);
+//      printf("%f, ", u[i*2+j]);
 //    }
 //    printf("\n");
 //  }
@@ -359,6 +359,13 @@ struct data_entry *find_eigenvectors(struct entries *data)
 
     memcpy(u, v, 2*n*sizeof(float));
   }
+
+//  for (i=0; i<2; i++) {
+//    for (j=0; j<n; j++) {
+//      printf("%f, ", u[i*n+j]);
+//    }
+//    printf("\n");
+//  }
 
   if (mu[0]==0.0 || mu[1]==0.0) goto everror;
   
@@ -436,6 +443,19 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
   eigen1 = mean->next;
   eigen2 = eigen1->next;
 
+  for (i=0; i<dim; i++) {
+    printf("%f, ", mean->points[i]);
+  }
+  printf("\n");
+  for (i=0; i<dim; i++) {
+    printf("%f, ", eigen1->points[i]);
+  }
+  printf("\n");
+  for (i=0; i<dim; i++) {
+    printf("%f, ", eigen2->points[i]);
+  }
+  printf("\n");
+
   /* allocate codebook entries */
   if ((entr = alloc_entry(codes)) == NULL)
     {
@@ -468,6 +488,9 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
     xf = 4.0 * (float) (index % xdim) / (xdim - 1.0) - 2.0;
     yf = 4.0 * (float) (index / xdim) / (ydim - 1.0) - 2.0;
 
+//    printf("index: %d, xf: %f, yf: %f\n", index, xf, yf);
+//    printf("\n");
+
     for (i = 0; i < dim; i++) {
       entr->points[i] = mean->points[i] 
                 + xf * eigen1->points[i] + yf * eigen2->points[i];
@@ -476,7 +499,7 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
 
     entr = next_entry(&p);
     index++;
-    printf("index %d, ", index);
+//    printf("index %d, ", index);
   }
   printf("\n");
 

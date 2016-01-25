@@ -54,9 +54,11 @@ namespace kohonen {
             RandomGenerator::initGenerator();
 
             utils::SMatrix<R> *means = findEigenVectors(inMatrix, 2);
-            R *eigen1 = means->getRow(0);
-            R *eigen2 = means->getRow(1);
+            R *mean = means->getRow(0);
+            R *eigen1 = means->getRow(1);
+            R *eigen2 = means->getRow(2);
 
+            // число нейронов
             size_t neuralNumber = xdim * ydim;
             utils::SMatrix<R> *resultsMatrix = new utils::SMatrix<R>(
                     neuralNumber, inMatrix.getColSize());
@@ -64,9 +66,10 @@ namespace kohonen {
                 R xf = 4.0 * (R) (r % xdim) / (xdim - 1.0) - 2.0;
                 R yf = 4.0 * (R) (r / xdim) / (ydim - 1.0) - 2.0;
 
+//                std::cout << "r: " << r << ", xf: " << xf << ", yf: " << yf << std::endl;
                 for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
                     (*resultsMatrix)(r, c) =
-                            eigen1[c] + xf * eigen1[c] + yf * eigen2[c];
+                            mean[c] + xf * eigen1[c] + yf * eigen2[c];
                 }
             }
 
@@ -160,29 +163,17 @@ namespace kohonen {
 
             //  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
 //          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
-            uVectors(0,0) = -0.521141;
-            uVectors(0,1) = 0.748481;
-            uVectors(0,2) = -0.110109;
-            uVectors(0,3) = -0.184878;
-            uVectors(0,4) = 0.349120;
-
-            uVectors(1,0) = 0.019565;
-            uVectors(1,1) = 0.369049;
-            uVectors(1,2) = 0.620548;
-            uVectors(1,3) = 0.384337;
-            uVectors(1,4) = -0.575001;
-
-//            uVectors.print();
-
-//            for (size_t i = 0; i < 2; i++) {
-//                for (size_t j = 0; j < n; j++) {
-//                    printf("%f, ", u[i * n + j]);
-//                }
-//                printf("\n");
-//            }
-
-
-//            squareMatrix.print();
+//            uVectors(0,0) = -0.521141;
+//            uVectors(0,1) = 0.748481;
+//            uVectors(0,2) = -0.110109;
+//            uVectors(0,3) = -0.184878;
+//            uVectors(0,4) = 0.349120;
+//
+//            uVectors(1,0) = 0.019565;
+//            uVectors(1,1) = 0.369049;
+//            uVectors(1,2) = 0.620548;
+//            uVectors(1,3) = 0.384337;
+//            uVectors(1,4) = -0.575001;
 
             matrix::GramSchmidtNormalized<R, R> gramSchmidtCalc;
             utils::SMatrix<R> vVectors(eigenVectorsCount, n);
@@ -220,8 +211,12 @@ namespace kohonen {
                 logic_error("error findEigenVectors: mu[0]==0 || mu[1]==0");
             }
 
-            utils::SMatrix<R> *result = new utils::SMatrix<R>(eigenVectorsCount,
-                                                              n);
+            // result - матрица в которой:
+            // 1-я строка средние-арифметическое по каждой из колонок
+            // 2-я и 3-я строки это собсвенные вектора
+            utils::SMatrix<R> *result = new utils::SMatrix<R>(
+                    eigenVectorsCount + 1, n);
+            result->writeRow(0, colMedians);
             // поделим каждое значение uVectors на mu[i] и запишем результат
             // в матрицу результатов
             for (size_t i = 0; i < eigenVectorsCount; ++i) {
@@ -229,7 +224,7 @@ namespace kohonen {
                 for (size_t j = 0; j < n; ++j) {
                     row[j] /= std::sqrt(mu[i]);
                 }
-                result->writeRow(i, row);
+                result->writeRow(i + 1, row);
             }
 
             return result;
