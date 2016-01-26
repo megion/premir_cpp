@@ -24,17 +24,18 @@
 
 namespace kohonen {
 
-    template<typename T, typename R>
+    template<typename InStreamReader, typename In, typename Out>
     class NetworkInitializer {
     public:
 
-        NetworkInitializer() {
+        NetworkInitializer(InStreamReader *_inStream) : dataReader(
+                _inStream) {
         }
 
         /**
          * Случайная инициализация нейронной сети.
          */
-        utils::SMatrix<R> *randomInitialization(utils::SMatrix<T> &inMatrix) {
+        utils::SMatrix<Out> *randomInitialization() {
             return nullptr;
         }
 
@@ -48,25 +49,24 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<R> *lineInitialization(utils::SMatrix<T> &inMatrix,
-                                              size_t xdim, size_t ydim) {
+        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim,
+                                              size_t colSize) {
 
             RandomGenerator::initGenerator();
 
-            utils::SMatrix<R> *means = findEigenVectors(inMatrix, 2);
-            R *mean = means->getRow(0);
-            R *eigen1 = means->getRow(1);
-            R *eigen2 = means->getRow(2);
+            utils::SMatrix<Out> *means = findEigenVectors(2, colSize);
+            Out *mean = means->getRow(0);
+            Out *eigen1 = means->getRow(1);
+            Out *eigen2 = means->getRow(2);
 
             // число нейронов
             size_t neuralNumber = xdim * ydim;
-            utils::SMatrix<R> *resultsMatrix = new utils::SMatrix<R>(
-                    neuralNumber, inMatrix.getColSize());
+            utils::SMatrix<Out> *resultsMatrix = new utils::SMatrix<Out>(
+                    neuralNumber, colSize);
             for (size_t r = 0; r < resultsMatrix->getRowSize(); ++r) {
-                R xf = 4.0 * (R) (r % xdim) / (xdim - 1.0) - 2.0;
-                R yf = 4.0 * (R) (r / xdim) / (ydim - 1.0) - 2.0;
+                Out xf = 4.0 * (Out)(r % xdim) / (xdim - 1.0) - 2.0;
+                Out yf = 4.0 * (Out)(r / xdim) / (ydim - 1.0) - 2.0;
 
-//                std::cout << "r: " << r << ", xf: " << xf << ", yf: " << yf << std::endl;
                 for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
                     (*resultsMatrix)(r, c) =
                             mean[c] + xf * eigen1[c] + yf * eigen2[c];
@@ -79,17 +79,17 @@ namespace kohonen {
 
 
     private:
+        InStreamReader *dataReader;
 
         /**
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<R> *findEigenVectors(utils::SMatrix<T> &inMatrix,
-                                            size_t eigenVectorsCount) {
-            size_t n = inMatrix.getColSize();
+        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount,
+                                              size_t colSize) {
 
             // квадратная матрица
-            utils::SMatrix<R> squareMatrix(n, n);
+            utils::SMatrix<Out> squareMatrix(colSize, colSize);
             for (size_t row = 0; row < squareMatrix.getRowSize(); ++row) {
                 for (size_t col = 0; col < squareMatrix.getColSize(); ++col) {
                     squareMatrix(row, col) = 0;
@@ -97,10 +97,10 @@ namespace kohonen {
             }
 
             // colMedians среднее значение по каждой колонке
-            R colMedians[n];
+            Out colMedians[colSize];
             // хранит число считаемых результатов по каждому столбцу
-            size_t k2[n];
-            for (size_t i = 0; i < n; ++i) {
+            size_t k2[colSize];
+            for (size_t i = 0; i < colSize; ++i) {
                 colMedians[i] = 0;
                 k2[i] = 0;
             }
@@ -112,51 +112,52 @@ namespace kohonen {
             // (пока такое не реализовано)
             // TODO: т.к. данные могут быть большие то возможно переполнение
             // переменных хранимых в colMedians
-            for (size_t k = 0; k < inMatrix.getRowSize(); ++k) {
-                T *row = inMatrix.getRow(k);
-                for (size_t i = 0; i < n; ++i) {
-                    colMedians[i] += row[i];
+            In inRow[colSize];
+            while (dataReader->readNext(inRow, colSize)) {
+                for (size_t i = 0; i < colSize; ++i) {
+                    colMedians[i] += inRow[i];
                     k2[i]++;
                 }
             }
 
-            for (size_t i = 0; i < n; ++i) {
+            for (size_t i = 0; i < colSize; ++i) {
                 colMedians[i] = colMedians[i] / k2[i];
             }
 
+            // установить поток на начало
+            dataReader->rewindReader();
+
             // iterate by all input matrix elements
             // получение треугольной квадратной матрицы
-            for (size_t k = 0; k < inMatrix.getRowSize(); ++k) {
-                T *row = inMatrix.getRow(k);
-                for (size_t i = 0; i < n; ++i) {
-                    for (size_t j = i; j < n; j++) {
+            while (dataReader->readNext(inRow, colSize)) {
+                for (size_t i = 0; i < colSize; ++i) {
+                    for (size_t j = i; j < colSize; ++j) {
                         squareMatrix(i, j) = squareMatrix(i, j) +
-                                             (row[i] - colMedians[i]) *
-                                             (row[j] - colMedians[j]);
+                                             (inRow[i] - colMedians[i]) *
+                                             (inRow[j] - colMedians[j]);
                     }
                 }
             }
 
             // поллучить симметричную матрицу, при этом разделим на
             // число строк входной матрицы
-            size_t inRowSize = inMatrix.getRowSize();
-            for (size_t i = 0; i < n; i++) {
-                for (size_t j = i; j < n; j++) {
-                    squareMatrix(i, j) /= inRowSize;
+            for (size_t i = 0; i < colSize; ++i) {
+                for (size_t j = i; j < colSize; ++j) {
+                    squareMatrix(i, j) /= k2[i];
                     squareMatrix(j, i) = squareMatrix(i, j);
                 }
             }
 
             // матрица из двух векторов заполненая случайными нормализованными
             // значениями
-            utils::SMatrix<R> uVectors(eigenVectorsCount, n);
-            R mu[eigenVectorsCount]; // два собственных значения
+            utils::SMatrix<Out> uVectors(eigenVectorsCount, colSize);
+            Out mu[eigenVectorsCount]; // два собственных значения
             for (size_t i = 0; i < uVectors.getRowSize(); ++i) {
-                R *row = uVectors.getRow(i);
+                Out *row = uVectors.getRow(i);
                 for (size_t j = 0; j < uVectors.getColSize(); ++j) {
                     row[j] = RandomGenerator::generate() / 16384.0 - 1.0;
                 }
-                utils::ArrayUtils<R, R, R>::
+                utils::ArrayUtils<Out, Out, Out>::
                 normalization(row, uVectors.getColSize());
                 mu[i] = 1;
             }
@@ -175,29 +176,31 @@ namespace kohonen {
 //            uVectors(1,3) = 0.384337;
 //            uVectors(1,4) = -0.575001;
 
-            matrix::GramSchmidtNormalized<R, R> gramSchmidtCalc;
-            utils::SMatrix<R> vVectors(eigenVectorsCount, n);
+            matrix::GramSchmidtNormalized<Out, Out> gramSchmidtCalc;
+            utils::SMatrix<Out> vVectors(eigenVectorsCount, colSize);
             for (int s = 0; s < 10; ++s) {
                 for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
-                    for (size_t j = 0; j < n; ++j) {
-                        R su = utils::ArrayUtils<R, R, R>::
+                    for (size_t j = 0; j < vVectors.getColSize(); ++j) {
+                        Out su = utils::ArrayUtils<Out, Out, Out>::
                         scalarMultiplication(squareMatrix.getRow(j),
-                                             uVectors.getRow(i), n);
+                                             uVectors.getRow(i),
+                                             uVectors.getColSize());
                         vVectors(i, j) = mu[i] * su + uVectors(i, j);
                     }
                 }
 
                 gramSchmidtCalc.gramSchmidt(vVectors);
 
-                R sum = 0;
+                Out sum = 0;
                 for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
-                    for (size_t j = 0; j < n; ++j) {
-                        R su = utils::ArrayUtils<R, R, R>::
+                    for (size_t j = 0; j < vVectors.getColSize(); ++j) {
+                        Out su = utils::ArrayUtils<Out, Out, Out>::
                         scalarMultiplication(squareMatrix.getRow(j),
-                                             vVectors.getRow(i), n);
+                                             vVectors.getRow(i),
+                                             vVectors.getColSize());
                         sum += std::abs(vVectors(i, j) / su);
                     }
-                    mu[i] = sum / n;
+                    mu[i] = sum / colSize;
                 }
 
                 // скопировать значения vVectors в uVectors
@@ -214,14 +217,14 @@ namespace kohonen {
             // result - матрица в которой:
             // 1-я строка средние-арифметическое по каждой из колонок
             // 2-я и 3-я строки это собсвенные вектора
-            utils::SMatrix<R> *result = new utils::SMatrix<R>(
-                    eigenVectorsCount + 1, n);
+            utils::SMatrix<Out> *result = new utils::SMatrix<Out>(
+                    eigenVectorsCount + 1, colSize);
             result->writeRow(0, colMedians);
             // поделим каждое значение uVectors на mu[i] и запишем результат
             // в матрицу результатов
             for (size_t i = 0; i < eigenVectorsCount; ++i) {
-                R *row = uVectors.getRow(i);
-                for (size_t j = 0; j < n; ++j) {
+                Out *row = uVectors.getRow(i);
+                for (size_t j = 0; j < uVectors.getColSize(); ++j) {
                     row[j] /= std::sqrt(mu[i]);
                 }
                 result->writeRow(i + 1, row);
