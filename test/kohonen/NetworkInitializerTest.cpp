@@ -11,17 +11,18 @@ namespace test {
         void test_line_initialization() {
             file::CsvFileReader<char> csvReader(
                     "../test/datafiles/kohonen/ex.dat", ' ');
-            kohonen::ArrayStreamReader<float> dataReader(&csvReader,
-                                                         readInitializer);
+            kohonen::ArrayStreamReader<double> dataReader(&csvReader,
+                                                          readInitializer, 5,
+                                                          true);
 
             kohonen::
-            NetworkInitializer<kohonen::ArrayStreamReader<float>, float, double>
+            NetworkInitializer<kohonen::ArrayStreamReader<double>, double, double>
                     initializer(&dataReader);
 
 //            std::cout.precision(std::numeric_limits<double>::digits10);
 
             utils::SMatrix<double> *resultsMatrix =
-                    initializer.lineInitialization(16, 12, 5);
+                    initializer.lineInitialization(16, 12);
 
             resultsMatrix->print();
 

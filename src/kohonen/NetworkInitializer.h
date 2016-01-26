@@ -49,12 +49,13 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim,
-                                              size_t colSize) {
+        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim) {
+
+            size_t colSize = dataReader->getColSize();
 
             RandomGenerator::initGenerator();
 
-            utils::SMatrix<Out> *means = findEigenVectors(2, colSize);
+            utils::SMatrix<Out> *means = findEigenVectors(2);
             Out *mean = means->getRow(0);
             Out *eigen1 = means->getRow(1);
             Out *eigen2 = means->getRow(2);
@@ -85,8 +86,8 @@ namespace kohonen {
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount,
-                                              size_t colSize) {
+        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount) {
+            size_t colSize = dataReader->getColSize();
 
             // квадратная матрица
             utils::SMatrix<Out> squareMatrix(colSize, colSize);
@@ -113,7 +114,7 @@ namespace kohonen {
             // TODO: т.к. данные могут быть большие то возможно переполнение
             // переменных хранимых в colMedians
             In inRow[colSize];
-            while (dataReader->readNext(inRow, colSize)) {
+            while (dataReader->readNext(inRow)) {
                 for (size_t i = 0; i < colSize; ++i) {
                     colMedians[i] += inRow[i];
                     k2[i]++;
@@ -129,7 +130,7 @@ namespace kohonen {
 
             // iterate by all input matrix elements
             // получение треугольной квадратной матрицы
-            while (dataReader->readNext(inRow, colSize)) {
+            while (dataReader->readNext(inRow)) {
                 for (size_t i = 0; i < colSize; ++i) {
                     for (size_t j = i; j < colSize; ++j) {
                         squareMatrix(i, j) = squareMatrix(i, j) +
@@ -162,19 +163,20 @@ namespace kohonen {
                 mu[i] = 1;
             }
 
+            // TODO: test
             //  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
 //          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
-//            uVectors(0,0) = -0.521141;
-//            uVectors(0,1) = 0.748481;
-//            uVectors(0,2) = -0.110109;
-//            uVectors(0,3) = -0.184878;
-//            uVectors(0,4) = 0.349120;
-//
-//            uVectors(1,0) = 0.019565;
-//            uVectors(1,1) = 0.369049;
-//            uVectors(1,2) = 0.620548;
-//            uVectors(1,3) = 0.384337;
-//            uVectors(1,4) = -0.575001;
+            uVectors(0,0) = -0.521141;
+            uVectors(0,1) = 0.748481;
+            uVectors(0,2) = -0.110109;
+            uVectors(0,3) = -0.184878;
+            uVectors(0,4) = 0.349120;
+
+            uVectors(1,0) = 0.019565;
+            uVectors(1,1) = 0.369049;
+            uVectors(1,2) = 0.620548;
+            uVectors(1,3) = 0.384337;
+            uVectors(1,4) = -0.575001;
 
             matrix::GramSchmidtNormalized<Out, Out> gramSchmidtCalc;
             utils::SMatrix<Out> vVectors(eigenVectorsCount, colSize);
