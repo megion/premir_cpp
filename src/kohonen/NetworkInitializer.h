@@ -80,6 +80,7 @@ namespace kohonen {
 
 
     private:
+        // поток входных данных
         InStreamReader *dataReader;
 
         /**

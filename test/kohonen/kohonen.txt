@@ -1,3 +1,4 @@
+# инициализация сети
+lininit -xdim 16 -ydim 12 -din ex.dat -cout mylin4.cod -neigh bubble -topol hexa
 # программа обучнения сети
-vsom -din ex1.dat -cin in_linit_neurals.cod -cout out_neurals.cod \
-     -rlen 10000 -alpha 0.002 -radius 3
+vsom -din ex.dat -cin mylin4.cod -cout out_neurals.cod -rlen 10000 -alpha 0.002 -radius 3

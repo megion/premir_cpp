@@ -2,7 +2,7 @@
 #define SRC_GRAPHICS_CHART_DATA_H_
 
 #include <xcb/xcb.h>
-#include <math.h>
+#include <cmath>
 
 //#include <cstdio>
 //#include <exception>
@@ -96,7 +96,7 @@ namespace graphics {
          * Calculate value by formula (line) out = a*value + b
          */
         int transformToOut(double a, double b, double inValue) {
-            return round(a * inValue + b);
+            return std::round(a * inValue + b);
         }
 
         double transformToIn(double a, double b, int16_t outValue) {

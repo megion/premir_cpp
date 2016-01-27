@@ -646,8 +646,13 @@ struct entries *som_training(struct teach_params *teach)
   float weight;
   float trad, talp;
   struct data_entry *sample;
+
+  // in data
   struct entries *data = teach->data;
+
+  // out som codes
   struct entries *codes = teach->codes;
+
   long le, length = teach->length;
   float alpha = teach->alpha;
   float radius = teach->radius;
@@ -691,7 +696,16 @@ struct entries *som_training(struct teach_params *teach)
 	  }
       }
 
-    weight = sample->weight;
+    // samples - входная строчка с данными
+//    weight = sample->weight;
+//    printf("%d weight %f \n ", le, weight);
+//
+//    for (int i=0; i<dim; i++) {
+//      printf("%f, ", sample->points[i]);
+//    }
+//    printf("\n ");
+
+
 
     /* Radius decreases linearly to one */
     trad = 1.0 + (radius - 1.0) * (float) (length - le) / (float) length;
@@ -711,6 +725,7 @@ struct entries *som_training(struct teach_params *teach)
       /* Get the values from fixed-structure */
       bxind = sample->fixed->xfix;
       byind = sample->fixed->yfix;
+      printf("use fixed bxind %d , byind %d \n ", bxind, byind);
     }
     else {
 
@@ -722,6 +737,8 @@ struct entries *som_training(struct teach_params *teach)
 	}
       bxind = win_info.index % codes->xdim;
       byind = win_info.index / codes->xdim;
+
+      printf("use winner bxind %d , byind %d \n ", bxind, byind);
     }
 
     /* Adapt the units */
