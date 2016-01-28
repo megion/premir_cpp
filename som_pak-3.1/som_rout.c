@@ -31,8 +31,8 @@
 
 /*---------------------------------------------------------------------*/
 
-struct entries *randinit_codes(struct entries *data, int topol, int neigh, 
-			       int xdim, int ydim)
+struct entries *randinit_codes(struct entries *data, int topol, int neigh,
+                               int xdim, int ydim)
 {
   long noc, i;
   int dim;
@@ -45,10 +45,10 @@ struct entries *randinit_codes(struct entries *data, int topol, int neigh,
   noc = xdim * ydim;
 
   if ((codes = alloc_entries()) == NULL)
-    {
-      fprintf(stderr, "randinit_codes: can't allocate memory for codes\n");
-      return NULL;
-    }
+  {
+    fprintf(stderr, "randinit_codes: can't allocate memory for codes\n");
+    return NULL;
+  }
 
 
   dim = data->dimension;
@@ -61,38 +61,38 @@ struct entries *randinit_codes(struct entries *data, int topol, int neigh,
 
   /* allocate codebook entries */
   if ((entr = alloc_entry(codes)) == NULL)
-    {
-      fprintf(stderr, "randinit_codes: can't allocate memory for codebook vector\n");
-      close_entries(codes);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "randinit_codes: can't allocate memory for codebook vector\n");
+    close_entries(codes);
+    return NULL;
+  }
   codes->entries = entr;
 
-  for (i = 1; i < noc; i++) 
-    {
-      entr->next = alloc_entry(codes);
-      entr = entr->next;
-      if (entr == NULL)
-	break;
-    }
+  for (i = 1; i < noc; i++)
+  {
+    entr->next = alloc_entry(codes);
+    entr = entr->next;
+    if (entr == NULL)
+      break;
+  }
 
   if (entr == NULL)
-    {
-      fprintf(stderr, "randinit_codes: can't allocate codebook\n");
-      close_entries(codes);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "randinit_codes: can't allocate codebook\n");
+    close_entries(codes);
+    return NULL;
+  }
 
   codes->num_entries = noc;
-  
+
   /* Find the maxim and minim values of data */
 
   if ((compcnt = malloc(sizeof(long) * dim)) == NULL)
-    {
-      fprintf(stderr, "randinit_codes: can't allocate memory\n");
-      close_entries(codes);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "randinit_codes: can't allocate memory\n");
+    close_entries(codes);
+    return NULL;
+  }
 
   for (i = 0; i < dim; i++)
     compcnt[i] = 0;
@@ -100,59 +100,59 @@ struct entries *randinit_codes(struct entries *data, int topol, int neigh,
   maval = alloc_entry(data);
   mival = alloc_entry(data);
   if (!(maval && mival))
-    {
-      close_entries(codes);
-      codes = NULL;
-      goto end;
-    }
-      
+  {
+    close_entries(codes);
+    codes = NULL;
+    goto end;
+  }
+
   for (i = 0; i < data->dimension; i++) {
     maval->points[i] = FLT_MIN;
     mival->points[i] = FLT_MAX;
   }
 
   if ((entr = rewind_entries(data, &p)) == NULL)
-    {
-      fprintf(stderr, "randinit_codes: can't get data\n");
-      close_entries(codes);
-      codes = NULL;
-      goto end;
-    }
+  {
+    fprintf(stderr, "randinit_codes: can't get data\n");
+    close_entries(codes);
+    codes = NULL;
+    goto end;
+  }
 
-  while (entr != NULL) 
-    {
-      for (i = 0; i < dim; i++) 
-	if (!((entr->mask != NULL) && (entr->mask[i] != 0)))
-	  {
-	    compcnt[i]++;
-	    if (maval->points[i] < entr->points[i])
-	      maval->points[i] = entr->points[i];
-	    if (mival->points[i] > entr->points[i])
-	      mival->points[i] = entr->points[i];
-	  }
-      entr = next_entry(&p);
-    }
+  while (entr != NULL)
+  {
+    for (i = 0; i < dim; i++)
+      if (!((entr->mask != NULL) && (entr->mask[i] != 0)))
+      {
+        compcnt[i]++;
+        if (maval->points[i] < entr->points[i])
+          maval->points[i] = entr->points[i];
+        if (mival->points[i] > entr->points[i])
+          mival->points[i] = entr->points[i];
+      }
+    entr = next_entry(&p);
+  }
 
   for (i = 0; i < dim; i++)
     if (compcnt[i] == 0)
       fprintf(stderr, "randinit_codes: warning! component %d has no data, using 0.0\n", (int)(i + 1));
-  
+
   /* Randomize the vector values */
 
   entr = rewind_entries(codes, &p);
   while (entr != NULL) {
     for (i = 0; i < dim; i++) {
       if (compcnt[i] > 0)
-	entr->points[i] = mival->points[i] +
-          (maval->points[i] - mival->points[i]) * ((float) orand() / 32768.0);
+        entr->points[i] = mival->points[i] +
+                          (maval->points[i] - mival->points[i]) * ((float) orand() / 32768.0);
       else
-	entr->points[i] = 0.0;
+        entr->points[i] = 0.0;
     }
     clear_entry_labels(entr);
     entr = next_entry(&p);
   }
 
- end:
+  end:
   if (compcnt)
     free(compcnt);
   free_entry(mival);
@@ -197,8 +197,8 @@ int gram_schmidt(float *v, int n, int e)
     for (t=0; t<n; t++) {
       sum=v[i*n+t];
       for (j=0; j<i; j++)
-	for (p=0; p<n; p++)
-	  sum-=w[j*n+t]*w[j*n+p]*v[i*n+p];
+        for (p=0; p<n; p++)
+          sum-=w[j*n+t]*w[j*n+p]*v[i*n+p];
       w[i*n+t]=sum;
     }
     normalize(w+i*n, n);
@@ -222,13 +222,12 @@ struct data_entry *find_eigenvectors(struct entries *data)
   long *k2, k;
   eptr p;
   char *mask;
-  float dp;
 
   if (r==NULL || m==NULL || u==NULL || v==NULL ) goto everror;
 
-  for (i=0; i<n*n; i++) 
+  for (i=0; i<n*n; i++)
     r[i]=0.0;
-  for (i=0; i<n; i++) 
+  for (i=0; i<n; i++)
     m[i]=0.0;
 
   k2 = malloc(n *sizeof(long));
@@ -237,26 +236,26 @@ struct data_entry *find_eigenvectors(struct entries *data)
   memset(k2, 0, n * sizeof(long));
 
   if ((ptr=rewind_entries(data, &p)) == NULL)
-    {
-      fprintf(stderr, "find_eigenvectors: can't get data\n");
-      goto everror;
-    }
+  {
+    fprintf(stderr, "find_eigenvectors: can't get data\n");
+    goto everror;
+  }
 
   for (k=0; ptr != NULL; k++, ptr=next_entry(&p))
-    {
-      mask = ptr->mask;
+  {
+    mask = ptr->mask;
 //        printf("num %d: ", k);
-      for (i=0; i<n; i++)
-	if ((!mask) || (mask && (mask[i] == 0)))
-	  {
+    for (i=0; i<n; i++)
+      if ((!mask) || (mask && (mask[i] == 0)))
+      {
 //        printf("%f, ", ptr->points[i]);
-	    m[i]+=ptr->points[i]; /* masked components have the value 0 so they
+        m[i]+=ptr->points[i]; /* masked components have the value 0 so they
 				     don't affect the sum */
-	    k2[i]++;
-	  }
+        k2[i]++;
+      }
 
 //    printf("\n");
-    }
+  }
 
   if (k<3) goto everror;
 
@@ -266,27 +265,27 @@ struct data_entry *find_eigenvectors(struct entries *data)
   free(k2); k2 = NULL;
 
   if ((ptr=rewind_entries(data, &p)) == NULL)
-    {
-      fprintf(stderr, "find_eigenvectors: can't get data\n");
-      goto everror;
-    }
+  {
+    fprintf(stderr, "find_eigenvectors: can't get data\n");
+    goto everror;
+  }
 
   // triangular matrix
   for (; ptr != NULL; ptr=next_entry(&p))
+  {
+    mask = ptr->mask;
+    for (i=0; i<n; i++)
     {
-      mask = ptr->mask;
-      for (i=0; i<n; i++)
-	{
-	  /* the components that are masked off are ignored */
-	  if (mask && (mask[i] != 0))
-	    continue;
-	  for (j=i; j<n; j++)
-	    if (mask && (mask[j] != 0))
-	      continue;
-	    else
-	      r[i*n+j]+=(ptr->points[i]-m[i])*(ptr->points[j]-m[j]);
-	}
+      /* the components that are masked off are ignored */
+      if (mask && (mask[i] != 0))
+        continue;
+      for (j=i; j<n; j++)
+        if (mask && (mask[j] != 0))
+          continue;
+        else
+          r[i*n+j]+=(ptr->points[i]-m[i])*(ptr->points[j]-m[j]);
     }
+  }
 
 
 
@@ -294,19 +293,12 @@ struct data_entry *find_eigenvectors(struct entries *data)
     for (j=i; j<n; j++)
       r[j*n+i]=r[i*n+j]/=k;
 
-  printf("r: \n");
-  for (i=0; i<n; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", r[i*n+j]);
-    }
-    printf("\n");
-  }
 
 
 
-
+//  init_random(1);
   for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) u[i*n+j]=867.0/16384.0-1.0;
+    for (j=0; j<n; j++) u[i*n+j]=orand()/16384.0-1.0;
     normalize(u+i*n, n);
     mu[i]=1.0;
   }
@@ -324,13 +316,12 @@ struct data_entry *find_eigenvectors(struct entries *data)
 //  u[8] = 0.384337;
 //  u[9] = -0.575001;
 
-  printf("u: \n");
-  for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", u[i*n+j]);
-    }
-    printf("\n");
-  }
+//  for (i=0; i<2; i++) {
+//    for (j=0; j<n; j++) {
+//      printf("%f, ", u[i*n+j]);
+//    }
+//    printf("\n");
+//  }
 
 //   [1,-1,1],[1,0,1],[1,1,2]
 //  float v2[9];
@@ -352,67 +343,33 @@ struct data_entry *find_eigenvectors(struct entries *data)
 //  }
 
 
-
   for (k=0; k<10; k++) {
-    printf("cycle k: %d \n", k);
+    for (i=0; i<2; i++)
+      for (j=0; j<n; j++)
+        v[i*n+j]=mu[i]*dotprod(r+j*n, u+i*n, n)+u[i*n+j];
 
-    for (i=0; i<2; i++) {
-      for (j=0; j<n; j++) {
-        float dp = dotprod(r+j*n, u+i*n, n);
-
-        v[i*n+j]=mu[i]*dp+u[i*n+j];
-//        printf("%f , ", v[i*n+j]);
-      }
-    }
-
-    printf("\n");
-
-    printf("1 gram_schmidt \n");
-    for (i=0; i<2; i++) {
-      for (j=0; j<n; j++) {
-        printf("%f, ", v[i*n+j]);
-      }
-      printf("\n");
-    }
     gram_schmidt(v, n, 2);
-    printf("2 gram_schmidt \n");
-    for (i=0; i<2; i++) {
-      for (j=0; j<n; j++) {
-        printf("%f, ", v[i*n+j]);
-      }
-      printf("\n");
-    }
-
-
-
 
     sum=0.0;
     for (i=0; i<2; i++) {
       for (j=0; j<n; j++)
-	sum+=fabs(v[i*n+j]/dotprod(r+j*n, v+i*n, n));
+        sum+=fabs(v[i*n+j]/dotprod(r+j*n, v+i*n, n));
 
       mu[i]=sum/n;
     }
 
     memcpy(u, v, 2*n*sizeof(float));
-    for (i=0; i<2; i++) {
-      for (j=0; j<n; j++) {
-        printf("%f, ", u[i*n+j]);
-      }
-      printf("\n");
-    }
   }
 
-  printf("2u: \n");
-  for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) {
-      printf("%f, ", u[i*n+j]);
-    }
-    printf("\n");
-  }
+//  for (i=0; i<2; i++) {
+//    for (j=0; j<n; j++) {
+//      printf("%f, ", u[i*n+j]);
+//    }
+//    printf("\n");
+//  }
 
   if (mu[0]==0.0 || mu[1]==0.0) goto everror;
-  
+
   ptr = tmp = alloc_entry(data);
   memcpy(tmp->points, m, n*sizeof(float));
 
@@ -420,10 +377,10 @@ struct data_entry *find_eigenvectors(struct entries *data)
     tmp->next=alloc_entry(data);
     tmp=tmp->next;
     if (tmp == NULL)
-      {
-	fprintf(stderr, "find_eigenvectors: can't allocate vector\n");
-	goto everror;
-      }
+    {
+      fprintf(stderr, "find_eigenvectors: can't allocate vector\n");
+      goto everror;
+    }
     memcpy(tmp->points, u+n*i, n*sizeof(float));
     for (j=0; j<n; j++)
       tmp->points[j]/=sqrt(mu[i]);
@@ -436,7 +393,7 @@ struct data_entry *find_eigenvectors(struct entries *data)
   ofree(r);
   return (ptr);
 
- everror:
+  everror:
   if (v!=NULL) ofree(v);
   if (u!=NULL) ofree(u);
   if (m!=NULL) ofree(m);
@@ -445,8 +402,8 @@ struct data_entry *find_eigenvectors(struct entries *data)
 
 }
 
-struct entries *lininit_codes(struct entries *data, int topol, int neigh, 
-			      int xdim, int ydim)
+struct entries *lininit_codes(struct entries *data, int topol, int neigh,
+                              int xdim, int ydim)
 {
   long i, number_of_codes;
   int index, dim;
@@ -463,10 +420,10 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
   printf("\n");
 
   if ((codes = alloc_entries()) == NULL)
-    {
-      fprintf(stderr, "Can't allocate memory for codes\n");
-      return NULL;
-    }
+  {
+    fprintf(stderr, "Can't allocate memory for codes\n");
+    return NULL;
+  }
 
   dim = data->dimension;
   codes->dimension = dim;
@@ -502,28 +459,28 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
 
   /* allocate codebook entries */
   if ((entr = alloc_entry(codes)) == NULL)
-    {
-      fprintf(stderr, "lininit_codes: can't allocate memory for codebook vector\n");
-      close_entries(codes);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "lininit_codes: can't allocate memory for codebook vector\n");
+    close_entries(codes);
+    return NULL;
+  }
   codes->entries = entr;
 
-  for (i = 1; i < number_of_codes; i++) 
-    {
-      entr->next = alloc_entry(codes);
-      entr = entr->next;
-      if (entr == NULL)
-	break;
-    }
+  for (i = 1; i < number_of_codes; i++)
+  {
+    entr->next = alloc_entry(codes);
+    entr = entr->next;
+    if (entr == NULL)
+      break;
+  }
 
   if (entr == NULL)
-    {
-      fprintf(stderr, "lininit_codes: can't allocate codebook\n");
-      free_entrys(mean);
-      close_entries(codes);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "lininit_codes: can't allocate codebook\n");
+    free_entrys(mean);
+    close_entries(codes);
+    return NULL;
+  }
 
   /* Initialize the units */
   entr = rewind_entries(codes, &p);
@@ -536,8 +493,8 @@ struct entries *lininit_codes(struct entries *data, int topol, int neigh,
 //    printf("\n");
 
     for (i = 0; i < dim; i++) {
-      entr->points[i] = mean->points[i] 
-                + xf * eigen1->points[i] + yf * eigen2->points[i];
+      entr->points[i] = mean->points[i]
+                        + xf * eigen1->points[i] + yf * eigen2->points[i];
     }
     clear_entry_labels(entr);
 
@@ -569,7 +526,7 @@ float hexa_dist(int bx, int by, int tx, int ty)
       diff += 0.5;
     }
   }
-  
+
   ret = diff * diff;
   diff = by - ty;
   ret += 0.75 * diff * diff;
@@ -594,7 +551,7 @@ float rect_dist(int bx, int by, int tx, int ty)
 /* Adaptation function for bubble-neighborhood */
 
 void bubble_adapt(struct teach_params *teach, struct data_entry *sample,
-		  int bx, int by, float radius, float alpha)
+                  int bx, int by, float radius, float alpha)
 {
   long index;
   int tx, ty, xdim, ydim;
@@ -606,35 +563,35 @@ void bubble_adapt(struct teach_params *teach, struct data_entry *sample,
 
   xdim = codes->xdim;
   ydim = codes->ydim;
-  
+
   ifverbose(10)
     fprintf(stderr, "Best match in %d, %d\n", bx, by);
 
   codetmp = rewind_entries(codes, &p);
   index = 0;
-  
-  while (codetmp != NULL)
-    {
-      tx = index % xdim;
-      ty = index / xdim;
-      
-      if (dist(bx, by, tx, ty) <= radius) {
-	ifverbose(11)
-	  fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
-	
-	adapt(codetmp, sample, codes->dimension, alpha);
 
-      }
-      codetmp = next_entry(&p);
-      index++;
+  while (codetmp != NULL)
+  {
+    tx = index % xdim;
+    ty = index / xdim;
+
+    if (dist(bx, by, tx, ty) <= radius) {
+      ifverbose(11)
+        fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
+
+      adapt(codetmp, sample, codes->dimension, alpha);
+
     }
+    codetmp = next_entry(&p);
+    index++;
+  }
 }
 
 
 /* Adaptation function for gaussian neighbourhood */
-     
+
 void gaussian_adapt(struct teach_params *teach, struct data_entry *sample,
-		    int bx, int by, float radius, float alpha)
+                    int bx, int by, float radius, float alpha)
 {
   long index;
   int tx, ty, xdim, ydim;
@@ -656,27 +613,27 @@ void gaussian_adapt(struct teach_params *teach, struct data_entry *sample,
   index = 0;
 
   while (codetmp != NULL)
-    {
-      tx = index % xdim;
-      ty = index / xdim;
+  {
+    tx = index % xdim;
+    ty = index / xdim;
 
-      ifverbose(11)
-	fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
-      dd = dist(bx, by, tx, ty);
+    ifverbose(11)
+      fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
+    dd = dist(bx, by, tx, ty);
 
-      alp = alpha *
-	(float) exp((double) (-dd * dd / (2.0 * radius * radius)));
-      
-      adapt(codetmp, sample, codes->dimension, alp);
+    alp = alpha *
+          (float) exp((double) (-dd * dd / (2.0 * radius * radius)));
 
-      codetmp = next_entry(&p);
-      index++;
-    }
+    adapt(codetmp, sample, codes->dimension, alp);
+
+    codetmp = next_entry(&p);
+    index++;
+  }
 }
 
 
-/* som_training - train a SOM. Radius of the neighborhood decreases 
-   linearly from the initial value to one and the learning parameter 
+/* som_training - train a SOM. Radius of the neighborhood decreases
+   linearly from the initial value to one and the learning parameter
    decreases linearly from its initial value to zero. */
 
 struct entries *som_training(struct teach_params *teach)
@@ -705,40 +662,40 @@ struct entries *som_training(struct teach_params *teach)
   eptr p;
 
   if (set_som_params(teach))
-    {
-      fprintf(stderr, "som_training: can't set SOM parameters\n");
-      return NULL;
-    }
+  {
+    fprintf(stderr, "som_training: can't set SOM parameters\n");
+    return NULL;
+  }
 
   adapt = teach->neigh_adapt;
 
   if ((sample = rewind_entries(data, &p)) == NULL)
-    {
-      fprintf(stderr, "som_training: can't get data\n");
-      return NULL;
-    }
+  {
+    fprintf(stderr, "som_training: can't get data\n");
+    return NULL;
+  }
 
   dim = codes->dimension;
   if (data->dimension != dim)
-    {
-      fprintf(stderr, "code dimension (%d) != data dimension (%d)\n",
-	      dim, data->dimension);
-      return NULL;
-    }
+  {
+    fprintf(stderr, "code dimension (%d) != data dimension (%d)\n",
+            dim, data->dimension);
+    return NULL;
+  }
 
   time(&teach->start_time);
 
   for (le = 0; le < length; le++, sample = next_entry(&p)) {
     /* if we are at the end of data file, go back to the start */
     if (sample == NULL)
+    {
+      sample = rewind_entries(data, &p);
+      if (sample == NULL)
       {
-	sample = rewind_entries(data, &p);
-	if (sample == NULL)
-	  {
-	    fprintf(stderr, "som_training: couldn't rewind data (%ld/%ld iterations done)\n", le, length);
-	    return NULL;
-	  }
+        fprintf(stderr, "som_training: couldn't rewind data (%ld/%ld iterations done)\n", le, length);
+        return NULL;
       }
+    }
 
     // samples - входная строчка с данными
 //    weight = sample->weight;
@@ -774,11 +731,11 @@ struct entries *som_training(struct teach_params *teach)
     else {
 
       if (find_winner(codes, sample, &win_info, 1) == 0)
-	{
-	  ifverbose(3)
-	    fprintf(stderr, "ignoring empty sample %d\n", le);
-	  goto skip_teach; /* ignore empty samples */
-	}
+      {
+        ifverbose(3)
+          fprintf(stderr, "ignoring empty sample %d\n", le);
+        goto skip_teach; /* ignore empty samples */
+      }
       bxind = win_info.index % codes->xdim;
       byind = win_info.index / codes->xdim;
 
@@ -788,17 +745,17 @@ struct entries *som_training(struct teach_params *teach)
     /* Adapt the units */
     adapt(teach, sample, bxind, byind, trad, talp);
 
-  skip_teach:
+    skip_teach:
     /* save snapshot when needed */
     if ((snap) && ((le % snap->interval) == 0) && (le > 0))
+    {
+      ifverbose(2)
+        fprintf(stderr, "Saving snapshot, %ld iterations\n", le);
+      if (save_snapshot(teach, le))
       {
-	ifverbose(2)
-	  fprintf(stderr, "Saving snapshot, %ld iterations\n", le);
-	if (save_snapshot(teach, le))
-	  {
-	    fprintf(stderr, "snapshot failed, continuing teaching\n");
-	  }
+        fprintf(stderr, "snapshot failed, continuing teaching\n");
       }
+    }
 
     ifverbose(1)
       mprint((long) (length-le));
@@ -806,10 +763,10 @@ struct entries *som_training(struct teach_params *teach)
   time(&teach->end_time);
 
   ifverbose(1)
-    {
-      mprint((long) 0);
-      fprintf(stderr, "\n");
-    }
+  {
+    mprint((long) 0);
+    fprintf(stderr, "\n");
+  }
   return(codes);
 }
 
@@ -831,51 +788,51 @@ float find_qerror(struct teach_params *teach)
   long nod;
 
   if (set_som_params(teach))
-    {
-      fprintf(stderr, "find_qerror: can't set SOM parameters\n");
-      return -1;
-    }
+  {
+    fprintf(stderr, "find_qerror: can't set SOM parameters\n");
+    return -1;
+  }
 
   /* Scan all data entries */
 
   qerror = 0.0;
   if ((dtmp = rewind_entries(data, &p)) == NULL)
-    {
-      fprintf(stderr, "find_qerror: can't get data\n");
-      return -1.0;
-    }
+  {
+    fprintf(stderr, "find_qerror: can't get data\n");
+    return -1.0;
+  }
 
   if ((length_known = data->flags.totlen_known))
     nod = data->num_entries;
   else
     nod = 0;
 
-  for (; dtmp != NULL; dtmp = next_entry(&p)) 
-    {
-      if (find_winner(codes, dtmp, &win_info, 1) == 0)
-	continue; /* ignore empty vectors */
-      
-      qerror += sqrt((double) win_info.diff);
-      
-      if (length_known)
-	ifverbose(1)
-	  mprint((long) nod--);
+  for (; dtmp != NULL; dtmp = next_entry(&p))
+  {
+    if (find_winner(codes, dtmp, &win_info, 1) == 0)
+      continue; /* ignore empty vectors */
 
-    }
+    qerror += sqrt((double) win_info.diff);
+
+    if (length_known)
+    ifverbose(1)
+      mprint((long) nod--);
+
+  }
 
   if (length_known)
-    ifverbose(1)
-      {
-	mprint((long) 0);
-	fprintf(stderr, "\n");
-      }
-  
+  ifverbose(1)
+  {
+    mprint((long) 0);
+    fprintf(stderr, "\n");
+  }
+
   return(qerror);
 }
 
 
 float bubble_qerror(struct teach_params *teach, struct data_entry *sample,
-		   int bx, int by, float radius)
+                    int bx, int by, float radius)
 {
   long index;
   int tx, ty, xdim, ydim;
@@ -888,7 +845,7 @@ float bubble_qerror(struct teach_params *teach, struct data_entry *sample,
 
   xdim = codes->xdim;
   ydim = codes->ydim;
-  
+
   ifverbose(10)
     fprintf(stderr, "Best match in %d, %d\n", bx, by);
 
@@ -897,28 +854,28 @@ float bubble_qerror(struct teach_params *teach, struct data_entry *sample,
   qerror = 0;
 
   while (codetmp != NULL)
-    {
-      tx = index % xdim;
-      ty = index / xdim;
-      
-      if (mdist(bx, by, tx, ty) <= radius) {
-	ifverbose(11)
-	  fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
-	
-	d = distance(codetmp, sample, codes->dimension);
-	/* assume that alpha = 1.0 */
-	qerror += d*d;
+  {
+    tx = index % xdim;
+    ty = index / xdim;
 
-      }
-      codetmp = next_entry(&p);
-      index++;
+    if (mdist(bx, by, tx, ty) <= radius) {
+      ifverbose(11)
+        fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
+
+      d = distance(codetmp, sample, codes->dimension);
+      /* assume that alpha = 1.0 */
+      qerror += d*d;
+
     }
+    codetmp = next_entry(&p);
+    index++;
+  }
   return (qerror);
 }
 
 
 float gaussian_qerror(struct teach_params *teach, struct data_entry *sample,
-		     int bx, int by, float radius)
+                      int bx, int by, float radius)
 {
   long index;
   int tx, ty, xdim, ydim;
@@ -942,23 +899,23 @@ float gaussian_qerror(struct teach_params *teach, struct data_entry *sample,
   qerror = 0.0;
 
   while (codetmp != NULL)
-    {
-      tx = index % xdim;
-      ty = index / xdim;
+  {
+    tx = index % xdim;
+    ty = index / xdim;
 
-      ifverbose(11)
-	fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
-      dd = mdist(bx, by, tx, ty);
+    ifverbose(11)
+      fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
+    dd = mdist(bx, by, tx, ty);
 
-      alp = exp((double) (-dd * dd / (2.0 * radius * radius)));
-      
-      d = distance(codetmp, sample, codes->dimension);
+    alp = exp((double) (-dd * dd / (2.0 * radius * radius)));
 
-      qerror += alp * d * d;
+    d = distance(codetmp, sample, codes->dimension);
 
-      codetmp = next_entry(&p);
-      index++;
-    }
+    qerror += alp * d * d;
+
+    codetmp = next_entry(&p);
+    index++;
+  }
 
   return (qerror);
 }
@@ -980,24 +937,24 @@ float find_qerror2(struct teach_params *teach)
   eptr p;
 
   if (set_som_params(teach))
-    {
-      fprintf(stderr, "find_qerror2: can't set SOM parameters\n");
-      return -1;
-    }
+  {
+    fprintf(stderr, "find_qerror2: can't set SOM parameters\n");
+    return -1;
+  }
 
   /* select neighborhood */
   if (teach->codes->neigh == NEIGH_GAUSSIAN)
-    {
-      ifverbose(3)
-	fprintf(stderr, "qmode 1, gaussian neighbourhood\n");
-      calc_qerror = gaussian_qerror;
-    }
+  {
+    ifverbose(3)
+      fprintf(stderr, "qmode 1, gaussian neighbourhood\n");
+    calc_qerror = gaussian_qerror;
+  }
   else
-    {
-      ifverbose(3)
-	fprintf(stderr, "qmode 1, bubble neighbourhood\n");
-      calc_qerror = bubble_qerror;
-    }
+  {
+    ifverbose(3)
+      fprintf(stderr, "qmode 1, bubble neighbourhood\n");
+    calc_qerror = bubble_qerror;
+  }
 
   /* Scan all data entries */
 
@@ -1010,28 +967,28 @@ float find_qerror2(struct teach_params *teach)
   else
     nod = 0;
 
-  for (; dtmp != NULL; dtmp = next_entry(&p)) 
-    {
-      if (find_winner(codes, dtmp, &win_info, 1) == 0)
-	continue; /* ignore empty vectors */
+  for (; dtmp != NULL; dtmp = next_entry(&p))
+  {
+    if (find_winner(codes, dtmp, &win_info, 1) == 0)
+      continue; /* ignore empty vectors */
 
-      bxind = win_info.index % codes->xdim;
-      byind = win_info.index / codes->xdim;
-      
-      qerror += calc_qerror(teach, dtmp, bxind, byind, radius);
-      
-      if (length_known)
-	ifverbose(1)
-	  mprint((long) nod--);
-    }
+    bxind = win_info.index % codes->xdim;
+    byind = win_info.index / codes->xdim;
+
+    qerror += calc_qerror(teach, dtmp, bxind, byind, radius);
+
+    if (length_known)
+    ifverbose(1)
+      mprint((long) nod--);
+  }
 
   if (length_known)
-    ifverbose(1)
-      {
-	mprint((long) 0);
-	fprintf(stderr, "\n");
-      }
-  
+  ifverbose(1)
+  {
+    mprint((long) 0);
+    fprintf(stderr, "\n");
+  }
+
   return(qerror);
 }
 
@@ -1040,18 +997,18 @@ MAPDIST_FUNCTION *get_mapdistf(int topol)
   MAPDIST_FUNCTION *dist;
 
   switch (topol)
-    {
+  {
     case TOPOL_RECT:
       dist = rect_dist;
-      break;
+          break;
     case TOPOL_HEXA:
       dist = hexa_dist;
-      break;
+          break;
     case TOPOL_LVQ:
     default:
       dist = NULL;
-      break;
-    }
+          break;
+  }
   return dist;
 }
 
@@ -1060,17 +1017,17 @@ NEIGH_ADAPT *get_nadaptf(int neigh)
   NEIGH_ADAPT *nadapt;
 
   switch (neigh)
-    {
+  {
     case NEIGH_GAUSSIAN:
       nadapt = gaussian_adapt;
-      break;
+          break;
     case NEIGH_BUBBLE:
       nadapt = bubble_adapt;
-      break;
+          break;
     default:
       nadapt = NULL;
-      break;
-    }
+          break;
+  }
 
   return nadapt;
 }
@@ -1081,12 +1038,12 @@ NEIGH_ADAPT *get_nadaptf(int neigh)
 int set_som_params(struct teach_params *params)
 {
   if (!params->mapdist)
-    if ((params->mapdist = get_mapdistf(params->topol)) == NULL)
-      return 1;
+  if ((params->mapdist = get_mapdistf(params->topol)) == NULL)
+    return 1;
 
   if (!params->neigh_adapt)
-    if ((params->neigh_adapt = get_nadaptf(params->neigh)) == NULL)
-      return 1;
+  if ((params->neigh_adapt = get_nadaptf(params->neigh)) == NULL)
+    return 1;
 
   return 0;
 }

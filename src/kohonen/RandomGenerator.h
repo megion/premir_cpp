@@ -1,5 +1,5 @@
 /**
- * Simple utils for random generate numbers
+ * Генератор псевдослучайных чисел.
  */
 
 #ifndef SRC_KOHONEN_RANDOMGENERATOR_H
@@ -15,6 +15,7 @@ namespace kohonen {
     public:
 
         RandomGenerator() {
+            nextValue = 1;
         }
 
         ~RandomGenerator() {
@@ -27,6 +28,10 @@ namespace kohonen {
 
         void initGenerator() {
             nextValue = (int) time(NULL);
+        }
+
+        void setNextValue(unsigned long _nextValue) {
+            nextValue = _nextValue;
         }
 
     private:

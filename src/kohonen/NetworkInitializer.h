@@ -24,13 +24,12 @@
 
 namespace kohonen {
 
-    template<typename InStreamReader, typename RandomEngine, typename In,
-            typename Out>
+    template<typename InStreamReader, typename In, typename Out>
     class NetworkInitializer {
     public:
 
-        NetworkInitializer(InStreamReader *_inStream, RandomEngine& _randomGen)
-                : dataReader(_inStream), randomGenerator(_randomGen) {
+        NetworkInitializer(InStreamReader *_inStream, RandomGenerator& _gen)
+                : dataReader(_inStream), randomGenerator(_gen) {
         }
 
         /**
@@ -51,10 +50,7 @@ namespace kohonen {
          *
          */
         utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim) {
-
             size_t colSize = dataReader->getColSize();
-
-//            RandomGenerator::initGenerator();
 
             utils::SMatrix<Out> *means = findEigenVectors(2);
             Out *mean = means->getRow(0);
@@ -83,7 +79,8 @@ namespace kohonen {
     private:
         // поток входных данных
         InStreamReader *dataReader;
-        RandomEngine randomGenerator;
+        // генератор псевдо случайных чисел
+        RandomGenerator randomGenerator;
 
         /**
          * Найти два собственных вектора с наибольшими
@@ -114,8 +111,6 @@ namespace kohonen {
             // т.е. одинаковым для каждого столбца. Однако оно может быть
             // различным если внедрить подсчет не каждого значения столбца.
             // (пока такое не реализовано)
-            // TODO: т.к. данные могут быть большие то возможно переполнение
-            // переменных хранимых в colMedians
             In inRow[colSize];
             while (dataReader->readNext(inRow)) {
                 for (size_t i = 0; i < colSize; ++i) {
@@ -159,36 +154,19 @@ namespace kohonen {
             for (size_t i = 0; i < uVectors.getRowSize(); ++i) {
                 Out *row = uVectors.getRow(i);
                 for (size_t j = 0; j < uVectors.getColSize(); ++j) {
-                    row[j] = (double)randomGenerator.generate() / 16384.0 - 1.0;
+                    // TODO: генерация рандомных чисел для правильного
+                    // вычисления отогональных векторов Грамма-Шмитда:
+                    // т.е. каждая строка должна быть различна
+                    row[j] = randomGenerator.generate() / 16384.0 - 1.0;
                 }
                 utils::ArrayUtils<Out, Out, Out>::
                 normalization(row, uVectors.getColSize());
                 mu[i] = 1.0;
             }
 
-            // TODO: test
-            //  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
-//          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
-//            uVectors(0,0) = -0.521141;
-//            uVectors(0,1) = 0.748481;
-//            uVectors(0,2) = -0.110109;
-//            uVectors(0,3) = -0.184878;
-//            uVectors(0,4) = 0.349120;
-//
-//            uVectors(1,0) = 0.019565;
-//            uVectors(1,1) = 0.369049;
-//            uVectors(1,2) = 0.620548;
-//            uVectors(1,3) = 0.384337;
-//            uVectors(1,4) = -0.575001;
-
-            std::cout << "squareMatrix: " << std::endl;
-            squareMatrix.print();
-
             matrix::GramSchmidtNormalized<Out, Out> gramSchmidtCalc;
             utils::SMatrix<Out> vVectors(eigenVectorsCount, colSize);
             for (int s = 0; s < 10; ++s) {
-                std::cout << "cycle s: " << s << std::endl;
-//                uVectors.print();
                 for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
                     for (size_t j = 0; j < vVectors.getColSize(); ++j) {
                         Out su = utils::ArrayUtils<Out, Out, Out>::
@@ -197,19 +175,10 @@ namespace kohonen {
                                              uVectors.getColSize());
 
                         vVectors(i, j) = mu[i] * su + uVectors(i, j);
-//                        std::cout << vVectors(i, j) << ", ";
                     }
                 }
 
-                std::cout << std::endl;
-                std::cout << "1 gramSchmidtCalc: " << std::endl;
-                vVectors.print();
-                // TODO: ошибка в посчете gramSchmidt
                 gramSchmidtCalc.gramSchmidt(vVectors);
-                std::cout << "2 gramSchmidtCalc: " << std::endl;
-                vVectors.print();
-//                std::cout << "cycle s: " << s << std::endl;
-//                vVectors.print();
 
                 Out sum = 0;
                 for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
@@ -226,10 +195,7 @@ namespace kohonen {
 
                 // скопировать значения vVectors в uVectors
                 vVectors.copyTo(uVectors);
-                uVectors.print();
             }
-
-//            uVectors.print();
 
             if (mu[0] == 0 || mu[1] == 0) {
                 // ошибка
