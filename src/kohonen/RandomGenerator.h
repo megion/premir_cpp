@@ -20,18 +20,18 @@ namespace kohonen {
         ~RandomGenerator() {
         }
 
-        static int generate() {
+        int generate() {
             return ((int) ((nextValue = (nextValue * 23) % 100000001) %
                            RANDOM_MAX_VALUE));
         }
 
-        static void initGenerator() {
+        void initGenerator() {
             nextValue = (int) time(NULL);
         }
 
     private:
         const static long RANDOM_MAX_VALUE = 32767L;
-        static unsigned long nextValue;
+        unsigned long nextValue;
     };
 }
 

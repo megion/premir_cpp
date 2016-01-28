@@ -222,6 +222,7 @@ struct data_entry *find_eigenvectors(struct entries *data)
   long *k2, k;
   eptr p;
   char *mask;
+  float dp;
 
   if (r==NULL || m==NULL || u==NULL || v==NULL ) goto everror;
 
@@ -293,34 +294,43 @@ struct data_entry *find_eigenvectors(struct entries *data)
     for (j=i; j<n; j++)
       r[j*n+i]=r[i*n+j]/=k;
 
+  printf("r: \n");
+  for (i=0; i<n; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", r[i*n+j]);
+    }
+    printf("\n");
+  }
+
 
 
 
   for (i=0; i<2; i++) {
-    for (j=0; j<n; j++) u[i*n+j]=orand()/16384.0-1.0;
+    for (j=0; j<n; j++) u[i*n+j]=867.0/16384.0-1.0;
     normalize(u+i*n, n);
     mu[i]=1.0;
   }
 
 //  -0.521141, 0.748481, -0.110109, -0.184878, 0.349120,
 //          0.019565, 0.369049, 0.620548, 0.384337, -0.575001,
-  u[0] = -0.521141;
-  u[1] = 0.748481;
-  u[2] = -0.110109;
-  u[3] = -0.184878;
-  u[4] = 0.349120;
-  u[5] = 0.019565;
-  u[6] = 0.369049;
-  u[7] = 0.620548;
-  u[8] = 0.384337;
-  u[9] = -0.575001;
+//  u[0] = -0.521141;
+//  u[1] = 0.748481;
+//  u[2] = -0.110109;
+//  u[3] = -0.184878;
+//  u[4] = 0.349120;
+//  u[5] = 0.019565;
+//  u[6] = 0.369049;
+//  u[7] = 0.620548;
+//  u[8] = 0.384337;
+//  u[9] = -0.575001;
 
-//  for (i=0; i<2; i++) {
-//    for (j=0; j<n; j++) {
-//      printf("%f, ", u[i*n+j]);
-//    }
-//    printf("\n");
-//  }
+  printf("u: \n");
+  for (i=0; i<2; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", u[i*n+j]);
+    }
+    printf("\n");
+  }
 
 //   [1,-1,1],[1,0,1],[1,1,2]
 //  float v2[9];
@@ -342,12 +352,39 @@ struct data_entry *find_eigenvectors(struct entries *data)
 //  }
 
 
-  for (k=0; k<10; k++) {
-    for (i=0; i<2; i++)
-      for (j=0; j<n; j++)
-	v[i*n+j]=mu[i]*dotprod(r+j*n, u+i*n, n)+u[i*n+j];
 
+  for (k=0; k<10; k++) {
+    printf("cycle k: %d \n", k);
+
+    for (i=0; i<2; i++) {
+      for (j=0; j<n; j++) {
+        float dp = dotprod(r+j*n, u+i*n, n);
+
+        v[i*n+j]=mu[i]*dp+u[i*n+j];
+//        printf("%f , ", v[i*n+j]);
+      }
+    }
+
+    printf("\n");
+
+    printf("1 gram_schmidt \n");
+    for (i=0; i<2; i++) {
+      for (j=0; j<n; j++) {
+        printf("%f, ", v[i*n+j]);
+      }
+      printf("\n");
+    }
     gram_schmidt(v, n, 2);
+    printf("2 gram_schmidt \n");
+    for (i=0; i<2; i++) {
+      for (j=0; j<n; j++) {
+        printf("%f, ", v[i*n+j]);
+      }
+      printf("\n");
+    }
+
+
+
 
     sum=0.0;
     for (i=0; i<2; i++) {
@@ -358,14 +395,21 @@ struct data_entry *find_eigenvectors(struct entries *data)
     }
 
     memcpy(u, v, 2*n*sizeof(float));
+    for (i=0; i<2; i++) {
+      for (j=0; j<n; j++) {
+        printf("%f, ", u[i*n+j]);
+      }
+      printf("\n");
+    }
   }
 
-//  for (i=0; i<2; i++) {
-//    for (j=0; j<n; j++) {
-//      printf("%f, ", u[i*n+j]);
-//    }
-//    printf("\n");
-//  }
+  printf("2u: \n");
+  for (i=0; i<2; i++) {
+    for (j=0; j<n; j++) {
+      printf("%f, ", u[i*n+j]);
+    }
+    printf("\n");
+  }
 
   if (mu[0]==0.0 || mu[1]==0.0) goto everror;
   

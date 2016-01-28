@@ -8,6 +8,7 @@
 #include "file/CsvFileReader.h"
 #include "utils/SMatrix.h"
 #include "kohonen/ArrayStreamReader.h"
+#include "kohonen/RandomGenerator.h"
 
 namespace test {
     namespace kohonen_initializer {
