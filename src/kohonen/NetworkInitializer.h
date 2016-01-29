@@ -28,8 +28,13 @@ namespace kohonen {
     class NetworkInitializer {
     public:
 
-        NetworkInitializer(InStreamReader *_inStream, RandomGenerator& _gen)
-                : dataReader(_inStream), randomGenerator(_gen) {
+        NetworkInitializer(InStreamReader *_inStream)
+                : dataReader(_inStream) {
+            randomEngine = new RandomGenerator();
+        }
+
+        ~NetworkInitializer() {
+            delete randomEngine;
         }
 
         /**
@@ -37,6 +42,10 @@ namespace kohonen {
          */
         utils::SMatrix<Out> *randomInitialization() {
             return nullptr;
+        }
+
+        RandomGenerator *getRandomGenerator() const {
+            return randomEngine;
         }
 
         /**
@@ -62,8 +71,8 @@ namespace kohonen {
             utils::SMatrix<Out> *resultsMatrix = new utils::SMatrix<Out>(
                     neuralNumber, colSize);
             for (size_t r = 0; r < resultsMatrix->getRowSize(); ++r) {
-                Out xf = 4.0 * (Out)(r % xdim) / (xdim - 1.0) - 2.0;
-                Out yf = 4.0 * (Out)(r / xdim) / (ydim - 1.0) - 2.0;
+                Out xf = 4.0 * (Out) (r % xdim) / (xdim - 1.0) - 2.0;
+                Out yf = 4.0 * (Out) (r / xdim) / (ydim - 1.0) - 2.0;
 
                 for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
                     (*resultsMatrix)(r, c) =
@@ -80,7 +89,7 @@ namespace kohonen {
         // поток входных данных
         InStreamReader *dataReader;
         // генератор псевдо случайных чисел
-        RandomGenerator randomGenerator;
+        RandomGenerator *randomEngine;
 
         /**
          * Найти два собственных вектора с наибольшими
@@ -157,7 +166,7 @@ namespace kohonen {
                     // TODO: генерация рандомных чисел для правильного
                     // вычисления отогональных векторов Грамма-Шмитда:
                     // т.е. каждая строка должна быть различна
-                    row[j] = randomGenerator.generate() / 16384.0 - 1.0;
+                    row[j] = randomEngine->generate() / 16384.0 - 1.0;
                 }
                 utils::ArrayUtils<Out, Out, Out>::
                 normalization(row, uVectors.getColSize());

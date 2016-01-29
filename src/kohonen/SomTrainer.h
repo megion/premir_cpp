@@ -14,24 +14,29 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+//#include <kohonen/winner/WinnerSearch.h>
 
 #include "utils/SMatrix.h"
+#include "kohonen/winner/WinnerSearch.h"
 
 namespace kohonen {
 
     template<typename InStreamReader, typename In, typename Out>
     class SomTrainer {
     public:
-        SomTrainer(InStreamReader *_inStream, Out _alpha, Out _radius)
-                : dataReader(_inStream), alpha(_alpha), radius(_radius) {
+        SomTrainer(InStreamReader *_inStream,
+                   winner::WinnerSearch<Out> *_winnerSearcher,
+                   Out _alpha, Out _radius)
+                : dataReader(_inStream), winnerSearcher(_winnerSearcher),
+                  alpha(_alpha), radius(_radius) {
         }
 
-        struct WinnerInfo {
-            size_t index;
-            xcb_point_t labelPoint;
-            double labelValue;
-            bool hideLabel;
-        };
+//        struct WinnerInfo {
+//            size_t index;
+//            xcb_point_t labelPoint;
+//            double labelValue;
+//            bool hideLabel;
+//        };
 
         /**
          * Обучение
@@ -41,9 +46,9 @@ namespace kohonen {
             for (size_t le = 0; le < teachSize; ++le) {
 
                 /* Radius decreases linearly to one */
-                Out trad = 1.0 + (radius - 1.0) * (Out) (teachSize - le) /
-                                 (Out) teachSize;
-                Out talp = alphaFunc(le, teachSize, alpha);
+//                Out trad = 1.0 + (radius - 1.0) * (Out) (teachSize - le) /
+//                                 (Out) teachSize;
+//                Out talp = alphaFunc(le, teachSize, alpha);
 
                 /*
                  * If the sample is weighted, we
@@ -54,6 +59,7 @@ namespace kohonen {
 //                    talp = 1.0 - (float) pow((double) (1.0 - talp), (double) weight);
 //                }
 
+                winnerSearcher->search(initializedSom);
 
             }
         }
@@ -69,6 +75,8 @@ namespace kohonen {
 
         // указатель на альфа функцию
         Out (*alphaFunc)(size_t, size_t, Out alpha);
+
+        winner::WinnerSearch<Out> *winnerSearcher;
     };
 }
 
