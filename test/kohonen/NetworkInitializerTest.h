@@ -7,10 +7,11 @@
 #include "kohonen/NetworkInitializer.h"
 #include "file/CsvFileReader.h"
 #include "utils/SMatrix.h"
-#include "kohonen/ArrayStreamReader.h"
+#include "file/stream/CsvFileArrayStreamReader.h"
 #include "kohonen/RandomGenerator.h"
-//#include "kohonen/winner/WinnerSearch.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
+#include "kohonen/alphafunc/InverseAlphaFunction.h"
+#include "kohonen/alphafunc/LinearAlphaFunction.h"
 #include "kohonen/SomTrainer.h"
 
 namespace test {

@@ -21,15 +21,16 @@
 #include "matrix/GramSchmidtNormalized.h"
 #include "RandomGenerator.h"
 #include "utils/console_colors.h"
+#include "file/stream/StreamReader.h"
 
 namespace kohonen {
 
-    template<typename InStreamReader, typename In, typename Out>
+    template<typename In, typename Out>
     class NetworkInitializer {
     public:
 
-        NetworkInitializer(InStreamReader *_inStream)
-                : dataReader(_inStream) {
+        NetworkInitializer(file::stream::StreamReader<In> *streamReader)
+                : dataReader(streamReader) {
             randomEngine = new RandomGenerator();
         }
 
@@ -58,10 +59,9 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim) {
-            size_t colSize = dataReader->getColSize();
-
-            utils::SMatrix<Out> *means = findEigenVectors(2);
+        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim,
+                                                size_t colSize) {
+            utils::SMatrix<Out> *means = findEigenVectors(2, colSize);
             Out *mean = means->getRow(0);
             Out *eigen1 = means->getRow(1);
             Out *eigen2 = means->getRow(2);
@@ -87,7 +87,7 @@ namespace kohonen {
 
     private:
         // поток входных данных
-        InStreamReader *dataReader;
+        file::stream::StreamReader<In> *dataReader;
         // генератор псевдо случайных чисел
         RandomGenerator *randomEngine;
 
@@ -95,9 +95,8 @@ namespace kohonen {
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount) {
-            size_t colSize = dataReader->getColSize();
-
+        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount,
+                                              size_t colSize) {
             // квадратная матрица
             utils::SMatrix<Out> squareMatrix(colSize, colSize);
             for (size_t row = 0; row < squareMatrix.getRowSize(); ++row) {
@@ -121,7 +120,7 @@ namespace kohonen {
             // различным если внедрить подсчет не каждого значения столбца.
             // (пока такое не реализовано)
             In inRow[colSize];
-            while (dataReader->readNext(inRow)) {
+            while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
                     colMedians[i] += inRow[i];
                     k2[i]++;
@@ -137,7 +136,7 @@ namespace kohonen {
 
             // iterate by all input matrix elements
             // получение треугольной квадратной матрицы
-            while (dataReader->readNext(inRow)) {
+            while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
                     for (size_t j = i; j < colSize; ++j) {
                         squareMatrix(i, j) = squareMatrix(i, j) +

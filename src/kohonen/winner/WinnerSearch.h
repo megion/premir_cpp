@@ -8,13 +8,11 @@
 namespace kohonen {
     namespace winner {
 
-        template<class Out>
+        template<typename T>
         class WinnerSearch {
         public:
 
-            virtual bool search(utils::SMatrix<Out> *somCodes) = 0;
-
-        private:
+            virtual bool search(utils::SMatrix<T> *somCodes) = 0;
 
         };
     }

@@ -38,12 +38,11 @@ namespace test {
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader(
                     "../test/datafiles/kohonen/ex.dat", ' ');
-            kohonen::ArrayStreamReader<double>
+            file::stream::CsvFileArrayStreamReader<double>
                     dataReader(&csvReader, readInitializer, 5, true);
 
             kohonen::
-            NetworkInitializer<kohonen::ArrayStreamReader<double>,
-                    double, double> initializer(&dataReader);
+            NetworkInitializer<double, double> initializer(&dataReader);
             kohonen::RandomGenerator *randomEngine
                     = initializer.getRandomGenerator();
             // TODO: в тестах для генерации кодов нейронов таких же как и в
@@ -56,7 +55,7 @@ namespace test {
 //            std::cout.precision(std::numeric_limits<double>::digits10);
 
             utils::SMatrix<double> *resultsMatrix =
-                    initializer.lineInitialization(16, 12);
+                    initializer.lineInitialization(16, 12, 5);
 
             utils::SMatrix<double> *somCodesMatrix =
                     read_some_initilized_codes();
@@ -65,11 +64,13 @@ namespace test {
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
 
             kohonen::winner::EuclideanWinnerSearch<double> winnerSearcher;
-            kohonen::SomTrainer<kohonen::ArrayStreamReader<double>, double, double>
-                    trainer(&dataReader, &winnerSearcher, 1.2, 1.3);
+            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
+            kohonen::SomTrainer<double, double> trainer(&dataReader,
+                                                        &alphaFunc,
+                                                       &winnerSearcher,
+                                                       1.2, 1.3);
 
             trainer.training(somCodesMatrix, 10);
-
 
             delete somCodesMatrix;
             delete resultsMatrix;

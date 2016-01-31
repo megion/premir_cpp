@@ -10,13 +10,13 @@
 namespace kohonen {
     namespace winner {
 
-        template<class Out>
-        class EuclideanWinnerSearch : public WinnerSearch<Out> {
+        template<typename T>
+        class EuclideanWinnerSearch : public WinnerSearch<T> {
         public:
             EuclideanWinnerSearch() {
             }
 
-            bool search(utils::SMatrix<Out> *somCodes) {
+            bool search(utils::SMatrix<T> *somCodes) {
                 std::cout << "call EuclideanWinnerSearch" << std::endl;
                 return true;
             }
