@@ -4,15 +4,17 @@
 #include <cstdio>
 
 #include "utils/SMatrix.h"
+#include "WinnerInfo.h"
 
 namespace kohonen {
     namespace winner {
 
-        template<typename T>
+        template<typename In, typename Out>
         class WinnerSearch {
         public:
 
-            virtual bool search(utils::SMatrix<T> *somCodes) = 0;
+            virtual bool search(utils::SMatrix<Out> *somCodes, In* inSampleRow,
+                                WinnerInfo<Out>* winner) = 0;
 
         };
     }

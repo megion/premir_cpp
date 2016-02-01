@@ -27,19 +27,12 @@ namespace kohonen {
     public:
         SomTrainer(file::stream::StreamReader<In> *streamReader,
                    alphafunc::AlphaFunction<Out>* _alphaFunction,
-                   winner::WinnerSearch<Out> *_winnerSearcher,
+                   winner::WinnerSearch<In, Out> *_winnerSearcher,
                    Out _alpha, Out _radius)
                 : dataReader(streamReader), alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher), alpha(_alpha),
                   radius(_radius) {
         }
-
-//        struct WinnerInfo {
-//            size_t index;
-//            xcb_point_t labelPoint;
-//            double labelValue;
-//            bool hideLabel;
-//        };
 
         /**
          * Обучение
@@ -62,7 +55,7 @@ namespace kohonen {
 //                    talp = 1.0 - (float) pow((double) (1.0 - talp), (double) weight);
 //                }
 
-                winnerSearcher->search(initializedSom);
+//                winnerSearcher->search(initializedSom);
 
             }
         }
@@ -79,7 +72,7 @@ namespace kohonen {
         Out alpha;
         Out radius;
 
-        winner::WinnerSearch<Out> *winnerSearcher;
+        winner::WinnerSearch<In, Out> *winnerSearcher;
     };
 }
 

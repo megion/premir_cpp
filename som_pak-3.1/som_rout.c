@@ -726,7 +726,7 @@ struct entries *som_training(struct teach_params *teach)
       /* Get the values from fixed-structure */
       bxind = sample->fixed->xfix;
       byind = sample->fixed->yfix;
-      printf("use fixed bxind %d , byind %d \n ", bxind, byind);
+//      printf("use fixed bxind %d , byind %d \n ", bxind, byind);
     }
     else {
 
@@ -739,7 +739,7 @@ struct entries *som_training(struct teach_params *teach)
       bxind = win_info.index % codes->xdim;
       byind = win_info.index / codes->xdim;
 
-      printf("use winner bxind %d , byind %d \n ", bxind, byind);
+//      printf("use winner bxind %d , byind %d \n ", bxind, byind);
     }
 
     /* Adapt the units */

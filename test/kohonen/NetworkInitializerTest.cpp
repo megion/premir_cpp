@@ -63,14 +63,21 @@ namespace test {
             // данные матрицы должны быть практически идентичными
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
 
-            kohonen::winner::EuclideanWinnerSearch<double> winnerSearcher;
+            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
             kohonen::SomTrainer<double, double> trainer(&dataReader,
                                                         &alphaFunc,
-                                                       &winnerSearcher,
-                                                       1.2, 1.3);
+                                                        &winnerSearcher,
+                                                        1.2, 1.3);
 
             trainer.training(somCodesMatrix, 10);
+
+            // test NAN
+            double a = 5.6;
+            assert(!std::isnan(a));
+            a = NAN;
+            assert(std::isnan(a));
+
 
             delete somCodesMatrix;
             delete resultsMatrix;

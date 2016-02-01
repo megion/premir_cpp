@@ -2,6 +2,7 @@
 #define TEST_KOHONEN_NETWORKINITIALIZER_TEST_H
 
 #include <iostream>
+#include <cmath>
 
 #include "test.h"
 #include "kohonen/NetworkInitializer.h"
