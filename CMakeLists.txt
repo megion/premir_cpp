@@ -22,6 +22,7 @@ add_executable(dummy_executable
   test/file/FileReaderTest.cpp
   test/ml/DigitalFilterTest.cpp
   test/kohonen/NetworkInitializerTest.cpp
+  test/coursera/CourseraTest.cpp
   src/graphics/ChartData.cpp
   src/graphics/Chart.cpp
   src/ml/DigitalFilter.cpp

@@ -78,6 +78,8 @@ namespace test {
             a = NAN;
             assert(std::isnan(a));
 
+//            std::cout << "test""ff"" ""C"" AB" << std::endl;
+
 
             delete somCodesMatrix;
             delete resultsMatrix;

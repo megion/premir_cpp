@@ -50,6 +50,10 @@ namespace file {
             return lineNumber;
         }
 
+        void setStrQuote(const char quote) {
+            strQuote = quote;
+        }
+
         void close() {
             if (fp) {
                 if (fclose(fp) < 0) {
@@ -107,6 +111,14 @@ namespace file {
             return *this;
         }
 
+        CsvFileReader &read(int &v) {
+            Ch buffer[64];
+            *buffer = '\0';
+            nextValue(buffer, 64);
+            v = std::atof(buffer);
+            return *this;
+        }
+
         CsvFileReader &read(float &v) {
             Ch buffer[64];
             *buffer = '\0';
@@ -131,8 +143,13 @@ namespace file {
             return *this;
         }
 
-        CsvFileReader &read(char* v, size_t len) {
+        CsvFileReader &read(char *v, size_t len) {
             nextValue(v, len);
+            return *this;
+        }
+
+        CsvFileReader &read(char *v, size_t len, bool useStrQuote) {
+            nextValue(v, len, useStrQuote);
             return *this;
         }
 
@@ -143,8 +160,9 @@ namespace file {
         bool isEnd; // end of file
         bool emptyRead; // no read data
         Ch separator;
+        char strQuote;
 
-        void nextValue(Ch *buffer, size_t bufferSize) {
+        void nextValue(Ch *buffer, size_t bufferSize, bool useStrQuote = false) {
             size_t i = 0;
             int ch;
             for (; ;) {
@@ -181,12 +199,23 @@ namespace file {
                     return;
                 }
 
-                if (ch == separator) {
-                    buffer[i] = '\0';
-                    return;
+                if (useStrQuote && ch == strQuote) {
+                    for (ch = fgetc(fp); ch!=strQuote && ch != EOF; ++i,
+                            ch = fgetc(fp)) {
+                        if (i >= bufferSize) {
+                            danger_text("buffer is overfull, use dynamic buffer");
+                            throw std::runtime_error("local buffer is overfull");
+                        }
+                        buffer[i] = ch;
+                    }
+                } else {
+                    if (ch == separator) {
+                        buffer[i] = '\0';
+                        return;
+                    }
+                    buffer[i] = ch;
+                    ++i;
                 }
-                buffer[i] = ch;
-                ++i;
             }
         }
     };

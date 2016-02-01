@@ -11,6 +11,7 @@
 #include "file/FileReaderTest.h"
 #include "sspy/SspyTest.h"
 #include "kohonen/NetworkInitializerTest.h"
+#include "coursera/CourseraTest.h"
 #include "ml/DigitalFilterTest.h"
 
 int main(int argc, char **argv) {
@@ -31,6 +32,7 @@ int main(int argc, char **argv) {
     test::file_reader::file_reader_test();
     test::sspy::sspy_data_read_test();
     test::kohonen_initializer::network_initializer_test();
+    test::coursera::coursera_test();
     matrix_utils_test();
 	digitalFilter_test();
 
