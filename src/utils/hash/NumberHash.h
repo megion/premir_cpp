@@ -10,11 +10,13 @@
 
 #include <cstdio>
 
+#include "HashEngine.h"
+
 namespace utils {
     namespace hash {
 
         template<typename T>
-        class NumberHash {
+        class NumberHash : public HashEngine<T> {
         public:
             NumberHash(size_t _indexSize) : indexSize(_indexSize) {
             }

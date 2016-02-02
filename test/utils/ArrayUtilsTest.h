@@ -6,6 +6,7 @@
 #include "test.h"
 #include "utils/ArrayUtils.h"
 #include "utils/CArrayList.h"
+#include "sort/HeapSort.h"
 
 namespace test {
     namespace utils_arrayutils {

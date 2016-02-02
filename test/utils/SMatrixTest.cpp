@@ -159,13 +159,13 @@ namespace test {
 
         void sMatrix_test() {
             suite("SMatrix");
-            test(push_row);
-            test(swap_rows);
-            test(comparison);
-            test(comparison_with_error);
-            test(create_clone);
-            test(copy_to);
-            test(get_row);
+            mytest(push_row);
+            mytest(swap_rows);
+            mytest(comparison);
+            mytest(comparison_with_error);
+            mytest(create_clone);
+            mytest(copy_to);
+            mytest(get_row);
         }
     }
 }

@@ -31,8 +31,10 @@ namespace test {
             while (reader.hasNext() && reader.getLineNumber() < 10) {
                 SspyData row;
                 reader.read(row.counter);
-                reader.read(row.msg_type).read(row.stream_type);
-                reader.read(row.date, 11).read(row.time, 13);
+                reader.read(row.msg_type);
+                reader.read(row.stream_type);
+                reader.read(row.date, 11);
+                reader.read(row.time, 13);
                 reader.read(row.interval, 10);
                 reader.toEndLine();
                 if (!reader.isEmptyRead()) {
@@ -47,8 +49,8 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-//            test(read_sspy_data_file_by_line);
-//            test(csv_parse_sspy_data_file);
+//            mytest(read_sspy_data_file_by_line);
+//            mytest(csv_parse_sspy_data_file);
         }
     }
 }

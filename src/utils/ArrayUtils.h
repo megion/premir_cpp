@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <cmath>
 
+#include "sort/HeapSort.h"
+
 namespace utils {
 
     template<typename InA, typename InB, typename Out>
@@ -43,6 +45,44 @@ namespace utils {
                 res = res + ai * ai;
             }
             return res;
+        }
+
+        /**
+         * Вычисление медианы массива:
+         *
+         * 1) сортировка массива - результат сортировки будет записан в
+         * исходный массив
+         * 2) если количество элементов массива четное - то медиана
+         * это середина между двумя средними элементами
+         * если нечетное то это средний элемент
+         *
+         */
+        static Out median(InA *a, size_t sizeArray) {
+            sort::HeapSort<InA> hsort;
+            hsort.sort(a, sizeArray);
+
+            if (sizeArray%2==0) {
+                // четное
+                size_t m = sizeArray/2 - 1;
+                return (Out)(a[m] + a[m+1]) / 2;
+            } else {
+                // нечетное
+                size_t m = sizeArray/2;
+                return (Out)a[m];
+            }
+        }
+
+        /**
+         * Вычисление среднего значения массива: сумма всех элементов деленных
+         * на их число
+         *
+         */
+        static Out average(InA *a, size_t sizeArray) {
+            Out sum = 0;
+            for (size_t i=0; i<sizeArray; ++i) {
+                sum+=a[i];
+            }
+            return (Out)sum/sizeArray;
         }
 
         /**

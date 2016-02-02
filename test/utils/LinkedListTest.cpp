@@ -159,9 +159,9 @@ void test_push_temp_values() {
 
 void linkedList_test() {
 	suite("LinkedList");
-	test(push_shift_unshift);
-	test(index_operator);
-	test(pop);
+	mytest(push_shift_unshift);
+	mytest(index_operator);
+	mytest(pop);
 //	test(concat_and_copy);
 //	test(push_temp_values);
 

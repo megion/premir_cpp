@@ -103,54 +103,52 @@ namespace file {
             emptyRead = false;
         }
 
-        CsvFileReader &read(double &v) {
+        size_t read(double &v) {
             Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 64);
+            size_t num = nextValue(buffer, 64);
             v = std::atof(buffer);
-            return *this;
+            return num;
         }
 
-        CsvFileReader &read(int &v) {
+        size_t read(int &v) {
             Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 64);
+            size_t num = nextValue(buffer, 64);
             v = std::atof(buffer);
-            return *this;
+            return num;
         }
 
-        CsvFileReader &read(float &v) {
+        size_t read(float &v) {
             Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 64);
+            size_t num = nextValue(buffer, 64);
             v = std::atof(buffer);
-            return *this;
+            return num;
         }
 
-        CsvFileReader &read(size_t &v) {
+        size_t read(size_t &v) {
             Ch buffer[64];
             *buffer = '\0';
-            nextValue(buffer, 64);
+            size_t num = nextValue(buffer, 64);
             v = std::atol(buffer);
-            return *this;
+            return num;
         }
 
-        CsvFileReader &read(char &v) {
+        size_t read(char &v) {
             Ch buffer[2];
             *buffer = '\0';
-            nextValue(buffer, 2);
+            size_t num = nextValue(buffer, 2);
             v = buffer[0];
-            return *this;
+            return num;
         }
 
-        CsvFileReader &read(char *v, size_t len) {
-            nextValue(v, len);
-            return *this;
+        size_t read(char *v, size_t len) {
+            return nextValue(v, len);
         }
 
-        CsvFileReader &read(char *v, size_t len, bool useStrQuote) {
-            nextValue(v, len, useStrQuote);
-            return *this;
+        size_t read(char *v, size_t len, bool useStrQuote) {
+            return nextValue(v, len, useStrQuote);
         }
 
     private:
@@ -162,7 +160,7 @@ namespace file {
         Ch separator;
         char strQuote;
 
-        void nextValue(Ch *buffer, size_t bufferSize, bool useStrQuote = false) {
+        size_t nextValue(Ch *buffer, size_t bufferSize, bool useStrQuote = false) {
             size_t i = 0;
             int ch;
             for (; ;) {
@@ -179,7 +177,7 @@ namespace file {
                         // end of file and has NO data for reading
                         emptyRead = true;
                     }
-                    return;
+                    return i;
                 }
 
                 if (i >= bufferSize) {
@@ -196,7 +194,7 @@ namespace file {
 # endif
                     buffer[i] = '\0';
                     ++lineNumber;
-                    return;
+                    return i;
                 }
 
                 if (useStrQuote && ch == strQuote) {
@@ -211,7 +209,7 @@ namespace file {
                 } else {
                     if (ch == separator) {
                         buffer[i] = '\0';
-                        return;
+                        return i;
                     }
                     buffer[i] = ch;
                     ++i;

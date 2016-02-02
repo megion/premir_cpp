@@ -35,7 +35,7 @@ namespace kohonen {
                 size_t dim = somCodes->getColSize();
 
                 winner->diff = -1.0;
-                size_t winnerIndex = NAN;
+//                size_t winnerIndex = NAN;
                 Out maxDifference = std::numeric_limits<Out>::max();
 
                 for (size_t r=0; r<somCodes->getRowSize(); ++r) {

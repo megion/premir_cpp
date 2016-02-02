@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "HashEngine.h"
+
 /**
  * Hash set only for store
  */
@@ -58,7 +60,7 @@ namespace utils {
         const static size_t DEFAULT_TABLE_SIZE = 1021;
 
 
-        H hashEngine; // hash code generator
+        hashEngine; // hash code generator
 
     };
 }

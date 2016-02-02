@@ -68,6 +68,6 @@ void test_distance_vectors() {
 
 void matrix_utils_test() {
     suite("matrix_utils");
-    test(multiply_matrix);
-    test(distance_vectors);
+    mytest(multiply_matrix);
+    mytest(distance_vectors);
 }

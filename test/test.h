@@ -8,7 +8,7 @@
  * Test the given `fn`.
  */
 
-#define test(fn) \
+#define mytest(fn) \
   printf("    \e[92m✓ \e[90m%s\e[0m\n", #fn); \
   test_##fn();
 

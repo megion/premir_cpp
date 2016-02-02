@@ -92,25 +92,6 @@ namespace utils {
             return typeSizeof;
         }
 
-        /**
-         * Insert to end
-         */
-        void push(const T &value);
-
-        void push(const T *values, size_t valuesSize);
-
-        /**
-         * Save copy values begin with specified position
-         */
-        void write(size_t position, const T &values);
-
-        void write(size_t position, const T *values, size_t valuesSize);
-
-        /**
-         * Remove all elements
-         */
-        void removeAll();
-
         // = assign operator: List l3; l3 = l2;
         CArrayList<T> &operator=(const CArrayList<T> &) = delete;
 
@@ -120,6 +101,22 @@ namespace utils {
         // [] index operator
         T &operator[](const size_t &index) const {
             return array[index];
+        }
+
+        bool operator==(const CArrayList<T> &other) const {
+            if (other.size() != length) {
+                return false;
+            }
+            for (size_t i = 0; i < length; ++i) {
+                if(array[i] != other[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool operator!=(const CArrayList<T> &other) const {
+            return !((*this) == other);
         }
 
         // + sum operator: a = a + b
@@ -182,12 +179,94 @@ namespace utils {
         }
         /////////////////////////////////
 
+        /**
+         * Insert to end
+         */
+        void push(const T &value) {
+            push(&value, 1);
+        }
+
+        void push(const T *values, size_t valuesSize) {
+            size_t newLength = length + valuesSize;
+            if (newLength > capacity) { // need increase capacity
+                if (newLength > (capacity + capacityIncrease)) {
+                    capacity = newLength;
+                } else {
+                    capacity = capacity + capacityIncrease;
+                }
+
+                size_t amount = capacity * typeSizeof;
+                T *newArray;
+                if (array) {
+                    newArray = (T *) std::realloc(array, amount);
+                } else {
+                    newArray = (T *) std::malloc(amount);
+                }
+
+                if (newArray == NULL) {
+                    throw std::runtime_error(std::strerror(errno));
+                }
+                array = newArray;
+            }
+
+            // copy value as bytes. Copy constructor not call.
+            T *last = array + length;
+            memcpy(last, values, valuesSize * typeSizeof);
+            length = newLength;
+        }
+
+        /**
+         * Save copy values begin with specified position
+         */
+        void write(size_t position, const T *values,
+                                  size_t valuesSize) {
+            size_t newLength = position + valuesSize;
+            if (newLength > capacity) { // need increase capacity
+                capacity = newLength;
+                size_t amount = capacity * typeSizeof;
+                T *newArray;
+                if (array) {
+                    newArray = (T *) std::realloc(array, amount);
+                } else {
+                    newArray = (T *) std::malloc(amount);
+                }
+
+                if (newArray == NULL) {
+                    throw std::runtime_error(std::strerror(errno));
+                }
+                array = newArray;
+            } else if (newLength > length) { // simple update length
+                length = newLength;
+            }
+
+            // copy value as bytes. Copy constructor not call.
+            T *last = array + position;
+            memcpy(last, values, valuesSize * typeSizeof);
+        }
+
+        void write(size_t position, const T &value) {
+            write(position, &value, 1);
+        }
+
+        /**
+         * Remove all elements
+         */
+        void removeAll() {
+            if (array) {
+                std::free(array);
+            }
+            array = nullptr;
+            length = 0;
+            capacity = 0;
+        }
+
         void print() {
             for(size_t i=0; i<length; ++i) {
                 std::cout << array[i] << ", ";
             }
             std::cout << std::endl;
         }
+
 
     private:
         T *array;
@@ -197,83 +276,6 @@ namespace utils {
         size_t capacityIncrease; // increase capacity value, default is 1
 
     };
-
-    template<typename T>
-    void CArrayList<T>::push(const T &value) {
-        push(&value, 1);
-    }
-
-    template<typename T>
-    void CArrayList<T>::push(const T *values, size_t valuesSize) {
-        size_t newLength = length + valuesSize;
-        if (newLength > capacity) { // need increase capacity
-            if (newLength > (capacity + capacityIncrease)) {
-                capacity = newLength;
-            } else {
-                capacity = capacity + capacityIncrease;
-            }
-
-            size_t amount = capacity * typeSizeof;
-            T *newArray;
-            if (array) {
-                newArray = (T *) std::realloc(array, amount);
-            } else {
-                newArray = (T *) std::malloc(amount);
-            }
-
-            if (newArray == NULL) {
-                throw std::runtime_error(std::strerror(errno));
-            }
-            array = newArray;
-        }
-
-        // copy value as bytes. Copy constructor not call.
-        T *last = array + length;
-        memcpy(last, values, valuesSize * typeSizeof);
-        length = newLength;
-    }
-
-    template<typename T>
-    void CArrayList<T>::write(size_t position, const T *values,
-                              size_t valuesSize) {
-        size_t newLength = position + valuesSize;
-        if (newLength > capacity) { // need increase capacity
-            capacity = newLength;
-            size_t amount = capacity * typeSizeof;
-            T *newArray;
-            if (array) {
-                newArray = (T *) std::realloc(array, amount);
-            } else {
-                newArray = (T *) std::malloc(amount);
-            }
-
-            if (newArray == NULL) {
-                throw std::runtime_error(std::strerror(errno));
-            }
-            array = newArray;
-        } else if (newLength > length) { // simple update length
-            length = newLength;
-        }
-
-        // copy value as bytes. Copy constructor not call.
-        T *last = array + position;
-        memcpy(last, values, valuesSize * typeSizeof);
-    }
-
-    template<typename T>
-    void CArrayList<T>::write(size_t position, const T &value) {
-        write(position, &value, 1);
-    }
-
-    template<typename T>
-    void CArrayList<T>::removeAll() {
-        if (array) {
-            std::free(array);
-        }
-        array = nullptr;
-        length = 0;
-        capacity = 0;
-    }
 
 }
 

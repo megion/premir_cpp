@@ -1,18 +1,15 @@
-//
-// Created by ilya on 1/6/16.
-// hash code for float number value if float range is defined
-//
-
 #ifndef SRC_UTILS_HASH_FLOATHASH_H
 #define SRC_UTILS_HASH_FLOATHASH_H
 
 #include <cstdio>
 
+#include "HashEngine.h"
+
 namespace utils {
     namespace hash {
 
         template<typename T>
-        class FloatHash {
+        class FloatHash : public HashEngine<T> {
         public:
             FloatHash(double _start, double _end) :
                     indexSize(0), start(_start), end(_end) {

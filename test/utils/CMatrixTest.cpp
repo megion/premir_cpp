@@ -178,12 +178,12 @@ void test_make_identity() {
 
 void cMatrix_test() {
     suite("CMatrix");
-    test(set_value);
-    test(comparison);
-    test(comparison_with_error);
-    test(push_row);
-    test(row_iterator);
-    test(create_clone);
-    test(swap_rows);
-    test(make_identity);
+    mytest(set_value);
+    mytest(comparison);
+    mytest(comparison_with_error);
+    mytest(push_row);
+    mytest(row_iterator);
+    mytest(create_clone);
+    mytest(swap_rows);
+    mytest(make_identity);
 }

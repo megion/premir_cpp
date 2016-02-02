@@ -87,7 +87,7 @@ namespace test {
 
         void network_initializer_test() {
             suite("NetworkInitializer_test");
-            test(line_initialization);
+            mytest(line_initialization);
         }
     }
 }

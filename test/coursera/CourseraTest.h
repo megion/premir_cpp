@@ -10,11 +10,14 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <regex>
 
 #include "test.h"
 
 #include "file/LineFileReader.h"
 #include "file/CsvFileReader.h"
+#include "utils/CArrayList.h"
+#include "utils/ArrayUtils.h"
 
 
 namespace test {

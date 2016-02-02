@@ -50,7 +50,7 @@ namespace test {
 
         void intBitSet_test() {
             suite("IntBitSet");
-            test(bit_set);
+            mytest(bit_set);
         }
     }
 }

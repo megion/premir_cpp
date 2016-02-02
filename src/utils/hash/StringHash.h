@@ -8,11 +8,13 @@
 
 #include <cstdio>
 
+#include "HashEngine.h"
+
 namespace utils {
     namespace hash {
 
         template<typename T>
-        class StringHash {
+        class StringHash : public HashEngine<T> {
         public:
             StringHash(size_t _indexSize) : indexSize(_indexSize) {
             }

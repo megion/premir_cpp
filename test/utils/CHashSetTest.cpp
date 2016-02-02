@@ -69,7 +69,7 @@ namespace test {
 
         void cHashSet_test() {
             suite("CHashSetTest");
-            test(hash_set);
+            mytest(hash_set);
 //            test(number_hash_charts);
 //            test(float_hash_charts);
         }

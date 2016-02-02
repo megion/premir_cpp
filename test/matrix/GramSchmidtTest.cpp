@@ -85,8 +85,8 @@ namespace test {
 
         void gramSchmidt_test() {
             suite("GramSchmidt");
-            test(gram_schmidt_strteam);
-            test(gram_schmidt_normalized);
+            mytest(gram_schmidt_strteam);
+            mytest(gram_schmidt_normalized);
         }
     }
 }
