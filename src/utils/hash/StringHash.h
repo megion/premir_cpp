@@ -16,24 +16,17 @@ namespace utils {
         template<typename T>
         class StringHash : public HashEngine<T> {
         public:
-            StringHash(size_t _indexSize) : indexSize(_indexSize) {
+            StringHash() {
             }
 
-            size_t setIndexSize(size_t _indexSize) {
-                indexSize = _indexSize;
-            }
-
-            size_t hashCode(const T& value) const {
+            size_t hashCode(const T &value) const {
                 T temp = value;
                 size_t h = 0, a = 127;
                 for (; *temp != 0; ++temp) {
-                    h = (a * h + *temp) % indexSize;
+                    h = (a * h + *temp) % HashEngine<T>::indexSize;
                 }
                 return h;
             }
-
-        private:
-            size_t indexSize;
         };
     }
 }

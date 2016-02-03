@@ -54,8 +54,12 @@ namespace test {
 
 //            std::cout.precision(std::numeric_limits<double>::digits10);
 
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
             utils::SMatrix<double> *resultsMatrix =
-                    initializer.lineInitialization(16, 12, 5);
+                    initializer.lineInitialization(xdim, ydim, dim);
 
             utils::SMatrix<double> *somCodesMatrix =
                     read_some_initilized_codes();
@@ -64,19 +68,19 @@ namespace test {
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
 
             kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
+            kohonen::alphafunc::BubbleNeighborAdaptation<double> alphaFunc;
             kohonen::SomTrainer<double, double> trainer(&dataReader,
                                                         &alphaFunc,
                                                         &winnerSearcher,
-                                                        1.2, 1.3);
+                                                        0.002, 3, xdim, ydim);
 
-            trainer.training(somCodesMatrix, 10);
+            trainer.training(somCodesMatrix, 10, dim);
 
             // test NAN
-            double a = 5.6;
-            assert(!std::isnan(a));
-            a = NAN;
-            assert(std::isnan(a));
+//            double a = 5.6;
+//            assert(!std::isnan(a));
+//            a = NAN;
+//            assert(std::isnan(a));
 
 //            std::cout << "test""ff"" ""C"" AB" << std::endl;
 

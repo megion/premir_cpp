@@ -30,8 +30,6 @@ namespace kohonen {
 
             bool search(utils::SMatrix<Out> *somCodes, In* inSampleRow,
                         WinnerInfo<Out>* winner) {
-                std::cout << "call EuclideanWinnerSearch" << std::endl;
-
                 size_t dim = somCodes->getColSize();
 
                 winner->diff = -1.0;

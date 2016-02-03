@@ -10,45 +10,45 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "HashEngine.h"
+#include "hash/HashEngine.h"
 
 /**
  * Hash set only for store
  */
 namespace utils {
 
-    template<typename T, typename H>
+    template<typename T>
     class CHashSet {
     public:
 
         // int, float (without range), string
-        CHashSet() :
-                tableSize(DEFAULT_TABLE_SIZE), hashEngine(tableSize) {
-        }
+//        CHashSet() :
+//                tableSize(DEFAULT_TABLE_SIZE), hashEngine(tableSize) {
+//        }
 
         // float with range
-        CHashSet(H _hashEngine) :
+        CHashSet(hash::HashEngine<T>* _hashEngine) :
                 tableSize(DEFAULT_TABLE_SIZE), hashEngine(_hashEngine) {
-            hashEngine.setIndexSize(tableSize);
+            hashEngine->setIndexSize(tableSize);
         }
 
         // copy constructor
-        CHashSet(const CHashSet<T, H> &) = delete;
+        CHashSet(const CHashSet<T> &) = delete;
 
         // replace constructor
-        CHashSet(CHashSet<T, H> &&) = delete;
+        CHashSet(CHashSet<T> &&) = delete;
 
         // assign operator
-        CHashSet<T, H> &operator=(const CHashSet<T, H> &) = delete;
+        CHashSet<T> &operator=(const CHashSet<T> &) = delete;
 
         // replacement operator
-        CHashSet<T, H> &operator=(CHashSet<T, H> &&) = delete;
+        CHashSet<T> &operator=(CHashSet<T> &&) = delete;
 
         ~CHashSet() {
         }
 
         size_t hash(const T &value) const {
-            return hashEngine.hashCode(value);
+            return hashEngine->hashCode(value);
         }
 
 
@@ -60,7 +60,7 @@ namespace utils {
         const static size_t DEFAULT_TABLE_SIZE = 1021;
 
 
-        hashEngine; // hash code generator
+        hash::HashEngine<T>* hashEngine; // hash code generator
 
     };
 }

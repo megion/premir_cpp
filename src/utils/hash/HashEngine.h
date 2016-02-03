@@ -12,6 +12,13 @@ namespace utils {
 
             virtual size_t hashCode(const T& value) const = 0;
 
+            size_t setIndexSize(size_t _indexSize) {
+                indexSize = _indexSize;
+            }
+
+        protected:
+            size_t indexSize;
+
         };
     }
 }

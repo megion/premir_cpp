@@ -26,13 +26,14 @@ namespace test {
 //                std::cout << "[" << i << "]: " << i % 64 << std::endl;
 //            }
 
-            utils::CHashSet<char *, utils::hash::StringHash<char *>> s1;
+            utils::hash::StringHash<char *> shash;
+            utils::CHashSet<char*> s1(&shash);
             char ch1[] = "test";
             size_t h = s1.hash(ch1);
 //            std::cout << "hash: " << h << std::endl;
 
             utils::hash::FloatHash<double> hash2(1.2, 1.6);
-            utils::CHashSet<double, utils::hash::FloatHash<double>> s2(hash2);
+            utils::CHashSet<double> s2(&hash2);
             size_t h2 = s2.hash(1.22222);
 //            std::cout << "hash2: " << h2 << std::endl;
             size_t h3 = s2.hash(1.233);
@@ -45,7 +46,8 @@ namespace test {
             graphics::ChartThread floatHashChart(710, 460);
             floatHashChart.getChart().setWindowTitle("Float hash");
 
-            utils::CHashSet<double, utils::hash::NumberHash<double>> numSet;
+            utils::hash::NumberHash<double> nflash;
+            utils::CHashSet<double> numSet(&nflash);
             for (double i = -1000; i < 1000; i = i + 0.1) {
                 size_t h = numSet.hash(i);
                 numberHashChart.getChart().redrawNewPoints(i, h);
@@ -58,8 +60,7 @@ namespace test {
             floatHashChart.getChart().setWindowTitle("Float hash");
 
             utils::hash::FloatHash<double> fhash(1.2, 1.6);
-            utils::CHashSet<double, utils::hash::FloatHash<double>> floatSet(
-                    fhash);
+            utils::CHashSet<double> floatSet(&fhash);
             for (double i = 1.2; i < 1.6; i = i + 0.0001) {
                 size_t h = floatSet.hash(i);
                 floatHashChart.getChart().redrawNewPoints(i, h);

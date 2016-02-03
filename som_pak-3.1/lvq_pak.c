@@ -70,7 +70,7 @@ int find_winner_euc(struct entries *codes, struct data_entry *sample,
       }
 
     // p.index порядковый номер нейрона сети (0,1..., number neurons)
-    printf("p.index %d \n ", p.index);
+//    printf("p.index %d \n ", p.index);
     
     if (masked == dim)
       return 0; /* can't calculate winner, empty data vector */

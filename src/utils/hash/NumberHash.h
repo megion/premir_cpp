@@ -18,19 +18,14 @@ namespace utils {
         template<typename T>
         class NumberHash : public HashEngine<T> {
         public:
-            NumberHash(size_t _indexSize) : indexSize(_indexSize) {
-            }
-
-            size_t setIndexSize(size_t _indexSize) {
-                indexSize = _indexSize;
+            NumberHash() {
             }
 
             size_t hashCode(const T& value) const {
-                return ((size_t)value) % indexSize;
+                return ((size_t)value) % HashEngine<T>::indexSize;
             }
 
-        private:
-            size_t indexSize;
+
         };
     }
 }
