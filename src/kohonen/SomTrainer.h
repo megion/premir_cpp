@@ -19,6 +19,7 @@
 #include "kohonen/winner/WinnerSearch.h"
 #include "file/stream/StreamReader.h"
 #include "kohonen/alphafunc/AlphaFunction.h"
+#include "kohonen/neighadap/NeighborAdaptation.h"
 
 namespace kohonen {
 
@@ -28,10 +29,13 @@ namespace kohonen {
         SomTrainer(file::stream::StreamReader<In> *streamReader,
                    alphafunc::AlphaFunction<double> *_alphaFunction,
                    winner::WinnerSearch<In, Out> *_winnerSearcher,
-                   Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
-                : dataReader(streamReader), alphaFunction(_alphaFunction),
-                  winnerSearcher(_winnerSearcher), alpha(_alpha),
-                  radius(_radius), xdim(_xdim), ydim(_ydim) {
+                   neighadap::NeighborAdaptation<In, Out> *_neighborAdaptation,
+                   double _alpha, double _radius, size_t _xdim, size_t _ydim)
+                : dataReader(streamReader),
+                  alphaFunction(_alphaFunction),
+                  winnerSearcher(_winnerSearcher),
+                  neighborAdaptation(_neighborAdaptation),
+                  alpha(_alpha), radius(_radius), xdim(_xdim), ydim(_ydim) {
         }
 
         /**
@@ -119,6 +123,7 @@ namespace kohonen {
         size_t ydim;
 
         winner::WinnerSearch<In, Out> *winnerSearcher;
+        neighadap::NeighborAdaptation<In, Out> *neighborAdaptation;
     };
 }
 

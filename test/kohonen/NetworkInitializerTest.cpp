@@ -68,10 +68,12 @@ namespace test {
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
 
             kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
-            kohonen::alphafunc::BubbleNeighborAdaptation<double> alphaFunc;
+            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
+            kohonen::neighadap::BubbleNeighborAdaptation<double, double> neiAdap;
             kohonen::SomTrainer<double, double> trainer(&dataReader,
                                                         &alphaFunc,
                                                         &winnerSearcher,
+                                                        &neiAdap,
                                                         0.002, 3, xdim, ydim);
 
             trainer.training(somCodesMatrix, 10, dim);
