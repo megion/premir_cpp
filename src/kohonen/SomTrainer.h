@@ -27,10 +27,10 @@ namespace kohonen {
     class SomTrainer {
     public:
         SomTrainer(file::stream::StreamReader<In> *streamReader,
-                   alphafunc::AlphaFunction<double> *_alphaFunction,
+                   alphafunc::AlphaFunction<Out> *_alphaFunction,
                    winner::WinnerSearch<In, Out> *_winnerSearcher,
                    neighadap::NeighborAdaptation<In, Out> *_neighborAdaptation,
-                   double _alpha, double _radius, size_t _xdim, size_t _ydim)
+                   Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
                 : dataReader(streamReader),
                   alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher),
@@ -65,9 +65,11 @@ namespace kohonen {
 
 
                 /* Radius decreases linearly to one */
-                double trad = 1.0 + (radius - 1.0) * (double) (teachSize - le) /
-                                 (double) teachSize;
-                double talp = alphaFunction->calcAlpha(le, teachSize, alpha);
+                Out trad = 1 + (radius - 1) * ((Out) (teachSize - le)) /
+                                 (Out) teachSize;
+                Out talp = alphaFunction->calcAlpha(le, teachSize, alpha);
+
+//                std::cout<< le << " trad: " << trad << ", talp: " << talp << std::endl;
 
                 /*
                  * If the sample is weighted, we
@@ -81,6 +83,7 @@ namespace kohonen {
                 winner::WinnerInfo<Out> wInfo;
                 wInfo.diff = -1;
                 bool ok = winnerSearcher->search(initializedSom, inRow, &wInfo);
+                // TODO ok == false только если весь вектор пуст
                 if (ok) {
 //                    long winnerIndex;
 //                    if (wInfo.codeIndexes->size() == 0) {
@@ -91,21 +94,16 @@ namespace kohonen {
 //
 //                    }
 
-                    // TODO: в отличии от оригинального алгоритма som_pack
-                    // в нашем случае ok == true только если winner найден
                     long winnerIndex = wInfo.codeIndexes->getArray()[0];
 
                     // координаты нейрона в решетке
                     long bxind = winnerIndex % xdim;
                     long byind = winnerIndex / xdim;
-//                    std::cout << "bxind: " << bxind << " byind: " << byind <<
-//                    std::endl;
+//                    std::cout<< le << " winnerIndex: " << winnerIndex << " diff: " << wInfo.diff << std::endl;
 
                     /* Adapt the units */
-//                    adapt(teach, sample, bxind, byind, trad, talp);
                     neighborAdaptation->adaptation(initializedSom, inRow,
                                                    bxind, byind, trad, talp);
-
                 } else {
                     // skip inRow for calculation
                     fprintf(stderr, "ignoring sample %d\n", le);
@@ -119,12 +117,12 @@ namespace kohonen {
         file::stream::StreamReader<In> *dataReader;
 
         // альфа функция
-        alphafunc::AlphaFunction<double> *alphaFunction;
+        alphafunc::AlphaFunction<Out> *alphaFunction;
 
         // параметры обучения:
 
-        double alpha;
-        double radius;
+        Out alpha;
+        Out radius;
         size_t xdim;
         size_t ydim;
 

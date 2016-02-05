@@ -33,7 +33,10 @@ namespace kohonen {
                 size_t dim = somCodes->getColSize();
 
                 winner->diff = -1.0;
-//                size_t winnerIndex = NAN;
+                if (winner->codeIndexes->size()==0) {
+                    winner->codeIndexes->push(-1);
+                }
+
                 Out maxDifference = std::numeric_limits<Out>::max();
 
                 for (size_t r=0; r<somCodes->getRowSize(); ++r) {
@@ -46,6 +49,7 @@ namespace kohonen {
                             /* ignore vector components that have 1 in mask */
                             continue;
                         }
+
                         Out diff = (*somCodes)(r, i) - inSampleRow[i];
                         difference += diff * diff;
                         if (difference > maxDifference) {
@@ -61,20 +65,16 @@ namespace kohonen {
 
                     /* If distance is smaller than previous distances */
                     if (difference < maxDifference) {
-                        if (winner->codeIndexes->size()==0) {
-                            winner->codeIndexes->push(r);
-                        } else {
-                            (*winner->codeIndexes)[0] = r;
-                        }
+                        (*winner->codeIndexes)[0] = r;
                         winner->diff = difference;
                         maxDifference = difference;
                     }
                 }
 
-                if (winner->codeIndexes->size()==0) {
+                if ((*winner->codeIndexes)[0]<0) {
                     /* TODO: can't find winner */
                     danger_text("EuclideanWinnerSearch: can't find winner");
-                    return false;
+//                    return false;
                 }
 
                 return true;

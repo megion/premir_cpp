@@ -532,6 +532,8 @@ float hexa_dist(int bx, int by, int tx, int ty)
   ret += 0.75 * diff * diff;
   ret = (float) sqrt((double) ret);
 
+//  printf("bx, by, tx, ty %d %d %d %d hexa_dist %f \n", bx, by, tx, ty, ret);
+
   return(ret);
 }
 
@@ -738,6 +740,7 @@ struct entries *som_training(struct teach_params *teach)
       }
       bxind = win_info.index % codes->xdim;
       byind = win_info.index / codes->xdim;
+//      printf("%d winnerIndex: %d diff: %f \n ", le, win_info.index, win_info.diff);
 
 
 //      printf("use winner bxind %d , byind %d \n ", bxind, byind);

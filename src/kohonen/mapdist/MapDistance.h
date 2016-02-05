@@ -14,7 +14,12 @@ namespace kohonen {
         class MapDistance {
         public:
 
-            virtual T distance(size_t bx, size_t by, size_t tx, size_t ty) = 0;
+            /**
+             * Передаваемые координаты bx, by, tx, ty
+             * должны быть знаковыми т.к. при вычислении расстояния
+             * разность может быть отрицательной.
+             */
+            virtual T distance(long bx, long by, long tx, long ty) = 0;
 
         };
     }

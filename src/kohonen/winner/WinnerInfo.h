@@ -12,7 +12,7 @@ namespace kohonen {
         class WinnerInfo {
         public:
             WinnerInfo() {
-                codeIndexes = new utils::CArrayList<size_t>();
+                codeIndexes = new utils::CArrayList<long>();
             }
 
             ~WinnerInfo() {
@@ -21,7 +21,7 @@ namespace kohonen {
 
             T diff; // вычисленное расстояние
             // индексы нейронов победителей
-            utils::CArrayList<size_t>* codeIndexes;
+            utils::CArrayList<long>* codeIndexes;
 
 
         };

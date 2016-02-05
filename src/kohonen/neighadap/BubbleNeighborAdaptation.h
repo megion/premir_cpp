@@ -26,13 +26,14 @@ namespace kohonen {
 
             void adaptation(utils::SMatrix<Out> *somCodes, In *inSampleRow,
                             long bx, long by,
-                            double radius, double alpha) {
+                            Out radius, Out alpha) {
                 for (size_t r=0; r<somCodes->getRowSize(); ++r) {
-                    size_t tx = r % NeighborAdaptation<In, Out>::xdim;
-                    size_t ty = r / NeighborAdaptation<In, Out>::xdim;
+                    long tx = r % NeighborAdaptation<In, Out>::xdim;
+                    long ty = r / NeighborAdaptation<In, Out>::xdim;
 
                     if ((mapDist->distance(bx, by, tx, ty)) <= radius) {
 //                        fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
+//                        std::cout<<"Adapt unit: "<< tx << ", "<<ty<<std::endl;
                         NeighborAdaptation<In, Out>::recalculateCodeVector(
                                 somCodes->getRow(r),
                                 inSampleRow, somCodes->getColSize(), alpha);

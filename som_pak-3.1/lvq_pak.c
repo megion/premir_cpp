@@ -64,13 +64,21 @@ int find_winner_euc(struct entries *codes, struct data_entry *sample,
 	    masked++;
 	    continue; /* ignore vector components that have 1 in mask */
 	  }
+
+//            printf("%f ", codetmp->points[i]);
 	diff = codetmp->points[i] - sample->points[i];
+
 	difference += diff * diff;
-	if (difference > diffsf) break;
+
+	if (difference > diffsf) {
+      break;
+    }
+
       }
+//    printf("\n");
 
     // p.index порядковый номер нейрона сети (0,1..., number neurons)
-//    printf("p.index %d \n ", p.index);
+
     
     if (masked == dim)
       return 0; /* can't calculate winner, empty data vector */

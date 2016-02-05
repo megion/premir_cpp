@@ -16,7 +16,7 @@ namespace kohonen {
             HexaMapDistance() {
             }
 
-            T distance(size_t bx, size_t by, size_t tx, size_t ty) {
+            T distance(long bx, long by, long tx, long ty) {
                 T diff = bx - tx;
 
                 if (((by - ty) % 2) != 0) {

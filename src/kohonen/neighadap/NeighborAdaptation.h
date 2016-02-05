@@ -22,10 +22,10 @@ namespace kohonen {
 
             virtual void adaptation(utils::SMatrix<Out> *somCodes,
                                     In *inSampleRow, long bx, long by,
-                                    double radius, double alpha) = 0;
+                                    Out radius, Out alpha) = 0;
 
             void recalculateCodeVector(Out *codeVector, In *inSampleRow,
-                                       size_t dim, double alpha) {
+                                       size_t dim, Out alpha) {
                 for (size_t i = 0; i < dim; ++i) {
                     // TODO: ignore NAN vector components
                     if (!std::isnan(inSampleRow[i])) {
