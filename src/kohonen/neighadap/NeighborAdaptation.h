@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cmath>
 
+#include "utils/SMatrix.h"
+
 namespace kohonen {
     namespace neighadap {
 
@@ -14,23 +16,28 @@ namespace kohonen {
         class NeighborAdaptation {
         public:
 
-            virtual void adaptation(utils::SMatrix <Out> *somCodes,
-                                    In *inSampleRow) = 0;
+            NeighborAdaptation(size_t _xdim, size_t _ydim) :
+                    xdim(_xdim), ydim(_ydim) {
+            }
+
+            virtual void adaptation(utils::SMatrix<Out> *somCodes,
+                                    In *inSampleRow, long bx, long by,
+                                    double radius, double alpha) = 0;
 
             void recalculateCodeVector(Out *codeVector, In *inSampleRow,
                                        size_t dim, double alpha) {
                 for (size_t i = 0; i < dim; ++i) {
-                    if (std::isnan(inSampleRow[i])) {
-                        /* ignore vector components */
-                        continue;
-                    } else {
+                    // TODO: ignore NAN vector components
+                    if (!std::isnan(inSampleRow[i])) {
                         codeVector[i] +=
                                 alpha * (inSampleRow[i] - codeVector[i]);
                     }
                 }
-
-
             }
+
+        protected:
+            size_t xdim;
+            size_t ydim;
 
         };
     }

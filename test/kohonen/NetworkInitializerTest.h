@@ -13,8 +13,13 @@
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"
 #include "kohonen/alphafunc/LinearAlphaFunction.h"
+
 #include "kohonen/neighadap/BubbleNeighborAdaptation.h"
 #include "kohonen/neighadap/GaussianNeighborAdaptation.h"
+
+#include "kohonen/mapdist/HexaMapDistance.h"
+#include "kohonen/mapdist/RectMapDistance.h"
+
 #include "kohonen/SomTrainer.h"
 
 namespace test {

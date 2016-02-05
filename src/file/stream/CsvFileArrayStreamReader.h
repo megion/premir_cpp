@@ -1,7 +1,8 @@
 #ifndef SRC_FILE_STREAM_CSVFILEARRAYSTREAMREADER_H
 #define SRC_FILE_STREAM_CSVFILEARRAYSTREAMREADER_H
 
-#include <stdio.h>
+#include <cstdio>
+#include <cmath>
 
 #include "file/CsvFileReader.h"
 #include "utils/SMatrix.h"

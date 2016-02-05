@@ -5,8 +5,8 @@
 #ifndef SRC_FILE_CSVFILEREADER_H
 #define SRC_FILE_CSVFILEREADER_H
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cmath>
 #include <cerrno>
 #include <cstring>
 
@@ -106,33 +106,41 @@ namespace file {
         size_t read(double &v) {
             Ch buffer[64];
             *buffer = '\0';
-            size_t num = nextValue(buffer, 64);
-            v = std::atof(buffer);
-            return num;
-        }
-
-        size_t read(int &v) {
-            Ch buffer[64];
-            *buffer = '\0';
-            size_t num = nextValue(buffer, 64);
-            v = std::atof(buffer);
-            return num;
+            size_t bytesRead = nextValue(buffer, 64);
+            if(bytesRead==0 || buffer[0] == 'x' || buffer[0] == 'X') {
+                v = NAN;
+            } else {
+                v = std::atof(buffer);
+            }
+            return bytesRead;
         }
 
         size_t read(float &v) {
             Ch buffer[64];
             *buffer = '\0';
-            size_t num = nextValue(buffer, 64);
-            v = std::atof(buffer);
-            return num;
+            size_t bytesRead = nextValue(buffer, 64);
+            if(bytesRead==0 || buffer[0] == 'x' || buffer[0] == 'X') {
+                v = NAN;
+            } else {
+                v = std::atof(buffer);
+            }
+            return bytesRead;
+        }
+
+        size_t read(int &v) {
+            Ch buffer[64];
+            *buffer = '\0';
+            size_t bytesRead = nextValue(buffer, 64);
+            v = std::atoi(buffer);
+            return bytesRead;
         }
 
         size_t read(size_t &v) {
             Ch buffer[64];
             *buffer = '\0';
-            size_t num = nextValue(buffer, 64);
+            size_t bytesRead = nextValue(buffer, 64);
             v = std::atol(buffer);
-            return num;
+            return bytesRead;
         }
 
         size_t read(char &v) {

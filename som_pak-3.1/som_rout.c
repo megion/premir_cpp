@@ -740,7 +740,7 @@ struct entries *som_training(struct teach_params *teach)
       byind = win_info.index / codes->xdim;
 
 
-      printf("use winner bxind %d , byind %d \n ", bxind, byind);
+//      printf("use winner bxind %d , byind %d \n ", bxind, byind);
     }
 
     /* Adapt the units */

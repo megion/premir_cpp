@@ -82,27 +82,33 @@ namespace kohonen {
                 wInfo.diff = -1;
                 bool ok = winnerSearcher->search(initializedSom, inRow, &wInfo);
                 if (ok) {
-                    long winnerIndex;
-                    if (wInfo.codeIndexes->size() == 0) {
-                        // победитель не найден в случае если все значения
-                        // в inRow пусты
-                        winnerIndex = -1;
-                    } else {
-                        winnerIndex = wInfo.codeIndexes->getArray()[0];
-                    }
+//                    long winnerIndex;
+//                    if (wInfo.codeIndexes->size() == 0) {
+//                        // победитель не найден в случае если все значения
+//                        // в inRow пусты
+//                        winnerIndex = -1;
+//                    } else {
+//
+//                    }
+
+                    // TODO: в отличии от оригинального алгоритма som_pack
+                    // в нашем случае ok == true только если winner найден
+                    long winnerIndex = wInfo.codeIndexes->getArray()[0];
 
                     // координаты нейрона в решетке
                     long bxind = winnerIndex % xdim;
                     long byind = winnerIndex / xdim;
-                    std::cout << "bxind: " << bxind << " byind: " << byind <<
-                    std::endl;
+//                    std::cout << "bxind: " << bxind << " byind: " << byind <<
+//                    std::endl;
 
                     /* Adapt the units */
 //                    adapt(teach, sample, bxind, byind, trad, talp);
+                    neighborAdaptation->adaptation(initializedSom, inRow,
+                                                   bxind, byind, trad, talp);
 
                 } else {
                     // skip inRow for calculation
-                    fprintf(stderr, "ignoring empty sample %d\n", le);
+                    fprintf(stderr, "ignoring sample %d\n", le);
                 }
 
             }

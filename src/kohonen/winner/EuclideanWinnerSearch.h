@@ -74,6 +74,7 @@ namespace kohonen {
                 if (winner->codeIndexes->size()==0) {
                     /* TODO: can't find winner */
                     danger_text("EuclideanWinnerSearch: can't find winner");
+                    return false;
                 }
 
                 return true;

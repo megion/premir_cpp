@@ -122,8 +122,10 @@ namespace kohonen {
             In inRow[colSize];
             while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
-                    colMedians[i] += inRow[i];
-                    k2[i]++;
+                    if (!std::isnan(inRow[i])) {
+                        colMedians[i] += inRow[i];
+                        k2[i]++;
+                    }
                 }
             }
 
@@ -135,13 +137,18 @@ namespace kohonen {
             dataReader->rewindReader();
 
             // iterate by all input matrix elements
-            // получение треугольной квадратной матрицы
+            // получение треугольной квадратной матрицы ковариации
             while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
+                    if (std::isnan(inRow[i])) {
+                        continue;
+                    }
                     for (size_t j = i; j < colSize; ++j) {
-                        squareMatrix(i, j) = squareMatrix(i, j) +
-                                             (inRow[i] - colMedians[i]) *
-                                             (inRow[j] - colMedians[j]);
+                        if (!std::isnan(inRow[j])) {
+                            squareMatrix(i, j) = squareMatrix(i, j) +
+                                                 (inRow[i] - colMedians[i]) *
+                                                 (inRow[j] - colMedians[j]);
+                        }
                     }
                 }
             }
