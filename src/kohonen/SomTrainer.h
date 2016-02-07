@@ -44,6 +44,9 @@ namespace kohonen {
          */
         bool training(utils::SMatrix<Out> *initializedSom,
                       size_t teachSize, size_t colSize) {
+            // установить поток на начало
+            dataReader->rewindReader();
+
             for (size_t le = 0; le < teachSize; ++le) {
 
                 models::DataSample<In> inRow[colSize];
@@ -101,6 +104,42 @@ namespace kohonen {
                 }
 
             }
+        }
+
+        /**
+         * Вычисление ошибки квантования
+         */
+        Out quantizationError(utils::SMatrix<Out> *trainedSom, size_t colSize) {
+            Out qerror = 0;
+
+            // установить поток на начало
+            dataReader->rewindReader();
+
+            models::DataSample<In> inRow[colSize];
+            while (dataReader->readNext(inRow, colSize)) {
+//                for (size_t i = 0; i < colSize; ++i) {
+//                    if (!inRow[i].skipped) {
+//                        colMedians[i] += inRow[i].value;
+//                        k2[i]++;
+//                    }
+//                }
+
+                winner::WinnerInfo<Out>
+                        wInfo[winnerSearcher->getWinnerSize()];
+
+                bool ok = winnerSearcher->search(trainedSom, inRow, wInfo);
+                // TODO ok == false только если весь вектор пуст
+                if (ok) {
+//                    long winnerIndex = wInfo[0].index;
+//                    // координаты нейрона в решетке
+//                    long bxind = winnerIndex % xdim;
+//                    long byind = winnerIndex / xdim;
+
+                    qerror += std::sqrt(wInfo[0].diff);
+                }
+            }
+
+            return qerror;
         }
 
     private:

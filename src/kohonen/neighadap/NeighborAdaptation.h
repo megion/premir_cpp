@@ -11,7 +11,10 @@ namespace kohonen {
     namespace neighadap {
 
         /**
-         * Функция подстройки соседей
+         * Функция подстройки соседей.
+         *
+         * Функция сосседства может иметь либо форму пузырька (bubble) либо
+         * гауссовскую форму.
          */
         template<typename In, typename Out>
         class NeighborAdaptation {
