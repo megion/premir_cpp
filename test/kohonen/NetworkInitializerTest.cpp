@@ -8,6 +8,14 @@ namespace test {
             csvReader->toEndLine();
         }
 
+        bool isSkipSample(char *buffer, size_t bytesRead) {
+            if (bytesRead == 0 || buffer[0] == 'x' || buffer[0] == 'X') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         utils::SMatrix<float> *read_codes_file(const char *filename,
                                                int skipLines) {
             file::CsvFileReader<char> reader(filename, ' ');
@@ -44,7 +52,8 @@ namespace test {
             file::CsvFileReader<char> csvReader(
                     "../test/datafiles/kohonen/ex.dat", ' ');
             file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer, 5, true);
+                    dataReader(&csvReader, readInitializer,
+                               isSkipSample, 5, true);
 
             kohonen::
             NetworkInitializer<float, float> initializer(&dataReader);
@@ -71,6 +80,8 @@ namespace test {
             // данные матрицы должны быть практически идентичными
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
 
+
+//            std::cout.precision(std::numeric_limits<double>::digits10);
             // test NAN
 //            double a = 5.6;
 //            assert(!std::isnan(a));
@@ -87,16 +98,16 @@ namespace test {
         }
 
         void test_eucw_bubble_hexa_16_12_som_training() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader(
                     "../test/datafiles/kohonen/ex.dat", ' ');
             file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer, 5, true);
-
-            size_t xdim = 16;
-            size_t ydim = 12;
-            size_t dim = 5;
+                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
+                               true);
 
             utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
 
@@ -110,9 +121,8 @@ namespace test {
                                                       &alphaFunc,
                                                       &winnerSearcher,
                                                       &neiAdap,
-                                                      0.002, 3, xdim, ydim);
+                                                      0.002, 3.0, xdim, ydim);
 
-//            std::cout.precision(std::numeric_limits<double>::digits10);
             trainer.training(somCodesMatrix, 10000, dim);
 
             utils::SMatrix<float> *expectedCodesMatrix =
@@ -122,10 +132,48 @@ namespace test {
 
             // данные матрицы должны быть практически идентичными
             assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
-                                                   0.01));
+                                                   0.001));
 
-//            expectedCodesMatrix->print();
-//            somCodesMatrix->print();
+            delete expectedCodesMatrix;
+            delete somCodesMatrix;
+        }
+
+        void test_eucw_gaussian_rect_16_12_som_training() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
+            // инициализация потока чтения файла с данными
+            file::CsvFileReader<char> csvReader(
+                    "../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float>
+                    dataReader(&csvReader, readInitializer,
+                               isSkipSample, dim, true);
+
+            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+
+            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
+            kohonen::mapdist::RectMapDistance<float> mapDist;
+
+            kohonen::neighadap::GaussianNeighborAdaptation<float, float>
+                    neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&dataReader,
+                                                      &alphaFunc,
+                                                      &winnerSearcher,
+                                                      &neiAdap,
+                                                      0.002, 3, xdim, ydim);
+
+            trainer.training(somCodesMatrix, 10000, dim);
+
+            utils::SMatrix<float> *expectedCodesMatrix =
+                    read_codes_file(
+                            "../test/datafiles/kohonen/som_trained_10000_"
+                                    "eucw_gaussian_rect_16_12.cod", 1);
+
+            // данные матрицы должны быть практически идентичными
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
+                                                   0.001));
 
             delete expectedCodesMatrix;
             delete somCodesMatrix;
@@ -135,6 +183,7 @@ namespace test {
             suite("NetworkInitializer_test");
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
+            mytest(eucw_gaussian_rect_16_12_som_training);
         }
     }
 }

@@ -661,6 +661,7 @@ struct entries *som_training(struct teach_params *teach)
   float radius = teach->radius;
   struct snapshot_info *snap = teach->snapshot;
   struct winner_info win_info;
+//  struct winner_info* win_info = (struct winner_info*)malloc(10*sizeof(struct winner_info));//[10];
   eptr p;
 
   if (set_som_params(teach))
@@ -740,11 +741,15 @@ struct entries *som_training(struct teach_params *teach)
       }
       bxind = win_info.index % codes->xdim;
       byind = win_info.index / codes->xdim;
+
+
+
 //      printf("%d winnerIndex: %d diff: %f \n ", le, win_info.index, win_info.diff);
 
 
 //      printf("use winner bxind %d , byind %d \n ", bxind, byind);
     }
+
 
     /* Adapt the units */
     adapt(teach, sample, bxind, byind, trad, talp);
@@ -764,6 +769,8 @@ struct entries *som_training(struct teach_params *teach)
     ifverbose(1)
       mprint((long) (length-le));
   }
+
+//  free(win_info);
   time(&teach->end_time);
 
   ifverbose(1)

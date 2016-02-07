@@ -32,8 +32,6 @@ namespace test {
 
             sort::HeapSort<int> hsort;
             hsort.sort(vectorA.getArray(), vectorA.size());
-            vectorA.print();
-
 
             int arrB[] = {1, 2, 2, 3, 3, 3, 4, 5, 6, 7, 8, 9};
             utils::CArrayList<int> vectorB;

@@ -7,28 +7,34 @@
 #include "file/CsvFileReader.h"
 #include "utils/SMatrix.h"
 #include "StreamReader.h"
+#include "models/DataSample.h"
 
 namespace file {
 
     namespace stream {
 
         template<typename T>
-        class CsvFileArrayStreamReader : public StreamReader<T> {
+        class CsvFileArrayStreamReader
+                : public StreamReader<models::DataSample<T>> {
         public:
 
             CsvFileArrayStreamReader(file::CsvFileReader<char> *_csvReader,
                                      void (*_readInitialization)
                                              (file::CsvFileReader<char> *),
+                                     bool (*_isSampleSkipped)(char *, size_t),
                                      size_t _maxColSize, bool _useBuffer) :
                     csvReader(_csvReader),
                     readInitialization(_readInitialization),
+                    isSampleSkipped(_isSampleSkipped),
                     useBuffer(_useBuffer),
                     rowIndex(0),
                     maxColSize(_maxColSize),
                     bufferMatrix(nullptr),
-                    typeSizeof(sizeof(T)) {
+                    typeSizeof(sizeof(models::DataSample<T>)) {
                 if (useBuffer) {
-                    bufferMatrix = new utils::SMatrix<T>(0, maxColSize);
+                    bufferMatrix =
+                            new utils::SMatrix<models::DataSample<T>>
+                                    (0, maxColSize);
                 }
                 readInitialization(csvReader);
             }
@@ -40,13 +46,39 @@ namespace file {
                 }
             }
 
-            bool readNext(T &a) {
+            bool readNext(models::DataSample<T> &a) {
                 return true;
             }
 
-            bool readNext(T *a, size_t arraySize) {
+            size_t readNextDataSample(models::DataSample<float> &sample) {
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
+                    sample.skipped = true;
+                } else {
+                    sample.skipped = false;
+                    sample.value = std::atof(buffer);
+                }
+                return bytesRead;
+            }
+
+            size_t readNextDataSample(models::DataSample<double> &sample) {
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
+                    sample.skipped = true;
+                } else {
+                    sample.skipped = false;
+                    sample.value = std::atof(buffer);
+                }
+                return bytesRead;
+            }
+
+            bool readNext(models::DataSample<T> *a, size_t arraySize) {
                 if (useBuffer && rowIndex < bufferMatrix->getRowSize()) {
-                    T *row = bufferMatrix->getRow(rowIndex);
+                    models::DataSample<T> *row = bufferMatrix->getRow(rowIndex);
                     memcpy(a, row, arraySize * typeSizeof);
                     rowIndex++;
                     return true;
@@ -57,7 +89,7 @@ namespace file {
                 }
 
                 for (size_t i = 0; i < arraySize; ++i) {
-                    csvReader->read(a[i]);
+                    readNextDataSample(a[i]);
                 }
 
                 if (csvReader->isEmptyRead()) {
@@ -92,8 +124,11 @@ namespace file {
             // указатель на функцию инициализации чтения
             void (*readInitialization)(file::CsvFileReader<char> *);
 
+            // указатель на функцию проверки прочитанного значения
+            bool (*isSampleSkipped)(char *, size_t);
+
             // variable for buffering
-            utils::SMatrix<T> *bufferMatrix;
+            utils::SMatrix<models::DataSample<T>> *bufferMatrix;
             size_t rowIndex;
             size_t maxColSize;
             bool useBuffer;

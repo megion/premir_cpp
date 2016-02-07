@@ -1197,7 +1197,7 @@ int set_teach_params(struct teach_params *params, struct entries *codes,
 		     struct entries *data, long dbuffer)
 {
   int error = 0;
-  
+
   /* set data buffer size */
   if (data != NULL)
     set_buffer(data, dbuffer);
@@ -1213,11 +1213,12 @@ int set_teach_params(struct teach_params *params, struct entries *codes,
   /* these two might change when using a different variation, for
      example, dot product */
 
+//  params->winner = find_winner_knn;
   params->winner = find_winner_euc;
   params->dist = vector_dist_euc;
   params->vector_adapt = adapt_vector;
 
-  if (codes) 
+  if (codes)
     params->codes = codes;
   if (data)
     params->data = data;

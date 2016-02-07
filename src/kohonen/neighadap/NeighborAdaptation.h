@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "utils/SMatrix.h"
+#include "models/DataSample.h"
 
 namespace kohonen {
     namespace neighadap {
@@ -21,16 +22,18 @@ namespace kohonen {
             }
 
             virtual void adaptation(utils::SMatrix<Out> *somCodes,
-                                    In *inSampleRow, long bx, long by,
+                                    models::DataSample<In> *inSampleRow,
+                                    long bx, long by,
                                     Out radius, Out alpha) = 0;
 
-            void recalculateCodeVector(Out *codeVector, In *inSampleRow,
+            void recalculateCodeVector(Out *codeVector,
+                                       models::DataSample<In> *inSampleRow,
                                        size_t dim, Out alpha) {
                 for (size_t i = 0; i < dim; ++i) {
-                    // TODO: ignore NAN vector components
-                    if (!std::isnan(inSampleRow[i])) {
+                    // TODO: ignore skipped vector components
+                    if (!inSampleRow[i].skipped) {
                         codeVector[i] +=
-                                alpha * (inSampleRow[i] - codeVector[i]);
+                                alpha * (inSampleRow[i].value - codeVector[i]);
                     }
                 }
             }

@@ -107,11 +107,10 @@ namespace file {
             Ch buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
-            if(bytesRead==0 || buffer[0] == 'x' || buffer[0] == 'X') {
-                v = NAN;
-            } else {
-                v = std::atof(buffer);
-            }
+//            if(bytesRead>0) {
+//                v = std::atof(buffer);
+//            }
+            v = std::atof(buffer);
             return bytesRead;
         }
 
@@ -119,11 +118,7 @@ namespace file {
             Ch buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
-            if(bytesRead==0 || buffer[0] == 'x' || buffer[0] == 'X') {
-                v = NAN;
-            } else {
-                v = std::atof(buffer);
-            }
+            v = std::atof(buffer);
             return bytesRead;
         }
 

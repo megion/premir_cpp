@@ -7,35 +7,32 @@
 #include <limits>
 
 #include "utils/SMatrix.h"
-#include "WinnerSearch.h"
-#include "WinnerInfo.h"
 #include "utils/console_colors.h"
+#include "WinnerSearch.h"
 
 namespace kohonen {
     namespace winner {
 
         /**
-         * finds the winning entry (1 nearest neighbour) in
+         * Finds the winning entry (1 nearest neighbour) in
          * codebook using euclidean distance. Information about the winning
-         * entry is saved in the winner_info structure. Return 1 (the number
-         * of neighbours) when successful and 0 when winner could not be found
+         * entry is saved in the WinnerInfo structure. Return true when
+         * successful and 0 when winner could not be found
          * (for example, all components of data vector have been masked off)
-         *
          */
         template<typename In, typename Out>
         class EuclideanWinnerSearch : public WinnerSearch<In, Out> {
         public:
-            EuclideanWinnerSearch() {
+            EuclideanWinnerSearch() : WinnerSearch<In, Out>(1) {
             }
 
-            bool search(utils::SMatrix<Out> *somCodes, In* inSampleRow,
-                        WinnerInfo<Out>* winner) {
+            bool search(utils::SMatrix<Out> *somCodes,
+                        models::DataSample<In>* inSampleRow,
+                        WinnerInfo<Out>* winners) {
                 size_t dim = somCodes->getColSize();
 
-                winner->diff = -1.0;
-                if (winner->codeIndexes->size()==0) {
-                    winner->codeIndexes->push(-1);
-                }
+                winners[0].diff = -1;
+                winners[0].index = -1;
 
                 Out maxDifference = std::numeric_limits<Out>::max();
 
@@ -44,13 +41,13 @@ namespace kohonen {
                     Out difference = 0;
                     /* Compute the distance between codebook and input entry */
                     for (size_t i = 0; i < dim; ++i) {
-                        if (std::isnan(inSampleRow[i])) {
+                        if (inSampleRow[i].skipped) {
                             masked++;
-                            /* ignore vector components that have 1 in mask */
+                            /* ignore vector components that skipped */
                             continue;
                         }
 
-                        Out diff = (*somCodes)(r, i) - inSampleRow[i];
+                        Out diff = (*somCodes)(r, i) - inSampleRow[i].value;
                         difference += diff * diff;
                         if (difference > maxDifference) {
                             break;
@@ -65,16 +62,15 @@ namespace kohonen {
 
                     /* If distance is smaller than previous distances */
                     if (difference < maxDifference) {
-                        (*winner->codeIndexes)[0] = r;
-                        winner->diff = difference;
+                        winners[0].index = r;
+                        winners[0].diff = difference;
                         maxDifference = difference;
                     }
                 }
 
-                if ((*winner->codeIndexes)[0]<0) {
+                if (winners[0].index<0) {
                     /* TODO: can't find winner */
                     danger_text("EuclideanWinnerSearch: can't find winner");
-//                    return false;
                 }
 
                 return true;

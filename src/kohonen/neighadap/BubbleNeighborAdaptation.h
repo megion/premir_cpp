@@ -12,8 +12,6 @@ namespace kohonen {
 
         /**
          * Функция адаптация соседей bubble
-         *
-         *
          */
         template<typename In, typename Out>
         class BubbleNeighborAdaptation : public NeighborAdaptation<In, Out> {
@@ -21,19 +19,19 @@ namespace kohonen {
             BubbleNeighborAdaptation(
                     kohonen::mapdist::MapDistance<Out> *_mapDist,
                     size_t _xdim, size_t _ydim)
-                    : mapDist(_mapDist), NeighborAdaptation<In, Out>(_xdim, _ydim) {
+                    : mapDist(_mapDist),
+                      NeighborAdaptation<In, Out>(_xdim, _ydim) {
             }
 
-            void adaptation(utils::SMatrix<Out> *somCodes, In *inSampleRow,
+            void adaptation(utils::SMatrix<Out> *somCodes,
+                            models::DataSample<In> *inSampleRow,
                             long bx, long by,
                             Out radius, Out alpha) {
-                for (size_t r=0; r<somCodes->getRowSize(); ++r) {
+                for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
                     long tx = r % NeighborAdaptation<In, Out>::xdim;
                     long ty = r / NeighborAdaptation<In, Out>::xdim;
 
                     if ((mapDist->distance(bx, by, tx, ty)) <= radius) {
-//                        fprintf(stderr, "Adapt unit %d, %d\n", tx, ty);
-//                        std::cout<<"Adapt unit: "<< tx << ", "<<ty<<std::endl;
                         NeighborAdaptation<In, Out>::recalculateCodeVector(
                                 somCodes->getRow(r),
                                 inSampleRow, somCodes->getColSize(), alpha);

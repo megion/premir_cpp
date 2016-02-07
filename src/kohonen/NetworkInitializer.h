@@ -22,6 +22,7 @@
 #include "RandomGenerator.h"
 #include "utils/console_colors.h"
 #include "file/stream/StreamReader.h"
+#include "models/DataSample.h"
 
 namespace kohonen {
 
@@ -29,7 +30,8 @@ namespace kohonen {
     class NetworkInitializer {
     public:
 
-        NetworkInitializer(file::stream::StreamReader<In> *streamReader)
+        NetworkInitializer(file::stream::StreamReader<models::DataSample<In>>
+                           *streamReader)
                 : dataReader(streamReader) {
             randomEngine = new RandomGenerator();
         }
@@ -87,7 +89,7 @@ namespace kohonen {
 
     private:
         // поток входных данных
-        file::stream::StreamReader<In> *dataReader;
+        file::stream::StreamReader<models::DataSample<In>> *dataReader;
         // генератор псевдо случайных чисел
         RandomGenerator *randomEngine;
 
@@ -119,11 +121,11 @@ namespace kohonen {
             // т.е. одинаковым для каждого столбца. Однако оно может быть
             // различным если внедрить подсчет не каждого значения столбца.
             // (пока такое не реализовано)
-            In inRow[colSize];
+            models::DataSample<In> inRow[colSize];
             while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
-                    if (!std::isnan(inRow[i])) {
-                        colMedians[i] += inRow[i];
+                    if (!inRow[i].skipped) {
+                        colMedians[i] += inRow[i].value;
                         k2[i]++;
                     }
                 }
@@ -140,14 +142,15 @@ namespace kohonen {
             // получение треугольной квадратной матрицы ковариации
             while (dataReader->readNext(inRow, colSize)) {
                 for (size_t i = 0; i < colSize; ++i) {
-                    if (std::isnan(inRow[i])) {
+                    if (inRow[i].skipped) {
                         continue;
                     }
                     for (size_t j = i; j < colSize; ++j) {
-                        if (!std::isnan(inRow[j])) {
-                            squareMatrix(i, j) = squareMatrix(i, j) +
-                                                 (inRow[i] - colMedians[i]) *
-                                                 (inRow[j] - colMedians[j]);
+                        if (!inRow[j].skipped) {
+                            squareMatrix(i, j) =
+                                    squareMatrix(i, j) +
+                                    (inRow[i].value - colMedians[i]) *
+                                    (inRow[j].value - colMedians[j]);
                         }
                     }
                 }
