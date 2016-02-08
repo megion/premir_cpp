@@ -10,3 +10,6 @@ qerror -din ex.dat -cin out_neurals3.cod -qtype 1 -radius 2
 
 # запись координат узлов карты и расстояний в файл
 visual -din ex.dat -cin out_neurals3.cod -dout out_neurals3_visual.vis
+
+# ставит в соответсвие входным векторам точки двумерной плоскости
+sammon -cin out_neurals3.cod -cout out_neurals3_sammon.sam -rlen 1000 -ps
