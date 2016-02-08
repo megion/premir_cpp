@@ -134,7 +134,7 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 16;
+            size_t xdim = 26;
             size_t ydim = 12;
             size_t dim = 5;
 
@@ -145,7 +145,15 @@ namespace test {
                     dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                true);
 
-            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+//            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+
+            kohonen::
+            NetworkInitializer<float, float> initializer(&dataReader);
+            kohonen::RandomGenerator *randomEngine
+                    = initializer.getRandomGenerator();
+            randomEngine->setNextValue(1);
+            utils::SMatrix<float> *somCodesMatrix =
+                    initializer.lineInitialization(xdim, ydim, dim);
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
@@ -167,6 +175,7 @@ namespace test {
             size_t colSize = somCodesMatrix->getColSize();
 
             double qerror = 0;
+            int step = 10000;
 
             for (size_t le = 0; le < teachSize; ++le) {
                 models::DataSample<float> inRow[colSize];
@@ -183,10 +192,10 @@ namespace test {
                 bool ok = trainer.trainingBySample(somCodesMatrix, inRow,
                                            winners, teachSize, le);
                 if (ok) {
-                    int cnt = le%1000;
+                    int cnt = le%step;
                     qerror+=std::sqrt(winners[0].diff);
                     if (cnt==0 && le!=0) {
-                        qerror = qerror / 1000.0;
+                        qerror = qerror / step;
                         qErrorChart.getChart().redrawNewPoints(le, qerror);
                         qerror = 0;
                         std::this_thread::sleep_for(std::chrono::milliseconds(20));
