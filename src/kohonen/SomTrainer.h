@@ -26,38 +26,49 @@ namespace kohonen {
     template<typename In, typename Out>
     class SomTrainer {
     public:
-        SomTrainer(
-                file::stream::StreamReader<models::DataSample<In>> *streamReader,
-                alphafunc::AlphaFunction<Out> *_alphaFunction,
+
+        typedef file::stream::StreamReader<models::DataSample<In>> InReader;
+
+        SomTrainer(alphafunc::AlphaFunction<Out> *_alphaFunction,
                 winner::WinnerSearch<In, Out> *_winnerSearcher,
                 neighadap::NeighborAdaptation<In, Out> *_neighborAdaptation,
                 Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
-                : dataReader(streamReader),
-                  alphaFunction(_alphaFunction),
+                : alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher),
                   neighborAdaptation(_neighborAdaptation),
                   alpha(_alpha), radius(_radius), xdim(_xdim), ydim(_ydim) {
         }
 
+        struct QuantumError {
+            /* сумма расстояний от каждого входного вектора до победителя */
+            Out sumWinnerDistance;
+            /* число входных данных на которых посчитана ошибка квантования */
+            size_t samplesSize;
+        };
+
         /**
-         * Обучение
+         * Обучение указанное teachSize число раз
          */
         bool training(utils::SMatrix<Out> *initializedSom,
-                      size_t teachSize, size_t colSize) {
+                      InReader *inDataStreamReader,
+                      size_t teachSize) {
             // установить поток на начало
-            dataReader->rewindReader();
+            inDataStreamReader->rewindReader();
+
+            size_t winnerSize = winnerSearcher->getWinnerSize();
+            size_t colSize = initializedSom->getColSize();
 
             for (size_t le = 0; le < teachSize; ++le) {
 
                 models::DataSample<In> inRow[colSize];
-                bool hasInRow = dataReader->readNext(inRow, colSize);
+                bool hasInRow = inDataStreamReader->readNext(inRow, colSize);
                 if (!hasInRow) {
                     // значит достигли конца данных, начинаем читать с начала
                     // установить поток на начало
-                    dataReader->rewindReader();
+                    inDataStreamReader->rewindReader();
 
                     // читаем первую стоку данных
-                    hasInRow = dataReader->readNext(inRow, colSize);
+                    hasInRow = inDataStreamReader->readNext(inRow, colSize);
                     if (!hasInRow) {
                         /* TODO: couldn't rewind data: NO input data */
                         danger_text("couldn't rewind data");
@@ -67,66 +78,64 @@ namespace kohonen {
                     }
                 }
 
-
-                /* Radius decreases linearly to one */
-                Out trad = 1 + (radius - 1) * ((Out) (teachSize - le)) /
-                               (Out) teachSize;
-                Out talp = alphaFunction->calcAlpha(le, teachSize, alpha);
-
-                /*
-                 * If the sample is weighted, we
-                 * modify the training rate so that we achieve the same effect
-                 * as repeating the sample 'weight' times
-                 */
-//                if ((weight > 0.0) && (use_weights(-1))) {
-//                    talp = 1.0 - (float) pow((double) (1.0 - talp), (double) weight);
-//                }
-
-                winner::WinnerInfo<Out>
-                        wInfo[winnerSearcher->getWinnerSize()];
-
-                bool ok = winnerSearcher->search(initializedSom, inRow, wInfo);
-                // TODO ok == false только если весь вектор пуст
-                if (ok) {
-                    long winnerIndex = wInfo[0].index;
-
-                    // координаты нейрона в решетке
-                    long bxind = winnerIndex % xdim;
-                    long byind = winnerIndex / xdim;
-//                    std::cout<< le << " winnerIndex: " << winnerIndex << " diff: " << wInfo.diff << std::endl;
-
-                    /* Adapt the units */
-                    neighborAdaptation->adaptation(initializedSom, inRow,
-                                                   bxind, byind, trad, talp);
-                } else {
-                    // skip inRow for calculation
-                    fprintf(stderr, "ignoring sample %d\n", le);
+                winner::WinnerInfo<Out> winners[winnerSize];
+                bool ok = trainingBySample(initializedSom, inRow,
+                                           winners, teachSize, le);
+                if (!ok) {
+                    std::cerr << "skip empty sample " << le << std::endl;
                 }
+            }
+            return true;
+        }
 
+        bool trainingBySample(utils::SMatrix<Out> *initializedSom,
+                              models::DataSample<In> *sampleVector,
+                              winner::WinnerInfo<Out> *winners,
+                              size_t teachSize,
+                              size_t index) {
+            /* Radius decreases linearly to one */
+            Out trad = 1 + (radius - 1) * ((Out) (teachSize - index)) /
+                           (Out) teachSize;
+            Out talp = alphaFunction->calcAlpha(index, teachSize, alpha);
+
+            bool ok = winnerSearcher->search(initializedSom, sampleVector,
+                                             winners);
+            // TODO ok == false только если весь вектор пуст
+            if (ok) {
+                long winnerIndex = winners[0].index;
+
+                // координаты нейрона в решетке
+                long bxind = winnerIndex % xdim;
+                long byind = winnerIndex / xdim;
+
+                /* Adapt the units */
+                neighborAdaptation->adaptation(initializedSom, sampleVector,
+                                               bxind, byind, trad, talp);
+                return true;
+            } else {
+                // skip inRow for calculation
+                danger_text("skip empty sample vector");
+                return false;
             }
         }
 
         /**
          * Вычисление ошибки квантования
          */
-        Out quantizationError(utils::SMatrix<Out> *trainedSom, size_t colSize) {
-            Out qerror = 0;
+        QuantumError quantizationError(utils::SMatrix<Out> *trainedSom,
+                                       InReader *inDataStreamReader) {
+            QuantumError qError = {0, 0};
 
             // установить поток на начало
-            dataReader->rewindReader();
+            inDataStreamReader->rewindReader();
+
+            size_t winnerSize = winnerSearcher->getWinnerSize();
+            size_t colSize = trainedSom->getColSize();
 
             models::DataSample<In> inRow[colSize];
-            while (dataReader->readNext(inRow, colSize)) {
-//                for (size_t i = 0; i < colSize; ++i) {
-//                    if (!inRow[i].skipped) {
-//                        colMedians[i] += inRow[i].value;
-//                        k2[i]++;
-//                    }
-//                }
 
-                winner::WinnerInfo<Out>
-                        wInfo[winnerSearcher->getWinnerSize()];
-
+            while (inDataStreamReader->readNext(inRow, colSize)) {
+                winner::WinnerInfo<Out> wInfo[winnerSize];
                 bool ok = winnerSearcher->search(trainedSom, inRow, wInfo);
                 // TODO ok == false только если весь вектор пуст
                 if (ok) {
@@ -135,16 +144,17 @@ namespace kohonen {
 //                    long bxind = winnerIndex % xdim;
 //                    long byind = winnerIndex / xdim;
 
-                    qerror += std::sqrt(wInfo[0].diff);
+                    qError.sumWinnerDistance += std::sqrt(wInfo[0].diff);
+                    qError.samplesSize++;
                 }
             }
 
-            return qerror;
+            return qError;
         }
 
     private:
         // поток входных данных
-        file::stream::StreamReader<models::DataSample<In>> *dataReader;
+//        ;
 
         // альфа функция
         alphafunc::AlphaFunction<Out> *alphaFunction;

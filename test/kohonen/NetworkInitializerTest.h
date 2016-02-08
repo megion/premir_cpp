@@ -22,6 +22,8 @@
 
 #include "kohonen/SomTrainer.h"
 
+#include "graphics/ChartThread.h"
+
 namespace test {
     namespace kohonen_initializer {
         void network_initializer_test();

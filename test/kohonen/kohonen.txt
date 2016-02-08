@@ -8,3 +8,5 @@ vsom -din ex.dat -cin mylin6.cod -cout out_neurals3.cod -rlen 10000 -alpha 0.002
 # вычисление ошибки квантования
 qerror -din ex.dat -cin out_neurals3.cod -qtype 1 -radius 2
 
+# запись координат узлов карты и расстояний в файл
+visual -din ex.dat -cin out_neurals3.cod -dout out_neurals3_visual.vis

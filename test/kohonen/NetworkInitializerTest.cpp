@@ -74,24 +74,9 @@ namespace test {
                     initializer.lineInitialization(xdim, ydim, dim);
 
             utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
-//            somCodesMatrix->print();
-//            resultsMatrix->print();
 
             // данные матрицы должны быть практически идентичными
             assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
-
-
-//            std::cout.precision(std::numeric_limits<double>::digits10);
-            // test NAN
-//            double a = 5.6;
-//            assert(!std::isnan(a));
-//            a = NAN;
-//            assert(std::isnan(a));
-
-//            std::cout << "test""ff"" ""C"" AB" << std::endl;
-
-//            somCodesMatrix->print();
-
 
             delete somCodesMatrix;
             delete resultsMatrix;
@@ -117,13 +102,12 @@ namespace test {
 
             kohonen::neighadap::BubbleNeighborAdaptation<float, float>
                     neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&dataReader,
-                                                      &alphaFunc,
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
                                                       &winnerSearcher,
                                                       &neiAdap,
                                                       0.002, 3.0, xdim, ydim);
 
-            trainer.training(somCodesMatrix, 10000, dim);
+            trainer.training(somCodesMatrix, &dataReader, 10000);
 
             utils::SMatrix<float> *expectedCodesMatrix =
                     read_codes_file(
@@ -134,7 +118,92 @@ namespace test {
             assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
                                                    0.001));
 
+            kohonen::SomTrainer<float, float>::QuantumError qe =
+                    trainer.quantizationError(somCodesMatrix, &dataReader);
+
+//            std::cout.precision(std::numeric_limits<float >::digits);
+//            std::cout << "sumWinnerDistance: " <<
+//            qe.sumWinnerDistance / qe.samplesSize <<
+//            ", num: " << qe.samplesSize << std::endl;
+
+            assert_range(qe.sumWinnerDistance / qe.samplesSize, 4.7287, 0.0001);
+
+
             delete expectedCodesMatrix;
+            delete somCodesMatrix;
+        }
+
+        void test_visible_som_training() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
+            // инициализация потока чтения файла с данными
+            file::CsvFileReader<char> csvReader(
+                    "../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float>
+                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
+                               true);
+
+            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+
+            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
+            kohonen::mapdist::HexaMapDistance<float> mapDist;
+
+            kohonen::neighadap::BubbleNeighborAdaptation<float, float>
+                    neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
+                                                      &winnerSearcher,
+                                                      &neiAdap,
+                                                      0.002, 3.0, xdim, ydim);
+
+            //
+            graphics::ChartThread qErrorChart(710, 460);
+            qErrorChart.getChart().setWindowTitle("Quantum error");
+
+            size_t teachSize = 4000000;
+            size_t winnerSize = winnerSearcher.getWinnerSize();
+            size_t colSize = somCodesMatrix->getColSize();
+
+            double qerror = 0;
+
+            for (size_t le = 0; le < teachSize; ++le) {
+                models::DataSample<float> inRow[colSize];
+                bool hasInRow = dataReader.readNext(inRow, colSize);
+                if (!hasInRow) {
+                    // значит достигли конца данных, начинаем читать с начала
+                    // установить поток на начало
+                    dataReader.rewindReader();
+                    // читаем первую стоку данных
+                    dataReader.readNext(inRow, colSize);
+                }
+
+                kohonen::winner::WinnerInfo<float> winners[winnerSize];
+                bool ok = trainer.trainingBySample(somCodesMatrix, inRow,
+                                           winners, teachSize, le);
+                if (ok) {
+                    int cnt = le%1000;
+                    qerror+=std::sqrt(winners[0].diff);
+                    if (cnt==0 && le!=0) {
+                        qerror = qerror / 1000.0;
+                        qErrorChart.getChart().redrawNewPoints(le, qerror);
+                        qerror = 0;
+                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                    }
+
+                }
+            }
+
+            // проверка
+//            utils::SMatrix<float> *expectedCodesMatrix =
+//                    read_codes_file(
+//                            "../test/datafiles/kohonen/som_trained_10000_"
+//                                    "eucw_bubble_hexa_16_12.cod", 1);
+//            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
+//                                                   0.001));
+
+//            delete expectedCodesMatrix;
             delete somCodesMatrix;
         }
 
@@ -158,13 +227,12 @@ namespace test {
 
             kohonen::neighadap::GaussianNeighborAdaptation<float, float>
                     neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&dataReader,
-                                                      &alphaFunc,
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
                                                       &winnerSearcher,
                                                       &neiAdap,
                                                       0.002, 3, xdim, ydim);
 
-            trainer.training(somCodesMatrix, 10000, dim);
+            trainer.training(somCodesMatrix, &dataReader, 10000);
 
             utils::SMatrix<float> *expectedCodesMatrix =
                     read_codes_file(
@@ -184,6 +252,7 @@ namespace test {
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
+            mytest(visible_som_training);
         }
     }
 }
