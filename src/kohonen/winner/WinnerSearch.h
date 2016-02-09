@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#include "utils/SMatrix.h"
+#include "utils/RMatrix.h"
 #include "models/DataSample.h"
 
 namespace kohonen {
@@ -22,9 +22,10 @@ namespace kohonen {
             WinnerSearch(size_t _winnersSize) : winnersSize(_winnersSize) {
             }
 
-            virtual bool search(utils::SMatrix<Out> *somCodes,
-                                models::DataSample<In> *inSampleRow,
-                                WinnerInfo<Out> *winners) = 0;
+            virtual bool search(
+                    utils::RMatrix<models::NeuronInfo, Out> *somCodes,
+                    models::DataSample<In> *inSampleRow,
+                    WinnerInfo<Out> *winners) = 0;
 
             size_t getWinnerSize() {
                 return winnersSize;

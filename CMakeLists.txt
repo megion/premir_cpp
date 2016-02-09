@@ -13,6 +13,7 @@ add_executable(dummy_executable
   test/utils/CArrayListTest.cpp
   test/utils/CMatrixTest.cpp
   test/utils/SMatrixTest.cpp
+  test/utils/RMatrixTest.cpp
   test/utils/ArrayUtilsTest.cpp
   test/utils/IntBitSetTest.cpp
   test/utils/CHashSetTest.cpp

@@ -2,6 +2,7 @@
 #include "utils/CArrayListTest.h"
 #include "utils/CMatrixTest.h"
 #include "utils/SMatrixTest.h"
+#include "utils/RMatrixTest.h"
 #include "utils/ArrayUtilsTest.h"
 #include "utils/IntBitSetTest.h"
 #include "utils/CHashSetTest.h"
@@ -25,6 +26,7 @@ int main(int argc, char **argv) {
     cMatrix_test();
     test::utils_arrayutils::arrayutils_test();
     test::utils_smatrix::sMatrix_test();
+    test::utils_rmatrix::rMatrix_test();
     test::utils_intBitSet::intBitSet_test();
     test::utils_cHashSet::cHashSet_test();
     test::matrix_determinant::determinant_test();

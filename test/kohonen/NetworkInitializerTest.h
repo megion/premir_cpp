@@ -8,6 +8,7 @@
 #include "kohonen/NetworkInitializer.h"
 #include "file/CsvFileReader.h"
 #include "utils/SMatrix.h"
+#include "utils/RMatrix.h"
 #include "file/stream/CsvFileArrayStreamReader.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"

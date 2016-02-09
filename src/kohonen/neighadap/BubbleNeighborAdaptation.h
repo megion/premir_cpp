@@ -23,7 +23,7 @@ namespace kohonen {
                       NeighborAdaptation<In, Out>(_xdim, _ydim) {
             }
 
-            void adaptation(utils::SMatrix<Out> *somCodes,
+            void adaptation(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
                             models::DataSample<In> *inSampleRow,
                             long bx, long by,
                             Out radius, Out alpha) {
@@ -33,7 +33,7 @@ namespace kohonen {
 
                     if ((mapDist->distance(bx, by, tx, ty)) <= radius) {
                         NeighborAdaptation<In, Out>::recalculateCodeVector(
-                                somCodes->getRow(r),
+                                somCodes->getRow(r).points,
                                 inSampleRow, somCodes->getColSize(), alpha);
                     }
                 }

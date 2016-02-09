@@ -26,7 +26,7 @@ namespace kohonen {
             EuclideanWinnerSearch() : WinnerSearch<In, Out>(1) {
             }
 
-            bool search(utils::SMatrix<Out> *somCodes,
+            bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
                         models::DataSample<In>* inSampleRow,
                         WinnerInfo<Out>* winners) {
                 size_t dim = somCodes->getColSize();

@@ -30,7 +30,7 @@ namespace kohonen {
                     WinnerSearch<In, Out>(_winnersSize) {
             }
 
-            bool search(utils::SMatrix<Out> *somCodes,
+            bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
                         models::DataSample<In> *inSampleRow,
                         WinnerInfo<Out> *winners) {
                 size_t knn = WinnerSearch<In, Out>::winnersSize;

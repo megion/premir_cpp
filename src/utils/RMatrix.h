@@ -1,5 +1,5 @@
 /**
- * Simple matrix for store values as MatrixRow*
+ * Simple matrix for store values as Row*
  */
 
 #ifndef SRC_UTILS_RMATRIX_H
@@ -91,12 +91,12 @@ namespace utils {
             return true;
         }
 
-        bool operator!=(const RMatrix<T> &other) const {
+        bool operator!=(const RMatrix<S, T> &other) const {
             return !((*this) == other);
         }
 
-        bool equalsWithError(const RMatrix<T> &other,
-                             const double &error) const {
+        bool equalsWithError(const RMatrix<S, T> &other,
+                             const double &error, bool skipCompareData=false) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
@@ -104,7 +104,7 @@ namespace utils {
                 return false;
             }
             for (size_t r = 0; r < rowSize; ++r) {
-                if(matrix[r].data != other.getRow(r).data) {
+                if(!skipCompareData && (matrix[r].data != other.getRow(r).data)) {
                     return false;
                 }
                 for (size_t c = 0; c < colSize; ++c) {
@@ -140,12 +140,23 @@ namespace utils {
             return matrix[r].points;
         }
 
+        void writeRow(size_t rowIndex, T *points) {
+            if (rowIndex < rowSize) {
+                // copy only points to exist row
+                memcpy(matrix[rowIndex].points, points, colSize * tTypeSizeof);
+            } else {
+                // create row value
+                Row value;
+                value.points = points;
+                writeRow(rowIndex, value);
+            }
+        }
+
         void writeRow(size_t rowIndex, const Row& value) {
             if (!(rowIndex < rowSize)) {
                 // re-initialize row memory
                 size_t newRowSize = rowIndex + 1;
                 initializeRowMemory(newRowSize);
-
 
                 size_t cAmount = tTypeSizeof * colSize;
                 for (size_t r = rowSize; r < newRowSize; ++r) {
@@ -165,47 +176,46 @@ namespace utils {
             writeRow(rowSize, value);
         }
 
-        void swapRows(size_t r1, size_t r2) {
-            // copy r1 row to temp
-            T *temp = *(matrix + r1);
-            // copy r2 row to r1
-            *(matrix + r1) = *(matrix + r2);
-            // copy temp to r2
-            *(matrix + r2) = temp;
+        void pushRow(T *points) {
+            writeRow(rowSize, points);
         }
 
-        SMatrix<T> *createClone(size_t startRow, size_t startCol,
-                                size_t sizeRow, size_t sizeCol) const {
-            SMatrix<T> *clone = new SMatrix<T>(sizeRow, sizeCol);
-            for (size_t r = 0; r < sizeRow; ++r) {
-                clone->writeRow(r, matrix[r + startRow] + startCol);
+        void swapRows(size_t r1, size_t r2) {
+            // create temp row
+            T tempPoints[colSize];
+            Row tempRow;
+            tempRow.points = tempPoints;
+
+            // copy r1 row to temp
+            copyRow(tempRow, matrix[r1]);
+            // copy r2 row to r1
+            copyRow(matrix[r1], matrix[r2]);
+            // copy temp to r2
+            copyRow(matrix[r2], tempRow);
+        }
+
+        RMatrix<S, T> *createClone() const {
+            RMatrix<S, T> *clone = new RMatrix<S, T>(rowSize, colSize);
+            for (size_t r = 0; r < rowSize; ++r) {
+                clone->writeRow(r, matrix[r]);
             }
             return clone;
-        }
-
-        SMatrix<T> *createClone(size_t startRow, size_t startCol) const {
-            return createClone(startRow, startCol, rowSize - startRow,
-                               colSize - startCol);
-        }
-
-        SMatrix<T> *createClone() const {
-            return createClone(0, 0, rowSize, colSize);
         }
 
         /**
          * Скопировать значения в матрицу destination
          */
-        void copyTo(SMatrix<T>& destination) const {
+        void copyTo(RMatrix<S, T>& destination) const {
             for (size_t r = 0; r < rowSize; ++r) {
                 destination.writeRow(r, matrix[r]);
             }
         }
 
         void print() const {
-            std::cout << "Matrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
+            std::cout << "RMatrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < colSize; ++c) {
-                    std::cout << matrix[r][c] << ", ";
+                    std::cout << matrix[r].points[c] << ", ";
                 }
                 std::cout << std::endl;
             }

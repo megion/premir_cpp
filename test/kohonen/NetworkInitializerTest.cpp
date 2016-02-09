@@ -3,6 +3,8 @@
 namespace test {
     namespace kohonen_initializer {
 
+        typedef utils::RMatrix<models::NeuronInfo, float> OutCodes;
+
         void readInitializer(file::CsvFileReader<char> *csvReader) {
             // skip first line
             csvReader->toEndLine();
@@ -16,11 +18,11 @@ namespace test {
             }
         }
 
-        utils::SMatrix<float> *read_codes_file(const char *filename,
+        OutCodes *read_codes_file(const char *filename,
                                                int skipLines) {
             file::CsvFileReader<char> reader(filename, ' ');
-            utils::SMatrix<float> *somCodesMatrix =
-                    new utils::SMatrix<float>(0, 5);
+            OutCodes *somCodesMatrix =
+                    new OutCodes(0, 5);
             // skip to lines
             for (int i = 0; i < skipLines; ++i) {
                 reader.toEndLine();
@@ -42,7 +44,7 @@ namespace test {
             return somCodesMatrix;
         }
 
-        utils::SMatrix<float> *read_some_initilized_codes() {
+        OutCodes *read_some_initilized_codes() {
             return read_codes_file(
                     "../test/datafiles/kohonen/som_initialized.cod", 2);
         }
@@ -70,13 +72,13 @@ namespace test {
             size_t ydim = 12;
             size_t dim = 5;
 
-            utils::SMatrix<float> *resultsMatrix =
+            OutCodes *resultsMatrix =
                     initializer.lineInitialization(xdim, ydim, dim);
 
-            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+            OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001));
+            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001, true));
 
             delete somCodesMatrix;
             delete resultsMatrix;
@@ -94,7 +96,7 @@ namespace test {
                     dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                true);
 
-            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+            OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
@@ -109,7 +111,7 @@ namespace test {
 
             trainer.training(somCodesMatrix, &dataReader, 10000);
 
-            utils::SMatrix<float> *expectedCodesMatrix =
+            OutCodes *expectedCodesMatrix =
                     read_codes_file(
                             "../test/datafiles/kohonen/som_trained_10000_"
                                     "eucw_bubble_hexa_16_12.cod", 1);
@@ -152,7 +154,7 @@ namespace test {
             kohonen::RandomGenerator *randomEngine
                     = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
-            utils::SMatrix<float> *somCodesMatrix =
+            OutCodes *somCodesMatrix =
                     initializer.lineInitialization(xdim, ydim, dim);
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
@@ -198,7 +200,7 @@ namespace test {
                         qerror = qerror / step;
                         qErrorChart.getChart().redrawNewPoints(le, qerror);
                         qerror = 0;
-                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+//                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     }
 
                 }
@@ -228,7 +230,7 @@ namespace test {
                     dataReader(&csvReader, readInitializer,
                                isSkipSample, dim, true);
 
-            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
+            OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
@@ -243,7 +245,7 @@ namespace test {
 
             trainer.training(somCodesMatrix, &dataReader, 10000);
 
-            utils::SMatrix<float> *expectedCodesMatrix =
+            OutCodes *expectedCodesMatrix =
                     read_codes_file(
                             "../test/datafiles/kohonen/som_trained_10000_"
                                     "eucw_gaussian_rect_16_12.cod", 1);
@@ -261,7 +263,7 @@ namespace test {
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
-            mytest(visible_som_training);
+//            mytest(visible_som_training);
         }
     }
 }

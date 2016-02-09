@@ -130,7 +130,6 @@ namespace utils {
                 size_t newRowSize = rowIndex + 1;
                 initializeRowMemory(newRowSize);
 
-
                 size_t cAmount = typeSizeof * colSize;
                 for (size_t r = rowSize; r < newRowSize; ++r) {
                     T *rowArray = (T *) std::malloc(cAmount);
@@ -185,7 +184,7 @@ namespace utils {
         }
 
         void print() const {
-            std::cout << "Matrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
+            std::cout << "SMatrix["<<rowSize<<"x"<<colSize<<"]"<< std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < colSize; ++c) {
                     std::cout << matrix[r][c] << ", ";

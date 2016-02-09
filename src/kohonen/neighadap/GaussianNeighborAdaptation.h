@@ -29,7 +29,7 @@ namespace kohonen {
             /**
              * Adaptation function for gaussian neighbourhood
              */
-            void adaptation(utils::SMatrix<Out> *somCodes,
+            void adaptation(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
                             models::DataSample<In> *inSampleRow,
                             long bx, long by,
                             Out radius, Out alpha) {
@@ -41,7 +41,7 @@ namespace kohonen {
                     Out alp = alpha * (Out) std::exp(
                             (double) (-dd * dd / (2.0 * radius * radius)));
                     NeighborAdaptation<In, Out>::recalculateCodeVector(
-                            somCodes->getRow(r),
+                            somCodes->getRow(r).points,
                             inSampleRow, somCodes->getColSize(), alp);
                 }
             }

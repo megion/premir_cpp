@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cmath>
 
-#include "utils/SMatrix.h"
+#include "utils/RMatrix.h"
 #include "models/DataSample.h"
 
 namespace kohonen {
@@ -24,10 +24,11 @@ namespace kohonen {
                     xdim(_xdim), ydim(_ydim) {
             }
 
-            virtual void adaptation(utils::SMatrix<Out> *somCodes,
-                                    models::DataSample<In> *inSampleRow,
-                                    long bx, long by,
-                                    Out radius, Out alpha) = 0;
+            virtual void adaptation(
+                    utils::RMatrix<models::NeuronInfo, Out> *somCodes,
+                    models::DataSample<In> *inSampleRow,
+                    long bx, long by,
+                    Out radius, Out alpha) = 0;
 
             void recalculateCodeVector(Out *codeVector,
                                        models::DataSample<In> *inSampleRow,

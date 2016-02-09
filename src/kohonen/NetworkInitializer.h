@@ -16,6 +16,7 @@
 #include <iostream>
 #include <cmath>
 
+#include "utils/RMatrix.h"
 #include "utils/SMatrix.h"
 #include "utils/ArrayUtils.h"
 #include "matrix/GramSchmidtNormalized.h"
@@ -29,6 +30,8 @@ namespace kohonen {
     template<typename In, typename Out>
     class NetworkInitializer {
     public:
+
+        typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
 
         NetworkInitializer(file::stream::StreamReader<models::DataSample<In>>
                            *streamReader)
@@ -44,7 +47,7 @@ namespace kohonen {
          * Случайная инициализация нейронной сети.
          * TODO: не реализовано.
          */
-        utils::SMatrix<Out> *randomInitialization() {
+        OutCodes *randomInitialization() {
             return nullptr;
         }
 
@@ -69,8 +72,7 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        utils::SMatrix<Out> *lineInitialization(size_t xdim, size_t ydim,
-                                                size_t colSize) {
+        OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize) {
             utils::SMatrix<Out> *means = findEigenVectors(2, colSize);
             Out *mean = means->getRow(0);
             Out *eigen1 = means->getRow(1);
@@ -78,8 +80,7 @@ namespace kohonen {
 
             // число нейронов
             size_t neuralNumber = xdim * ydim;
-            utils::SMatrix<Out> *resultsMatrix = new utils::SMatrix<Out>(
-                    neuralNumber, colSize);
+            OutCodes *resultsMatrix = new OutCodes(neuralNumber, colSize);
             for (size_t r = 0; r < resultsMatrix->getRowSize(); ++r) {
                 Out xf = 4.0 * (Out) (r % xdim) / (xdim - 1.0) - 2.0;
                 Out yf = 4.0 * (Out) (r / xdim) / (ydim - 1.0) - 2.0;

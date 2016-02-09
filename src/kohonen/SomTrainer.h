@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "utils/SMatrix.h"
+#include "utils/RMatrix.h"
 #include "file/stream/StreamReader.h"
 #include "kohonen/alphafunc/AlphaFunction.h"
 #include "kohonen/neighadap/NeighborAdaptation.h"
@@ -28,6 +29,7 @@ namespace kohonen {
     public:
 
         typedef file::stream::StreamReader<models::DataSample<In>> InReader;
+        typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
 
         SomTrainer(alphafunc::AlphaFunction<Out> *_alphaFunction,
                 winner::WinnerSearch<In, Out> *_winnerSearcher,
@@ -49,7 +51,7 @@ namespace kohonen {
         /**
          * Обучение указанное teachSize число раз
          */
-        bool training(utils::SMatrix<Out> *initializedSom,
+        bool training(OutCodes *initializedSom,
                       InReader *inDataStreamReader,
                       size_t teachSize) {
             // установить поток на начало
@@ -88,7 +90,7 @@ namespace kohonen {
             return true;
         }
 
-        bool trainingBySample(utils::SMatrix<Out> *initializedSom,
+        bool trainingBySample(OutCodes *initializedSom,
                               models::DataSample<In> *sampleVector,
                               winner::WinnerInfo<Out> *winners,
                               size_t teachSize,
@@ -122,7 +124,7 @@ namespace kohonen {
         /**
          * Вычисление ошибки квантования
          */
-        QuantumError quantizationError(utils::SMatrix<Out> *trainedSom,
+        QuantumError quantizationError(OutCodes *trainedSom,
                                        InReader *inDataStreamReader) {
             QuantumError qError = {0, 0};
 

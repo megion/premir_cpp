@@ -42,7 +42,7 @@ namespace utils {
             Out res = 0;
             for (size_t i = 0; i < sizeArray; ++i) {
                 const InA &ai = *(a + i);
-                res = res + ai * ai;
+                res += ai * ai;
             }
             return res;
         }
@@ -114,36 +114,22 @@ namespace utils {
             }
         }
 
+        /**
+         * Евклидовое расстояние массивов A и B.
+         * result = sum( (a(i)-b(i))*(a(i)-b(i)) ) where i = 0...N-1
+         */
+        static Out euclideanDistance(const InA *a, const InB *b,
+                                     size_t sizeArray) {
+            Out res = 0;
+            Out diff = 0;
+            for (size_t i = 0; i < sizeArray; ++i) {
+                diff = a[i] - b[i];
+                res = res + diff * diff;
+            }
+            return std::sqrt(res);
+        }
 
-//        double normArray(const double *a, size_t sizeArray) {
-//            double res = 0;
-//            for (size_t i = 0; i < sizeArray; ++i) {
-//                const double &ai = *(a + i);
-//                res = res + std::abs(ai);
-//            }
-//            return res;
-//        }
 
-
-//        void normalize(float *v, int n)
-//        {
-//            float sum=0.0;
-//            int j;
-//
-//            for (j=0; j<n; j++) sum+=v[j]*v[j];
-//            sum=sqrt(sum);
-//            for (j=0; j<n; j++) v[j]/=sum;
-//        }
-//
-//
-//        float dotprod(float *v, float *w, int n)
-//        {
-//            float sum=0.0;
-//            int j;
-//
-//            for (j=0; j<n; j++) sum+=v[j]*w[j];
-//            return (sum);
-//        }
 
     };
 }
