@@ -22,6 +22,7 @@
 #include "kohonen/mapdist/RectMapDistance.h"
 
 #include "kohonen/SomTrainer.h"
+#include "kohonen/SammonMap.h"
 
 #include "graphics/ChartThread.h"
 

@@ -135,6 +135,70 @@ namespace test {
             delete somCodesMatrix;
         }
 
+        void test_eucw_bubble_hexa_16_12_sammon() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
+            // инициализация потока чтения файла с данными
+            file::CsvFileReader<char> csvReader(
+                    "../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float>
+                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
+                               true);
+
+            OutCodes *somCodesMatrix = read_some_initilized_codes();
+
+            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
+            kohonen::mapdist::HexaMapDistance<float> mapDist;
+
+            kohonen::neighadap::BubbleNeighborAdaptation<float, float>
+                    neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
+                                                      &winnerSearcher,
+                                                      &neiAdap,
+                                                      0.002, 3.0, xdim, ydim);
+
+            trainer.training(somCodesMatrix, &dataReader, 10000);
+
+            kohonen::SammonMap<float> sammonMap;
+            kohonen::RandomGenerator *randomEngine
+                    = sammonMap.getRandomGenerator();
+            // для теста псевдоинициализация
+            randomEngine->setNextValue(1);
+
+//            somCodesMatrix->print();
+
+            OutCodes *sammonMatrix = sammonMap.sammon(somCodesMatrix, 1000);
+
+            sammonMatrix->print();
+
+//            OutCodes *expectedCodesMatrix =
+//                    read_codes_file(
+//                            "../test/datafiles/kohonen/som_trained_10000_"
+//                                    "eucw_bubble_hexa_16_12.cod", 1);
+
+            // данные матрицы должны быть практически идентичными
+//            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
+//                                                   0.001));
+
+//            kohonen::SomTrainer<float, float>::QuantumError qe =
+//                    trainer.quantizationError(somCodesMatrix, &dataReader);
+
+//            std::cout.precision(std::numeric_limits<float >::digits);
+//            std::cout << "sumWinnerDistance: " <<
+//            qe.sumWinnerDistance / qe.samplesSize <<
+//            ", num: " << qe.samplesSize << std::endl;
+
+//            assert_range(qe.sumWinnerDistance / qe.samplesSize, 4.7287, 0.0001);
+
+
+//            delete expectedCodesMatrix;
+            delete sammonMatrix;
+            delete somCodesMatrix;
+        }
+
         void test_visible_som_training() {
             size_t xdim = 26;
             size_t ydim = 12;
@@ -263,6 +327,7 @@ namespace test {
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
+            mytest(eucw_bubble_hexa_16_12_sammon);
 //            mytest(visible_som_training);
         }
     }

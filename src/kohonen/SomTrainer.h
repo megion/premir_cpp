@@ -21,6 +21,7 @@
 #include "kohonen/alphafunc/AlphaFunction.h"
 #include "kohonen/neighadap/NeighborAdaptation.h"
 #include "models/DataSample.h"
+#include "utils/console_colors.h"
 
 namespace kohonen {
 

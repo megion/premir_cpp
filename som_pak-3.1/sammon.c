@@ -104,6 +104,7 @@ struct entries *remove_identicals(struct entries *codes, int *rem)
     prev = p1.current;
     while (entr1 != NULL) {
       if (distance(entr, entr1, dim) == 0.0) {
+//        printf( "(entries %d, %d), removing one.\n", ii, ij);
 	fprintf(stderr, "Identical entries in codebook ");
         fprintf(stderr, "(entries %d, %d), removing one.\n", ii, ij);
         *rem = 1;
@@ -170,18 +171,28 @@ struct entries *sammon_iterate(struct entries *codes, int length)
   mutual = 0;
   entr = rewind_entries(codes, &p1);
   entr = next_entry(&p1);
+  int ii = 0, jj = 0;
   while (entr != NULL) {
     entr1 = rewind_entries(codes, &p2);
+    ii=0;
     while (entr1 != entr) {
       dd[mutual] = distance(entr, entr1, dim);
+      printf("%d x %d  dd[i] %f\n", ii, jj, dd[mutual]);
       if (dd[mutual] == 0.0) {
+//        printf("%d  dd[i] %f\n", mutual, dd[mutual]);
 	fprintf(stderr, "Identical entries in codebook\n");
       }
       mutual++;
       entr1 = next_entry(&p2);
+      ii++;
     }
     entr = next_entry(&p1);
+    jj++;
   }
+
+//  for (i=0; i<(noc * (noc - 1) / 2); ++i) {
+//    printf("%d  dd[i] %f\n", i, dd[i]);
+//  }
   
   /* Iterate */
   for (i = 0; i < length; i++) {
