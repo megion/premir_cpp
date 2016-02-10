@@ -172,7 +172,7 @@ namespace test {
 
             OutCodes *sammonMatrix = sammonMap.sammon(somCodesMatrix, 1000);
 
-            sammonMatrix->print();
+//            sammonMatrix->print();
 
 //            OutCodes *expectedCodesMatrix =
 //                    read_codes_file(

@@ -67,9 +67,13 @@ namespace kohonen {
                 Neuron &ni = trainedSom->getRow(i);
                 ni.data.skipped = false; // сбросить флаг в начале
                 for (size_t j = 0; j < trainedSom->getRowSize(); ++j) {
+                    if (i==j) {
+                        break;
+                    }
                     Neuron &nj = trainedSom->getRow(j);
                     Out dist = ArrayUtils::euclideanDistance(
                             ni.points, nj.points, colSize);
+//                    std::cout << mutualIndex << " dist " << dist << std::endl;
                     dd[mutualIndex] = dist;
                     mutualIndex++;
 

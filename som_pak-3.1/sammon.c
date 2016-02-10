@@ -177,7 +177,7 @@ struct entries *sammon_iterate(struct entries *codes, int length)
     ii=0;
     while (entr1 != entr) {
       dd[mutual] = distance(entr, entr1, dim);
-      printf("%d x %d  dd[i] %f\n", ii, jj, dd[mutual]);
+//      printf("%d x %d  dd[i] %f\n", ii, jj, dd[mutual]);
       if (dd[mutual] == 0.0) {
 //        printf("%d  dd[i] %f\n", mutual, dd[mutual]);
 	fprintf(stderr, "Identical entries in codebook\n");
