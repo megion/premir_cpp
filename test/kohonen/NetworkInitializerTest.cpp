@@ -177,7 +177,7 @@ namespace test {
                     read_codes_file(
                             "../test/datafiles/kohonen/som_trained_"
                                     "10000_eucw_bubble_hexa_16_12.cod", 1);
-            OutCodes *sammonMatrix = sammonMap.sammon(somTrainedMatrix, 1000);
+            OutCodes *sammonMatrix = sammonMap.buildMap(somTrainedMatrix, 1000);
 
             OutCodes *expectedSammonMatrix =
                     read_sammon_file(
@@ -185,14 +185,13 @@ namespace test {
                             1);
             assert(sammonMatrix->equalsWithError(*expectedSammonMatrix, 0.001, true));
 
-            graphics::ChartThread sammonChart(1710, 800);
-            sammonChart.getChart().setWindowTitle("Sammon Map");
+            graphics::ChartThread sammonChart(1200, 700);
+            sammonChart.getChart()->setWindowTitle("Sammon Map");
 
             for (size_t i = 0; i<sammonMatrix->getRowSize(); ++i) {
                 Neuron& r = sammonMatrix->getRow(i);
-                sammonChart.getChart().redrawNewPoints(r.points[0], r.points[1]);
+                sammonChart.getChart()->redrawNewPoints(r.points[0], r.points[1]);
             }
-
 
             delete somTrainedMatrix;
             delete sammonMatrix;
@@ -234,7 +233,7 @@ namespace test {
 
             //
             graphics::ChartThread qErrorChart(710, 460);
-            qErrorChart.getChart().setWindowTitle("Quantum error");
+            qErrorChart.getChart()->setWindowTitle("Quantum error");
 
             size_t teachSize = 4000000;
             size_t winnerSize = winnerSearcher.getWinnerSize();
@@ -262,7 +261,7 @@ namespace test {
                     qerror += std::sqrt(winners[0].diff);
                     if (cnt == 0 && le != 0) {
                         qerror = qerror / step;
-                        qErrorChart.getChart().redrawNewPoints(le, qerror);
+                        qErrorChart.getChart()->redrawNewPoints(le, qerror);
                         qerror = 0;
 //                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     }

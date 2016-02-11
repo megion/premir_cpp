@@ -8,12 +8,12 @@ void test_filter_charts() {
 	graphics::ChartThread chartSignalOut(710, 460);
 	graphics::ChartThread chartFilterWeights(710, 460);
 
-	chartSignalTemplate.getChart().setWindowTitle("Signal template");
-	chartSignalIn.getChart().setWindowTitle("Signal+noise");
+	chartSignalTemplate.getChart()->setWindowTitle("Signal template");
+	chartSignalIn.getChart()->setWindowTitle("Signal+noise");
 //	chartNoise.getChart().setWindowTitle("Noise");
-	chartNoiseEval.getChart().setWindowTitle("Noise eval");
-	chartSignalOut.getChart().setWindowTitle("Signal out");
-	chartFilterWeights.getChart().setWindowTitle("Weights");
+	chartNoiseEval.getChart()->setWindowTitle("Noise eval");
+	chartSignalOut.getChart()->setWindowTitle("Signal out");
+	chartFilterWeights.getChart()->setWindowTitle("Weights");
 
 	double TN = 500.0; // кол-во точек на период
 	size_t N = 1200; // размеры
@@ -51,11 +51,11 @@ void test_filter_charts() {
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
 //
-			chartSignalTemplate.getChart().redrawNewPoints(i, signal);
-			chartNoiseEval.getChart().redrawNewPoints(i, noiseEval);
-			chartSignalIn.getChart().redrawNewPoints(i, signalAndNoise);
+			chartSignalTemplate.getChart()->redrawNewPoints(i, signal);
+			chartNoiseEval.getChart()->redrawNewPoints(i, noiseEval);
+			chartSignalIn.getChart()->redrawNewPoints(i, signalAndNoise);
 //			chartNoise.getChart().redrawNewPoints(i, noise);
-			chartSignalOut.getChart().redrawNewPoints(i, signalEval);
+			chartSignalOut.getChart()->redrawNewPoints(i, signalEval);
 
 //			chartSignalTemplate.getChart().flush();
 //			chartNoiseEval.getChart().flush();
@@ -70,18 +70,18 @@ void test_filter_charts() {
 //			chartSignalOut.getChart().getData()->addPoint(i, signalEval);
 
 			///////// draw filter weight
-			chartFilterWeights.getChart().getData()->removeData();
+			chartFilterWeights.getChart()->getData()->removeData();
 			double k = 0.0;
 			for (double& w : (*df.getWeightsArray())) {
-				chartFilterWeights.getChart().getData()->addPoint(k, w);
+				chartFilterWeights.getChart()->getData()->addPoint(k, w);
 				++k;
 
 			}
-			chartFilterWeights.getChart().drawBackground();
-			chartFilterWeights.getChart().drawAxes();
-			chartFilterWeights.getChart().drawAxesLabels();
-			chartFilterWeights.getChart().drawPoints();
-			chartFilterWeights.getChart().flush();
+			chartFilterWeights.getChart()->drawBackground();
+			chartFilterWeights.getChart()->drawAxes();
+			chartFilterWeights.getChart()->drawAxesLabels();
+			chartFilterWeights.getChart()->drawPoints();
+			chartFilterWeights.getChart()->flush();
 			/////////
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -90,47 +90,10 @@ void test_filter_charts() {
 		}
 	}
 
-	chartSignalTemplate.getChart().draw();
-	chartNoiseEval.getChart().draw();
-	chartSignalIn.getChart().draw();
-//	chartNoise.getChart().draw();
-	chartSignalOut.getChart().draw();
-
-	chartSignalTemplate.getChart().flush();
-	chartNoiseEval.getChart().flush();
-	chartSignalIn.getChart().flush();
-//	chartNoise.getChart().flush();
-	chartSignalOut.getChart().flush();
-
-//	chartSignalIn.getChart().draw();
-//	chartSignalIn.getChart().flush();
-//
-//	chart2.getChart().draw();
-//	chart2.getChart().flush();
-
-//	graphics::ChartThread chart2(560, 460);
-//
-//	graphics::ChartData* chartData2 = chart2.getChart().getData();
-//	chartData2->addPoint(10, 10);
-//	chartData2->addPoint(20, 20);
-//	chartData2->addPoint(30, 10);
-//
-//	chart2.getChart().draw();
-//	chart2.getChart().flush();
-
-//	chart.addPoint(1, 1);
-//	chart.addPoint(2, 2);
-//	chart.addPoint(100, 100);
-//	chart.addPoint(101, 100);
-//	chart.addPoint(102, 100);
-//	chart.addPoint(1000, 1000);
-//	chart.printPoints();
-//	chart.runChart();
-
 }
 
 void digitalFilter_test() {
 	suite("charts");
-//	test(filter_charts);
+//	mytest(filter_charts);
 
 }

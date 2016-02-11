@@ -8,28 +8,30 @@
 
 namespace graphics {
 
-class ChartThread {
-public:
-	ChartThread(uint16_t _width = 400, uint16_t _height = 260) :
-			chart(Chart(_width, _height)), chartThread(
-					std::thread(&Chart::runChart, &chart)) {
-	}
+    class ChartThread {
+    public:
+        ChartThread(uint16_t _width = 400, uint16_t _height = 260) :
+                chart(new Chart(_width, _height)), chartThread(
+                std::thread(&Chart::runChart, chart)) {
+        }
 
-	~ChartThread() {
-		std::cout << "destroy ChartThread - call join" << chartThread.joinable() << std::endl;
-		chartThread.join();
-		std::cout << "destroy ChartThread - call join after" << std::endl;
-	}
+        ~ChartThread() {
+            std::cout << "destroy ChartThread - call join" <<
+            chartThread.joinable() << std::endl;
+            chartThread.join();
+            delete chart;
+            std::cout << "destroy ChartThread - call join after" << std::endl;
+        }
 
-	Chart& getChart() {
-		return chart;
-	}
+        Chart *getChart() {
+            return chart;
+        }
 
-private:
-	Chart chart;
-	std::thread chartThread;
+    private:
+        Chart *chart;
+        std::thread chartThread;
 
-};
+    };
 
 }
 

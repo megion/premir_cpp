@@ -46,8 +46,7 @@ namespace kohonen {
         /**
          * Построение проекций Саммона
          */
-        OutCodes* sammon(OutCodes *trainedSom, size_t iterationLen) {
-
+        OutCodes* buildMap(OutCodes *trainedSom, size_t iterationLen) {
             long nLen = trainedSom->getRowSize();
             Out x[nLen];
             Out y[nLen];
@@ -58,10 +57,7 @@ namespace kohonen {
             for (size_t i = 0; i < nLen; ++i) {
                 x[i] = (Out) (randomEngine->generate() % nLen) / nLen;
                 y[i] = (Out) (i) / nLen;
-
-//                std::cout << i << " x[i] " << x[i] << " y[i] " << y[i] << std::endl;
             }
-
 
             size_t mutualIndex = 0;
             size_t colSize = trainedSom->getColSize();
@@ -75,7 +71,6 @@ namespace kohonen {
                     Neuron &nj = trainedSom->getRow(j);
                     Out dist = ArrayUtils::euclideanDistance(
                             ni.points, nj.points, colSize);
-//                    std::cout << mutualIndex << " dist " << dist << std::endl;
                     dd[mutualIndex] = dist;
                     mutualIndex++;
 
@@ -91,10 +86,6 @@ namespace kohonen {
                     }
                 }
             }
-
-//            for (size_t i=0; i<nLen * (nLen - 1) / 2; ++i) {
-//                std::cout<<i<<" dd[i] " << dd[i] << std::endl;
-//            }
 
             for (size_t i = 0; i < iterationLen; ++i) {
 
@@ -129,8 +120,6 @@ namespace kohonen {
                     yu[j] = y[j] + MAGIC_NUM * e1y / std::fabs(e2y);
                 }
 
-//                std::cout << i << " xu[0] " << xu[0] << " yu[0] " << yu[0] << std::endl;
-
                 /* Move the center of mass to the center of picture */
                 Out xx = 0, yy = 0;
                 for (size_t j = 0; j < nLen; ++j) {
@@ -163,18 +152,10 @@ namespace kohonen {
                 }
 
                 e /= tot;
-//                if (i==0 || i==1) {
-//                std::cout << "tot " << tot << std::endl;
-//                    std::cout << "Mapping error " << e << std::endl;
-//                    for (size_t a=0; a<neuronsLen; ++a) {
-//                        std::cout<<a<<" x[a] " << x[a] <<" y[a] " << y[a] << std::endl;
-//                    }
-//                }
 //                std::cout << "Mapping error " << e << std::endl;
             }
 
             OutCodes* sammonCodes = new OutCodes(nLen, 2);
-//            std::cout<<"neuronsLen: " << neuronsLen << std::endl;
             for (size_t i = 0; i < nLen; ++i) {
                 Out points[2];
                 points[0] = x[i];
