@@ -4,6 +4,7 @@ namespace test {
     namespace kohonen_initializer {
 
         typedef utils::RMatrix<models::NeuronInfo, float> OutCodes;
+        typedef typename utils::RMatrix<models::NeuronInfo, float>::Row Neuron;
 
         void readInitializer(file::CsvFileReader<char> *csvReader) {
             // skip first line
@@ -19,10 +20,9 @@ namespace test {
         }
 
         OutCodes *read_codes_file(const char *filename,
-                                               int skipLines) {
+                                  int skipLines) {
             file::CsvFileReader<char> reader(filename, ' ');
-            OutCodes *somCodesMatrix =
-                    new OutCodes(0, 5);
+            OutCodes *somCodesMatrix = new OutCodes(0, 5);
             // skip to lines
             for (int i = 0; i < skipLines; ++i) {
                 reader.toEndLine();
@@ -42,6 +42,25 @@ namespace test {
             }
 
             return somCodesMatrix;
+        }
+
+        OutCodes *read_sammon_file(const char *filename,
+                                  int skipLines) {
+            file::CsvFileReader<char> reader(filename, ' ');
+            OutCodes *matrix = new OutCodes(0, 2);
+            for (int i = 0; i < skipLines; ++i) {
+                reader.toEndLine();
+            }
+            while (reader.hasNext()) {
+                float row[2];
+                reader.read(row[0]);
+                reader.read(row[1]);
+                reader.toEndLine();
+                if (!reader.isEmptyRead()) {
+                    matrix->pushRow(row);
+                }
+            }
+            return matrix;
         }
 
         OutCodes *read_some_initilized_codes() {
@@ -78,7 +97,8 @@ namespace test {
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001, true));
+            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001,
+                                                   true));
 
             delete somCodesMatrix;
             delete resultsMatrix;
@@ -147,56 +167,36 @@ namespace test {
                     dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                true);
 
-            OutCodes *somCodesMatrix = read_some_initilized_codes();
-
-            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
-            kohonen::mapdist::HexaMapDistance<float> mapDist;
-
-            kohonen::neighadap::BubbleNeighborAdaptation<float, float>
-                    neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
-                                                      &winnerSearcher,
-                                                      &neiAdap,
-                                                      0.002, 3.0, xdim, ydim);
-
-            trainer.training(somCodesMatrix, &dataReader, 10000);
-
             kohonen::SammonMap<float> sammonMap;
             kohonen::RandomGenerator *randomEngine
                     = sammonMap.getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
 
-//            somCodesMatrix->print();
+            OutCodes *somTrainedMatrix =
+                    read_codes_file(
+                            "../test/datafiles/kohonen/som_trained_"
+                                    "10000_eucw_bubble_hexa_16_12.cod", 1);
+            OutCodes *sammonMatrix = sammonMap.sammon(somTrainedMatrix, 1000);
 
-            OutCodes *sammonMatrix = sammonMap.sammon(somCodesMatrix, 1000);
+            OutCodes *expectedSammonMatrix =
+                    read_sammon_file(
+                            "../test/datafiles/kohonen/sammon_out_result.sam",
+                            1);
+            assert(sammonMatrix->equalsWithError(*expectedSammonMatrix, 0.001, true));
 
-//            sammonMatrix->print();
+            graphics::ChartThread sammonChart(1710, 800);
+            sammonChart.getChart().setWindowTitle("Sammon Map");
 
-//            OutCodes *expectedCodesMatrix =
-//                    read_codes_file(
-//                            "../test/datafiles/kohonen/som_trained_10000_"
-//                                    "eucw_bubble_hexa_16_12.cod", 1);
-
-            // данные матрицы должны быть практически идентичными
-//            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
-//                                                   0.001));
-
-//            kohonen::SomTrainer<float, float>::QuantumError qe =
-//                    trainer.quantizationError(somCodesMatrix, &dataReader);
-
-//            std::cout.precision(std::numeric_limits<float >::digits);
-//            std::cout << "sumWinnerDistance: " <<
-//            qe.sumWinnerDistance / qe.samplesSize <<
-//            ", num: " << qe.samplesSize << std::endl;
-
-//            assert_range(qe.sumWinnerDistance / qe.samplesSize, 4.7287, 0.0001);
+            for (size_t i = 0; i<sammonMatrix->getRowSize(); ++i) {
+                Neuron& r = sammonMatrix->getRow(i);
+                sammonChart.getChart().redrawNewPoints(r.points[0], r.points[1]);
+            }
 
 
-//            delete expectedCodesMatrix;
+            delete somTrainedMatrix;
             delete sammonMatrix;
-            delete somCodesMatrix;
+            delete expectedSammonMatrix;
         }
 
         void test_visible_som_training() {
@@ -256,11 +256,11 @@ namespace test {
 
                 kohonen::winner::WinnerInfo<float> winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, inRow,
-                                           winners, teachSize, le);
+                                                   winners, teachSize, le);
                 if (ok) {
-                    int cnt = le%step;
-                    qerror+=std::sqrt(winners[0].diff);
-                    if (cnt==0 && le!=0) {
+                    int cnt = le % step;
+                    qerror += std::sqrt(winners[0].diff);
+                    if (cnt == 0 && le != 0) {
                         qerror = qerror / step;
                         qErrorChart.getChart().redrawNewPoints(le, qerror);
                         qerror = 0;

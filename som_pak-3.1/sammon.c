@@ -165,6 +165,7 @@ struct entries *sammon_iterate(struct entries *codes, int length)
   for (i = 0; i < noc; i++) {
     x[i] = (float) (orand() % noc) / noc;
     y[i] = (float) (i) / noc;
+
   }
 
   /* Compute the mutual distances between entries */
@@ -221,6 +222,8 @@ struct entries *sammon_iterate(struct entries *codes, int length)
       xu[j] = x[j] + MAGIC * e1x / fabs(e2x);
       yu[j] = y[j] + MAGIC * e1y / fabs(e2y);
     }
+
+    printf("%d xu[0] %f yu[0] %f\n", i, xu[0], yu[0]);
     
     /* Move the center of mass to the center of picture */
     xx = yy = 0.0;
@@ -249,6 +252,12 @@ struct entries *sammon_iterate(struct entries *codes, int length)
 	mutual++;
       }
     e /= tot;
+
+//    if (i==0 || i==1) {
+//    fprintf(stdout, "tot: %f\n", tot);
+//      fprintf(stdout, "Mapping error: %f\n", e);
+//    }
+
     ifverbose(2)
       fprintf(stdout, "Mapping error: %7.3f\n", e);
     if (verbose(-1) == 1)

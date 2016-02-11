@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <cerrno>
 #include <cstring>
+#include <math.h>
 
 #include <string>
 #include <exception>
@@ -47,17 +48,18 @@ namespace kohonen {
          */
         OutCodes* sammon(OutCodes *trainedSom, size_t iterationLen) {
 
-            long neuronsLen = trainedSom->getRowSize();
-            Out x[neuronsLen];
-            Out y[neuronsLen];
-            Out xu[neuronsLen];
-            Out yu[neuronsLen];
-            Out dd[neuronsLen * (neuronsLen - 1) / 2];
+            long nLen = trainedSom->getRowSize();
+            Out x[nLen];
+            Out y[nLen];
+            Out xu[nLen];
+            Out yu[nLen];
+            Out dd[nLen * (nLen - 1) / 2];
 
-            for (size_t i = 0; i < neuronsLen; ++i) {
-                x[i] = (Out) (randomEngine->generate() % neuronsLen) /
-                       neuronsLen;
-                y[i] = (Out) (i) / neuronsLen;
+            for (size_t i = 0; i < nLen; ++i) {
+                x[i] = (Out) (randomEngine->generate() % nLen) / nLen;
+                y[i] = (Out) (i) / nLen;
+
+//                std::cout << i << " x[i] " << x[i] << " y[i] " << y[i] << std::endl;
             }
 
 
@@ -90,19 +92,22 @@ namespace kohonen {
                 }
             }
 
-//            for (size_t i=0; i<neuronsLen * (neuronsLen - 1) / 2; ++i) {
+//            for (size_t i=0; i<nLen * (nLen - 1) / 2; ++i) {
 //                std::cout<<i<<" dd[i] " << dd[i] << std::endl;
 //            }
 
             for (size_t i = 0; i < iterationLen; ++i) {
 
-                for (size_t j = 0; j < neuronsLen; ++j) {
+                for (size_t j = 0; j < nLen; ++j) {
                     Out e1x = 0, e1y = 0, e2x = 0, e2y = 0;
-                    for (size_t k = 0; k < neuronsLen; ++k) {
+                    for (size_t k = 0; k < nLen; ++k) {
                         if (j != k) {
                             Out xd = x[j] - x[k];
                             Out yd = y[j] - y[k];
-                            Out dpj = (Out) std::sqrt(xd * xd + yd * yd);
+                            // TODO: непонятно почему к double приводится только
+                            // первый слагаемый - если поставить (double)
+                            // ко второму то результат будет другим
+                            Out dpj = (Out) std::sqrt((double) xd * xd + yd * yd);
 
                             /* calculate derivatives */
                             Out dt;
@@ -124,15 +129,17 @@ namespace kohonen {
                     yu[j] = y[j] + MAGIC_NUM * e1y / std::fabs(e2y);
                 }
 
+//                std::cout << i << " xu[0] " << xu[0] << " yu[0] " << yu[0] << std::endl;
+
                 /* Move the center of mass to the center of picture */
                 Out xx = 0, yy = 0;
-                for (size_t j = 0; j < neuronsLen; ++j) {
+                for (size_t j = 0; j < nLen; ++j) {
                     xx += xu[j];
                     yy += yu[j];
                 }
-                xx /= neuronsLen;
-                yy /= neuronsLen;
-                for (size_t j = 0; j < neuronsLen; ++j) {
+                xx /= nLen;
+                yy /= nLen;
+                for (size_t j = 0; j < nLen; ++j) {
                     x[j] = xu[j] - xx;
                     y[j] = yu[j] - yy;
                 }
@@ -140,25 +147,35 @@ namespace kohonen {
                 /* Error in distances */
                 Out e = 0, tot = 0;
                 mutualIndex = 0;
-                for (size_t j = 1; j < neuronsLen; ++j) {
+                for (size_t j = 1; j < nLen; ++j) {
                     for (size_t k = 0; k < j; ++k) {
                         Out dist = dd[mutualIndex];
                         tot += dist;
                         Out xd = x[j] - x[k];
                         Out yd = y[j] - y[k];
-                        Out ee = dist - (Out) sqrt((double) xd * xd + yd * yd);
+                        // TODO: непонятно почему к double приводится только
+                        // первый слагаемый - если поставить (double)
+                        // ко второму то результат будет другим
+                        Out ee = dist - (Out) std::sqrt((double) xd * xd + yd * yd);
                         e += (ee * ee / dist);
                         mutualIndex++;
                     }
                 }
 
                 e /= tot;
+//                if (i==0 || i==1) {
+//                std::cout << "tot " << tot << std::endl;
+//                    std::cout << "Mapping error " << e << std::endl;
+//                    for (size_t a=0; a<neuronsLen; ++a) {
+//                        std::cout<<a<<" x[a] " << x[a] <<" y[a] " << y[a] << std::endl;
+//                    }
+//                }
 //                std::cout << "Mapping error " << e << std::endl;
             }
 
-            OutCodes* sammonCodes = new OutCodes(neuronsLen, 2);
-            std::cout<<"neuronsLen: " << neuronsLen << std::endl;
-            for (size_t i = 0; i < neuronsLen; ++i) {
+            OutCodes* sammonCodes = new OutCodes(nLen, 2);
+//            std::cout<<"neuronsLen: " << neuronsLen << std::endl;
+            for (size_t i = 0; i < nLen; ++i) {
                 Out points[2];
                 points[0] = x[i];
                 points[1] = y[i];
