@@ -41,29 +41,33 @@ namespace test {
         }
 
         void test_number_hash_charts() {
-            graphics::ChartThread numberHashChart(710, 460);
-            numberHashChart.getChart()->setWindowTitle("Number hash");
-            graphics::ChartThread floatHashChart(710, 460);
-            floatHashChart.getChart()->setWindowTitle("Float hash");
+            graphics::PointChart numberHashChart(710, 460);
+            numberHashChart.setWindowTitle("Number hash");
+            graphics::ChartThread numberHashChartThread(&numberHashChart);
+
+            graphics::PointChart floatHashChart(710, 460);
+            floatHashChart.setWindowTitle("Float hash");
+            graphics::ChartThread floatHashChartThread(&floatHashChart);
 
             utils::hash::NumberHash<double> nflash;
             utils::CHashSet<double> numSet(&nflash);
             for (double i = -1000; i < 1000; i = i + 0.1) {
                 size_t h = numSet.hash(i);
-                numberHashChart.getChart()->redrawNewPoints(i, h);
+                numberHashChart.redrawNewPoints(i, h);
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }
 
         void test_float_hash_charts() {
-            graphics::ChartThread floatHashChart(710, 460);
-            floatHashChart.getChart()->setWindowTitle("Float hash");
+            graphics::PointChart floatHashChart(710, 460);
+            floatHashChart.setWindowTitle("Float hash");
+            graphics::ChartThread floatHashChartThread(&floatHashChart);
 
             utils::hash::FloatHash<double> fhash(1.2, 1.6);
             utils::CHashSet<double> floatSet(&fhash);
             for (double i = 1.2; i < 1.6; i = i + 0.0001) {
                 size_t h = floatSet.hash(i);
-                floatHashChart.getChart()->redrawNewPoints(i, h);
+                floatHashChart.redrawNewPoints(i, h);
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }

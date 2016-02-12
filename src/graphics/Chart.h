@@ -16,7 +16,7 @@ namespace graphics {
         Chart(uint16_t _width = 400, uint16_t _height = 260) :
                 connection(xcb_connect(NULL, NULL)), width(_width), //
                 height(_height) {
-            std::cout << "call connect: " << std::endl;
+            std::cout << "Create Chart" << std::endl;
             if (xcb_connection_has_error(connection)) {
                 throw std::runtime_error("Cannot open display");
             }
@@ -59,7 +59,7 @@ namespace graphics {
         }
 
         ~Chart() {
-            std::cout << "call disconnect: " << std::endl;
+            std::cout << "Destroy Chart" << std::endl;
             backgroundContext = 0;
             screen = nullptr;
             delete colormap;
@@ -76,7 +76,7 @@ namespace graphics {
          */
         void runChart() const;
 
-        void draw() const;
+        virtual void draw() const = 0;
 
         void drawAxes() const;
 
@@ -86,44 +86,8 @@ namespace graphics {
 
         void drawAxisLabel(const ChartData::Axis &axis) const;
 
-        /**
-         * 1. draw clean current points
-         * 2. add new points and update all points position
-         * 3. draw updated current points
-         */
-        void redrawNewPoints(double x, double y) const;
-
         void flush() const {
             xcb_flush(connection);
-        }
-
-        void drawPoints() const {
-            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
-                           pointsContext,
-                           data->size(), data->getOutpoints()->getArray());
-        }
-
-        void drawArcs() const {
-            xcb_arc_t arcs[data->size()];
-            xcb_point_t* outPoints = data->getOutpoints()->getArray();
-            for (size_t i = 0; i<data->size(); ++i) {
-                xcb_point_t& point = outPoints[i];
-                arcs[i].x = point.x - 2;
-                arcs[i].y = point.y - 2;
-                arcs[i].width = 4;
-                arcs[i].height = 4;
-                arcs[i].angle1 = 0;
-                arcs[i].angle2 = 360 << 6;
-            }
-            xcb_poly_arc(connection, window,
-                           arcsContext,
-                           data->size(), arcs);
-        }
-
-        void drawCleanPoints() const {
-            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window,
-                           cleanPointsContext, data->size(),
-                           data->getOutpoints()->getArray());
         }
 
         void drawBackground() const {
@@ -131,9 +95,19 @@ namespace graphics {
                                     &rectangle);
         }
 
-        void setWindowTitle(const char *title);
+        void setWindowTitle(const char *title) {
+            /* set the title of the window */
+            xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
+                                XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(title),
+                                title);
 
-    private:
+            /* set the title of the window icon */
+            xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
+                                XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
+                                strlen(title), title);
+        }
+
+    protected:
 
         void createContexts();
 
@@ -148,11 +122,6 @@ namespace graphics {
         ChartData *data;
 
         xcb_gcontext_t backgroundContext;
-
-        xcb_gcontext_t pointsContext;
-        xcb_gcontext_t arcsContext;
-        xcb_gcontext_t cleanPointsContext;
-        xcb_gcontext_t cleanArcsContext;
 
         xcb_gcontext_t axisContext;
         xcb_gcontext_t axisFontContext;

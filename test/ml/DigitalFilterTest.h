@@ -6,6 +6,7 @@
 #include <chrono>         // std::chrono::seconds
 
 #include "graphics/ChartThread.h"
+#include "graphics/PointChart.h"
 #include "ml/DigitalFilter.h"
 
 #include "test.h"

@@ -28,43 +28,6 @@ namespace graphics {
         std::cout << "chart closed" << std::endl;
     }
 
-    void Chart::draw() const {
-        drawBackground();
-        drawAxes();
-        drawAxesLabels();
-        drawPoints();
-        drawArcs();
-    }
-
-    void Chart::redrawNewPoints(double x, double y) const {
-        drawCleanPoints();
-        data->addPoint(x, y);
-        drawPoints();
-
-        if (data->size() % 36 == 0) { // каждую третью
-            drawAxes();
-            drawAxesLabels();
-//			drawPoints();
-        }
-
-        xcb_flush(connection);
-
-//	drawCleanPoints();
-
-    }
-
-    void Chart::setWindowTitle(const char *title) {
-        /* set the title of the window */
-        xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
-                            XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(title),
-                            title);
-
-        /* set the title of the window icon */
-        xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
-                            XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
-                            strlen(title), title);
-    }
-
     void Chart::createContexts() {
         // black background context
         backgroundContext = xcb_generate_id(connection);
@@ -72,26 +35,6 @@ namespace graphics {
         uint32_t values[] = {screen->black_pixel, 0};
         xcb_create_gc(connection, backgroundContext, screen->root, mask,
                       values);
-
-        // points context
-        pointsContext = xcb_generate_id(connection);
-        mask = XCB_GC_FOREGROUND;
-        uint32_t values2[] = {colormap->getGreen()->pixel};
-        xcb_create_gc(connection, pointsContext, screen->root, mask, values2);
-
-        // arcs context
-        arcsContext = xcb_generate_id(connection);
-        mask = XCB_GC_FOREGROUND;
-        xcb_create_gc(connection, arcsContext, screen->root, mask, values2);
-
-        // clean points context
-        cleanPointsContext = xcb_generate_id(connection);
-        uint32_t values22[] = {screen->black_pixel};
-        xcb_create_gc(connection, cleanPointsContext, screen->root, mask,
-                      values22);
-        cleanArcsContext = xcb_generate_id(connection);
-        xcb_create_gc(connection, cleanArcsContext, screen->root, mask,
-                      values22);
 
         // axis context
         axisContext = xcb_generate_id(connection);
@@ -133,8 +76,7 @@ namespace graphics {
         xcb_generic_error_t *error = xcb_request_check(connection, cookie);
         if (error) {
             std::cout << "ERROR: " << errMessage << " code : " <<
-            error->error_code
-            << std::endl;
+            error->error_code << std::endl;
             free(error);
             throw std::runtime_error("XCB cookie error");
         }

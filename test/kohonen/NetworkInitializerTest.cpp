@@ -185,13 +185,17 @@ namespace test {
                             1);
             assert(sammonMatrix->equalsWithError(*expectedSammonMatrix, 0.001, true));
 
-            graphics::ChartThread sammonChart(1200, 700);
-            sammonChart.getChart()->setWindowTitle("Sammon Map");
+            graphics::SammonMapChart sammonChart(1200, 700);
+            sammonChart.setWindowTitle("Sammon Map");
+            graphics::ChartThread chartThread(&sammonChart);
+
 
             for (size_t i = 0; i<sammonMatrix->getRowSize(); ++i) {
                 Neuron& r = sammonMatrix->getRow(i);
-                sammonChart.getChart()->redrawNewPoints(r.points[0], r.points[1]);
+                sammonChart.getData()->addPoint(r.points[0], r.points[1]);
             }
+
+            sammonChart.draw();
 
             delete somTrainedMatrix;
             delete sammonMatrix;
@@ -232,8 +236,9 @@ namespace test {
                                                       0.002, 3.0, xdim, ydim);
 
             //
-            graphics::ChartThread qErrorChart(710, 460);
-            qErrorChart.getChart()->setWindowTitle("Quantum error");
+            graphics::PointChart qErrorChart(710, 460);
+            qErrorChart.setWindowTitle("Quantum error");
+            graphics::ChartThread chartThread(&qErrorChart);
 
             size_t teachSize = 4000000;
             size_t winnerSize = winnerSearcher.getWinnerSize();
@@ -261,7 +266,7 @@ namespace test {
                     qerror += std::sqrt(winners[0].diff);
                     if (cnt == 0 && le != 0) {
                         qerror = qerror / step;
-                        qErrorChart.getChart()->redrawNewPoints(le, qerror);
+                        qErrorChart.redrawNewPoints(le, qerror);
                         qerror = 0;
 //                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     }

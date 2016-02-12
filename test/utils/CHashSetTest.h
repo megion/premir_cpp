@@ -11,6 +11,7 @@
 #include "utils/hash/FloatHash.h"
 #include "utils/hash/NumberHash.h"
 #include "graphics/ChartThread.h"
+#include "graphics/PointChart.h"
 
 namespace test {
     namespace utils_cHashSet {

@@ -25,6 +25,8 @@
 #include "kohonen/SammonMap.h"
 
 #include "graphics/ChartThread.h"
+#include "graphics/SammonMapChart.h"
+#include "graphics/PointChart.h"
 
 namespace test {
     namespace kohonen_initializer {
