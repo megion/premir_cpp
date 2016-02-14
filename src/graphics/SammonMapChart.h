@@ -17,17 +17,16 @@ namespace graphics {
         SammonMapChart(uint16_t _width = 400, uint16_t _height = 260) :
                 Chart(_width, _height) {
             // arcs context
-            uint32_t values2[] = {Chart::colormap->getGreen()->pixel};
-            arcsContext = xcb_generate_id(Chart::connection);
+            uint32_t values2[] = {colormap->getGreen()->pixel};
+            arcsContext = xcb_generate_id(connection);
             uint32_t mask = XCB_GC_FOREGROUND;
-            xcb_create_gc(Chart::connection, arcsContext, Chart::screen->root,
+            xcb_create_gc(connection, arcsContext, screen->root,
                           mask, values2);
 
-            uint32_t values22[] = {Chart::screen->black_pixel};
+            uint32_t values22[] = {screen->black_pixel};
             cleanArcsContext = xcb_generate_id(connection);
-            xcb_create_gc(Chart::connection, cleanArcsContext,
-                          Chart::screen->root, mask,
-                          values22);
+            xcb_create_gc(connection, cleanArcsContext, screen->root,
+                          mask, values22);
         }
 
         ~SammonMapChart() {
@@ -63,6 +62,7 @@ namespace graphics {
             xcb_poly_arc(connection, window,
                          arcsContext,
                          len, arcs);
+            flush();
         }
 
     private:

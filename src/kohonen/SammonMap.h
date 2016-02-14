@@ -18,6 +18,7 @@
 
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
+#include "utils/CArrayList.h"
 #include "utils/ArrayUtils.h"
 #include "file/stream/StreamReader.h"
 #include "kohonen/alphafunc/AlphaFunction.h"
@@ -48,11 +49,11 @@ namespace kohonen {
          */
         OutCodes* buildMap(OutCodes *trainedSom, size_t iterationLen) {
             long nLen = trainedSom->getRowSize();
-            Out x[nLen];
-            Out y[nLen];
-            Out xu[nLen];
-            Out yu[nLen];
-            Out dd[nLen * (nLen - 1) / 2];
+            utils::CArrayList<Out> x(nLen);
+            utils::CArrayList<Out> y(nLen);
+            utils::CArrayList<Out> xu(nLen);
+            utils::CArrayList<Out> yu(nLen);
+            utils::CArrayList<Out> dd(nLen * (nLen - 1) / 2);
 
             for (size_t i = 0; i < nLen; ++i) {
                 x[i] = (Out) (randomEngine->generate() % nLen) / nLen;

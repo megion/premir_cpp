@@ -17,17 +17,17 @@ namespace graphics {
         PointChart(uint16_t _width = 400, uint16_t _height = 260) :
                 Chart(_width, _height) {
             // points context
-            pointsContext = xcb_generate_id(Chart::connection);
+            pointsContext = xcb_generate_id(connection);
             uint32_t mask = XCB_GC_FOREGROUND;
-            uint32_t values2[] = {Chart::colormap->getGreen()->pixel};
-            xcb_create_gc(Chart::connection, pointsContext, Chart::screen->root,
+            uint32_t values2[] = {colormap->getGreen()->pixel};
+            xcb_create_gc(connection, pointsContext, screen->root,
                           mask, values2);
 
             // clean points context
-            cleanPointsContext = xcb_generate_id(Chart::connection);
-            uint32_t values22[] = {Chart::screen->black_pixel};
-            xcb_create_gc(Chart::connection, cleanPointsContext,
-                          Chart::screen->root, mask,
+            cleanPointsContext = xcb_generate_id(connection);
+            uint32_t values22[] = {screen->black_pixel};
+            xcb_create_gc(connection, cleanPointsContext,
+                          screen->root, mask,
                           values22);
         }
 
@@ -37,16 +37,16 @@ namespace graphics {
         }
 
         void drawPoints() const {
-            xcb_poly_point(Chart::connection, XCB_COORD_MODE_ORIGIN,
-                           Chart::window, pointsContext, Chart::data->size(),
-                           Chart::data->getOutpoints()->getArray());
+            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
+                           window, pointsContext, data->size(),
+                           data->getOutpoints()->getArray());
         }
 
         void drawCleanPoints() const {
-            xcb_poly_point(Chart::connection, XCB_COORD_MODE_ORIGIN,
-                           Chart::window, cleanPointsContext,
-                           Chart::data->size(),
-                           Chart::data->getOutpoints()->getArray());
+            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
+                           window, cleanPointsContext,
+                           data->size(),
+                           data->getOutpoints()->getArray());
         }
 
         /**

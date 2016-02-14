@@ -37,6 +37,7 @@ namespace graphics {
                       values);
 
         // axis context
+        mask = XCB_GC_FOREGROUND;
         axisContext = xcb_generate_id(connection);
         uint32_t values3[] = {colormap->getGray()->pixel};
         xcb_create_gc(connection, axisContext, screen->root, mask, values3);
