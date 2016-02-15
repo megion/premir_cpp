@@ -53,7 +53,7 @@ namespace test {
             utils::CHashSet<double> numSet(&nflash);
             for (double i = -1000; i < 1000; i = i + 0.1) {
                 size_t h = numSet.hash(i);
-                numberHashChart.redrawNewPoints(i, h);
+                numberHashChart.redrawNewPoint(i, h);
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }
@@ -67,7 +67,7 @@ namespace test {
             utils::CHashSet<double> floatSet(&fhash);
             for (double i = 1.2; i < 1.6; i = i + 0.0001) {
                 size_t h = floatSet.hash(i);
-                floatHashChart.redrawNewPoints(i, h);
+                floatHashChart.redrawNewPoint(i, h);
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }

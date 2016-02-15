@@ -12,6 +12,7 @@
 //#include <limits>
 
 #include "utils/CArrayList.h"
+#include "utils/RDMatrix.h"
 
 namespace graphics {
 
@@ -23,9 +24,8 @@ namespace graphics {
     public:
         ChartData(const xcb_rectangle_t &_boundRect) :
                 boundRect(_boundRect), inrange({0, 0, 0, 0}), //
-                outpoints(nullptr) {
-            inpoints = new utils::CArrayList<Point>(0, 40);
-            outpoints = new utils::CArrayList<xcb_point_t>(0, 40);
+                outpoints(new utils::RDMatrix<bool, xcb_point_t>()), //
+                inpoints(new utils::RDMatrix<bool, Point>()) {
             createAxesPoints();
         }
 
@@ -59,7 +59,7 @@ namespace graphics {
             }
         };
 
-        utils::CArrayList<xcb_point_t> *getOutpoints() {
+        utils::RDMatrix<bool, xcb_point_t> *getOutpoints() {
             return outpoints;
         }
 
@@ -71,23 +71,21 @@ namespace graphics {
             return yAxes;
         }
 
-        size_t size() {
-            return inpoints->size();
-        }
-
-        void addPoint(double x, double y);
+        void addPoints(Point* points, size_t len);
 
         void updateAxesLabel(double ax, double bx, double ay, double by);
 
-        void printPoints();
-
-        void removeData();
+        void removeData() {
+            inpoints->removeAll();
+            outpoints->removeAll();
+        }
 
     private:
-        utils::CArrayList<Point> *inpoints;
+        utils::RDMatrix<bool, Point> *inpoints;
+        utils::RDMatrix<bool, xcb_point_t> *outpoints;
+
         utils::CArrayList<Axis> *yAxes;
         utils::CArrayList<Axis> *xAxes;
-        utils::CArrayList<xcb_point_t> *outpoints;
         xcb_rectangle_t boundRect;
 
         Range inrange;

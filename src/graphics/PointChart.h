@@ -37,16 +37,24 @@ namespace graphics {
         }
 
         void drawPoints() const {
-            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
-                           window, pointsContext, data->size(),
-                           data->getOutpoints()->getArray());
+            for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
+                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint =
+                        data->getOutpoints()->getRow(r);
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
+                               window, pointsContext, outPoint.colSize,
+                               outPoint.points);
+            }
+
         }
 
         void drawCleanPoints() const {
-            xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
-                           window, cleanPointsContext,
-                           data->size(),
-                           data->getOutpoints()->getArray());
+            for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
+                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint =
+                        data->getOutpoints()->getRow(r);
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
+                               window, cleanPointsContext, outPoint.colSize,
+                               outPoint.points);
+            }
         }
 
         /**
@@ -54,15 +62,32 @@ namespace graphics {
          * 2. add new points and update all points position
          * 3. draw updated current points
          */
-        void redrawNewPoints(double x, double y) const {
+        void redrawNewPoints(ChartData::Point *points, size_t len) const {
             drawCleanPoints();
-            data->addPoint(x, y);
+            data->addPoints(points, len);
             drawPoints();
 
-            if (data->size() % 36 == 0) { // оптимизация :)
-                drawAxes();
-                drawAxesLabels();
-            }
+//            if (data->size() % 36 == 0) { // оптимизация :)
+            drawAxes();
+            drawAxesLabels();
+//            }
+
+            flush();
+        }
+
+        void redrawNewPoint(double x, double y) const {
+            drawCleanPoints();
+
+            ChartData::Point points[1];
+            points[0].x = x;
+            points[0].y = y;
+            data->addPoints(points, 1);
+            drawPoints();
+
+//            if (data->size() % 36 == 0) { // оптимизация :)
+            drawAxes();
+            drawAxesLabels();
+//            }
 
             flush();
         }

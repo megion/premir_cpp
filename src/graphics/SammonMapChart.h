@@ -14,8 +14,8 @@ namespace graphics {
 
     class SammonMapChart : public Chart {
     public:
-        SammonMapChart(uint16_t _width = 400, uint16_t _height = 260) :
-                Chart(_width, _height) {
+        SammonMapChart(uint16_t _width = 400, uint16_t _height = 260, long _xdim) :
+                Chart(_width, _height), xdim(_xdim) {
             // arcs context
             uint32_t values2[] = {colormap->getGreen()->pixel};
             arcsContext = xcb_generate_id(connection);
@@ -34,39 +34,73 @@ namespace graphics {
             cleanArcsContext = 0;
         }
 
+        struct NeighborLine {
+            xcb_point_t line[2];
+        };
+
         void draw() const {
             drawBackground();
 //            drawAxes();
             drawAxesLabels();
-//            drawPoints();
             drawArcs();
         }
 
         void drawArcs() const {
-            // TODO: необходимо заблокировать изменение данных перед рисованием
-            // и разблокировать после или создать локальную копию данных (на чтение)
-            // для которых идет рисование
+            NeighborLine yNeighborPolyLines[xdim];
+            xcb_point_t xPolyLines[xdim];
+            size_t xIndex = 0;
+            size_t yIndex = 0;
 
-            size_t len = data->getOutpoints()->size();
-            xcb_arc_t arcs[len];
-            xcb_point_t *outPoints = data->getOutpoints()->getArray();
-            for (size_t i = 0; i < len; ++i) {
-                xcb_point_t &point = outPoints[i];
-                arcs[i].x = point.x - 2;
-                arcs[i].y = point.y - 2;
-                arcs[i].width = 4;
-                arcs[i].height = 4;
-                arcs[i].angle1 = 0;
-                arcs[i].angle2 = 360 << 6;
+            for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
+                utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
+                        data->getOutpoints()->getRow(r);
+                xcb_arc_t arcs[outRow.colSize];
+
+                for (size_t i = 0; i < outRow.colSize; ++i) {
+                    xcb_point_t &point = outRow.points[i];
+                    arcs[i].x = point.x - 2;
+                    arcs[i].y = point.y - 2;
+                    arcs[i].width = 4;
+                    arcs[i].height = 4;
+                    arcs[i].angle1 = 0;
+                    arcs[i].angle2 = 360 << 6;
+
+                    xPolyLines[xIndex].x = point.x;
+                    xPolyLines[xIndex].y = point.y;
+
+                    yNeighborPolyLines[xIndex].line[yIndex].x = point.x;
+                    yNeighborPolyLines[xIndex].line[yIndex].y = point.y;
+                    if (yIndex == 1) {
+                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
+                                      window, arcsContext, 2,
+                                      yNeighborPolyLines[xIndex].line);
+                    }
+
+                    if (xIndex == xdim - 1) {
+                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
+                                      window, arcsContext, xdim,
+                                      xPolyLines);
+                        xIndex = 0;
+                        if (yIndex == 1) {
+                            yIndex = 0;
+                        } else {
+                            ++yIndex;
+                        }
+                    } else {
+                        ++xIndex;
+                    }
+                }
+
+                xcb_poly_arc(connection, window, arcsContext,
+                             outRow.colSize, arcs);
             }
-            xcb_poly_arc(connection, window,
-                         arcsContext,
-                         len, arcs);
+
             flush();
         }
 
     private:
 
+        long xdim;
         xcb_gcontext_t arcsContext;
         xcb_gcontext_t cleanArcsContext;
 

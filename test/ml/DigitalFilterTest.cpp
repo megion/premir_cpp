@@ -58,10 +58,10 @@ void test_filter_charts() {
 //			chart.getChart().drawPoints();
 //			chart.getChart().flush();
 //
-            chartSignalTemplate.redrawNewPoints(i, signal);
-            chartNoiseEval.redrawNewPoints(i, noiseEval);
-            chartSignalIn.redrawNewPoints(i, signalAndNoise);
-            chartSignalOut.redrawNewPoints(i, signalEval);
+            chartSignalTemplate.redrawNewPoint(i, signal);
+            chartNoiseEval.redrawNewPoint(i, noiseEval);
+            chartSignalIn.redrawNewPoint(i, signalAndNoise);
+            chartSignalOut.redrawNewPoint(i, signalEval);
 
 //			chartSignalTemplate.getChart().flush();
 //			chartNoiseEval.getChart().flush();
@@ -77,12 +77,15 @@ void test_filter_charts() {
 
             ///////// draw filter weight
             chartFilterWeights.getData()->removeData();
-            double k = 0.0;
-            for (double &w : (*df.getWeightsArray())) {
-                chartFilterWeights.getData()->addPoint(k, w);
-                ++k;
-
+            utils::CArrayList<graphics::ChartData::Point> wPoints(
+                    df.getWeightsArray()->size());
+            for (size_t k = 0; df.getWeightsArray()->size(); ++k) {
+                graphics::ChartData::Point wp = {k,
+                                                 df.getWeightsArray()->getArray()[k]};
+                wPoints.push(wp);
             }
+            chartFilterWeights.getData()->addPoints(wPoints.getArray(),
+                                                    wPoints.size());
             chartFilterWeights.drawBackground();
             chartFilterWeights.drawAxes();
             chartFilterWeights.drawAxesLabels();
