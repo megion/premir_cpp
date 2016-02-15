@@ -14,7 +14,7 @@ namespace graphics {
 
     class SammonMapChart : public Chart {
     public:
-        SammonMapChart(uint16_t _width = 400, uint16_t _height = 260, long _xdim) :
+        SammonMapChart(long _xdim, uint16_t _width, uint16_t _height) :
                 Chart(_width, _height), xdim(_xdim) {
             // arcs context
             uint32_t values2[] = {colormap->getGreen()->pixel};
@@ -50,6 +50,7 @@ namespace graphics {
             xcb_point_t xPolyLines[xdim];
             size_t xIndex = 0;
             size_t yIndex = 0;
+            size_t cnt = 0;
 
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
@@ -70,7 +71,7 @@ namespace graphics {
 
                     yNeighborPolyLines[xIndex].line[yIndex].x = point.x;
                     yNeighborPolyLines[xIndex].line[yIndex].y = point.y;
-                    if (yIndex == 1) {
+                    if (cnt >= xdim) {
                         xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
                                       window, arcsContext, 2,
                                       yNeighborPolyLines[xIndex].line);
@@ -89,6 +90,7 @@ namespace graphics {
                     } else {
                         ++xIndex;
                     }
+                    ++cnt;
                 }
 
                 xcb_poly_arc(connection, window, arcsContext,

@@ -79,9 +79,9 @@ void test_filter_charts() {
             chartFilterWeights.getData()->removeData();
             utils::CArrayList<graphics::ChartData::Point> wPoints(
                     df.getWeightsArray()->size());
-            for (size_t k = 0; df.getWeightsArray()->size(); ++k) {
-                graphics::ChartData::Point wp = {k,
-                                                 df.getWeightsArray()->getArray()[k]};
+            for (size_t k = 0; k<df.getWeightsArray()->size(); ++k) {
+                graphics::ChartData::Point wp = {(double)k,
+                                                 (df.getWeightsArray()->getArray())[k]};
                 wPoints.push(wp);
             }
             chartFilterWeights.getData()->addPoints(wPoints.getArray(),
