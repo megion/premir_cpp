@@ -40,14 +40,14 @@ namespace kohonen {
                 nLen(_nLen),
                 randomEngine(new RandomGenerator()),
                 mapPoints(new utils::CArrayList<Point>(nLen, 1, nLen)),
-                xyu(new utils::CArrayList<Point>(nLen)),
+                correctionPoints(new utils::CArrayList<Point>(nLen)),
                 dd(new utils::CArrayList<Out>(nLen * (nLen - 1) / 2)) {
         }
 
         ~SammonMap() {
             delete randomEngine;
             delete mapPoints;
-            delete xyu;
+            delete correctionPoints;
             delete dd;
         }
 
@@ -124,23 +124,23 @@ namespace kohonen {
                     }
                 }
                 /* Correction */
-                (*xyu)[j].x = (*mapPoints)[j].x +
-                              MAGIC_NUM * e1x / std::fabs(e2x);
-                (*xyu)[j].y = (*mapPoints)[j].y +
-                              MAGIC_NUM * e1y / std::fabs(e2y);
+                (*correctionPoints)[j].x = (*mapPoints)[j].x +
+                                           MAGIC_NUM * e1x / std::fabs(e2x);
+                (*correctionPoints)[j].y = (*mapPoints)[j].y +
+                                           MAGIC_NUM * e1y / std::fabs(e2y);
             }
 
             /* Move the center of mass to the center of picture */
             Out xx = 0, yy = 0;
             for (size_t j = 0; j < nLen; ++j) {
-                xx += (*xyu)[j].x;
-                yy += (*xyu)[j].y;
+                xx += (*correctionPoints)[j].x;
+                yy += (*correctionPoints)[j].y;
             }
             xx /= nLen;
             yy /= nLen;
             for (size_t j = 0; j < nLen; ++j) {
-                (*mapPoints)[j].x = (*xyu)[j].x - xx;
-                (*mapPoints)[j].y = (*xyu)[j].y - yy;
+                (*mapPoints)[j].x = (*correctionPoints)[j].x - xx;
+                (*mapPoints)[j].y = (*correctionPoints)[j].y - yy;
             }
 
             /* Error in distances */
@@ -191,7 +191,7 @@ namespace kohonen {
 
         long nLen;
         utils::CArrayList<Point> *mapPoints;
-        utils::CArrayList<Point> *xyu; // TODO: надо переименовать :)
+        utils::CArrayList<Point> *correctionPoints;
         utils::CArrayList<Out> *dd;
 
     };

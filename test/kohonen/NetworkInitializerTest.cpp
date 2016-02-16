@@ -269,8 +269,8 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 40;
-            size_t ydim = 20;
+            size_t xdim = 80;
+            size_t ydim = 60;
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
@@ -376,8 +376,8 @@ namespace test {
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
-//            mytest(eucw_bubble_hexa_16_12_sammon);
-            mytest(visible_som_training);
+            mytest(eucw_bubble_hexa_16_12_sammon);
+//            mytest(visible_som_training);
         }
     }
 }

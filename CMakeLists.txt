@@ -9,25 +9,26 @@ include_directories(test)
 #include_directories(test/ml)
 #include_directories(test/utils)
 add_executable(dummy_executable
-  test/utils/LinkedListTest.cpp
-  test/utils/CArrayListTest.cpp
-  test/utils/CMatrixTest.cpp
-  test/utils/SMatrixTest.cpp
-  test/utils/RMatrixTest.cpp
-  test/utils/RDMatrixTest.cpp
-  test/utils/ArrayUtilsTest.cpp
-  test/utils/IntBitSetTest.cpp
-  test/utils/CHashSetTest.cpp
-  test/utils/matrix_utils_test.cpp
-  test/matrix/DeterminantTest.cpp
-  test/matrix/GramSchmidtTest.cpp
-  test/file/FileReaderTest.cpp
-  test/ml/DigitalFilterTest.cpp
-  test/kohonen/NetworkInitializerTest.cpp
-  test/coursera/CourseraTest.cpp
-  src/graphics/ChartData.cpp
-  src/graphics/Chart.cpp
-  src/ml/DigitalFilter.cpp
-  src/utils/matrix_utils.cpp
-  test/test.cpp
-)
+        test/utils/LinkedListTest.cpp
+        test/utils/CArrayListTest.cpp
+        test/utils/CMatrixTest.cpp
+        test/utils/SMatrixTest.cpp
+        test/utils/RMatrixTest.cpp
+        test/utils/RDMatrixTest.cpp
+        test/utils/ArrayUtilsTest.cpp
+        test/utils/IntBitSetTest.cpp
+        test/utils/CHashSetTest.cpp
+        test/utils/matrix_utils_test.cpp
+        test/matrix/DeterminantTest.cpp
+        test/matrix/GramSchmidtTest.cpp
+        test/file/FileReaderTest.cpp
+        test/ml/DigitalFilterTest.cpp
+        test/sspy/SspyTest.cpp
+        test/kohonen/NetworkInitializerTest.cpp
+        test/coursera/CourseraTest.cpp
+        src/graphics/ChartData.cpp
+        src/graphics/Chart.cpp
+        src/ml/DigitalFilter.cpp
+        src/utils/matrix_utils.cpp
+        test/test.cpp
+        )

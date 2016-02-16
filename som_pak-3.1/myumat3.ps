@@ -1,0 +1,215 @@
+%!PS-Adobe-2.0
+%%Pages: 1
+%%Creator: umat V1.0
+%%CreationDate: Tue Feb 16 22:54:42 2016
+559 36 translate 90 rotate
+gsave 0 24 translate 0.750977 dup scale
+gsave /Helvetica findfont 18 scalefont setfont
+0 setgray 2.000000 631.476868 8 add moveto
+(out_neurals3.cod - Dim: 5, Size: 16*12 units, bubble neighborhood) show
+grestore
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 0 0 1000 632
+%%Title: out_neurals3.cod
+%%Creator: umat V1.0
+%%CreationDate: Tue Feb 16 22:54:42 2016
+%%Pages: 0
+%%DocumentFonts: Helvetica
+%%DocumentNeededFonts: Helvetica
+%%EndComments
+%
+% PS header for umat - SOM to PS converter
+% Version 1.0 Tue Feb 28 1995
+% Author: Jussi Hynninen <hynde@nucleus.hut.fi>
+100 dict begin
+
+% predefine variables
+/yoff 0 def /xoff 0 def /xstep 0 def /ystep 0 def /y 0 def /radius 0 def
+/doborder false def
+% default font
+/fontname /Helvetica def
+% font size relative to radius
+/fontsize 1.0 def
+
+% default black and white tresholds
+/bt 0.0 def /wt 1.0 def
+
+% labelpallon sade suhteessa hexan sateeseen
+/ballrad 0.2 def
+
+% newline function. Moves the y coordinate to the next line
+/NL 
+{ /yoff yoff ystep sub def % next row
+  /y y 1 add def % add y by one
+  } bind def
+
+% start of line (for hexagonal lattice) - moves the current position in 
+% x direction to the correct place of the line
+/XSH
+{ xoff 
+  y 4 mod
+  dup 3 eq {pop 1} if
+  xstep 2 div mul
+  add
+  yoff moveto % move to start of line
+} bind def
+
+% start of line (for rectangular lattice) - moves the current position in 
+% x direction to the correct place of the line
+/XSR { xoff yoff moveto } bind def
+
+% set label color. If block is light -> label is black and same for dark block
+/sbc { .5 gt {0} {1} ifelse setgray } bind def
+
+% set gray level
+/G { 
+  100 div dup bt le {pop 0}
+  { dup wt ge {pop 1} {bt sub wt bt sub div} ifelse
+  } ifelse
+} bind def
+
+% unlabelled node
+/LN { 
+  gsave
+  G sbc
+  currentpoint radius ballrad mul 0 360 arc fill 
+  grestore
+  xstep 2 mul 0 rmoveto
+} bind def
+
+%select font
+/selfont {
+  fontname findfont radius fontsize mul scalefont setfont
+} bind def
+
+% print single label
+
+/LAB { 
+  gsave
+  G sbc
+  dup %duplicate string  
+  stringwidth
+  pop fontsize radius mul -0.25 mul exch
+  -2 div exch
+  rmoveto
+  show
+  grestore
+  xstep 2 mul 0 rmoveto
+} bind def
+
+% print multiple labels on one unit
+/ML {
+  gsave
+  G sbc
+  /numlabs exch def %number of labels
+  numlabs
+  2 div 
+  0.25 sub
+  radius fontsize mul mul neg
+  0 exch rmoveto
+  1 1 numlabs {
+    pop
+    gsave
+    dup %duplicate string  
+    stringwidth
+    pop 
+    -2 div 0
+    rmoveto
+    show
+    grestore
+    0 fontsize radius mul rmoveto
+  } for 
+  grestore
+  xstep 2 mul 0 rmoveto
+} bind def
+
+% print hexagon
+/H { 
+  gsave
+  G dup setgray %duplicate gray level
+  currentpoint translate
+  newpath 0 radius moveto
+  5 {60 rotate 0 radius lineto} repeat
+  closepath
+  doborder { gsave fill grestore sbc stroke}
+           { fill pop } ifelse
+  grestore  
+  xstep 0 rmoveto
+} bind def
+
+% print rectangle
+/R {
+  gsave
+  G dup setgray %duplicate gray level
+  currentpoint translate
+  newpath
+  xstep 0.5 mul dup moveto
+  xstep neg 0 rlineto
+  0 xstep neg rlineto
+  xstep 0 rlineto
+  closepath
+  doborder { gsave fill grestore sbc stroke}
+           { fill pop } ifelse
+  grestore  
+  xstep 0 rmoveto
+} bind def
+
+1 setlinewidth
+
+% End of umat PS header
+% Start image
+
+
+/radius 18.042196 def
+/xstep 31.250000 def
+/ystep 27.063293 def
+%%IncludeFont: Helvetica
+/fontname /Helvetica def
+selfont
+/doborder false def
+/wt 1.000000 def /bt 0.000000 def
+/y 0 def
+/xoff 15.625000 def
+/yoff 613.434692 def
+XSH 67 H 54 H 53 H 53 H 53 H 54 H 53 H 52 H 52 H 53 H 54 H 54 H 54 H 53 H 53 H 53 H 53 H 53 H 54 H 54 H 53 H 52 H 53 H 54 H 54 H 55 H 54 H 52 H 44 H 42 H 52 H NL
+XSH 81 H 47 H 79 H 46 H 71 H 47 H 53 H 49 H 59 H 46 H 58 H 39 H 58 H 36 H 58 H 33 H 62 H 35 H 64 H 39 H 69 H 39 H 74 H 40 H 77 H 42 H 60 H 46 H 43 H 52 H 66 H NL
+XSH 52 H 52 H 51 H 51 H 49 H 45 H 51 H 55 H 55 H 54 H 55 H 55 H 56 H 56 H 56 H 55 H 52 H 51 H 52 H 53 H 54 H 57 H 55 H 53 H 48 H 32 H 44 H 42 H 47 H 65 H 65 H NL
+XSH 71 H 31 H 63 H 21 H 61 H 12 H 61 H 23 H 59 H 28 H 61 H 38 H 61 H 41 H 59 H 44 H 53 H 43 H 55 H 48 H 55 H 52 H 57 H 49 H 61 H 22 H 66 H 32 H 71 H 42 H 62 H NL
+XSH 49 H 49 H 47 H 45 H 46 H 47 H 56 H 56 H 59 H 60 H 60 H 60 H 61 H 58 H 60 H 61 H 58 H 56 H 54 H 53 H 54 H 55 H 54 H 52 H 50 H 26 H 38 H 40 H 60 H 55 H 62 H NL
+XSH 43 H 49 H 43 H 49 H 41 H 62 H 56 H 61 H 64 H 65 H 69 H 63 H 72 H 60 H 74 H 62 H 77 H 54 H 78 H 46 H 75 H 46 H 76 H 47 H 71 H 36 H 54 H 66 H 71 H 64 H 90 H NL
+XSH 47 H 47 H 48 H 42 H 61 H 61 H 61 H 60 H 64 H 60 H 67 H 64 H 68 H 59 H 69 H 64 H 68 H 63 H 69 H 51 H 64 H 53 H 60 H 47 H 47 H 0 H 62 H 64 H 73 H 76 H 90 H NL
+XSH 81 H 44 H 81 H 52 H 81 H 67 H 88 H 73 H 86 H 72 H 87 H 77 H 86 H 72 H 86 H 77 H 86 H 72 H 84 H 74 H 79 H 84 H 68 H 84 H 61 H 48 H 60 H 81 H 89 H 87 H 93 H NL
+XSH 81 H 55 H 64 H 54 H 63 H 56 H 72 H 65 H 78 H 58 H 79 H 64 H 80 H 60 H 79 H 62 H 81 H 61 H 76 H 63 H 76 H 62 H 73 H 56 H 65 H 5 H 44 H 33 H 75 H 69 H 87 H NL
+XSH 85 H 73 H 89 H 71 H 87 H 77 H 92 H 83 H 83 H 86 H 88 H 88 H 84 H 88 H 86 H 86 H 90 H 81 H 92 H 79 H 92 H 77 H 95 H 70 H 77 H 39 H 89 H 56 H 100 H 75 H 99 H NL
+XSH 73 H 57 H 72 H 50 H 78 H 60 H 81 H 55 H 83 H 63 H 84 H 60 H 80 H 63 H 82 H 67 H 75 H 63 H 76 H 63 H 78 H 63 H 71 H 35 H 46 H 16 H 57 H 50 H 73 H 72 H 84 H NL
+XSH 89 H 71 H 92 H 73 H 84 H 80 H 87 H 79 H 83 H 84 H 87 H 82 H 86 H 76 H 90 H 78 H 91 H 69 H 87 H 72 H 80 H 80 H 73 H 82 H 54 H 64 H 58 H 81 H 64 H 83 H 84 H NL
+XSH 89 H 57 H 68 H 59 H 71 H 57 H 80 H 61 H 79 H 61 H 79 H 61 H 71 H 56 H 72 H 66 H 68 H 59 H 67 H 69 H 70 H 69 H 72 H 60 H 61 H 10 H 50 H 43 H 63 H 52 H 81 H NL
+XSH 93 H 65 H 92 H 68 H 82 H 81 H 84 H 80 H 85 H 77 H 82 H 73 H 69 H 77 H 68 H 70 H 56 H 65 H 62 H 64 H 77 H 72 H 76 H 63 H 79 H 36 H 85 H 62 H 88 H 64 H 81 H NL
+XSH 69 H 57 H 69 H 44 H 74 H 62 H 78 H 63 H 77 H 63 H 72 H 50 H 69 H 62 H 66 H 58 H 68 H 71 H 68 H 66 H 72 H 64 H 70 H 45 H 49 H 17 H 56 H 47 H 63 H 62 H 81 H NL
+XSH 69 H 75 H 76 H 70 H 73 H 74 H 84 H 75 H 86 H 77 H 85 H 70 H 78 H 68 H 86 H 64 H 83 H 72 H 85 H 78 H 72 H 76 H 81 H 76 H 67 H 53 H 58 H 55 H 63 H 52 H 83 H NL
+XSH 69 H 51 H 63 H 50 H 60 H 50 H 69 H 63 H 71 H 66 H 71 H 58 H 67 H 52 H 70 H 58 H 71 H 65 H 76 H 73 H 76 H 60 H 74 H 57 H 62 H 25 H 52 H 30 H 53 H 39 H 52 H NL
+XSH 78 H 31 H 78 H 36 H 76 H 43 H 80 H 55 H 82 H 63 H 79 H 65 H 72 H 72 H 76 H 78 H 82 H 80 H 87 H 83 H 84 H 71 H 80 H 72 H 52 H 55 H 52 H 52 H 66 H 40 H 58 H NL
+XSH 50 H 46 H 46 H 41 H 54 H 52 H 57 H 60 H 59 H 58 H 58 H 45 H 58 H 55 H 66 H 62 H 67 H 68 H 72 H 69 H 70 H 56 H 64 H 32 H 42 H 31 H 50 H 48 H 52 H 56 H 58 H NL
+XSH 71 H 50 H 59 H 46 H 56 H 56 H 56 H 58 H 59 H 55 H 58 H 55 H 52 H 61 H 65 H 66 H 67 H 65 H 75 H 55 H 79 H 42 H 76 H 16 H 79 H 18 H 78 H 39 H 76 H 40 H 76 H NL
+XSH 71 H 53 H 51 H 46 H 48 H 51 H 56 H 57 H 59 H 60 H 57 H 56 H 53 H 44 H 60 H 61 H 60 H 60 H 61 H 62 H 55 H 55 H 39 H 33 H 37 H 32 H 47 H 51 H 51 H 51 H 51 H NL
+XSH 76 H 42 H 76 H 34 H 71 H 28 H 66 H 29 H 60 H 32 H 60 H 32 H 58 H 19 H 59 H 34 H 54 H 33 H 45 H 40 H 25 H 36 H 22 H 42 H 41 H 44 H 67 H 45 H 71 H 45 H 78 H NL
+XSH 53 H 53 H 53 H 53 H 52 H 51 H 53 H 55 H 55 H 55 H 53 H 52 H 49 H 46 H 51 H 56 H 55 H 60 H 48 H 50 H 43 H 50 H 43 H 44 H 44 H 54 H 54 H 53 H 54 H 54 H 66 H NL
+/y 0 def
+/xoff 15.625000 def
+/yoff 613.434692 def
+XSH 67 LN 53 LN 53 LN 53 LN 52 LN 54 LN 54 LN 53 LN 53 LN 54 LN 53 LN 53 LN 54 LN 54 LN 44 LN 52 LN NL NL
+XSH 52 LN 51 LN 49 LN 51 LN 55 LN 55 LN 56 LN 56 LN 52 LN 52 LN 54 LN 55 LN 48 LN 44 LN 47 LN 65 LN NL NL
+XSH 49 LN 47 LN 46 LN 56 LN 59 LN 60 LN 61 LN 60 LN 58 LN 54 LN 54 LN 54 LN 50 LN 38 LN 60 LN 62 LN NL NL
+XSH 47 LN 48 LN 61 LN 61 LN 64 LN 67 LN 68 LN 69 LN 68 LN 69 LN 64 LN 60 LN 47 LN 62 LN 73 LN 90 LN NL NL
+XSH 81 LN 64 LN 63 LN 72 LN 78 LN 79 LN 80 LN 79 LN 81 LN 76 LN 76 LN 73 LN 65 LN 44 LN 75 LN 87 LN NL NL
+XSH 73 LN 72 LN 78 LN 81 LN 83 LN 84 LN 80 LN 82 LN 75 LN 76 LN 78 LN 71 LN 46 LN 57 LN 73 LN 84 LN NL NL
+XSH 89 LN 68 LN 71 LN 80 LN 79 LN 79 LN 71 LN 72 LN 68 LN 67 LN 70 LN 72 LN 61 LN 50 LN 63 LN 81 LN NL NL
+XSH 69 LN 69 LN 74 LN 78 LN 77 LN 72 LN 69 LN 66 LN 68 LN 68 LN 72 LN 70 LN 49 LN 56 LN 63 LN 81 LN NL NL
+XSH 69 LN 63 LN 60 LN 69 LN 71 LN 71 LN 67 LN 70 LN 71 LN 76 LN 76 LN 74 LN 62 LN 52 LN 53 LN 52 LN NL NL
+XSH 50 LN 46 LN 54 LN 57 LN 59 LN 58 LN 58 LN 66 LN 67 LN 72 LN 70 LN 64 LN 42 LN 50 LN 52 LN 58 LN NL NL
+XSH 71 LN 51 LN 48 LN 56 LN 59 LN 57 LN 53 LN 60 LN 60 LN 61 LN 55 LN 39 LN 37 LN 47 LN 51 LN 51 LN NL NL
+XSH 53 LN 53 LN 52 LN 53 LN 55 LN 53 LN 49 LN 51 LN 55 LN 48 LN 43 LN 43 LN 44 LN 54 LN 54 LN 66 LN NL NL
+end
+% end of EPS object
+grestore
+showpage
