@@ -192,24 +192,28 @@ namespace test {
 
         void buildAndShowSammonMap(OutCodes *somTrainedMatrix,
                                    graphics::SammonMapChart& sammonChart) {
-            kohonen::SammonMap<float> sammonMap;
+            kohonen::SammonMap<float> sammonMap(somTrainedMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine
                     = sammonMap.getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
+            sammonMap.initializeMap(somTrainedMatrix);
 
-            OutCodes *sammonMatrix = sammonMap.buildMap(somTrainedMatrix, 200);
-            sammonChart.getData()->removeData();
 
-            utils::CArrayList<graphics::ChartData::Point> points(sammonMatrix->getRowSize());
-            for (size_t i = 0; i<sammonMatrix->getRowSize(); ++i) {
-                Neuron& r = sammonMatrix->getRow(i);
-                graphics::ChartData::Point p = {r.points[0], r.points[1]};
-                points.push(p);
+
+            for (size_t i = 0; i<200; ++i) {
+                sammonChart.getData()->removeData();
+                sammonMap.doOneIteration();
+
+                utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
+                for (size_t i = 0; i<sammonMap.getMapPoints()->size(); ++i) {
+                    kohonen::SammonMap<float>::Point& r = (*sammonMap.getMapPoints())[i];
+                    graphics::ChartData::Point p = {r.x, r.y};
+                    points.push(p);
+                }
+                sammonChart.getData()->addPoints(points.getArray(), points.size());
+                sammonChart.draw();
             }
-            sammonChart.getData()->addPoints(points.getArray(), points.size());
-            sammonChart.draw();
-            delete sammonMatrix;
         }
 
         void test_eucw_bubble_hexa_16_12_sammon() {
@@ -224,17 +228,20 @@ namespace test {
                     dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                true);
 
-            kohonen::SammonMap<float> sammonMap;
-            kohonen::RandomGenerator *randomEngine
-                    = sammonMap.getRandomGenerator();
-            // для теста псевдоинициализация
-            randomEngine->setNextValue(1);
 
             OutCodes *somTrainedMatrix =
                     read_codes_file(
                             "../test/datafiles/kohonen/som_trained_"
                                     "10000_eucw_bubble_hexa_16_12.cod", 1);
-            OutCodes *sammonMatrix = sammonMap.buildMap(somTrainedMatrix, 1000);
+
+            kohonen::SammonMap<float> sammonMap(somTrainedMatrix->getRowSize());
+            kohonen::RandomGenerator *randomEngine
+                    = sammonMap.getRandomGenerator();
+            // для теста псевдоинициализация
+            randomEngine->setNextValue(1);
+            sammonMap.initializeMap(somTrainedMatrix);
+
+            sammonMap.buildMap(1000);
 
             OutCodes *expectedSammonMatrix =
                     read_sammon_file(
@@ -245,10 +252,12 @@ namespace test {
             graphics::SammonMapChart sammonChart(xdim, 740, 740);
             sammonChart.setWindowTitle("Sammon Map");
             graphics::ChartThread chartThread(&sammonChart);
-            utils::CArrayList<graphics::ChartData::Point> points(sammonMatrix->getRowSize());
-            for (size_t i = 0; i<sammonMatrix->getRowSize(); ++i) {
-                Neuron& r = sammonMatrix->getRow(i);
-                graphics::ChartData::Point p = {r.points[0], r.points[1]};
+            std::cout << "size: " << sammonMap.getMapPoints()->size() << std::endl;
+            std::cout << "x: " << (*sammonMap.getMapPoints())[0].x << std::endl;
+            utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
+            for (size_t i = 0; i<sammonMap.getMapPoints()->size(); ++i) {
+                kohonen::SammonMap<float>::Point& r = (*sammonMap.getMapPoints())[i];
+                graphics::ChartData::Point p = {r.x, r.y};
                 points.push(p);
             }
             sammonChart.getData()->addPoints(points.getArray(), points.size());
@@ -256,7 +265,6 @@ namespace test {
 
 
             delete somTrainedMatrix;
-            delete sammonMatrix;
             delete expectedSammonMatrix;
         }
 

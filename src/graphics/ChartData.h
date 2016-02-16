@@ -78,6 +78,10 @@ namespace graphics {
         void removeData() {
             inpoints->removeAll();
             outpoints->removeAll();
+            inrange.xMax = 0;
+            inrange.yMax = 0;
+            inrange.xMin = 0;
+            inrange.yMin = 0;
         }
 
     private:

@@ -33,8 +33,8 @@ namespace utils {
                 typeSizeof(sizeof(T)), array(nullptr) {
         }
 
-        CArrayList(size_t _capacity, size_t _capacityIncrease = 1) :
-                length(0), capacity(_capacity), //
+        CArrayList(size_t _capacity, size_t _capacityIncrease = 1, size_t _length = 0) :
+                length(_length), capacity(_capacity), //
                 capacityIncrease(_capacityIncrease), typeSizeof(sizeof(T)) {
             if (capacity == 0) {
                 array = nullptr;

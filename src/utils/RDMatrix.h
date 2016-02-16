@@ -195,6 +195,38 @@ namespace utils {
             pushRow(value);
         }
 
+        void appendValues(size_t rowIndex, T *arr, size_t arrSize) {
+            if (rowIndex < rowSize) {
+                // добавим значения в конец существующей строки
+                size_t oldColSize = matrix[rowIndex].colSize;
+                size_t newColSize = oldColSize + arrSize;
+
+                // re-initialize col memory
+                size_t cAmount = tTypeSizeof * newColSize;
+                T *newPointsArray;
+                if (matrix[rowIndex].points) {
+                    newPointsArray = (T *) std::realloc(matrix[rowIndex].points, cAmount);
+                } else {
+                    newPointsArray = (T *) std::malloc(cAmount);
+                }
+
+                if (newPointsArray == NULL) {
+                    throw std::runtime_error(std::strerror(errno));
+                }
+                matrix[rowIndex].points = newPointsArray;
+                matrix[rowIndex].colSize = newColSize;
+
+                memcpy(matrix[rowIndex].points + oldColSize, arr, arrSize * tTypeSizeof);
+            } else {
+                // добавить новую строку
+                writeRow(rowIndex, arr, arrSize);
+            }
+        }
+
+        void appendValue(size_t rowIndex, T& val) {
+            appendValues(rowIndex, &val, 1);
+        }
+
         void print() const {
             std::cout << "RDMatrix[" << rowSize << "]" << std::endl;
             for (size_t r = 0; r < rowSize; ++r) {

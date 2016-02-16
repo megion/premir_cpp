@@ -36,28 +36,31 @@ namespace kohonen {
         typedef typename utils::RMatrix<models::NeuronInfo, Out>::Row Neuron;
         typedef utils::ArrayUtils<Out, Out, Out> ArrayUtils;
 
-        SammonMap() {
-            randomEngine = new RandomGenerator();
+        SammonMap(long _nLen) :
+                nLen(_nLen),
+                randomEngine(new RandomGenerator()),
+                mapPoints(new utils::CArrayList<Point>(nLen, 1, nLen)),
+                xyu(new utils::CArrayList<Point>(nLen)),
+                dd(new utils::CArrayList<Out>(nLen * (nLen - 1) / 2)) {
         }
 
         ~SammonMap() {
             delete randomEngine;
+            delete mapPoints;
+            delete xyu;
+            delete dd;
         }
 
-        /**
-         * Построение проекций Саммона
-         */
-        OutCodes* buildMap(OutCodes *trainedSom, size_t iterationLen) {
-            long nLen = trainedSom->getRowSize();
-            utils::CArrayList<Out> x(nLen);
-            utils::CArrayList<Out> y(nLen);
-            utils::CArrayList<Out> xu(nLen);
-            utils::CArrayList<Out> yu(nLen);
-            utils::CArrayList<Out> dd(nLen * (nLen - 1) / 2);
+        struct Point {
+            Out x;
+            Out y;
+        };
 
+        void initializeMap(OutCodes *trainedSom) {
             for (size_t i = 0; i < nLen; ++i) {
-                x[i] = (Out) (randomEngine->generate() % nLen) / nLen;
-                y[i] = (Out) (i) / nLen;
+                (*mapPoints)[i].x =
+                        (Out) (randomEngine->generate() % nLen) / nLen;
+                (*mapPoints)[i].y = (Out) (i) / nLen;
             }
 
             size_t mutualIndex = 0;
@@ -66,13 +69,13 @@ namespace kohonen {
                 Neuron &ni = trainedSom->getRow(i);
                 ni.data.skipped = false; // сбросить флаг в начале
                 for (size_t j = 0; j < trainedSom->getRowSize(); ++j) {
-                    if (i==j) {
+                    if (i == j) {
                         break;
                     }
                     Neuron &nj = trainedSom->getRow(j);
                     Out dist = ArrayUtils::euclideanDistance(
                             ni.points, nj.points, colSize);
-                    dd[mutualIndex] = dist;
+                    (*dd)[mutualIndex] = dist;
                     mutualIndex++;
 
                     if (dist == 0) {
@@ -87,87 +90,97 @@ namespace kohonen {
                     }
                 }
             }
+        }
 
-            for (size_t i = 0; i < iterationLen; ++i) {
-
-                for (size_t j = 0; j < nLen; ++j) {
-                    Out e1x = 0, e1y = 0, e2x = 0, e2y = 0;
-                    for (size_t k = 0; k < nLen; ++k) {
-                        if (j != k) {
-                            Out xd = x[j] - x[k];
-                            Out yd = y[j] - y[k];
-                            // TODO: непонятно почему к double приводится только
-                            // первый слагаемый - если поставить (double)
-                            // ко второму то результат будет другим
-                            Out dpj = (Out) std::sqrt((double) xd * xd + yd * yd);
-
-                            /* calculate derivatives */
-                            Out dt;
-                            if (k > j) {
-                                dt = dd[k * (k - 1) / 2 + j];
-                            } else {
-                                dt = dd[j * (j - 1) / 2 + k];
-                            }
-                            Out dq = dt - dpj;
-                            Out dr = dt * dpj;
-                            e1x += xd * dq / dr;
-                            e1y += yd * dq / dr;
-                            e2x += (dq - xd * xd * (1.0 + dq / dpj) / dpj) / dr;
-                            e2y += (dq - yd * yd * (1.0 + dq / dpj) / dpj) / dr;
-                        }
-                    }
-                    /* Correction */
-                    xu[j] = x[j] + MAGIC_NUM * e1x / std::fabs(e2x);
-                    yu[j] = y[j] + MAGIC_NUM * e1y / std::fabs(e2y);
-                }
-
-                /* Move the center of mass to the center of picture */
-                Out xx = 0, yy = 0;
-                for (size_t j = 0; j < nLen; ++j) {
-                    xx += xu[j];
-                    yy += yu[j];
-                }
-                xx /= nLen;
-                yy /= nLen;
-                for (size_t j = 0; j < nLen; ++j) {
-                    x[j] = xu[j] - xx;
-                    y[j] = yu[j] - yy;
-                }
-
-                /* Error in distances */
-                Out e = 0, tot = 0;
-                mutualIndex = 0;
-                for (size_t j = 1; j < nLen; ++j) {
-                    for (size_t k = 0; k < j; ++k) {
-                        Out dist = dd[mutualIndex];
-                        tot += dist;
-                        Out xd = x[j] - x[k];
-                        Out yd = y[j] - y[k];
+        /**
+         * Построение проекций Саммона - одна итерация
+         */
+        void doOneIteration() {
+            for (size_t j = 0; j < nLen; ++j) {
+                Out e1x = 0, e1y = 0, e2x = 0, e2y = 0;
+                for (size_t k = 0; k < nLen; ++k) {
+                    if (j != k) {
+                        Out xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
+                        Out yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
                         // TODO: непонятно почему к double приводится только
                         // первый слагаемый - если поставить (double)
                         // ко второму то результат будет другим
-                        Out ee = dist - (Out) std::sqrt((double) xd * xd + yd * yd);
-                        e += (ee * ee / dist);
-                        mutualIndex++;
+                        Out dpj = (Out) std::sqrt(
+                                (double) xd * xd + yd * yd);
+
+                        /* calculate derivatives */
+                        Out dt;
+                        if (k > j) {
+                            dt = (*dd)[k * (k - 1) / 2 + j];
+                        } else {
+                            dt = (*dd)[j * (j - 1) / 2 + k];
+                        }
+                        Out dq = dt - dpj;
+                        Out dr = dt * dpj;
+                        e1x += xd * dq / dr;
+                        e1y += yd * dq / dr;
+                        e2x += (dq - xd * xd * (1.0 + dq / dpj) / dpj) / dr;
+                        e2y += (dq - yd * yd * (1.0 + dq / dpj) / dpj) / dr;
                     }
                 }
+                /* Correction */
+                (*xyu)[j].x = (*mapPoints)[j].x +
+                              MAGIC_NUM * e1x / std::fabs(e2x);
+                (*xyu)[j].y = (*mapPoints)[j].y +
+                              MAGIC_NUM * e1y / std::fabs(e2y);
+            }
 
-                e /= tot;
+            /* Move the center of mass to the center of picture */
+            Out xx = 0, yy = 0;
+            for (size_t j = 0; j < nLen; ++j) {
+                xx += (*xyu)[j].x;
+                yy += (*xyu)[j].y;
+            }
+            xx /= nLen;
+            yy /= nLen;
+            for (size_t j = 0; j < nLen; ++j) {
+                (*mapPoints)[j].x = (*xyu)[j].x - xx;
+                (*mapPoints)[j].y = (*xyu)[j].y - yy;
+            }
+
+            /* Error in distances */
+            Out e = 0, tot = 0;
+            size_t mutualIndex = 0;
+            for (size_t j = 1; j < nLen; ++j) {
+                for (size_t k = 0; k < j; ++k) {
+                    Out dist = (*dd)[mutualIndex];
+                    tot += dist;
+                    Out xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
+                    Out yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
+                    // TODO: непонятно почему к double приводится только
+                    // первый слагаемый - если поставить (double)
+                    // ко второму то результат будет другим
+                    Out ee = dist -
+                             (Out) std::sqrt((double) xd * xd + yd * yd);
+                    e += (ee * ee / dist);
+                    mutualIndex++;
+                }
+            }
+
+            e /= tot;
 //                std::cout << "Mapping error " << e << std::endl;
-            }
+        }
 
-            OutCodes* sammonCodes = new OutCodes(nLen, 2);
-            for (size_t i = 0; i < nLen; ++i) {
-                Out points[2];
-                points[0] = x[i];
-                points[1] = y[i];
-                sammonCodes->writeRow(i, points);
+        /**
+         * Построение проекций Саммона
+         */
+        void buildMap(size_t iterationLen) {
+            for (size_t i = 0; i < iterationLen; ++i) {
+                doOneIteration();
             }
-            return sammonCodes;
         }
 
         RandomGenerator *getRandomGenerator() const {
             return randomEngine;
+        }
+
+        utils::CArrayList<Point> *getMapPoints() const {
+            return mapPoints;
         }
 
     private:
@@ -176,25 +189,11 @@ namespace kohonen {
 
         const double MAGIC_NUM = 0.2;
 
-        /**
-         * Для идентичных нейронов (евклидовое расстояние между котороми
-         * = 0) установить флаг skipped = true.
-         */
-        void setSkippedIdenticalNeurons(OutCodes *trainedSom) {
-            size_t colSize = trainedSom->getColSize();
-            for (size_t i = 0; i < trainedSom->getRowSize(); ++i) {
-                Neuron &ni = trainedSom->getRow(i);
-                ni.data.skipped = false; // сбросить флаг в начале
-                for (size_t j = i + 1; j < trainedSom->getRowSize(); ++j) {
-                    Neuron &nj = trainedSom->getRow(j);
-                    if (ArrayUtils::euclideanDistance(
-                            ni.points, nj.points, colSize) == 0) {
-                        ni.data.skipped = true;
-                        break;
-                    }
-                }
-            }
-        }
+        long nLen;
+        utils::CArrayList<Point> *mapPoints;
+        utils::CArrayList<Point> *xyu; // TODO: надо переименовать :)
+        utils::CArrayList<Out> *dd;
+
     };
 }
 

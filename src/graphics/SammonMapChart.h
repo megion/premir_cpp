@@ -34,10 +34,6 @@ namespace graphics {
             cleanArcsContext = 0;
         }
 
-        struct NeighborLine {
-            xcb_point_t line[2];
-        };
-
         void draw() const {
             drawBackground();
 //            drawAxes();
@@ -46,11 +42,9 @@ namespace graphics {
         }
 
         void drawArcs() const {
-            NeighborLine yNeighborPolyLines[xdim];
+            utils::RDMatrix<bool, xcb_point_t> yPolyLines;
             xcb_point_t xPolyLines[xdim];
             size_t xIndex = 0;
-            size_t yIndex = 0;
-            size_t cnt = 0;
 
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
@@ -69,32 +63,28 @@ namespace graphics {
                     xPolyLines[xIndex].x = point.x;
                     xPolyLines[xIndex].y = point.y;
 
-                    yNeighborPolyLines[xIndex].line[yIndex].x = point.x;
-                    yNeighborPolyLines[xIndex].line[yIndex].y = point.y;
-                    if (cnt >= xdim) {
-                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                                      window, arcsContext, 2,
-                                      yNeighborPolyLines[xIndex].line);
-                    }
+                    yPolyLines.appendValue(xIndex, point);
 
                     if (xIndex == xdim - 1) {
                         xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
                                       window, arcsContext, xdim,
                                       xPolyLines);
                         xIndex = 0;
-                        if (yIndex == 1) {
-                            yIndex = 0;
-                        } else {
-                            ++yIndex;
-                        }
                     } else {
                         ++xIndex;
                     }
-                    ++cnt;
                 }
 
                 xcb_poly_arc(connection, window, arcsContext,
                              outRow.colSize, arcs);
+            }
+
+            for (size_t r = 0; r < yPolyLines.getRowSize(); ++r) {
+                utils::RDMatrix<bool, xcb_point_t>::Row &row =
+                        yPolyLines.getRow(r);
+                xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
+                              window, arcsContext, row.colSize,
+                              row.points);
             }
 
             flush();

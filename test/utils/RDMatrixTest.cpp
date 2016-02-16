@@ -126,12 +126,39 @@ namespace test {
             }
         }
 
+        void test_append_values() {
+            utils::RDMatrix<double, int> a;
+
+            int row0[] = {1, 1, 1, 1};
+            a.writeRow(0, row0, 4);
+            a.writeRow(1, row0, 4);
+
+            int vals[] = {2, 3, 4, 5};
+            a.appendValues(0, vals, 4);
+
+            assert(a[0].colSize==8);
+            assert(a(0, 7)==5);
+            assert(a.getRowSize()==2);
+
+            a.appendValues(2, vals, 4);
+            assert(a.getRowSize()==3);
+            assert(a[2].colSize == 4);
+            assert(a(2, 3) == 5);
+
+            int val = 12;
+            a.appendValue(0, val);
+            assert(a[0].colSize==9);
+            assert(a(0, 8)==12);
+            assert(a.getRowSize()==3);
+        }
+
         void rDMatrix_test() {
             suite("RDMatrix");
             mytest(push_row);
             mytest(comparison);
             mytest(comparison_with_error);
             mytest(get_row);
+            mytest(append_values);
         }
     }
 }
