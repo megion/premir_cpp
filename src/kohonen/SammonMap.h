@@ -58,8 +58,7 @@ namespace kohonen {
 
         void initializeMap(OutCodes *trainedSom) {
             for (size_t i = 0; i < nLen; ++i) {
-                (*mapPoints)[i].x =
-                        (Out) (randomEngine->generate() % nLen) / nLen;
+                (*mapPoints)[i].x = (Out) (randomEngine->generate() % nLen) / nLen;
                 (*mapPoints)[i].y = (Out) (i) / nLen;
             }
 
@@ -73,8 +72,7 @@ namespace kohonen {
                         break;
                     }
                     Neuron &nj = trainedSom->getRow(j);
-                    Out dist = ArrayUtils::euclideanDistance(
-                            ni.points, nj.points, colSize);
+                    Out dist = ArrayUtils::euclideanDistance(ni.points, nj.points, colSize);
                     (*dd)[mutualIndex] = dist;
                     mutualIndex++;
 
@@ -82,8 +80,7 @@ namespace kohonen {
                         // нейроны идентичны
                         ni.data.skipped = true;
                         danger_text("skip identical neuron");
-                        std::cout << "Neuron " << i << " equal neuron " << j <<
-                        std::endl;
+                        std::cout << "Neuron " << i << " equal neuron " << j << std::endl;
                         // выйдем из цикла и начнем новую итерацию верхнего
                         // цикла
 //                        break;
@@ -105,8 +102,7 @@ namespace kohonen {
                         // TODO: непонятно почему к double приводится только
                         // первый слагаемый - если поставить (double)
                         // ко второму то результат будет другим
-                        Out dpj = (Out) std::sqrt(
-                                (double) xd * xd + yd * yd);
+                        Out dpj = (Out) std::sqrt((double) xd * xd + yd * yd);
 
                         /* calculate derivatives */
                         Out dt;
@@ -124,10 +120,8 @@ namespace kohonen {
                     }
                 }
                 /* Correction */
-                (*correctionPoints)[j].x = (*mapPoints)[j].x +
-                                           MAGIC_NUM * e1x / std::fabs(e2x);
-                (*correctionPoints)[j].y = (*mapPoints)[j].y +
-                                           MAGIC_NUM * e1y / std::fabs(e2y);
+                (*correctionPoints)[j].x = (*mapPoints)[j].x + MAGIC_NUM * e1x / std::fabs(e2x);
+                (*correctionPoints)[j].y = (*mapPoints)[j].y + MAGIC_NUM * e1y / std::fabs(e2y);
             }
 
             /* Move the center of mass to the center of picture */
@@ -155,8 +149,7 @@ namespace kohonen {
                     // TODO: непонятно почему к double приводится только
                     // первый слагаемый - если поставить (double)
                     // ко второму то результат будет другим
-                    Out ee = dist -
-                             (Out) std::sqrt((double) xd * xd + yd * yd);
+                    Out ee = dist - (Out) std::sqrt((double) xd * xd + yd * yd);
                     e += (ee * ee / dist);
                     mutualIndex++;
                 }

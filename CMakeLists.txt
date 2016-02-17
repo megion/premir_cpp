@@ -15,6 +15,7 @@ add_executable(dummy_executable
         test/utils/SMatrixTest.cpp
         test/utils/RMatrixTest.cpp
         test/utils/RDMatrixTest.cpp
+        test/utils/R3DMatrixTest.cpp
         test/utils/ArrayUtilsTest.cpp
         test/utils/IntBitSetTest.cpp
         test/utils/CHashSetTest.cpp
