@@ -24,12 +24,20 @@ namespace utils {
             size_t pointSize;
             C data; // произвольные данные ячейки
             T *points; // массив однотипных данных ячейки
+
+            T &operator[](const size_t &p) const {
+                return points[p];
+            }
         };
 
         struct Row {
             size_t cellSize;
             R data; // произвольные данные строки
             Cell *cells; // массив ячеек строки
+
+            Cell &operator[](const size_t &c) const {
+                return cells[c];
+            }
         };
 
         R3DMatrix() : rowSize(0), matrix(nullptr),

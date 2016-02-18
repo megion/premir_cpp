@@ -83,11 +83,15 @@ namespace test {
                 for (int c = 0; c < cNum; ++c) {
                     assert(a[r].cells[c].pointSize == 0);
                     assert(a[r].cells[c].points == nullptr);
+
+                    int points[] = {1, 2};
+                    a.writePoints(r, c, points, 2);
+                    assert(a[r][c][1] == 2);
                     ++i;
                 }
             }
 
-            assert(i == rNum*cNum);
+            assert(i == rNum * cNum);
         }
 
         void r3DMatrix_test() {
