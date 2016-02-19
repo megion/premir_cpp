@@ -24,6 +24,10 @@ namespace utils {
             size_t colSize;
             S data; // произвольные данные строки
             T *points; // массив однотипных данных строки
+
+            T &operator[](const size_t &p) const {
+                return points[p];
+            }
         };
 
         RDMatrix() : rowSize(0), matrix(nullptr),
