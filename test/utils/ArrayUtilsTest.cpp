@@ -25,10 +25,20 @@ namespace test {
             assert(res == 19);
         }
 
+        /* Comparison function for the sort */
+//        int compar(const void *first, const void *sec) {
+//            if(*(int *)first < *(int *)sec) return -1;
+//            else return *(int *)first > *(int *)sec;
+//        }
+
         void test_heap_sort() {
             int arrA[] = {1, 2, 2, 8, 9, 3, 4, 5, 3, 3, 6, 7};
             utils::CArrayList<int> vectorA;
             vectorA.push(arrA, 12);
+
+//            vectorA.print();
+//            std::qsort((void *)vectorA.getArray(), vectorA.size(), sizeof(*vectorA.getArray()), compar);
+//            vectorA.print();
 
             sort::HeapSort<int> hsort;
             hsort.sort(vectorA.getArray(), vectorA.size());

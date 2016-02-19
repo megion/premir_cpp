@@ -376,7 +376,7 @@ namespace test {
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
-            mytest(eucw_bubble_hexa_16_12_sammon);
+//            mytest(eucw_bubble_hexa_16_12_sammon);
 //            mytest(visible_som_training);
         }
     }
