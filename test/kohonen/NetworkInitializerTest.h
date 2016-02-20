@@ -24,6 +24,10 @@
 #include "kohonen/SomTrainer.h"
 #include "kohonen/SammonMap.h"
 
+#include "kohonen/umat/UMat.h"
+#include "kohonen/umat/RectUMat.h"
+#include "kohonen/umat/HexaUMat.h"
+
 #include "graphics/ChartThread.h"
 #include "graphics/SammonMapChart.h"
 #include "graphics/PointChart.h"

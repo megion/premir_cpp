@@ -45,7 +45,7 @@ namespace utils {
                       rowTypeSizeof(sizeof(Row)), cellTypeSizeof(sizeof(Cell)) {
         }
 
-        R3DMatrix(size_t _rowSize, size_t _colSize) : matrix(nullptr),
+        R3DMatrix(size_t _rowSize, size_t _colSize) : rowSize(0), matrix(nullptr),
                       rTypeSizeof(sizeof(R)), cTypeSizeof(sizeof(C)), tTypeSizeof(sizeof(T)),
                       rowTypeSizeof(sizeof(Row)), cellTypeSizeof(sizeof(Cell)) {
             initializeRowMemory(_rowSize);

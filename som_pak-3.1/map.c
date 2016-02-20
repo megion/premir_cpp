@@ -514,11 +514,19 @@ int calc_umatrix(struct umatrix *umat,int xswap,int yswap)
       fprintf(stderr,"maximum distance between elements : %f\n",max);
     }
 
+	printf("minimum distance between elements : %f\n",min);
+	printf("maximum distance between elements : %f\n",max);
+
   bw = max - min;
   /* scale values to [0,1] */
-  for (i=0;i<umat->uxdim;i++)
-    for (j=0;j<umat->uydim;j++)
-      umat->uvalue[i][j] = 1.0 - (umat->uvalue[i][j] - min) / bw;
+  for (i=0;i<umat->uxdim;i++) {
+	  for (j = 0; j < umat->uydim; j++) {
+		  umat->uvalue[i][j] = 1.0 - (umat->uvalue[i][j] - min) / bw;
+
+		  printf("%f ",umat->uvalue[i][j]);
+	  }
+	  printf("\n");
+  }
 
 #if 0
       umat->uvalue[i][j] = -umat->uvalue[i][j]/max+1.0;

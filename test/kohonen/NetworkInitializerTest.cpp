@@ -371,11 +371,29 @@ namespace test {
             delete somCodesMatrix;
         }
 
+        void test_umatrix_hexa() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
+            OutCodes *somTrainedMatrix =
+                    read_codes_file(
+                            "../test/datafiles/kohonen/som_trained_"
+                                    "10000_eucw_bubble_hexa_16_12.cod", 1);
+
+            kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
+            umat.initializeMat(somTrainedMatrix);
+            umat.buildUMatrix();
+
+            umat.getUMatrix()->print();
+        }
+
         void network_initializer_test() {
             suite("NetworkInitializer_test");
             mytest(line_initialization);
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
+            mytest(umatrix_hexa);
 //            mytest(eucw_bubble_hexa_16_12_sammon);
 //            mytest(visible_som_training);
         }

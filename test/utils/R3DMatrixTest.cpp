@@ -73,8 +73,8 @@ namespace test {
         }
 
         void test_init_in_constructor() {
-            int rNum = 10;
-            int cNum = 20;
+            int rNum = 160;
+            int cNum = 12;
             utils::R3DMatrix<bool, bool, int> a(rNum, cNum);
 
             int i = 0;
