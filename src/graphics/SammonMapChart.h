@@ -49,9 +49,9 @@ namespace graphics {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
                         data->getOutpoints()->getRow(r);
-                xcb_arc_t arcs[outRow.colSize];
+                xcb_arc_t arcs[outRow.pointSize];
 
-                for (size_t i = 0; i < outRow.colSize; ++i) {
+                for (size_t i = 0; i < outRow.pointSize; ++i) {
                     xcb_point_t &point = outRow.points[i];
                     arcs[i].x = point.x - 2;
                     arcs[i].y = point.y - 2;
@@ -63,7 +63,7 @@ namespace graphics {
                     xPolyLines[xIndex].x = point.x;
                     xPolyLines[xIndex].y = point.y;
 
-                    yPolyLines.appendValue(xIndex, point);
+                    yPolyLines.writeToEndRow(xIndex, point);
 
                     if (xIndex == xdim - 1) {
                         xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
@@ -76,14 +76,14 @@ namespace graphics {
                 }
 
                 xcb_poly_arc(connection, window, arcsContext,
-                             outRow.colSize, arcs);
+                             outRow.pointSize, arcs);
             }
 
             for (size_t r = 0; r < yPolyLines.getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &row =
                         yPolyLines.getRow(r);
                 xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                              window, arcsContext, row.colSize,
+                              window, arcsContext, row.pointSize,
                               row.points);
             }
 

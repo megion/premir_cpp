@@ -16,13 +16,14 @@
 
 namespace utils {
 
-    template<typename S, typename T>
+    template<typename R, typename T>
     class RDMatrix {
     public:
 
         struct Row {
-            size_t colSize;
-            S data; // произвольные данные строки
+            size_t pointSize;
+            size_t pointCapacity;
+            R data; // произвольные данные строки
             T *points; // массив однотипных данных строки
 
             T &operator[](const size_t &p) const {
@@ -30,26 +31,46 @@ namespace utils {
             }
         };
 
-        RDMatrix() : rowSize(0), matrix(nullptr),
-                     tTypeSizeof(sizeof(T)), rTypeSizeof(sizeof(Row)),
-                     sTypeSizeof(sizeof(S)) {
+        RDMatrix() : rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1),
+                     matrix(nullptr), tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
         }
 
-        RDMatrix<S, T>(
-                const RDMatrix<S, T> &) = delete; // disable copy constructor
-        RDMatrix<S, T> &operator=(
-                const RDMatrix<S, T> &) = delete; // assign operator
-        RDMatrix<S, T> &operator=(
-                RDMatrix<S, T> &&) = delete; // replacement operator
+        RDMatrix(size_t _rowSize, size_t _rowCapacityIncrease, size_t _pointCapacityIncrease) :
+                rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(_rowCapacityIncrease),
+                pointCapacityIncrease(_pointCapacityIncrease), matrix(nullptr),
+                tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
+            initializeRowMemory(_rowSize);
+        }
+
+        RDMatrix(size_t _rowSize, size_t _pointSize) :
+                rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1),
+                matrix(nullptr), tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
+            initializeRowMemory(_rowSize);
+            for (size_t r=0; r<rowSize; ++r) {
+                initializePointsMemory(matrix[r], _pointSize);
+            }
+        }
+
+        RDMatrix<R, T>(const RDMatrix<R, T> &) = delete; // disable copy constructor
+        RDMatrix<R, T> &operator=(const RDMatrix<R, T> &) = delete; // assign operator
+        RDMatrix<R, T> &operator=(RDMatrix<R, T> &&) = delete; // replacement operator
 
         ~RDMatrix() {
             removeAll();
         }
 
+        void setRowCapacityIncrease(size_t _rowCapacityIncrease) {
+            rowCapacityIncrease = _rowCapacityIncrease;
+        }
+
+        void setPointCapacityIncrease(size_t _pointCapacityIncrease) {
+            pointCapacityIncrease = _pointCapacityIncrease;
+        }
+
         void removeAll() {
             if (matrix) {
                 // remove all row array
-                for (size_t r = 0; r < rowSize; ++r) {
+                for (size_t r = 0; r < rowCapacity; ++r) {
                     if (matrix[r].points) {
                         std::free(matrix[r].points);
                         // set to null each array pointer
@@ -59,6 +80,7 @@ namespace utils {
                 std::free(matrix);
                 matrix = nullptr;
                 rowSize = 0;
+                rowCapacity = 0;
             }
         }
 
@@ -70,20 +92,20 @@ namespace utils {
             return matrix[r];
         }
 
-        bool operator==(const RDMatrix<S, T> &other) const {
+        bool operator==(const RDMatrix<R, T> &other) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
             for (size_t r = 0; r < rowSize; ++r) {
-                if (other.getRow(r).colSize != matrix[r].colSize) {
+                if (other[r].pointSize != matrix[r].pointSize) {
                     return false;
                 }
                 // проверка объекта с произвольными данными
-                if (other.getRow(r).data != matrix[r].data) {
+                if (other[r].data != matrix[r].data) {
                     return false;
                 }
-                for (size_t c = 0; c < matrix[r].colSize; ++c) {
-                    if (matrix[r].points[c] != other(r, c)) {
+                for (size_t c = 0; c < matrix[r].pointSize; ++c) {
+                    if (matrix[r].points[c] != other[r][c]) {
                         return false;
                     } // compare each element
                 }
@@ -91,28 +113,24 @@ namespace utils {
             return true;
         }
 
-        bool operator!=(const RDMatrix<S, T> &other) const {
+        bool operator!=(const RDMatrix<R, T> &other) const {
             return !((*this) == other);
         }
 
-        bool equalsWithError(const RDMatrix<S, T> &other,
-                             const double &error,
-                             bool skipCompareData = false) const {
+        bool equalsWithError(const RDMatrix<R, T> &other, const double &error, bool skipCompareData = false) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
             for (size_t r = 0; r < rowSize; ++r) {
-                if (other.getRow(r).colSize != matrix[r].colSize) {
+                if (other[r].pointSize != matrix[r].pointSize) {
                     return false;
                 }
-
-                if (!skipCompareData &&
-                    (matrix[r].data != other.getRow(r).data)) {
+                if (!skipCompareData && (matrix[r].data != other[r].data)) {
                     return false;
                 }
-                for (size_t c = 0; c < matrix[r].colSize; ++c) {
-                    const T &a = (*this)(r, c);
-                    const T &b = other(r, c);
+                for (size_t c = 0; c < matrix[r].pointSize; ++c) {
+                    const T &a = (*this)[r][c];
+                    const T &b = other[r][c];
 
                     // compare each element as range b-error <= a <= b+error
                     if (!(((b - error) <= a) && (a <= (b + error)))) {
@@ -141,50 +159,31 @@ namespace utils {
         }
 
         void writeRow(size_t rowIndex, const Row &value) {
-            if (rowIndex < rowSize) {
-                if (matrix[rowIndex].colSize < value.colSize) {
-                    // re-initialize col memory
-                    size_t cAmount = tTypeSizeof * value.colSize;
-                    T *newPointsArray;
-                    if (matrix[rowIndex].points) {
-                        newPointsArray = (T *) std::realloc(matrix[rowIndex].points, cAmount);
-                    } else {
-                        newPointsArray = (T *) std::malloc(cAmount);
-                    }
-
-                    if (newPointsArray == NULL) {
-                        throw std::runtime_error(std::strerror(errno));
-                    }
-                    matrix[rowIndex].points = newPointsArray;
+            if (rowIndex < rowCapacity) {
+                if (matrix[rowIndex].pointCapacity < value.pointSize) {
+                    // re-initialize points memory
+                    initializePointsMemory(matrix[rowIndex], value.pointSize);
+                } else {
+                    matrix[rowIndex].pointSize = value.pointSize;
+                }
+                if (rowIndex >= rowSize) {
+                    rowSize = rowIndex + 1;
                 }
             } else {
                 // re-initialize row memory
                 size_t newRowSize = rowIndex + 1;
                 initializeRowMemory(newRowSize);
 
-                // initialize colSize = 0
-                for (size_t r = rowSize; r < newRowSize; ++r) {
-                    matrix[r].colSize = 0;
-                    matrix[r].points = nullptr;
-                }
-
-                size_t cAmount = tTypeSizeof * value.colSize;
-                T *pointsArray = (T *) std::malloc(cAmount);
-                if (pointsArray == NULL) {
-                    throw std::runtime_error(std::strerror(errno));
-                }
-
-                matrix[rowIndex].points = pointsArray;
-                rowSize = newRowSize;
+                initializePointsMemory(matrix[rowIndex], value.pointSize);
             }
 
             copyRow(matrix[rowIndex], value);
         }
 
-        void writeRow(size_t rowIndex, T *points, size_t colSize) {
+        void writeRow(size_t rowIndex, T *points, size_t pointSize) {
             Row value;
             value.points = points;
-            value.colSize = colSize;
+            value.pointSize = pointSize;
             writeRow(rowIndex, value);
         }
 
@@ -192,49 +191,44 @@ namespace utils {
             writeRow(rowSize, value);
         }
 
-        void pushRow(T *points, size_t colSize) {
+        void pushRow(T *points, size_t pointSize) {
             Row value;
             value.points = points;
-            value.colSize = colSize;
+            value.pointSize = pointSize;
             pushRow(value);
         }
 
-        void appendValues(size_t rowIndex, T *arr, size_t arrSize) {
+        /**
+         * Записать значения в конец строки
+         */
+        void writeToEndRow(size_t rowIndex, T *arr, size_t arrSize) {
             if (rowIndex < rowSize) {
                 // добавим значения в конец существующей строки
-                size_t oldColSize = matrix[rowIndex].colSize;
-                size_t newColSize = oldColSize + arrSize;
+                size_t oldPointSize = matrix[rowIndex].pointSize;
+                size_t newPointSize = oldPointSize + arrSize;
 
-                // re-initialize col memory
-                size_t cAmount = tTypeSizeof * newColSize;
-                T *newPointsArray;
-                if (matrix[rowIndex].points) {
-                    newPointsArray = (T *) std::realloc(matrix[rowIndex].points, cAmount);
+                // re-initialize points memory
+                if (matrix[rowIndex].pointCapacity < newPointSize) {
+                    initializePointsMemory(matrix[rowIndex], newPointSize);
                 } else {
-                    newPointsArray = (T *) std::malloc(cAmount);
+                    matrix[rowIndex].pointSize = newPointSize;
                 }
 
-                if (newPointsArray == NULL) {
-                    throw std::runtime_error(std::strerror(errno));
-                }
-                matrix[rowIndex].points = newPointsArray;
-                matrix[rowIndex].colSize = newColSize;
-
-                memcpy(matrix[rowIndex].points + oldColSize, arr, arrSize * tTypeSizeof);
+                memcpy(matrix[rowIndex].points + oldPointSize, arr, arrSize * tTypeSizeof);
             } else {
                 // добавить новую строку
                 writeRow(rowIndex, arr, arrSize);
             }
         }
 
-        void appendValue(size_t rowIndex, T& val) {
-            appendValues(rowIndex, &val, 1);
+        void writeToEndRow(size_t rowIndex, T& val) {
+            writeToEndRow(rowIndex, &val, 1);
         }
 
         void print() const {
             std::cout << "RDMatrix[" << rowSize << "]" << std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
-                for (size_t c = 0; c < matrix[r].colSize; ++c) {
+                for (size_t c = 0; c < matrix[r].pointSize; ++c) {
                     std::cout << matrix[r].points[c] << ", ";
                 }
                 std::cout << std::endl;
@@ -243,32 +237,78 @@ namespace utils {
 
     private:
         Row *matrix;
-        size_t rowSize;
-        size_t tTypeSizeof; // saved value sizeof T
-        size_t sTypeSizeof; // saved value sizeof S
-        size_t rTypeSizeof; // saved value sizeof Row
 
-        void initializeRowMemory(size_t _rowSize) {
-            size_t rAmount = rTypeSizeof * _rowSize;
+        size_t rowSize; // число строк
+        size_t rowCapacity; // число строк для которых выделена память
+        size_t rowCapacityIncrease; // число на которое увеличивается rowCapacity при выделении памяти
+        size_t pointCapacityIncrease; // число на которое увеличивается pointCapacity при выделении памяти
+
+        size_t tTypeSizeof; // saved value sizeof T
+        size_t rTypeSizeof; // saved value sizeof R
+        size_t rowTypeSizeof; // saved value sizeof Row
+
+        void initializeRowMemory(size_t newRowSize) {
+            size_t newRowCapacity = 0;
+            if (newRowSize > (rowCapacity + rowCapacityIncrease)) {
+                newRowCapacity = newRowSize;
+            } else {
+                newRowCapacity = rowCapacity + rowCapacityIncrease;
+            }
+
+            size_t rowAmount = rowTypeSizeof * newRowCapacity;
             Row *newMatrix;
             if (matrix) {
-                newMatrix = (Row *) std::realloc(matrix, rAmount);
+                newMatrix = (Row *) std::realloc(matrix, rowAmount);
             } else {
-                newMatrix = (Row *) std::malloc(rAmount);
+                newMatrix = (Row *) std::malloc(rowAmount);
             }
 
             if (newMatrix == NULL) {
                 throw std::runtime_error(std::strerror(errno));
             }
             matrix = newMatrix;
+
+            // clean points
+            for (size_t r = rowCapacity; r < newRowCapacity; ++r) {
+                matrix[r].pointSize = 0;
+                matrix[r].pointCapacity = 0;
+                matrix[r].points = nullptr;
+            }
+
+            rowCapacity = newRowCapacity;
+            rowSize = newRowSize;
+        }
+
+        void initializePointsMemory(Row& row, size_t newPointsSize) {
+            size_t newPointsCapacity = 0;
+            if (newPointsSize > (row.pointCapacity + pointCapacityIncrease)) {
+                newPointsCapacity = newPointsSize;
+            } else {
+                newPointsCapacity = row.pointCapacity + pointCapacityIncrease;
+            }
+
+            size_t pointsAmount = tTypeSizeof * newPointsCapacity;
+            T *newPoints;
+            if (row.points) {
+                newPoints = (T *) std::realloc(row.points, pointsAmount);
+            } else {
+                newPoints = (T *) std::malloc(pointsAmount);
+            }
+
+            if (newPoints == NULL) {
+                throw std::runtime_error(std::strerror(errno));
+            }
+            row.points = newPoints;
+            row.pointSize = newPointsSize;
+            row.pointCapacity = newPointsCapacity;
         }
 
         void copyRow(Row &dest, const Row &src) {
-            dest.colSize = src.colSize;
+//            dest.pointSize = src.pointSize;
             // copy data
-            memcpy(&(dest.data), &(src.data), sTypeSizeof);
+            memcpy(&(dest.data), &(src.data), rTypeSizeof);
             // copy points array
-            memcpy(dest.points, src.points, dest.colSize * tTypeSizeof);
+            memcpy(dest.points, src.points, dest.pointSize * tTypeSizeof);
         }
     };
 }

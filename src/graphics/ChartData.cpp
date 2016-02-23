@@ -2,12 +2,12 @@
 
 namespace graphics {
 
-    void ChartData::addPoints(Point *points, size_t len) {
+    void ChartData::addPoints(size_t rowIndex, Point *points, size_t len) {
         // 1. add point
-        inpoints->pushRow(points, len);
+        inpoints->writeToEndRow(rowIndex, points, len);
 
         // 2. start coordinate point apply left-down corner = (x0, y0 + h0)
-        if (inpoints->getRowSize() == 1 && len == 1) {
+        if (pointsSize == 0 && len == 1) {
             // first point so simple do initialize
             Point &p = points[0];
             inrange.xMax = p.x;
@@ -19,7 +19,8 @@ namespace graphics {
             xcb_point_t op[1];
             op[0].x = boundRect.x;
             op[0].y = (int16_t) (boundRect.y + boundRect.height);
-            outpoints->pushRow(op, 1);
+            outpoints->writeToEndRow(rowIndex, op, 1);
+            pointsSize += len;
             return;
         }
 
@@ -80,12 +81,12 @@ namespace graphics {
             // ay = -h0/(ymax-ymin); by = (y0+h0) - ay*ymin
             double ydiff = inrange.yMax - inrange.yMin;
             ay = -((double) boundRect.height) / ydiff;
-            by = ((double) (boundRect.y + boundRect.height)) -
-                 ay * inrange.yMin;
+            by = ((double) (boundRect.y + boundRect.height)) - ay * inrange.yMin;
         }
 
         if (xIsConst && yIsConst) {
-            outpoints->pushRow(tempOutPoints.getArray(), len);
+            outpoints->writeToEndRow(rowIndex, tempOutPoints.getArray(), len);
+            pointsSize += len;
             return;
         }
 
@@ -102,25 +103,21 @@ namespace graphics {
                     tempOutPoints[i].y = transformToOut(ay, by, points[i].y);
                 }
             }
-            outpoints->pushRow(tempOutPoints.getArray(), len);
+            outpoints->writeToEndRow(rowIndex, tempOutPoints.getArray(), len);
+            pointsSize += len;
         } else {
-            outpoints->pushRow(tempOutPoints.getArray(), len);
+            outpoints->writeToEndRow(rowIndex, tempOutPoints.getArray(), len);
+            pointsSize += len;
             for (size_t r = 0; r < inpoints->getRowSize(); ++r) {
-                utils::RDMatrix<bool, Point>::Row &inPoints =
-                        inpoints->getRow(r);
-                utils::RDMatrix<bool, xcb_point_t>::Row &outPoints =
-                        outpoints->getRow(r);
-                for (size_t c = 0; c < inPoints.colSize; ++c) {
+                utils::RDMatrix<bool, Point>::Row &inPoints = inpoints->getRow(r);
+                utils::RDMatrix<bool, xcb_point_t>::Row &outPoints = outpoints->getRow(r);
+                for (size_t c = 0; c < inPoints.pointSize; ++c) {
                     // recalculate all if IsDirty else only last is recalculate
-                    if (!xIsConst &&
-                        (xIsDirty || (r == (inpoints->getRowSize() - 1)))) {
-                        outPoints.points[c].x =
-                                transformToOut(ax, bx, inPoints.points[c].x);
+                    if (!xIsConst && (xIsDirty || (r == (inpoints->getRowSize() - 1)))) {
+                        outPoints.points[c].x = transformToOut(ax, bx, inPoints.points[c].x);
                     }
-                    if (!yIsConst &&
-                        (yIsDirty || (r == (inpoints->getRowSize() - 1)))) {
-                        outPoints.points[c].y =
-                                transformToOut(ay, by, inPoints.points[c].y);
+                    if (!yIsConst && (yIsDirty || (r == (inpoints->getRowSize() - 1)))) {
+                        outPoints.points[c].y = transformToOut(ay, by, inPoints.points[c].y);
                     }
                 }
 

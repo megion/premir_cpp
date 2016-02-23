@@ -67,7 +67,7 @@ namespace graphics {
             xcb_disconnect(connection);
         }
 
-        ChartData *getData() {
+        ChartData *getData() const {
             return data;
         }
 

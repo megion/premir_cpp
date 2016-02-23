@@ -9,7 +9,7 @@ namespace test {
             int points0[] = {1, 2};
             utils::RDMatrix<double, int>::Row row0;
             row0.points = points0;
-            row0.colSize = 2;
+            row0.pointSize = 2;
             a.writeRow(0, row0);
 
             int points1[] = {3, 4};
@@ -21,7 +21,7 @@ namespace test {
             int points3[] = {5, 6, 7};
             utils::RDMatrix<double, int>::Row row3;
             row3.points = points3;
-            row3.colSize = 3;
+            row3.pointSize = 3;
             a.pushRow(row3);
 
             assert(a(2, 0) == 5);
@@ -64,7 +64,7 @@ namespace test {
             utils::RDMatrix<double, int>::Row row0;
             row0.points = points0;
             row0.data = 2;
-            row0.colSize = 2;
+            row0.pointSize = 2;
             a.writeRow(0, row0);
             c.writeRow(0, row0);
 
@@ -72,7 +72,7 @@ namespace test {
             utils::RDMatrix<double, int>::Row row1;
             row1.points = points1;
             row1.data = 4;
-            row1.colSize = 2;
+            row1.pointSize = 2;
             a.writeRow(1, row1);
             c.writeRow(1, row1);
 
@@ -90,7 +90,7 @@ namespace test {
             utils::RDMatrix<double, int>::Row row0;
             row0.points = points0;
             row0.data = 2;
-            row0.colSize = 2;
+            row0.pointSize = 2;
             a.writeRow(0, row0);
             c.writeRow(0, row0);
 
@@ -98,7 +98,7 @@ namespace test {
             utils::RDMatrix<double, int>::Row row1;
             row1.points = points1;
             row1.data = 4;
-            row1.colSize = 2;
+            row1.pointSize = 2;
             a.writeRow(1, row1);
             c.writeRow(1, row1);
 
@@ -119,8 +119,8 @@ namespace test {
             a.writeRow(1, row0, 4);
 
             for (size_t r=0; r<a.getRowSize(); ++r) {
-                utils::RDMatrix<double, int>::Row& row = a.getRow(r);
-                for (size_t i=0; i<row.colSize; ++i) {
+                utils::RDMatrix<double, int>::Row& row = a[r];
+                for (size_t i=0; i<row.pointSize; ++i) {
                     assert(row.points[i]==1);
                 }
             }
@@ -134,22 +134,54 @@ namespace test {
             a.writeRow(1, row0, 4);
 
             int vals[] = {2, 3, 4, 5};
-            a.appendValues(0, vals, 4);
+            a.writeToEndRow(0, vals, 4);
 
-            assert(a[0].colSize==8);
+            assert(a[0].pointSize==8);
             assert(a(0, 7)==5);
             assert(a.getRowSize()==2);
 
-            a.appendValues(2, vals, 4);
+            a.writeToEndRow(2, vals, 4);
             assert(a.getRowSize()==3);
-            assert(a[2].colSize == 4);
+            assert(a[2].pointSize == 4);
             assert(a(2, 3) == 5);
 
             int val = 12;
-            a.appendValue(0, val);
-            assert(a[0].colSize==9);
+            a.writeToEndRow(0, val);
+            assert(a[0].pointSize==9);
             assert(a(0, 8)==12);
             assert(a.getRowSize()==3);
+        }
+
+        void test_capacity() {
+            utils::RDMatrix<double, int> a(10, 1, 1);
+            assert(a.getRowSize()==10);
+            int row0[] = {1, 1, 1, 1};
+            a.pushRow(row0, 4);
+            assert(a.getRowSize()==11);
+            a.pushRow(row0, 4);
+            assert(a.getRowSize()==12);
+
+            utils::RDMatrix<double, int> b(10, 12, 9);
+            assert(b.getRowSize()==10);
+            b.pushRow(row0, 4);
+            assert(b.getRowSize()==11);
+            b.writeToEndRow(9, row0, 4);
+            b.writeToEndRow(9, row0, 4);
+            b.writeToEndRow(9, row0, 4);
+
+            assert(b[9].pointSize==12);
+            assert(b[9].pointCapacity==18);
+
+            int row1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20};
+
+            b.writeToEndRow(9, row1, 20);
+            assert(b[9].pointSize==32);
+            assert(b[9].pointCapacity==32);
+
+            utils::RDMatrix<double, int> ab(16, 19);
+            assert(ab.getRowSize()==16);
+            assert(ab[15].pointSize==19);
+            assert(ab[15].pointCapacity==19);
         }
 
         void rDMatrix_test() {
@@ -159,6 +191,7 @@ namespace test {
             mytest(comparison_with_error);
             mytest(get_row);
             mytest(append_values);
+            mytest(capacity);
         }
     }
 }

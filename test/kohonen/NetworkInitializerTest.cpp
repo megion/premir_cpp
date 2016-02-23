@@ -19,23 +19,26 @@ namespace test {
             }
         }
 
-        OutCodes *read_codes_file(const char *filename,
-                                  int skipLines) {
+        OutCodes *read_matrix_file(const char *filename,
+                                   int skipLines, size_t colSize) {
             file::CsvFileReader<char> reader(filename, ' ');
-            OutCodes *somCodesMatrix = new OutCodes(0, 5);
+            OutCodes *somCodesMatrix = new OutCodes(0, colSize);
             // skip to lines
             for (int i = 0; i < skipLines; ++i) {
                 reader.toEndLine();
             }
 
             while (reader.hasNext()) {
-                float row[5];
-                reader.read(row[0]);
-                reader.read(row[1]);
-                reader.read(row[2]);
-                reader.read(row[3]);
-                reader.read(row[4]);
-                reader.toEndLine();
+                float row[colSize];
+                size_t lNo1 = reader.getLineNumber();
+                for (size_t j = 0; j < colSize; ++j) {
+                    reader.read(row[j]);
+                }
+                size_t lNo2 = reader.getLineNumber();
+                if (lNo1 == lNo2) {
+                    // TODO: строка прочитана не доконца, тогда прочитать до конца
+                    reader.toEndLine();
+                }
                 if (!reader.isEmptyRead()) {
                     somCodesMatrix->pushRow(row);
                 }
@@ -44,42 +47,26 @@ namespace test {
             return somCodesMatrix;
         }
 
-        OutCodes *read_sammon_file(const char *filename,
-                                  int skipLines) {
-            file::CsvFileReader<char> reader(filename, ' ');
-            OutCodes *matrix = new OutCodes(0, 2);
-            for (int i = 0; i < skipLines; ++i) {
-                reader.toEndLine();
-            }
-            while (reader.hasNext()) {
-                float row[2];
-                reader.read(row[0]);
-                reader.read(row[1]);
-                reader.toEndLine();
-                if (!reader.isEmptyRead()) {
-                    matrix->pushRow(row);
-                }
-            }
-            return matrix;
+        OutCodes *read_codes_file(const char *filename, int skipLines) {
+            return read_matrix_file(filename, skipLines, 5);
+        }
+
+        OutCodes *read_sammon_file(const char *filename, int skipLines) {
+            return read_matrix_file(filename, skipLines, 2);
         }
 
         OutCodes *read_some_initilized_codes() {
-            return read_codes_file(
-                    "../test/datafiles/kohonen/som_initialized.cod", 2);
+            return read_codes_file("../test/datafiles/kohonen/som_initialized.cod", 2);
         }
 
         void test_line_initialization() {
             // инициализация потока чтения файла с данными
-            file::CsvFileReader<char> csvReader(
-                    "../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer,
-                               isSkipSample, 5, true);
+            file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, 5,
+                                                                     true);
 
-            kohonen::
-            NetworkInitializer<float, float> initializer(&dataReader);
-            kohonen::RandomGenerator *randomEngine
-                    = initializer.getRandomGenerator();
+            kohonen::NetworkInitializer<float, float> initializer(&dataReader);
+            kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             // TODO: в тестах для генерации кодов нейронов таких же как и в
             // проверочном файле 'som_initialized.cod', необходимо задавать
             // начальное рандомное число setNextValue(1) т.к. файл
@@ -91,9 +78,7 @@ namespace test {
             size_t ydim = 12;
             size_t dim = 5;
 
-            OutCodes *resultsMatrix =
-                    initializer.lineInitialization(xdim, ydim, dim);
-
+            OutCodes *resultsMatrix = initializer.lineInitialization(xdim, ydim, dim);
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             // данные матрицы должны быть практически идентичными
@@ -110,10 +95,8 @@ namespace test {
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
-            file::CsvFileReader<char> csvReader(
-                    "../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
+            file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                true);
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
@@ -122,29 +105,20 @@ namespace test {
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
             kohonen::mapdist::HexaMapDistance<float> mapDist;
 
-            kohonen::neighadap::BubbleNeighborAdaptation<float, float>
-                    neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
-                                                      &winnerSearcher,
-                                                      &neiAdap,
-                                                      0.002, 3.0, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3.0, xdim, ydim);
 
             trainer.training(somCodesMatrix, &dataReader, 10000);
 
-            OutCodes *expectedCodesMatrix =
-                    read_codes_file(
-                            "../test/datafiles/kohonen/som_trained_10000_"
-                                    "eucw_bubble_hexa_16_12.cod", 1);
+            OutCodes *expectedCodesMatrix = read_codes_file(
+                            "../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
-                                                   0.001));
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001, true));
 
-            kohonen::SomTrainer<float, float>::QuantumError qe =
-                    trainer.quantizationError(somCodesMatrix, &dataReader);
+            kohonen::SomTrainer<float, float>::QuantumError qe = trainer.quantizationError(somCodesMatrix, &dataReader);
 
             assert_range(qe.sumWinnerDistance / qe.samplesSize, 4.7287, 0.0001);
-
 
             delete expectedCodesMatrix;
             delete somCodesMatrix;
@@ -156,11 +130,8 @@ namespace test {
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
-            file::CsvFileReader<char> csvReader(
-                    "../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer,
-                               isSkipSample, dim, true);
+            file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, true);
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
@@ -168,50 +139,40 @@ namespace test {
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
             kohonen::mapdist::RectMapDistance<float> mapDist;
 
-            kohonen::neighadap::GaussianNeighborAdaptation<float, float>
-                    neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
-                                                      &winnerSearcher,
-                                                      &neiAdap,
-                                                      0.002, 3, xdim, ydim);
+            kohonen::neighadap::GaussianNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3, xdim, ydim);
 
             trainer.training(somCodesMatrix, &dataReader, 10000);
 
-            OutCodes *expectedCodesMatrix =
-                    read_codes_file(
-                            "../test/datafiles/kohonen/som_trained_10000_"
-                                    "eucw_gaussian_rect_16_12.cod", 1);
+            OutCodes *expectedCodesMatrix = read_codes_file(
+                            "../test/datafiles/kohonen/som_trained_10000_eucw_gaussian_rect_16_12.cod", 1);
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix,
-                                                   0.001));
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001));
 
             delete expectedCodesMatrix;
             delete somCodesMatrix;
         }
 
         void buildAndShowSammonMap(OutCodes *somTrainedMatrix,
-                                   graphics::SammonMapChart& sammonChart) {
+                                   graphics::SammonMapChart &sammonChart) {
             kohonen::SammonMap<float> sammonMap(somTrainedMatrix->getRowSize());
-            kohonen::RandomGenerator *randomEngine
-                    = sammonMap.getRandomGenerator();
+            kohonen::RandomGenerator *randomEngine = sammonMap.getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
             sammonMap.initializeMap(somTrainedMatrix);
 
-
-
-            for (size_t i = 0; i<200; ++i) {
+            for (size_t i = 0; i < 200; ++i) {
                 sammonChart.getData()->removeData();
                 sammonMap.doOneIteration();
 
                 utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
-                for (size_t i = 0; i<sammonMap.getMapPoints()->size(); ++i) {
-                    kohonen::SammonMap<float>::Point& r = (*sammonMap.getMapPoints())[i];
+                for (size_t i = 0; i < sammonMap.getMapPoints()->size(); ++i) {
+                    kohonen::SammonMap<float>::Point &r = (*sammonMap.getMapPoints())[i];
                     graphics::ChartData::Point p = {r.x, r.y};
                     points.push(p);
                 }
-                sammonChart.getData()->addPoints(points.getArray(), points.size());
+                sammonChart.getData()->addPoints(0, points.getArray(), points.size());
                 sammonChart.draw();
             }
         }
@@ -222,17 +183,12 @@ namespace test {
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
-            file::CsvFileReader<char> csvReader(
-                    "../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                               true);
-
+            file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
+                                                                     true);
 
             OutCodes *somTrainedMatrix =
-                    read_codes_file(
-                            "../test/datafiles/kohonen/som_trained_"
-                                    "10000_eucw_bubble_hexa_16_12.cod", 1);
+                    read_codes_file("../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
 
             kohonen::SammonMap<float> sammonMap(somTrainedMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine
@@ -243,10 +199,7 @@ namespace test {
 
             sammonMap.buildMap(1000);
 
-            OutCodes *expectedSammonMatrix =
-                    read_sammon_file(
-                            "../test/datafiles/kohonen/sammon_out_result.sam",
-                            1);
+            OutCodes *expectedSammonMatrix = read_sammon_file("../test/datafiles/kohonen/sammon_out_result.sam", 1);
 //            assert(sammonMatrix->equalsWithError(*expectedSammonMatrix, 0.001, true));
 
             graphics::SammonMapChart sammonChart(xdim, 740, 740);
@@ -255,12 +208,12 @@ namespace test {
             std::cout << "size: " << sammonMap.getMapPoints()->size() << std::endl;
             std::cout << "x: " << (*sammonMap.getMapPoints())[0].x << std::endl;
             utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
-            for (size_t i = 0; i<sammonMap.getMapPoints()->size(); ++i) {
-                kohonen::SammonMap<float>::Point& r = (*sammonMap.getMapPoints())[i];
+            for (size_t i = 0; i < sammonMap.getMapPoints()->size(); ++i) {
+                kohonen::SammonMap<float>::Point &r = (*sammonMap.getMapPoints())[i];
                 graphics::ChartData::Point p = {r.x, r.y};
                 points.push(p);
             }
-            sammonChart.getData()->addPoints(points.getArray(), points.size());
+            sammonChart.getData()->addPoints(0, points.getArray(), points.size());
             sammonChart.draw();
 
 
@@ -274,38 +227,28 @@ namespace test {
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
-            file::CsvFileReader<char> csvReader(
-                    "../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float>
-                    dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                               true);
+            file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
+            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
+                                                                     true);
 
 //            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
 
-            kohonen::
-            NetworkInitializer<float, float> initializer(&dataReader);
-            kohonen::RandomGenerator *randomEngine
-                    = initializer.getRandomGenerator();
+            kohonen::NetworkInitializer<float, float> initializer(&dataReader);
+            kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
-            OutCodes *somCodesMatrix =
-                    initializer.lineInitialization(xdim, ydim, dim);
+            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim);
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
             kohonen::mapdist::HexaMapDistance<float> mapDist;
 
-            kohonen::neighadap::BubbleNeighborAdaptation<float, float>
-                    neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<float, float> trainer(&alphaFunc,
-                                                      &winnerSearcher,
-                                                      &neiAdap,
-                                                      0.002, 3.0, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3.0, xdim, ydim);
 
             //
             graphics::PointChart qErrorChart(710, 460);
             qErrorChart.setWindowTitle("Quantum error");
             graphics::ChartThread chartThread(&qErrorChart);
-
 
             size_t winnerSize = winnerSearcher.getWinnerSize();
             size_t colSize = somCodesMatrix->getColSize();
@@ -320,7 +263,6 @@ namespace test {
             graphics::ChartThread sammonChartThread(&sammonChart);
 
             buildAndShowSammonMap(somCodesMatrix, sammonChart);
-
 
             for (size_t le = 0; le < teachSize; ++le) {
                 models::DataSample<float> inRow[colSize];
@@ -377,15 +319,19 @@ namespace test {
             size_t dim = 5;
 
             OutCodes *somTrainedMatrix =
-                    read_codes_file(
-                            "../test/datafiles/kohonen/som_trained_"
-                                    "10000_eucw_bubble_hexa_16_12.cod", 1);
+                    read_codes_file("../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
+
+            OutCodes *expectedUMatrix =
+                    read_matrix_file("../test/datafiles/kohonen/umat_scaled_hexa_16_12.umat", 0, 23);
 
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
 
-            umat.getUMatrix()->print();
+            assert(umat.getUMatrix()->equalsWithError(*expectedUMatrix, 0.001, true));
+
+            delete somTrainedMatrix;
+            delete expectedUMatrix;
         }
 
         void network_initializer_test() {

@@ -15,7 +15,7 @@ namespace graphics {
     class PointChart : public Chart {
     public:
         PointChart(uint16_t _width = 400, uint16_t _height = 260) :
-                Chart(_width, _height) {
+                Chart(_width, _height), currentBufSize(0) {
             // points context
             pointsContext = xcb_generate_id(connection);
             uint32_t mask = XCB_GC_FOREGROUND;
@@ -29,6 +29,9 @@ namespace graphics {
             xcb_create_gc(connection, cleanPointsContext,
                           screen->root, mask,
                           values22);
+
+            // оптимизация выделения памяти
+            getData()->getOutpoints()->setPointCapacityIncrease(40);
         }
 
         ~PointChart() {
@@ -40,8 +43,7 @@ namespace graphics {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outPoint =
                         data->getOutpoints()->getRow(r);
-                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
-                               window, pointsContext, outPoint.colSize,
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext, outPoint.pointSize,
                                outPoint.points);
             }
 
@@ -49,10 +51,8 @@ namespace graphics {
 
         void drawCleanPoints() const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
-                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint =
-                        data->getOutpoints()->getRow(r);
-                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN,
-                               window, cleanPointsContext, outPoint.colSize,
+                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, cleanPointsContext, outPoint.pointSize,
                                outPoint.points);
             }
         }
@@ -64,30 +64,30 @@ namespace graphics {
          */
         void redrawNewPoints(ChartData::Point *points, size_t len) const {
             drawCleanPoints();
-            data->addPoints(points, len);
+            data->addPoints(0, points, len);
             drawPoints();
 
-//            if (data->size() % 36 == 0) { // оптимизация :)
-            drawAxes();
-            drawAxesLabels();
-//            }
+            if (data->size() % 36 == 0) { // оптимизация :)
+                drawAxes();
+                drawAxesLabels();
+            }
 
             flush();
         }
 
-        void redrawNewPoint(double x, double y) const {
+        void redrawNewPoint(double x, double y) {
             drawCleanPoints();
 
             ChartData::Point points[1];
             points[0].x = x;
             points[0].y = y;
-            data->addPoints(points, 1);
+            data->addPoints(0, points, 1);
             drawPoints();
 
-//            if (data->size() % 36 == 0) { // оптимизация :)
-            drawAxes();
-            drawAxesLabels();
-//            }
+            if (data->size() % 36 == 0) { // оптимизация :)
+                drawAxes();
+                drawAxesLabels();
+            }
 
             flush();
         }
@@ -105,6 +105,9 @@ namespace graphics {
         xcb_gcontext_t pointsContext;
         xcb_gcontext_t cleanPointsContext;
 
+        const static size_t MAX_BUFF_SIZE = 36;
+        size_t currentBufSize;
+        ChartData::Point pointsBuff[MAX_BUFF_SIZE];
 
     };
 

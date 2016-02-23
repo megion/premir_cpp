@@ -23,7 +23,7 @@ namespace graphics {
     class ChartData {
     public:
         ChartData(const xcb_rectangle_t &_boundRect) :
-                boundRect(_boundRect), inrange({0, 0, 0, 0}), //
+                pointsSize(0), boundRect(_boundRect), inrange({0, 0, 0, 0}), //
                 outpoints(new utils::RDMatrix<bool, xcb_point_t>()), //
                 inpoints(new utils::RDMatrix<bool, Point>()) {
             createAxesPoints();
@@ -59,25 +59,30 @@ namespace graphics {
             }
         };
 
-        utils::RDMatrix<bool, xcb_point_t> *getOutpoints() {
+        utils::RDMatrix<bool, xcb_point_t> *getOutpoints()const {
             return outpoints;
         }
 
-        utils::CArrayList<Axis> *getXAxes() {
+        utils::CArrayList<Axis> *getXAxes() const {
             return xAxes;
         }
 
-        utils::CArrayList<Axis> *getYAxes() {
+        utils::CArrayList<Axis> *getYAxes() const {
             return yAxes;
         }
 
-        void addPoints(Point* points, size_t len);
+        size_t size() const {
+            return pointsSize;
+        }
+
+        void addPoints(size_t rowIndex, Point* points, size_t len);
 
         void updateAxesLabel(double ax, double bx, double ay, double by);
 
         void removeData() {
             inpoints->removeAll();
             outpoints->removeAll();
+            pointsSize = 0;
             inrange.xMax = 0;
             inrange.yMax = 0;
             inrange.xMin = 0;
@@ -85,6 +90,7 @@ namespace graphics {
         }
 
     private:
+        size_t pointsSize;
         utils::RDMatrix<bool, Point> *inpoints;
         utils::RDMatrix<bool, xcb_point_t> *outpoints;
 

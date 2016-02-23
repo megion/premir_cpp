@@ -113,7 +113,7 @@ namespace utils {
 
                     // compare each element as range b-error <= a <= b+error
                     if (!(((b - error) <= a) && (a <= (b + error)))) {
-//                        std::cout<< "matrix element [" << r << "x" << c << "] this " << a << " != " << b << std::endl;
+                        std::cout<< "matrix element [" << r << "x" << c << "] this " << a << " != " << b << std::endl;
                         return false;
                     }
                 }
