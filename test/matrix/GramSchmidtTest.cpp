@@ -29,8 +29,7 @@ namespace test {
             matrixCheck.writeRow(2, rowCheck2);
 
             // test with error
-            assert(basis.getOutVectors()->equalsWithError(matrixCheck,
-                                                          0.00001));
+            assert(basis.getOutVectors()->equalsWithError(matrixCheck, 0.00001));
         }
 
         void test_gram_schmidt_normalized() {
@@ -75,11 +74,9 @@ namespace test {
             matrix::MatrixUtils<double, double, double>::
             normalizationMatrixRows(*basis2.getOutVectors());
 
-            assert(basis2.getOutVectors()->equalsWithError(checkMatrix,
-                                                           0.00001));
+            assert(basis2.getOutVectors()->equalsWithError(checkMatrix, 0.00001));
             // данные матрицы должны быть практически идентичными
-            assert(dataClone->equalsWithError(*basis2.getOutVectors(),
-                                              0.000000001));
+            assert(dataClone->equalsWithError(*basis2.getOutVectors(), 0.000000001));
             delete dataClone;
         }
 

@@ -82,8 +82,7 @@ namespace test {
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001,
-                                                   true));
+            assert(somCodesMatrix->equalsWithError(*resultsMatrix, 0.001, true));
 
             delete somCodesMatrix;
             delete resultsMatrix;
@@ -148,7 +147,7 @@ namespace test {
                             "../test/datafiles/kohonen/som_trained_10000_eucw_gaussian_rect_16_12.cod", 1);
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001));
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001, true));
 
             delete expectedCodesMatrix;
             delete somCodesMatrix;
