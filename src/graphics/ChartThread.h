@@ -8,10 +8,11 @@
 
 namespace graphics {
 
+    template<typename R>
     class ChartThread {
     public:
-        ChartThread(Chart *chart) :
-                chartThread(std::thread(&Chart::runChart, chart)) {
+        ChartThread(Chart<R> *chart) :
+                chartThread(std::thread(&Chart<R>::runChart, chart)) {
         }
 
         ~ChartThread() {

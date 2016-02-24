@@ -12,7 +12,7 @@
 
 namespace graphics {
 
-    class SammonMapChart : public Chart {
+    class SammonMapChart : public Chart<bool> {
     public:
         SammonMapChart(long _xdim, uint16_t _width, uint16_t _height) :
                 Chart(_width, _height), xdim(_xdim) {

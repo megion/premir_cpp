@@ -12,9 +12,9 @@
 
 namespace graphics {
 
-    class UMatChart : public Chart {
+    class UMatChart : public Chart<bool> {
     public:
-        SammonMapChart(long _xdim, uint16_t _width, uint16_t _height) :
+        UMatChart(long _xdim, uint16_t _width, uint16_t _height) :
                 Chart(_width, _height), xdim(_xdim) {
             // arcs context
             uint32_t values2[] = {colormap->getGreen()->pixel};

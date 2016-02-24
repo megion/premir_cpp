@@ -12,10 +12,10 @@
 
 namespace graphics {
 
-    class PointChart : public Chart {
+    class PointChart : public Chart<bool> {
     public:
         PointChart(uint16_t _width = 400, uint16_t _height = 260) :
-                Chart(_width, _height), currentBufSize(0) {
+                Chart(_width, _height) {
             // points context
             pointsContext = xcb_generate_id(connection);
             uint32_t mask = XCB_GC_FOREGROUND;
@@ -41,8 +41,7 @@ namespace graphics {
 
         void drawPoints() const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
-                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint =
-                        data->getOutpoints()->getRow(r);
+                utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
                 xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext, outPoint.pointSize,
                                outPoint.points);
             }
@@ -62,7 +61,7 @@ namespace graphics {
          * 2. add new points and update all points position
          * 3. draw updated current points
          */
-        void redrawNewPoints(ChartData::Point *points, size_t len) const {
+        void redrawNewPoints(ChartData<bool>::Point *points, size_t len) const {
             drawCleanPoints();
             data->addPoints(0, points, len);
             drawPoints();
@@ -78,7 +77,7 @@ namespace graphics {
         void redrawNewPoint(double x, double y) {
             drawCleanPoints();
 
-            ChartData::Point points[1];
+            ChartData<bool>::Point points[1];
             points[0].x = x;
             points[0].y = y;
             data->addPoints(0, points, 1);
@@ -105,9 +104,9 @@ namespace graphics {
         xcb_gcontext_t pointsContext;
         xcb_gcontext_t cleanPointsContext;
 
-        const static size_t MAX_BUFF_SIZE = 36;
-        size_t currentBufSize;
-        ChartData::Point pointsBuff[MAX_BUFF_SIZE];
+//        const static size_t MAX_BUFF_SIZE = 36;
+//        size_t currentBufSize;
+//        ChartData::Point<bool> pointsBuff[MAX_BUFF_SIZE];
 
     };
 

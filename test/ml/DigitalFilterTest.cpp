@@ -3,23 +3,23 @@
 void test_filter_charts() {
     graphics::PointChart chartSignalTemplate(710, 460);
     chartSignalTemplate.setWindowTitle("Signal template");
-    graphics::ChartThread chartSignalTemplateThread(&chartSignalTemplate);
+    graphics::ChartThread<bool> chartSignalTemplateThread(&chartSignalTemplate);
 
     graphics::PointChart chartSignalIn(710, 460);
     chartSignalIn.setWindowTitle("Signal+noise");
-    graphics::ChartThread chartSignalInThread(&chartSignalIn);
+    graphics::ChartThread<bool> chartSignalInThread(&chartSignalIn);
 
     graphics::PointChart chartNoiseEval(710, 460);
     chartNoiseEval.setWindowTitle("Noise eval");
-    graphics::ChartThread chartNoiseEvalThread(&chartNoiseEval);
+    graphics::ChartThread<bool> chartNoiseEvalThread(&chartNoiseEval);
 
     graphics::PointChart chartSignalOut(710, 460);
     chartSignalOut.setWindowTitle("Signal out");
-    graphics::ChartThread chartSignalOutThread(&chartSignalOut);
+    graphics::ChartThread<bool> chartSignalOutThread(&chartSignalOut);
 
     graphics::PointChart chartFilterWeights(710, 460);
     chartFilterWeights.setWindowTitle("Weights");
-    graphics::ChartThread chartFilterWeightsThread(&chartFilterWeights);
+    graphics::ChartThread<bool> chartFilterWeightsThread(&chartFilterWeights);
 
 
     double TN = 500.0; // кол-во точек на период
@@ -77,9 +77,9 @@ void test_filter_charts() {
 
             ///////// draw filter weight
             chartFilterWeights.getData()->removeData();
-            utils::CArrayList<graphics::ChartData::Point> wPoints(df.getWeightsArray()->size());
+            utils::CArrayList<graphics::ChartData<bool>::Point> wPoints(df.getWeightsArray()->size());
             for (size_t k = 0; k<df.getWeightsArray()->size(); ++k) {
-                graphics::ChartData::Point wp = {(double)k, (df.getWeightsArray()->getArray())[k]};
+                graphics::ChartData<bool>::Point wp = {(double)k, (df.getWeightsArray()->getArray())[k]};
                 wPoints.push(wp);
             }
             chartFilterWeights.getData()->addPoints(0, wPoints.getArray(), wPoints.size());

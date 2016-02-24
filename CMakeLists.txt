@@ -27,8 +27,6 @@ add_executable(dummy_executable
         test/sspy/SspyTest.cpp
         test/kohonen/NetworkInitializerTest.cpp
         test/coursera/CourseraTest.cpp
-        src/graphics/ChartData.cpp
-        src/graphics/Chart.cpp
         src/ml/DigitalFilter.cpp
         src/utils/matrix_utils.cpp
         test/test.cpp

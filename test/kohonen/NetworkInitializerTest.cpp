@@ -165,10 +165,10 @@ namespace test {
                 sammonChart.getData()->removeData();
                 sammonMap.doOneIteration();
 
-                utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
+                utils::CArrayList<graphics::ChartData<bool>::Point> points(sammonMap.getMapPoints()->size());
                 for (size_t i = 0; i < sammonMap.getMapPoints()->size(); ++i) {
                     kohonen::SammonMap<float>::Point &r = (*sammonMap.getMapPoints())[i];
-                    graphics::ChartData::Point p = {r.x, r.y};
+                    graphics::ChartData<bool>::Point p = {r.x, r.y};
                     points.push(p);
                 }
                 sammonChart.getData()->addPoints(0, points.getArray(), points.size());
@@ -203,13 +203,13 @@ namespace test {
 
             graphics::SammonMapChart sammonChart(xdim, 740, 740);
             sammonChart.setWindowTitle("Sammon Map");
-            graphics::ChartThread chartThread(&sammonChart);
+            graphics::ChartThread<bool> chartThread(&sammonChart);
             std::cout << "size: " << sammonMap.getMapPoints()->size() << std::endl;
             std::cout << "x: " << (*sammonMap.getMapPoints())[0].x << std::endl;
-            utils::CArrayList<graphics::ChartData::Point> points(sammonMap.getMapPoints()->size());
+            utils::CArrayList<graphics::ChartData<bool>::Point> points(sammonMap.getMapPoints()->size());
             for (size_t i = 0; i < sammonMap.getMapPoints()->size(); ++i) {
                 kohonen::SammonMap<float>::Point &r = (*sammonMap.getMapPoints())[i];
-                graphics::ChartData::Point p = {r.x, r.y};
+                graphics::ChartData<bool>::Point p = {r.x, r.y};
                 points.push(p);
             }
             sammonChart.getData()->addPoints(0, points.getArray(), points.size());
@@ -247,7 +247,7 @@ namespace test {
             //
             graphics::PointChart qErrorChart(710, 460);
             qErrorChart.setWindowTitle("Quantum error");
-            graphics::ChartThread chartThread(&qErrorChart);
+            graphics::ChartThread<bool> chartThread(&qErrorChart);
 
             size_t winnerSize = winnerSearcher.getWinnerSize();
             size_t colSize = somCodesMatrix->getColSize();
@@ -259,7 +259,7 @@ namespace test {
 
             graphics::SammonMapChart sammonChart(xdim, 1200, 700);
             sammonChart.setWindowTitle("Sammon Map");
-            graphics::ChartThread sammonChartThread(&sammonChart);
+            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 
             buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
@@ -297,7 +297,7 @@ namespace test {
 
             graphics::SammonMapChart sammonChart2(xdim, 1200, 700);
             sammonChart2.setWindowTitle("Sammon Map2");
-            graphics::ChartThread sammonChartThread2(&sammonChart2);
+            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
             buildAndShowSammonMap(somCodesMatrix, sammonChart2);
 
             // проверка
@@ -339,7 +339,7 @@ namespace test {
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
             mytest(umatrix_hexa);
-//            mytest(eucw_bubble_hexa_16_12_sammon);
+            mytest(eucw_bubble_hexa_16_12_sammon);
 //            mytest(visible_som_training);
         }
     }

@@ -43,11 +43,11 @@ namespace test {
         void test_number_hash_charts() {
             graphics::PointChart numberHashChart(710, 460);
             numberHashChart.setWindowTitle("Number hash");
-            graphics::ChartThread numberHashChartThread(&numberHashChart);
+            graphics::ChartThread<bool> numberHashChartThread(&numberHashChart);
 
             graphics::PointChart floatHashChart(710, 460);
             floatHashChart.setWindowTitle("Float hash");
-            graphics::ChartThread floatHashChartThread(&floatHashChart);
+            graphics::ChartThread<bool> floatHashChartThread(&floatHashChart);
 
             utils::hash::NumberHash<double> nflash;
             utils::CHashSet<double> numSet(&nflash);
@@ -61,7 +61,7 @@ namespace test {
         void test_float_hash_charts() {
             graphics::PointChart floatHashChart(710, 460);
             floatHashChart.setWindowTitle("Float hash");
-            graphics::ChartThread floatHashChartThread(&floatHashChart);
+            graphics::ChartThread<bool> floatHashChartThread(&floatHashChart);
 
             utils::hash::FloatHash<double> fhash(1.2, 1.6);
             utils::CHashSet<double> floatSet(&fhash);
