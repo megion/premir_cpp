@@ -5,6 +5,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 #include "ChartColormap.h"
 #include "ChartData.h"
@@ -24,8 +25,8 @@ namespace graphics {
 
         typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
 
-        UMatChart(long _xdim, uint16_t _width, uint16_t _height) :
-                Chart(_width, _height), xdim(_xdim) {
+        UMatChart(uint16_t _width, uint16_t _height) :
+                Chart(_width, _height) {
             // arcs context
             uint32_t values2[] = {colormap->getGreen()->pixel};
             arcsContext = xcb_generate_id(connection);
@@ -47,73 +48,82 @@ namespace graphics {
         void draw() const {
             drawBackground();
 //            drawAxes();
-            drawAxesLabels();
+//            drawAxesLabels();
             drawUMat();
         }
 
-        void addUMatPoints(UMatCodes* uMatrix) {
+        void addHexaUMatPoints(UMatCodes* uMatrix) {
             UMatCodes &uvalue = (*uMatrix);
             size_t uxdim = uvalue.getRowSize();
             size_t uydim = uvalue.getColSize();
+
+            double sin30 = 0.5;
+            double cos30 = std::pow(3, 0.5)/2.0;
+
+            //double m = 1; // сторона многоугольника
+            size_t index = 0;
+            size_t k = 4;
+
             for (size_t i = 0; i < uxdim; i++) {
-                for (size_t j = 0; j < uydim; j++) {
-//                    uvalue[i][j];
+                double x0 = 0;
+                double y0 = i*2*cos30;
+                for (size_t j = 0, k = 4; j < uydim; j++) {
+                    ChartData<bool>::Point points[7];
+
+                    points[0].x = x0;
+                    points[0].y = y0;
+
+                    points[1].x = x0 + sin30;
+                    points[1].y = y0 - cos30;
+
+                    points[2].x = points[1].x + 1.0;
+                    points[2].y = points[1].y;
+
+                    points[3].x = points[0].x + 2.0;
+                    points[3].y = points[0].y;
+
+                    points[4].x = points[2].x;
+                    points[4].y = points[0].y + cos30;
+
+                    points[5].x = points[1].x;
+                    points[5].y = points[4].y;
+
+                    points[6].x = points[0].x;
+                    points[6].y = points[0].y;
+
+                    data->addPoints(index, points, 7);
+
+
+                    // k = 2,2,4,4,2,2,4,4...
+                    if (j%2==0) {
+                         if (k==4) {
+                             k = 2;
+                         } else {
+                             k = 4;
+                         }
+                    }
+
+                    x0 = points[k].x;
+                    y0 = points[k].y;
+
+                    ++index;
                 }
+
             }
         }
 
         void drawUMat() const {
-            utils::RDMatrix<bool, xcb_point_t> yPolyLines;
-            xcb_point_t xPolyLines[xdim];
-            size_t xIndex = 0;
-
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
                         data->getOutpoints()->getRow(r);
-                xcb_arc_t arcs[outRow.pointSize];
-
-                for (size_t i = 0; i < outRow.pointSize; ++i) {
-                    xcb_point_t &point = outRow.points[i];
-                    arcs[i].x = point.x - 2;
-                    arcs[i].y = point.y - 2;
-                    arcs[i].width = 4;
-                    arcs[i].height = 4;
-                    arcs[i].angle1 = 0;
-                    arcs[i].angle2 = 360 << 6;
-
-                    xPolyLines[xIndex].x = point.x;
-                    xPolyLines[xIndex].y = point.y;
-
-                    yPolyLines.writeToEndRow(xIndex, point);
-
-                    if (xIndex == xdim - 1) {
-                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                                      window, arcsContext, xdim,
-                                      xPolyLines);
-                        xIndex = 0;
-                    } else {
-                        ++xIndex;
-                    }
-                }
-
-                xcb_poly_arc(connection, window, arcsContext,
-                             outRow.pointSize, arcs);
-            }
-
-            for (size_t r = 0; r < yPolyLines.getRowSize(); ++r) {
-                utils::RDMatrix<bool, xcb_point_t>::Row &row =
-                        yPolyLines.getRow(r);
                 xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                              window, arcsContext, row.pointSize,
-                              row.points);
+                              window, arcsContext, outRow.pointSize,
+                              outRow.points);
             }
-
-            flush();
         }
 
     private:
 
-        long xdim;
         xcb_gcontext_t arcsContext;
         xcb_gcontext_t cleanArcsContext;
 
@@ -122,4 +132,4 @@ namespace graphics {
 
 }
 
-#endif /* SRC_GRAPHICS_CHART_H_ */
+#endif

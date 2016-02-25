@@ -329,6 +329,12 @@ namespace test {
 
             assert(umat.getUMatrix()->equalsWithError(*expectedUMatrix, 0.001, true));
 
+            graphics::UMatChart<float> umatChart(500, 740);
+            umatChart.setWindowTitle("UMat");
+            graphics::ChartThread<bool> chartThread(&umatChart);
+            umatChart.addHexaUMatPoints(umat.getUMatrix());
+            umatChart.draw();
+
             delete somTrainedMatrix;
             delete expectedUMatrix;
         }
@@ -339,7 +345,7 @@ namespace test {
             mytest(eucw_bubble_hexa_16_12_som_training);
             mytest(eucw_gaussian_rect_16_12_som_training);
             mytest(umatrix_hexa);
-            mytest(eucw_bubble_hexa_16_12_sammon);
+//            mytest(eucw_bubble_hexa_16_12_sammon);
 //            mytest(visible_som_training);
         }
     }

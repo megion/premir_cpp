@@ -31,6 +31,7 @@
 #include "graphics/ChartThread.h"
 #include "graphics/SammonMapChart.h"
 #include "graphics/PointChart.h"
+#include "graphics/UMatChart.h"
 
 namespace test {
     namespace kohonen_initializer {
