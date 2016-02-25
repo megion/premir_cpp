@@ -9,11 +9,21 @@
 #include "ChartColormap.h"
 #include "ChartData.h"
 #include "Chart.h"
+#include "models/DataSample.h"
+#include "utils/RMatrix.h"
 
 namespace graphics {
 
+    struct UMatCell {
+        double colorValue;
+    };
+
+    template<typename Out>
     class UMatChart : public Chart<bool> {
     public:
+
+        typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
+
         UMatChart(long _xdim, uint16_t _width, uint16_t _height) :
                 Chart(_width, _height), xdim(_xdim) {
             // arcs context
@@ -39,6 +49,17 @@ namespace graphics {
 //            drawAxes();
             drawAxesLabels();
             drawUMat();
+        }
+
+        void addUMatPoints(UMatCodes* uMatrix) {
+            UMatCodes &uvalue = (*uMatrix);
+            size_t uxdim = uvalue.getRowSize();
+            size_t uydim = uvalue.getColSize();
+            for (size_t i = 0; i < uxdim; i++) {
+                for (size_t j = 0; j < uydim; j++) {
+//                    uvalue[i][j];
+                }
+            }
         }
 
         void drawUMat() const {
