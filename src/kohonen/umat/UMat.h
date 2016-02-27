@@ -70,8 +70,8 @@ namespace kohonen {
                     }
                 }
 
-                std::cout << "minimum distance between elements: " << min << std::endl;
-                std::cout << "maximum distance between elements: " << max << std::endl;
+//                std::cout << "minimum distance between elements: " << min << std::endl;
+//                std::cout << "maximum distance between elements: " << max << std::endl;
 
                 Out bw = max - min;
                 /* scale values to [0,1] */

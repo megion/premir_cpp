@@ -29,7 +29,7 @@ namespace utils {
                 _size(list._size), _first(list._first), _last(list._last) {
             list._size = 0;
             list._first = nullptr;
-            list._first = nullptr;
+            list._last = nullptr;
         }
 
         ~LinkedList();

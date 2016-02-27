@@ -214,11 +214,24 @@ int main(int argc, char **argv)
 
   calc_umatrix(umat, 0, 0);
 
-  if (average)
+  if (average) {
     average_umatrix(umat);
+    printf("after average \n");
+  }
 
-  if (median)
+  if (median) {
     median_umatrix(umat);
+    printf("after median \n");
+  }
+
+  // print umat
+  size_t i, j;
+  for (i=0;i<umat->uxdim;i++) {
+    for (j = 0; j < umat->uydim; j++) {
+      printf("%f ",umat->uvalue[i][j]);
+    }
+    printf("\n");
+  }
 
   if (mode == 0)
     mode = OUTPUT_EPS;

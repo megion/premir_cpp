@@ -523,9 +523,9 @@ int calc_umatrix(struct umatrix *umat,int xswap,int yswap)
 	  for (j = 0; j < umat->uydim; j++) {
 		  umat->uvalue[i][j] = 1.0 - (umat->uvalue[i][j] - min) / bw;
 
-		  printf("%f ",umat->uvalue[i][j]);
+//		  printf("%f ",umat->uvalue[i][j]);
 	  }
-	  printf("\n");
+//	  printf("\n");
   }
 
 #if 0

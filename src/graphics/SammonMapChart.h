@@ -9,11 +9,18 @@
 #include "ChartColormap.h"
 #include "ChartData.h"
 #include "Chart.h"
+#include "kohonen/SammonMap.h"
 
 namespace graphics {
 
+    template<typename Out>
     class SammonMapChart : public Chart<bool> {
     public:
+
+        typedef typename kohonen::SammonMap<Out>::Point SPoint;
+        typedef utils::CArrayList<SPoint> SammonPoints;
+        typedef utils::CArrayList<graphics::ChartData<bool>::Point> ChartPoints;
+
         SammonMapChart(long _xdim, uint16_t _width, uint16_t _height) :
                 Chart(_width, _height), xdim(_xdim) {
             // arcs context
@@ -41,14 +48,24 @@ namespace graphics {
             drawArcs();
         }
 
+        void addSammonMapPoints(SammonPoints *inPoints) {
+            std::lock_guard<std::mutex> guard(*Chart<bool>::changeDataMutex);
+            ChartPoints chartPoints(inPoints->size());
+            for (size_t i = 0; i < inPoints->size(); ++i) {
+                SPoint &r = (*inPoints)[i];
+                graphics::ChartData<bool>::Point p = {r.x, r.y};
+                chartPoints.push(p);
+            }
+            Chart<bool>::data->addPoints(0, chartPoints.getArray(), chartPoints.size());
+        }
+
         void drawArcs() const {
             utils::RDMatrix<bool, xcb_point_t> yPolyLines;
             xcb_point_t xPolyLines[xdim];
             size_t xIndex = 0;
 
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
-                utils::RDMatrix<bool, xcb_point_t>::Row &outRow =
-                        data->getOutpoints()->getRow(r);
+                utils::RDMatrix<bool, xcb_point_t>::Row &outRow = data->getOutpoints()->getRow(r);
                 xcb_arc_t arcs[outRow.pointSize];
 
                 for (size_t i = 0; i < outRow.pointSize; ++i) {

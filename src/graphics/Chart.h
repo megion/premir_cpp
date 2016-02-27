@@ -5,6 +5,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <mutex>
 
 #include "ChartColormap.h"
 #include "ChartData.h"
@@ -18,8 +19,8 @@ namespace graphics {
         typedef typename ChartData<R>::Axis ChartAxis;
 
         Chart(uint16_t _width = 400, uint16_t _height = 260) :
-                connection(xcb_connect(NULL, NULL)), width(_width), //
-                height(_height) {
+                connection(xcb_connect(NULL, NULL)), width(_width), height(_height),
+                changeDataMutex(new std::mutex()) {
             std::cout << "Create Chart" << std::endl;
             if (xcb_connection_has_error(connection)) {
                 throw std::runtime_error("Cannot open display");
@@ -68,11 +69,27 @@ namespace graphics {
             screen = nullptr;
             delete colormap;
             delete data;
+            delete changeDataMutex;
             xcb_disconnect(connection);
         }
 
         ChartData<R> *getData() const {
             return data;
+        }
+
+        /**
+         * Безопасноя отрисовка - перед функцией рисования производится блокировка мьютекса.
+         */
+        void drawSafely() const {
+//            std::cout<< "lock before draw"<< std::endl;
+            std::lock_guard<std::mutex> guard(*changeDataMutex);
+            draw();
+        }
+
+        void removeDataSafely() {
+//            std::cout<< "lock before remove data"<< std::endl;
+            std::lock_guard<std::mutex> guard(*changeDataMutex);
+            data->removeData();
         }
 
         /**
@@ -91,7 +108,8 @@ namespace graphics {
                     case XCB_EXPOSE: /* отрисовать или перерисовать окно */
 //			std::cout << "XCB_EXPOSE event" << std::endl;
 
-                        draw();
+//                        draw();
+                        drawSafely();
 
                         xcb_flush(connection);
                         break;
@@ -194,6 +212,8 @@ namespace graphics {
         uint16_t width;
         uint16_t height;
         xcb_rectangle_t rectangle;
+
+        std::mutex* changeDataMutex;
 
         void createContexts() {
             // black background context

@@ -75,6 +75,8 @@ namespace utils {
                         std::free(matrix[r].points);
                         // set to null each array pointer
                         matrix[r].points = nullptr;
+                        matrix[r].pointSize = 0;
+                        matrix[r].pointCapacity = 0;
                     }
                 }
                 std::free(matrix);

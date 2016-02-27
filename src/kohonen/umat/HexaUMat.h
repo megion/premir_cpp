@@ -252,19 +252,19 @@ namespace kohonen {
                     for (size_t i = 1; i < uxdim - 1; i++) {
                         /* Non-borders */
                         if ((j % 4) == 1) {
-                            uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] +
+                            umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] +
                                              uvalue[i][j] + uvalue[i + 1][j] + uvalue[i - 1][j + 1] +
                                              uvalue[i][j + 1]) / ((float) 7.0));
                         } else if ((j % 4) == 2) {
-                            uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] +
+                            umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] +
                                              uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1] +
                                              uvalue[i + 1][j + 1]) / ((float) 7.0));
                         } else if ((j % 4) == 3) {
-                            uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] +
+                            umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] +
                                              uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1] +
                                              uvalue[i + 1][j + 1]) / ((float) 7.0));
                         } else if ((j % 4) == 0) {
-                            uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] +
+                            umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] +
                                              uvalue[i][j] + uvalue[i + 1][j] + uvalue[i - 1][j + 1] +
                                              uvalue[i][j + 1]) / ((float) 7.0));
                         }
@@ -273,23 +273,23 @@ namespace kohonen {
                 /* north border */
                 size_t j = 0;
                 for (size_t i = 1; i < uxdim - 1; i++) {
-                    uvalue[i][j] = ((uvalue[i - 1][j] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i - 1][j + 1] +
+                    umat2[i][j] = ((uvalue[i - 1][j] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i - 1][j + 1] +
                                      uvalue[i][j + 1]) / ((float) 5.0));
                 }
                 /*south border*/
                 j = uydim - 1;
                 for (size_t i = 1; i < uxdim - 1; i++) {
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i + 1][j]) / ((float) 5.0));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i + 1][j]) / ((float) 5.0));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i + 1][j]) / ((float) 5.0));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i + 1][j]) / ((float) 5.0));
                     }
                 }
@@ -297,16 +297,16 @@ namespace kohonen {
                 size_t i = uxdim - 1;
                 for (j = 1; j < uydim - 1; j++) {
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] + uvalue[i - 1][j + 1] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] + uvalue[i - 1][j + 1] +
                                          uvalue[i][j + 1]) / ((float) 5.0));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] + uvalue[i][j + 1]) /
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] + uvalue[i][j + 1]) /
                                         ((float) 4.0));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i][j + 1]) / ((float) 5.0));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
+                        umat2[i][j] = ((uvalue[i - 1][j - 1] + uvalue[i][j - 1] + uvalue[i - 1][j] + uvalue[i][j] +
                                          uvalue[i - 1][j + 1] + uvalue[i][j + 1]) / ((float) 6.0));
 
                     }
@@ -315,29 +315,29 @@ namespace kohonen {
                 for (j = 1; j < uydim - 1; j++) {
                     /*west border*/
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i][j] + uvalue[i + 1][j] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i][j] + uvalue[i + 1][j] +
                                          uvalue[i][j + 1]) / ((float) 5.0));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i][j] + uvalue[i + 1][j] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i + 1][j - 1] + uvalue[i][j] + uvalue[i + 1][j] +
                                          uvalue[i][j + 1] + uvalue[i + 1][j + 1]) / ((float) 6.0));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1] +
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1] +
                                          uvalue[i + 1][j + 1]) / ((float) 5.0));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = ((uvalue[i][j - 1] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1]) /
+                        umat2[i][j] = ((uvalue[i][j - 1] + uvalue[i][j] + uvalue[i + 1][j] + uvalue[i][j + 1]) /
                                         ((float) 4.0));
                     }
                 }
 
                 /*Corners*/
-                uvalue[0][0] = (uvalue[1][0] + uvalue[0][0] + uvalue[0][1]) / ((float) 3.0);
-                uvalue[(uxdim - 1)][0] = (uvalue[(uxdim - 1)][0] + uvalue[(uxdim - 1)][1] + uvalue[(uxdim - 2)][0] +
+                umat2[0][0] = (uvalue[1][0] + uvalue[0][0] + uvalue[0][1]) / ((float) 3.0);
+                umat2[(uxdim - 1)][0] = (uvalue[(uxdim - 1)][0] + uvalue[(uxdim - 1)][1] + uvalue[(uxdim - 2)][0] +
                                           uvalue[(uxdim - 2)][1]) / ((float) 4.0);
                 /* Short cut */
-                uvalue[(uxdim - 1)][(uydim - 1)] =
+                umat2[(uxdim - 1)][(uydim - 1)] =
                         (uvalue[(uxdim - 1)][(uydim - 1)] + uvalue[(uxdim - 1)][(uydim - 2)] +
                          uvalue[(uxdim - 2)][(uydim - 1)]) / ((float) 3.0);
-                uvalue[0][(uydim - 1)] = (uvalue[0][(uydim - 1)] + uvalue[1][(uydim - 1)] + uvalue[0][(uydim - 2)]) /
+                umat2[0][(uydim - 1)] = (uvalue[0][(uydim - 1)] + uvalue[1][(uydim - 1)] + uvalue[0][(uydim - 2)]) /
                                          ((float) 3.0);
 
                 for (j = 0; j < uydim; j++) {
@@ -362,21 +362,24 @@ namespace kohonen {
                     for (size_t i = 1; i < uxdim - 1; i++) {
                         /* Non-borders */
                         if ((j % 4) == 1) {
-                            uvalue[i][j] = (UMat<Out>::median7(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
-                                                    uvalue[i][j], uvalue[i + 1][j], uvalue[i - 1][j + 1],
-                                                    uvalue[i][j + 1]));
+                            umat2[i][j] = (UMat<Out>::median7(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
+                                                               uvalue[i][j], uvalue[i + 1][j], uvalue[i - 1][j + 1],
+                                                               uvalue[i][j + 1]));
                         } else if ((j % 4) == 2) {
-                            uvalue[i][j] = (UMat<Out>::median7(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
-                                                    uvalue[i][j],
-                                                    uvalue[i + 1][j], uvalue[i][j + 1], uvalue[i + 1][j + 1]));
+                            umat2[i][j] = (UMat<Out>::median7(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
+                                                               uvalue[i][j],
+                                                               uvalue[i + 1][j], uvalue[i][j + 1],
+                                                               uvalue[i + 1][j + 1]));
                         } else if ((j % 4) == 3) {
-                            uvalue[i][j] = (UMat<Out>::median7(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
-                                                    uvalue[i][j],
-                                                    uvalue[i + 1][j], uvalue[i][j + 1], uvalue[i + 1][j + 1]));
+                            umat2[i][j] = (UMat<Out>::median7(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                               uvalue[i][j],
+                                                               uvalue[i + 1][j], uvalue[i][j + 1],
+                                                               uvalue[i + 1][j + 1]));
                         } else if ((j % 4) == 0) {
-                            uvalue[i][j] = (UMat<Out>::median7(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
-                                                    uvalue[i][j],
-                                                    uvalue[i + 1][j], uvalue[i - 1][j + 1], uvalue[i][j + 1]));
+                            umat2[i][j] = (UMat<Out>::median7(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                               uvalue[i][j],
+                                                               uvalue[i + 1][j], uvalue[i - 1][j + 1],
+                                                               uvalue[i][j + 1]));
                         }
                     }
                 }
@@ -384,24 +387,25 @@ namespace kohonen {
                 /* north border */
                 size_t j = 0;
                 for (size_t i = 1; i < uxdim - 1; i++) {
-                    uvalue[i][j] = (UMat<Out>::median5(uvalue[i - 1][j], uvalue[i][j], uvalue[i + 1][j], uvalue[i - 1][j + 1],
-                                            uvalue[i][j + 1]));
+                    umat2[i][j] = (UMat<Out>::median5(uvalue[i - 1][j], uvalue[i][j], uvalue[i + 1][j],
+                                                       uvalue[i - 1][j + 1], uvalue[i][j + 1]));
                 }
                 /*south border*/
                 j = uydim - 1;
                 for (size_t i = 1; i < uxdim - 1; i++) {
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i + 1][j]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j], uvalue[i + 1][j]));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i + 1][j]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j],
+                                                           uvalue[i + 1][j]));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i + 1][j]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j], uvalue[i + 1][j]));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i + 1][j]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j], uvalue[i + 1][j]));
                     }
                 }
 
@@ -409,16 +413,17 @@ namespace kohonen {
                 size_t i = uxdim - 1;
                 for (j = 1; j < uydim - 1; j++) {
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j], uvalue[i - 1][j + 1],
-                                                uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
+                                                           uvalue[i - 1][j + 1], uvalue[i][j + 1]));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = (UMat<Out>::median4(uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j], uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median4(uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
+                                                           uvalue[i][j + 1]));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j], uvalue[i][j + 1]));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = (UMat<Out>::median6(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j], uvalue[i][j],
-                                                uvalue[i - 1][j + 1], uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median6(uvalue[i - 1][j - 1], uvalue[i][j - 1], uvalue[i - 1][j],
+                                                           uvalue[i][j], uvalue[i - 1][j + 1], uvalue[i][j + 1]));
                     }
                 }
 
@@ -426,28 +431,29 @@ namespace kohonen {
                 i = 0;
                 for (j = 1; j < uydim - 1; j++) {
                     if ((j % 4) == 1) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i][j], uvalue[i + 1][j],
-                                                uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i][j],
+                                                           uvalue[i + 1][j], uvalue[i][j + 1]));
                     } else if ((j % 4) == 2) {
-                        uvalue[i][j] = (UMat<Out>::median6(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i][j], uvalue[i + 1][j],
-                                                uvalue[i][j + 1], uvalue[i + 1][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median6(uvalue[i][j - 1], uvalue[i + 1][j - 1], uvalue[i][j],
+                                                           uvalue[i + 1][j], uvalue[i][j + 1], uvalue[i + 1][j + 1]));
                     } else if ((j % 4) == 3) {
-                        uvalue[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i][j], uvalue[i + 1][j], uvalue[i][j + 1],
-                                                uvalue[i + 1][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median5(uvalue[i][j - 1], uvalue[i][j], uvalue[i + 1][j],
+                                                           uvalue[i][j + 1], uvalue[i + 1][j + 1]));
                     } else if ((j % 4) == 0) {
-                        uvalue[i][j] = (UMat<Out>::median4(uvalue[i][j - 1], uvalue[i][j], uvalue[i + 1][j], uvalue[i][j + 1]));
+                        umat2[i][j] = (UMat<Out>::median4(uvalue[i][j - 1], uvalue[i][j], uvalue[i + 1][j],
+                                                           uvalue[i][j + 1]));
                     }
                 }
 
                 // corners
-                uvalue[0][0] = UMat<Out>::median3(uvalue[1][0], uvalue[0][0], uvalue[0][1]);
-                uvalue[(uxdim - 1)][0] = UMat<Out>::median4(uvalue[(uxdim - 1)][0], uvalue[(uxdim - 1)][1], uvalue[(uxdim - 2)][0],
-                                                 uvalue[(uxdim - 2)][1]);
-                uvalue[(uxdim - 1)][(uydim - 1)] = UMat<Out>::median3(uvalue[(uxdim - 1)][(uydim - 1)],
-                                                           uvalue[(uxdim - 1)][(uydim - 2)],
-                                                           uvalue[(uxdim - 2)][(uydim - 1)]);
-                uvalue[0][(uydim - 1)] = UMat<Out>::median3(uvalue[0][(uydim - 1)], uvalue[1][(uydim - 1)],
-                                                 uvalue[0][(uydim - 2)]);
+                umat2[0][0] = UMat<Out>::median3(uvalue[1][0], uvalue[0][0], uvalue[0][1]);
+                umat2[(uxdim - 1)][0] = UMat<Out>::median4(uvalue[(uxdim - 1)][0], uvalue[(uxdim - 1)][1],
+                                                            uvalue[(uxdim - 2)][0], uvalue[(uxdim - 2)][1]);
+                umat2[(uxdim - 1)][(uydim - 1)] = UMat<Out>::median3(uvalue[(uxdim - 1)][(uydim - 1)],
+                                                                      uvalue[(uxdim - 1)][(uydim - 2)],
+                                                                      uvalue[(uxdim - 2)][(uydim - 1)]);
+                umat2[0][(uydim - 1)] = UMat<Out>::median3(uvalue[0][(uydim - 1)], uvalue[1][(uydim - 1)],
+                                                            uvalue[0][(uydim - 2)]);
 
                 for (size_t j = 0; j < uydim; j++) {
                     for (size_t i = 0; i < uxdim; i++) {
@@ -455,7 +461,7 @@ namespace kohonen {
                     }
                 }
 
-                UMat<Out>::scaleUMatrix(1);
+//                UMat<Out>::scaleUMatrix(1);
             }
 
         };
