@@ -12,7 +12,7 @@ CC := g++
 # -lX11 for X11 lib
 # -g for include debugging symbols
 # -pthread enable multithreading
-CCFLAGS := -std=c++11 -lxcb -g -pthread
+CCFLAGS := -std=c++11 -lxcb -g -pthread -lpng -lxcb-image
 
 # список каталогов с исходыми кодами
 SRC_DIRS := $(shell find ../src -type d)

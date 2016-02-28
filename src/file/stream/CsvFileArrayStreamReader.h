@@ -14,13 +14,11 @@ namespace file {
     namespace stream {
 
         template<typename T>
-        class CsvFileArrayStreamReader
-                : public StreamReader<models::DataSample<T>> {
+        class CsvFileArrayStreamReader : public StreamReader<models::DataSample<T>> {
         public:
 
             CsvFileArrayStreamReader(file::CsvFileReader<char> *_csvReader,
-                                     void (*_readInitialization)
-                                             (file::CsvFileReader<char> *),
+                                     void (*_readInitialization)(file::CsvFileReader<char> *),
                                      bool (*_isSampleSkipped)(char *, size_t),
                                      size_t _maxColSize, bool _useBuffer) :
                     csvReader(_csvReader),

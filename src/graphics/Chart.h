@@ -9,6 +9,7 @@
 
 #include "ChartColormap.h"
 #include "ChartData.h"
+#include "StoreImage.h"
 
 namespace graphics {
 
@@ -192,6 +193,11 @@ namespace graphics {
             xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window,
                                 XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
                                 strlen(title), title);
+        }
+
+        void saveImage() {
+            StoreImage store("test.png", width, height, connection, screen);
+            store.saveImage();
         }
 
     protected:

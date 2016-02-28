@@ -63,7 +63,7 @@ namespace test {
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
             file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, 5,
-                                                                     true);
+                                                                     false);
 
             kohonen::NetworkInitializer<float, float> initializer(&dataReader);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
@@ -184,7 +184,7 @@ namespace test {
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
-//            umat.medianUMatrix();
+            umat.medianUMatrix();
 //            umat.averageUMatrix();
 
             chart.removeDataSafely();
@@ -215,7 +215,7 @@ namespace test {
             sammonMap.getMapPoints();
 
             OutCodes *expectedSammonMatrix = read_sammon_file("../test/datafiles/kohonen/sammon_out_result.sam", 1);
-            assert(sammonMap.getMapPoints()->size()==expectedSammonMatrix->getRowSize());
+            assert(sammonMap.getMapPoints()->size() == expectedSammonMatrix->getRowSize());
             for (size_t r = 0; r < expectedSammonMatrix->getRowSize(); ++r) {
                 assert_range((*sammonMap.getMapPoints())[r].x, (*expectedSammonMatrix)[r][0], 0.001);
                 assert_range((*sammonMap.getMapPoints())[r].y, (*expectedSammonMatrix)[r][1], 0.001);
@@ -262,14 +262,14 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 220;
-            size_t ydim = 220;
+            size_t xdim = 260;
+            size_t ydim = 260;
             size_t dim = 5;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
             file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                                                                     true);
+                                                                     false);
 
 //            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
 
@@ -293,10 +293,10 @@ namespace test {
             size_t winnerSize = winnerSearcher.getWinnerSize();
             size_t colSize = somCodesMatrix->getColSize();
 
-            size_t teachSize = 100000;
+            size_t teachSize = 20000;
             double qerror = 0;
-            int step = 10000;
-            int step2 = 10000;
+            int step = 1000;
+            int step2 = 6000;
 
 //            graphics::SammonMapChart sammonChart(xdim, 1200, 700);
 //            sammonChart.setWindowTitle("Sammon Map");
@@ -304,9 +304,7 @@ namespace test {
 
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float> umatChart(740, 740);
-            umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<float> umchartThread(&umatChart);
+
 
             for (size_t le = 0; le < teachSize; ++le) {
                 models::DataSample<float> inRow[colSize];
@@ -333,13 +331,18 @@ namespace test {
                     }
 
                     if (le % step2 == 0) {
-                        drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+//                        drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
 //                        buildAndShowSammonMap(somCodesMatrix, sammonChart);
                     }
 
 
                 }
             }
+
+            graphics::UMatChart<float> umatChart(1740, 1740);
+            umatChart.setWindowTitle("UMat");
+            graphics::ChartThread<float> umchartThread(&umatChart);
+            drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
 //            sammonChart2.setWindowTitle("Sammon Map2");
@@ -438,24 +441,25 @@ namespace test {
             umat.averageUMatrix();
             umatAChart.addHexaUMatPoints(umat.getUMatrix());
             umatAChart.draw();
+            umatAChart.saveImage();
 
             graphics::UMatChart<float> umatAMChart(500, 740);
-            umatAMChart.setWindowTitle("UMatAM");
+            umatAMChart.setWindowTitle("UMatM");
             graphics::ChartThread<float> chartThreadAM(&umatAMChart);
             umat.medianUMatrix();
             umatAMChart.addHexaUMatPoints(umat.getUMatrix());
             umatAMChart.draw();
 
             // нарисуем медианную матрицу заново
-            kohonen::umat::HexaUMat<float> umatM(xdim, ydim, dim);
-            umatM.initializeMat(somTrainedMatrix);
-            umatM.buildUMatrix();
-            umatM.medianUMatrix();
-            graphics::UMatChart<float> umatMChart(500, 740);
-            umatMChart.setWindowTitle("UMatM");
-            graphics::ChartThread<float> chartThreadM(&umatMChart);
-            umatMChart.addHexaUMatPoints(umat.getUMatrix());
-            umatMChart.draw();
+//            kohonen::umat::HexaUMat<float> umatM(xdim, ydim, dim);
+//            umatM.initializeMat(somTrainedMatrix);
+//            umatM.buildUMatrix();
+//            umatM.medianUMatrix();
+//            graphics::UMatChart<float> umatMChart(500, 740);
+//            umatMChart.setWindowTitle("UMatM");
+//            graphics::ChartThread<float> chartThreadM(&umatMChart);
+//            umatMChart.addHexaUMatPoints(umat.getUMatrix());
+//            umatMChart.draw();
         }
 
         void network_initializer_test() {
@@ -469,8 +473,8 @@ namespace test {
             mytest(eucw_bubble_hexa_16_12_sammon);
 
 //            mytest(sammon_visible);
-//            mytest(umatrix_visible);
-            mytest(visible_som_training);
+            mytest(umatrix_visible);
+//            mytest(visible_som_training);
         }
     }
 }
