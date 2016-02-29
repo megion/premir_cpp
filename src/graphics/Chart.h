@@ -81,10 +81,18 @@ namespace graphics {
         /**
          * Безопасноя отрисовка - перед функцией рисования производится блокировка мьютекса.
          */
-        void drawSafely() const {
-//            std::cout<< "lock before draw"<< std::endl;
+        void drawOnWindowSafely() const {
             std::lock_guard<std::mutex> guard(*changeDataMutex);
-            draw();
+            draw(window);
+        }
+
+        void drawSafely(const xcb_pixmap_t& pixmap) const {
+            std::lock_guard<std::mutex> guard(*changeDataMutex);
+            draw(pixmap);
+        }
+
+        void drawOnWindow() const {
+            draw(window);
         }
 
         void removeDataSafely() {
@@ -110,7 +118,7 @@ namespace graphics {
 //			std::cout << "XCB_EXPOSE event" << std::endl;
 
 //                        draw();
-                        drawSafely();
+                        drawOnWindowSafely();
 
                         xcb_flush(connection);
                         break;
@@ -123,39 +131,39 @@ namespace graphics {
             std::cout << "chart closed" << std::endl;
         }
 
-        virtual void draw() const = 0;
+        virtual void draw(const xcb_pixmap_t& pixmap) const = 0;
 
-        void drawAxes() const {
+        void drawAxes(const xcb_pixmap_t& pixmap) const {
             // vertical lines
             for (ChartAxis &axis : (*data->getYAxes())) {
-                drawAxis(axis);
+                drawAxis(pixmap, axis);
             }
 
             // horizontal lines
             for (ChartAxis &axis : (*data->getXAxes())) {
-                drawAxis(axis);
+                drawAxis(pixmap, axis);
             }
         }
 
-        void drawAxesLabels() const {
+        void drawAxesLabels(const xcb_pixmap_t& pixmap) const {
             // vertical labels
             for (ChartAxis &axis : (*data->getYAxes())) {
-                drawAxisLabel(axis);
+                drawAxisLabel(pixmap, axis);
             }
 
             // horizontal labels
             for (ChartAxis &axis : (*data->getXAxes())) {
-                drawAxisLabel(axis);
+                drawAxisLabel(pixmap, axis);
             }
         }
 
-        void drawAxis(const ChartAxis &axis) const {
+        void drawAxis(const xcb_pixmap_t& pixmap, const ChartAxis &axis) const {
             // 1. clean text labels - draw black rectangle
-            xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window, axisContext, 2,
+            xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, pixmap, axisContext, 2,
                           axis.line);
         }
 
-        void drawAxisLabel(const ChartAxis &axis) const {
+        void drawAxisLabel(const xcb_pixmap_t& pixmap, const ChartAxis &axis) const {
             // 1. clean text labels - draw black rectangle
             if (!axis.hideLabel) {
                 uint16_t labelHeight = 16;
@@ -178,8 +186,8 @@ namespace graphics {
             xcb_flush(connection);
         }
 
-        void drawBackground() const {
-            xcb_poly_fill_rectangle(connection, window, backgroundContext, 1,
+        void drawBackground(const xcb_pixmap_t& pixmap) const {
+            xcb_poly_fill_rectangle(connection, pixmap, backgroundContext, 1,
                                     &rectangle);
         }
 
@@ -196,8 +204,14 @@ namespace graphics {
         }
 
         void saveImage() {
-            StoreImage store("test.png", width, height, connection, screen);
+            xcb_pixmap_t pixmap = xcb_generate_id(connection);
+            xcb_create_pixmap(connection,screen->root_depth, pixmap, window, width, height);
+            drawSafely(pixmap);
+
+            StoreImage store("test.png", width, height, connection, screen, pixmap);
             store.saveImage();
+            xcb_free_pixmap (connection, pixmap);
+
         }
 
     protected:

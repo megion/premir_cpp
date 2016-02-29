@@ -175,7 +175,7 @@ namespace test {
 //                sammonChart.getData()->addPoints(0, points.getArray(), points.size());
 
                 sammonChart.addSammonMapPoints(sammonMap.getMapPoints());
-                sammonChart.draw();
+                sammonChart.drawOnWindow();
             }
         }
 
@@ -189,7 +189,7 @@ namespace test {
 
             chart.removeDataSafely();
             chart.addHexaUMatPoints(umat.getUMatrix());
-            chart.draw();
+            chart.drawOnWindow();
         }
 
         void test_eucw_bubble_hexa_16_12_sammon() {
@@ -256,7 +256,7 @@ namespace test {
 //                points.push(p);
 //            }
 //            sammonChart.getData()->addPoints(0, points.getArray(), points.size());
-            sammonChart.draw();
+            sammonChart.drawOnWindow();
 
             delete somTrainedMatrix;
         }
@@ -433,14 +433,14 @@ namespace test {
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> chartThread(&umatChart);
             umatChart.addHexaUMatPoints(umat.getUMatrix());
-            umatChart.draw();
+            umatChart.drawOnWindow();
 
             graphics::UMatChart<float> umatAChart(500, 740);
             umatAChart.setWindowTitle("UMatA");
             graphics::ChartThread<float> chartThreadA(&umatAChart);
             umat.averageUMatrix();
             umatAChart.addHexaUMatPoints(umat.getUMatrix());
-            umatAChart.draw();
+            umatAChart.drawOnWindow();
             umatAChart.saveImage();
 
             graphics::UMatChart<float> umatAMChart(500, 740);
@@ -448,7 +448,7 @@ namespace test {
             graphics::ChartThread<float> chartThreadAM(&umatAMChart);
             umat.medianUMatrix();
             umatAMChart.addHexaUMatPoints(umat.getUMatrix());
-            umatAMChart.draw();
+            umatAMChart.drawOnWindow();
 
             // нарисуем медианную матрицу заново
 //            kohonen::umat::HexaUMat<float> umatM(xdim, ydim, dim);

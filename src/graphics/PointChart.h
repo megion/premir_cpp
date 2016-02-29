@@ -39,19 +39,19 @@ namespace graphics {
             cleanPointsContext = 0;
         }
 
-        void drawPoints() const {
+        void drawPoints(const xcb_pixmap_t& pixmap) const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
-                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, pointsContext, outPoint.pointSize,
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, pixmap, pointsContext, outPoint.pointSize,
                                outPoint.points);
             }
 
         }
 
-        void drawCleanPoints() const {
+        void drawCleanPoints(const xcb_pixmap_t& pixmap) const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
-                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, window, cleanPointsContext, outPoint.pointSize,
+                xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, pixmap, cleanPointsContext, outPoint.pointSize,
                                outPoint.points);
             }
         }
@@ -62,40 +62,40 @@ namespace graphics {
          * 3. draw updated current points
          */
         void redrawNewPoints(ChartData<bool>::Point *points, size_t len) const {
-            drawCleanPoints();
+            drawCleanPoints(window);
             data->addPoints(0, points, len);
-            drawPoints();
+            drawPoints(window);
 
             if (data->size() % 36 == 0) { // оптимизация :)
-                drawAxes();
-                drawAxesLabels();
+                drawAxes(window);
+                drawAxesLabels(window);
             }
 
             flush();
         }
 
         void redrawNewPoint(double x, double y) {
-            drawCleanPoints();
+            drawCleanPoints(window);
 
             ChartData<bool>::Point points[1];
             points[0].x = x;
             points[0].y = y;
             data->addPoints(0, points, 1);
-            drawPoints();
+            drawPoints(window);
 
             if (data->size() % 36 == 0) { // оптимизация :)
-                drawAxes();
-                drawAxesLabels();
+                drawAxes(window);
+                drawAxesLabels(window);
             }
 
             flush();
         }
 
-        void draw() const {
-            drawBackground();
-            drawAxes();
-            drawAxesLabels();
-            drawPoints();
+        void draw(const xcb_pixmap_t& pixmap) const {
+            drawBackground(pixmap);
+            drawAxes(pixmap);
+            drawAxesLabels(pixmap);
+            drawPoints(pixmap);
         }
 
 

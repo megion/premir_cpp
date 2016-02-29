@@ -52,11 +52,11 @@ namespace graphics {
             cellBackgroundContext = 0;
         }
 
-        void draw() const {
+        void draw(const xcb_pixmap_t& pixmap) const {
 //            Chart<Out>::drawBackground();
 //            drawAxes();
 //            drawAxesLabels();
-            drawUMat();
+            drawUMat(pixmap);
             Chart<Out>::flush();
         }
         
@@ -125,7 +125,7 @@ namespace graphics {
             }
         }
 
-        void drawUMat() const {
+        void drawUMat(const xcb_pixmap_t& pixmap) const {
             OutMatrix* outMatrix = Chart<Out>::data->getOutpoints();
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
@@ -145,7 +145,7 @@ namespace graphics {
                 uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
                 xcb_change_gc(Chart<Out>::connection, cellBackgroundContext, mask, values);
-                xcb_fill_poly(Chart<Out>::connection, Chart<Out>::window, cellBackgroundContext,
+                xcb_fill_poly(Chart<Out>::connection, pixmap, cellBackgroundContext,
                               XCB_POLY_SHAPE_CONVEX, XCB_COORD_MODE_ORIGIN, outRow.pointSize, outRow.points);
 
             }

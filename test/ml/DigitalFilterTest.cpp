@@ -76,17 +76,14 @@ void test_filter_charts() {
 //			chartSignalOut.getChart().getData()->addPoint(i, signalEval);
 
             ///////// draw filter weight
-            chartFilterWeights.getData()->removeData();
+            chartFilterWeights.removeDataSafely();
             utils::CArrayList<graphics::ChartData<bool>::Point> wPoints(df.getWeightsArray()->size());
             for (size_t k = 0; k<df.getWeightsArray()->size(); ++k) {
                 graphics::ChartData<bool>::Point wp = {(double)k, (df.getWeightsArray()->getArray())[k]};
                 wPoints.push(wp);
             }
             chartFilterWeights.getData()->addPoints(0, wPoints.getArray(), wPoints.size());
-            chartFilterWeights.drawBackground();
-            chartFilterWeights.drawAxes();
-            chartFilterWeights.drawAxesLabels();
-            chartFilterWeights.drawPoints();
+            chartFilterWeights.drawOnWindowSafely();
             chartFilterWeights.flush();
             /////////
 
