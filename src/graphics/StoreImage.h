@@ -28,12 +28,16 @@ namespace graphics {
                 throw std::runtime_error(errMsg);
             }
 
-//            xcb_get_image_cookie_t image_cookie = xcb_get_image(connection, XCB_IMAGE_FORMAT_XY_PIXMAP,
-//                                                                screen->root, 0, 0, width, height, XCB_GC_FOREGROUND);
-//            imrep = xcb_get_image_reply(connection, image_cookie, 0);
-//            if (!imrep) {
-//                throw std::runtime_error("Cannot get image");
-//            }
+//                        xcb_pixmap_t pixmap = xcb_generate_id(connection);
+//            xcb_create_pixmap(connection, XCB_COPY_FROM_PARENT, pixmap, screen->root, width, height );
+//            xcb_create_pixmap(connection,screen->root_depth,pixmap,window,this->width,this->height);
+
+            xcb_get_image_cookie_t image_cookie = xcb_get_image(connection, XCB_IMAGE_FORMAT_XY_PIXMAP,
+                                                                screen->root, 0, 0, width, height, XCB_GC_FOREGROUND);
+            imrep = xcb_get_image_reply(connection, image_cookie, 0);
+            if (!imrep) {
+                throw std::runtime_error("Cannot get image");
+            }
 
             image = xcb_image_get(connection, screen->root, 0, 0, width, height, XCB_GC_PLANE_MASK, XCB_IMAGE_FORMAT_XY_PIXMAP);
             if (!image) {
@@ -89,9 +93,10 @@ namespace graphics {
             png_write_info(png_ptr, png_info_ptr);
 
 
-//            uint32_t imageDateSize = xcb_get_image_data_length(imrep);
-//            uint8_t *imageData = xcb_get_image_data(imrep);
+            uint32_t imageDateSize = xcb_get_image_data_length(imrep);
+            uint8_t *imageData = xcb_get_image_data(imrep);
             std::cout << "imageDateSize: " << image->size << std::endl;
+            std::cout << "imageDateSize2: " << imageDateSize << std::endl;
 
 //            if (imageData == NULL) {
 //                throw std::runtime_error("Cannot get image data");
@@ -156,8 +161,7 @@ namespace graphics {
                 std::free(png_row);
             }
 
-//            xcb_pixmap_t pixmap = xcb_generate_id(connection);
-//            xcb_create_pixmap(connection, XCB_COPY_FROM_PARENT, pixmap, screen->root, width, height );
+
 //            xcb_image_t* image = xcb_image_create_native(connection, width, height, XCB_IMAGE_FORMAT_Z_PIXMAP,
 //                                                XCB_COPY_FROM_PARENT, NULL, 0L, NULL);
 
@@ -179,8 +183,10 @@ namespace graphics {
         xcb_connection_t *connection;
         xcb_screen_t *screen;
 
-//        xcb_get_image_reply_t *imrep;
+        xcb_get_image_reply_t *imrep;
         xcb_image_t *image;
+
+        xcb_pixmap_t pixmap;
 
         uint16_t width;
         uint16_t height;
