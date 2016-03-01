@@ -1,5 +1,5 @@
-#ifndef SRC_GRAPHICS_CHART_H_
-#define SRC_GRAPHICS_CHART_H_
+#ifndef SRC_GRAPHICS_CHART_H
+#define SRC_GRAPHICS_CHART_H
 
 #include <xcb/xcb.h>
 #include <exception>
@@ -86,7 +86,7 @@ namespace graphics {
             draw(window);
         }
 
-        void drawSafely(const xcb_pixmap_t& pixmap) const {
+        void drawSafely(const xcb_drawable_t &pixmap) const {
             std::lock_guard<std::mutex> guard(*changeDataMutex);
             draw(pixmap);
         }
@@ -131,9 +131,9 @@ namespace graphics {
             std::cout << "chart closed" << std::endl;
         }
 
-        virtual void draw(const xcb_pixmap_t& pixmap) const = 0;
+        virtual void draw(const xcb_drawable_t &pixmap) const = 0;
 
-        void drawAxes(const xcb_pixmap_t& pixmap) const {
+        void drawAxes(const xcb_drawable_t &pixmap) const {
             // vertical lines
             for (ChartAxis &axis : (*data->getYAxes())) {
                 drawAxis(pixmap, axis);
@@ -145,7 +145,7 @@ namespace graphics {
             }
         }
 
-        void drawAxesLabels(const xcb_pixmap_t& pixmap) const {
+        void drawAxesLabels(const xcb_drawable_t &pixmap) const {
             // vertical labels
             for (ChartAxis &axis : (*data->getYAxes())) {
                 drawAxisLabel(pixmap, axis);
@@ -157,28 +157,24 @@ namespace graphics {
             }
         }
 
-        void drawAxis(const xcb_pixmap_t& pixmap, const ChartAxis &axis) const {
+        void drawAxis(const xcb_drawable_t &pixmap, const ChartAxis &axis) const {
             // 1. clean text labels - draw black rectangle
             xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, pixmap, axisContext, 2,
                           axis.line);
         }
 
-        void drawAxisLabel(const xcb_pixmap_t& pixmap, const ChartAxis &axis) const {
+        void drawAxisLabel(const xcb_drawable_t &pixmap, const ChartAxis &axis) const {
             // 1. clean text labels - draw black rectangle
             if (!axis.hideLabel) {
                 uint16_t labelHeight = 16;
                 uint16_t labelWidth = 80;
                 int16_t labelRectTop = axis.labelPoint.y - labelHeight;
-                xcb_rectangle_t labelRect = {axis.labelPoint.x, labelRectTop,
-                                             labelWidth, labelHeight};
-                xcb_poly_fill_rectangle(connection, window, cleanAxesLabelContext,
-                                        1,
-                                        &labelRect);
+                xcb_rectangle_t labelRect = {axis.labelPoint.x, labelRectTop, labelWidth, labelHeight};
+                xcb_poly_fill_rectangle(connection, window, cleanAxesLabelContext, 1, &labelRect);
                 char buffer[32];
                 snprintf(buffer, sizeof(buffer), "%g", axis.labelValue);
-                xcb_image_text_8(connection, strlen(buffer), window,
-                                 axisFontContext,
-                                 axis.labelPoint.x, axis.labelPoint.y, buffer);
+                xcb_image_text_8(connection, strlen(buffer), window, axisFontContext, axis.labelPoint.x,
+                                 axis.labelPoint.y, buffer);
             }
         }
 
@@ -186,7 +182,7 @@ namespace graphics {
             xcb_flush(connection);
         }
 
-        void drawBackground(const xcb_pixmap_t& pixmap) const {
+        void drawBackground(const xcb_drawable_t &pixmap) const {
             xcb_poly_fill_rectangle(connection, pixmap, backgroundContext, 1,
                                     &rectangle);
         }
@@ -203,15 +199,16 @@ namespace graphics {
                                 strlen(title), title);
         }
 
-        void saveImage() {
+        void saveImage(const char *filename) {
+            uint16_t imageWidth = width + 50;
+            uint16_t imageHeight = height + 50;
             xcb_pixmap_t pixmap = xcb_generate_id(connection);
-            xcb_create_pixmap(connection,screen->root_depth, pixmap, window, width, height);
+            xcb_create_pixmap(connection, screen->root_depth, pixmap, window, imageWidth, imageHeight);
             drawSafely(pixmap);
 
-            StoreImage store("test.png", width, height, connection, screen, pixmap);
+            StoreImage store(filename, imageWidth, imageHeight, connection, screen, pixmap);
             store.saveImage();
-            xcb_free_pixmap (connection, pixmap);
-
+            xcb_free_pixmap(connection, pixmap);
         }
 
     protected:
@@ -233,7 +230,7 @@ namespace graphics {
         uint16_t height;
         xcb_rectangle_t rectangle;
 
-        std::mutex* changeDataMutex;
+        std::mutex *changeDataMutex;
 
         void createContexts() {
             // black background context
@@ -252,18 +249,13 @@ namespace graphics {
             // axis labels font context
             const char *fontName = "fixed";
             xcb_font_t axisFont = xcb_generate_id(connection);
-            xcb_void_cookie_t fontCookie = xcb_open_font_checked(connection,
-                                                                 axisFont,
-                                                                 strlen(fontName),
-                                                                 fontName);
+            xcb_void_cookie_t fontCookie = xcb_open_font_checked(connection, axisFont, strlen(fontName), fontName);
             testCookie(fontCookie, connection, "can't open font");
             /* create graphics context */
             axisFontContext = xcb_generate_id(connection);
             mask = XCB_GC_FOREGROUND | XCB_GC_FONT;
             uint32_t values4[3] = {screen->white_pixel, axisFont};
-            xcb_void_cookie_t gcCookie = xcb_create_gc_checked(connection,
-                                                               axisFontContext,
-                                                               screen->root, mask,
+            xcb_void_cookie_t gcCookie = xcb_create_gc_checked(connection, axisFontContext, screen->root, mask,
                                                                values4);
             testCookie(gcCookie, connection, "can't create gc");
             /* close font */
@@ -274,15 +266,13 @@ namespace graphics {
             cleanAxesLabelContext = xcb_generate_id(connection);
             mask = XCB_GC_FOREGROUND;
             uint32_t values5[] = {screen->black_pixel};
-            xcb_create_gc(connection, cleanAxesLabelContext, screen->root, mask,
-                          values5);
+            xcb_create_gc(connection, cleanAxesLabelContext, screen->root, mask, values5);
         }
 
         void testCookie(xcb_void_cookie_t cookie, xcb_connection_t *connection, const char *errMessage) {
             xcb_generic_error_t *error = xcb_request_check(connection, cookie);
             if (error) {
-                std::cout << "ERROR: " << errMessage << " code : " <<
-                error->error_code << std::endl;
+                std::cout << "ERROR: " << errMessage << " code : " << error->error_code << std::endl;
                 free(error);
                 throw std::runtime_error("XCB cookie error");
             }

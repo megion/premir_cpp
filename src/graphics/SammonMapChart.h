@@ -41,7 +41,7 @@ namespace graphics {
             cleanArcsContext = 0;
         }
 
-        void draw(const xcb_pixmap_t& pixmap) const {
+        void draw(const xcb_drawable_t& pixmap) const {
             drawBackground(pixmap);
 //            drawAxes();
             drawAxesLabels(pixmap);
@@ -59,7 +59,7 @@ namespace graphics {
             Chart<bool>::data->addPoints(0, chartPoints.getArray(), chartPoints.size());
         }
 
-        void drawArcs(const xcb_pixmap_t& pixmap) const {
+        void drawArcs(const xcb_drawable_t& pixmap) const {
             utils::RDMatrix<bool, xcb_point_t> yPolyLines;
             xcb_point_t xPolyLines[xdim];
             size_t xIndex = 0;
@@ -83,9 +83,7 @@ namespace graphics {
                     yPolyLines.writeToEndRow(xIndex, point);
 
                     if (xIndex == xdim - 1) {
-                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                                      pixmap, arcsContext, xdim,
-                                      xPolyLines);
+                        xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, pixmap, arcsContext, xdim, xPolyLines);
                         xIndex = 0;
                     } else {
                         ++xIndex;

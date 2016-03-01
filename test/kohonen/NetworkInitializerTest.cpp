@@ -271,8 +271,6 @@ namespace test {
             file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                                                      false);
 
-//            utils::SMatrix<float> *somCodesMatrix = read_some_initilized_codes();
-
             kohonen::NetworkInitializer<float, float> initializer(&dataReader);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
@@ -293,9 +291,9 @@ namespace test {
             size_t winnerSize = winnerSearcher.getWinnerSize();
             size_t colSize = somCodesMatrix->getColSize();
 
-            size_t teachSize = 20000;
+            size_t teachSize = 40000;
             double qerror = 0;
-            int step = 1000;
+            int step = 10000;
             int step2 = 6000;
 
 //            graphics::SammonMapChart sammonChart(xdim, 1200, 700);
@@ -339,10 +337,11 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float> umatChart(1740, 1740);
+            graphics::UMatChart<float> umatChart(6740, 6740);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+            umatChart.saveImage("u-matrix-big5.png");
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
 //            sammonChart2.setWindowTitle("Sammon Map2");
@@ -441,7 +440,6 @@ namespace test {
             umat.averageUMatrix();
             umatAChart.addHexaUMatPoints(umat.getUMatrix());
             umatAChart.drawOnWindow();
-            umatAChart.saveImage();
 
             graphics::UMatChart<float> umatAMChart(500, 740);
             umatAMChart.setWindowTitle("UMatM");
@@ -449,6 +447,7 @@ namespace test {
             umat.medianUMatrix();
             umatAMChart.addHexaUMatPoints(umat.getUMatrix());
             umatAMChart.drawOnWindow();
+            umatAChart.saveImage("u-mat-m2.png");
 
             // нарисуем медианную матрицу заново
 //            kohonen::umat::HexaUMat<float> umatM(xdim, ydim, dim);
@@ -473,8 +472,8 @@ namespace test {
             mytest(eucw_bubble_hexa_16_12_sammon);
 
 //            mytest(sammon_visible);
-            mytest(umatrix_visible);
-//            mytest(visible_som_training);
+//            mytest(umatrix_visible);
+            mytest(visible_som_training);
         }
     }
 }

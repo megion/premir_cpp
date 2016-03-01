@@ -15,10 +15,6 @@
 
 namespace graphics {
 
-    struct UMatCell {
-        double colorValue;
-    };
-
     template<typename Out>
     class UMatChart : public Chart<Out> {
     public:
@@ -44,7 +40,7 @@ namespace graphics {
 
             // создадим 1000 оттенков серого
 //            Chart<Out>::colormap->createGrayColors(1000);
-            Chart<Out>::colormap->createWavelengthColors(1000);
+            Chart<Out>::colormap->createWavelengthColors(4000);
         }
 
         ~UMatChart() {
@@ -52,8 +48,8 @@ namespace graphics {
             cellBackgroundContext = 0;
         }
 
-        void draw(const xcb_pixmap_t& pixmap) const {
-//            Chart<Out>::drawBackground();
+        void draw(const xcb_drawable_t& pixmap) const {
+            Chart<Out>::drawBackground(pixmap);
 //            drawAxes();
 //            drawAxesLabels();
             drawUMat(pixmap);
@@ -125,23 +121,11 @@ namespace graphics {
             }
         }
 
-        void drawUMat(const xcb_pixmap_t& pixmap) const {
+        void drawUMat(const xcb_drawable_t& pixmap) const {
             OutMatrix* outMatrix = Chart<Out>::data->getOutpoints();
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
-//                xcb_poly_line(Chart<Out>::connection, XCB_COORD_MODE_ORIGIN,
-//                              Chart<Out>::window, cellBorderContext, outRow.pointSize,
-//                              outRow.points);
-//                if (r % 2 == 0) {
-//                    uint32_t values[] = {colormap->getGray()->pixel};
-//                    uint32_t mask = XCB_GC_FOREGROUND;
-//                    xcb_change_gc(connection, cellBackgroundContext, mask, values);
-//                } else {
-//
-//                }
-//                std::cout<<"outRow.pointSize: "<<outRow.pointSize<<std::endl;
-//                uint32_t values[] = {Chart<Out>::colormap->getScaledGrayColor(outRow.data)->pixel};
                 uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
                 xcb_change_gc(Chart<Out>::connection, cellBackgroundContext, mask, values);
@@ -155,7 +139,6 @@ namespace graphics {
 
         xcb_gcontext_t cellBorderContext;
         xcb_gcontext_t cellBackgroundContext;
-
 
     };
 

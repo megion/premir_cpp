@@ -39,7 +39,7 @@ namespace graphics {
             cleanPointsContext = 0;
         }
 
-        void drawPoints(const xcb_pixmap_t& pixmap) const {
+        void drawPoints(const xcb_drawable_t& pixmap) const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
                 xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, pixmap, pointsContext, outPoint.pointSize,
@@ -48,7 +48,7 @@ namespace graphics {
 
         }
 
-        void drawCleanPoints(const xcb_pixmap_t& pixmap) const {
+        void drawCleanPoints(const xcb_drawable_t& pixmap) const {
             for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
                 xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, pixmap, cleanPointsContext, outPoint.pointSize,
@@ -91,7 +91,7 @@ namespace graphics {
             flush();
         }
 
-        void draw(const xcb_pixmap_t& pixmap) const {
+        void draw(const xcb_drawable_t& pixmap) const {
             drawBackground(pixmap);
             drawAxes(pixmap);
             drawAxesLabels(pixmap);
@@ -104,12 +104,8 @@ namespace graphics {
         xcb_gcontext_t pointsContext;
         xcb_gcontext_t cleanPointsContext;
 
-//        const static size_t MAX_BUFF_SIZE = 36;
-//        size_t currentBufSize;
-//        ChartData::Point<bool> pointsBuff[MAX_BUFF_SIZE];
-
     };
 
 }
 
-#endif /* SRC_GRAPHICS_CHART_H_ */
+#endif
