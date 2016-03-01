@@ -37,7 +37,14 @@ namespace file {
             }
 
             void collectSummary() {
-
+                while (dataReader->readNext(inRow, colSize)) {
+                    for (size_t i = 0; i < colSize; ++i) {
+                        if (!inRow[i].skipped) {
+                            colMedians[i] += inRow[i].value;
+                            k2[i]++;
+                        }
+                    }
+                }
             }
 
             size_t readNextDataSample(models::DataSample<float> &sample) {
