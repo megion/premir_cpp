@@ -25,7 +25,7 @@ add_executable(dummy_executable
         test/file/FileReaderTest.cpp
         test/ml/DigitalFilterTest.cpp
         test/sspy/SspyTest.cpp
-        test/kohonen/NetworkInitializerTest.cpp
+        test/kohonen/KohonenTest.cpp
         test/coursera/CourseraTest.cpp
         src/ml/DigitalFilter.cpp
         src/utils/matrix_utils.cpp

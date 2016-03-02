@@ -1,7 +1,7 @@
-#include "NetworkInitializerTest.h"
+#include "KohonenTest.h"
 
 namespace test {
-    namespace kohonen_initializer {
+    namespace kohonen {
 
         typedef utils::RMatrix<models::NeuronInfo, float> OutCodes;
         typedef typename utils::RMatrix<models::NeuronInfo, float>::Row Neuron;

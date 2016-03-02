@@ -25,16 +25,16 @@
 
 namespace kohonen {
 
-    template<typename In, typename Out>
+    template<typename InRow, typename InNum, typename Out>
     class SomTrainer {
     public:
 
-        typedef file::stream::StreamReader<models::DataSample<In>> InReader;
+        typedef file::stream::StreamReader<InRow, InNum> InReader;
         typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
 
         SomTrainer(alphafunc::AlphaFunction<Out> *_alphaFunction,
-                winner::WinnerSearch<In, Out> *_winnerSearcher,
-                neighadap::NeighborAdaptation<In, Out> *_neighborAdaptation,
+                winner::WinnerSearch<InNum, Out> *_winnerSearcher,
+                neighadap::NeighborAdaptation<InNum, Out> *_neighborAdaptation,
                 Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
                 : alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher),
@@ -52,9 +52,7 @@ namespace kohonen {
         /**
          * Обучение указанное teachSize число раз
          */
-        bool training(OutCodes *initializedSom,
-                      InReader *inDataStreamReader,
-                      size_t teachSize) {
+        bool training(OutCodes *initializedSom, InReader *inDataStreamReader, size_t teachSize) {
             // установить поток на начало
             inDataStreamReader->rewindReader();
 
@@ -62,28 +60,26 @@ namespace kohonen {
             size_t colSize = initializedSom->getColSize();
 
             for (size_t le = 0; le < teachSize; ++le) {
-
-                models::DataSample<In> inRow[colSize];
-                bool hasInRow = inDataStreamReader->readNext(inRow, colSize);
+                models::DataSample<InNum> samples[colSize];
+                InRow rowData;
+                bool hasInRow = inDataStreamReader->readNext(rowData, samples);
                 if (!hasInRow) {
                     // значит достигли конца данных, начинаем читать с начала
                     // установить поток на начало
                     inDataStreamReader->rewindReader();
 
                     // читаем первую стоку данных
-                    hasInRow = inDataStreamReader->readNext(inRow, colSize);
+                    hasInRow = inDataStreamReader->readNext(rowData, samples);
                     if (!hasInRow) {
                         /* TODO: couldn't rewind data: NO input data */
                         danger_text("couldn't rewind data");
-                        fprintf(stderr, "SomTraining: couldn't rewind data"
-                                " (%ld/%ld iterations done)\n", le, teachSize);
+                        fprintf(stderr, "SomTraining: couldn't rewind data(%ld/%ld iterations done)\n", le, teachSize);
                         return false;
                     }
                 }
 
                 winner::WinnerInfo<Out> winners[winnerSize];
-                bool ok = trainingBySample(initializedSom, inRow,
-                                           winners, teachSize, le);
+                bool ok = trainingBySample(initializedSom, samples, winners, teachSize, le);
                 if (!ok) {
                     std::cerr << "skip empty sample " << le << std::endl;
                 }
@@ -92,17 +88,14 @@ namespace kohonen {
         }
 
         bool trainingBySample(OutCodes *initializedSom,
-                              models::DataSample<In> *sampleVector,
+                              models::DataSample<InNum> *sampleVector,
                               winner::WinnerInfo<Out> *winners,
-                              size_t teachSize,
-                              size_t index) {
+                              size_t teachSize, size_t index) {
             /* Radius decreases linearly to one */
-            Out trad = 1 + (radius - 1) * ((Out) (teachSize - index)) /
-                           (Out) teachSize;
+            Out trad = 1 + (radius - 1) * ((Out) (teachSize - index)) / (Out) teachSize;
             Out talp = alphaFunction->calcAlpha(index, teachSize, alpha);
 
-            bool ok = winnerSearcher->search(initializedSom, sampleVector,
-                                             winners);
+            bool ok = winnerSearcher->search(initializedSom, sampleVector, winners);
             // TODO ok == false только если весь вектор пуст
             if (ok) {
                 long winnerIndex = winners[0].index;
@@ -112,8 +105,7 @@ namespace kohonen {
                 long byind = winnerIndex / xdim;
 
                 /* Adapt the units */
-                neighborAdaptation->adaptation(initializedSom, sampleVector,
-                                               bxind, byind, trad, talp);
+                neighborAdaptation->adaptation(initializedSom, sampleVector, bxind, byind, trad, talp);
                 return true;
             } else {
                 // skip inRow for calculation
@@ -125,8 +117,7 @@ namespace kohonen {
         /**
          * Вычисление ошибки квантования
          */
-        QuantumError quantizationError(OutCodes *trainedSom,
-                                       InReader *inDataStreamReader) {
+        QuantumError quantizationError(OutCodes *trainedSom, InReader *inDataStreamReader, size_t rowsLimit = 0) {
             QuantumError qError = {0, 0};
 
             // установить поток на начало
@@ -135,11 +126,12 @@ namespace kohonen {
             size_t winnerSize = winnerSearcher->getWinnerSize();
             size_t colSize = trainedSom->getColSize();
 
-            models::DataSample<In> inRow[colSize];
-
-            while (inDataStreamReader->readNext(inRow, colSize)) {
+            models::DataSample<InNum> samples[colSize];
+            InRow rowData;
+            size_t rowIndex = 0;
+            while (inDataStreamReader->readNext(rowData, samples) && (rowsLimit==0 || (rowIndex<rowsLimit))) {
                 winner::WinnerInfo<Out> wInfo[winnerSize];
-                bool ok = winnerSearcher->search(trainedSom, inRow, wInfo);
+                bool ok = winnerSearcher->search(trainedSom, samples, wInfo);
                 // TODO ok == false только если весь вектор пуст
                 if (ok) {
 //                    long winnerIndex = wInfo[0].index;
@@ -150,15 +142,13 @@ namespace kohonen {
                     qError.sumWinnerDistance += std::sqrt(wInfo[0].diff);
                     qError.samplesSize++;
                 }
+                rowIndex++;
             }
 
             return qError;
         }
 
     private:
-        // поток входных данных
-//        ;
-
         // альфа функция
         alphafunc::AlphaFunction<Out> *alphaFunction;
 
@@ -168,8 +158,8 @@ namespace kohonen {
         size_t xdim;
         size_t ydim;
 
-        winner::WinnerSearch<In, Out> *winnerSearcher;
-        neighadap::NeighborAdaptation<In, Out> *neighborAdaptation;
+        winner::WinnerSearch<InNum, Out> *winnerSearcher;
+        neighadap::NeighborAdaptation<InNum, Out> *neighborAdaptation;
     };
 }
 

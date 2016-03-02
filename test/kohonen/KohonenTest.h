@@ -1,5 +1,5 @@
-#ifndef TEST_KOHONEN_NETWORKINITIALIZER_TEST_H
-#define TEST_KOHONEN_NETWORKINITIALIZER_TEST_H
+#ifndef TEST_KOHONEN_KOHONENTEST_H
+#define TEST_KOHONEN_KOHONENTEST_H
 
 #include <iostream>
 #include <cmath>
@@ -7,6 +7,7 @@
 #include "test.h"
 #include "kohonen/NetworkInitializer.h"
 #include "file/CsvFileReader.h"
+#include "file/CsvFileRowParser.h"
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
@@ -34,8 +35,25 @@
 #include "graphics/UMatChart.h"
 
 namespace test {
-    namespace kohonen_initializer {
-        void network_initializer_test();
+    namespace kohonen {
+
+        struct DemoInRow {
+            bool value1;
+        };
+
+        class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
+
+            bool parseRow(DemoInRow& row, models::DataSample<float>* samples, file::CsvFileReader<char> *csvReader) {
+                return true;
+            }
+
+            void initReadFile(file::CsvFileReader<char> *csvReader) {
+
+            }
+
+        };
+
+        void kohonen_test();
     }
 }
 

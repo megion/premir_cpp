@@ -26,8 +26,7 @@ namespace kohonen {
         template<typename In, typename Out>
         class KnnWinnerSearch : public WinnerSearch<In, Out> {
         public:
-            KnnWinnerSearch(size_t _winnersSize) :
-                    WinnerSearch<In, Out>(_winnersSize) {
+            KnnWinnerSearch(size_t _winnersSize) : WinnerSearch<In, Out>(_winnersSize) {
             }
 
             bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
@@ -63,8 +62,7 @@ namespace kohonen {
 
                     if (masked == dim) {
                         /* TODO: can't calculate winner, empty data vector */
-                        danger_text(
-                                "can't calculate winner, empty data vector");
+                        danger_text("can't calculate winner, empty data vector");
                         return false;
                     }
 
@@ -72,8 +70,7 @@ namespace kohonen {
                     // найти текущий максимальный номер победителя у которого
                     // diff <= difference
                     size_t lastWinnerNumber = 0;
-                    for (size_t i = 0;
-                         (i < knn) && (difference > winners[i].diff); ++i) {
+                    for (size_t i = 0; (i < knn) && (difference > winners[i].diff); ++i) {
                         lastWinnerNumber++;
                     }
 

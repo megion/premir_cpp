@@ -27,8 +27,8 @@ namespace kohonen {
             }
 
             bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                        models::DataSample<In>* inSampleRow,
-                        WinnerInfo<Out>* winners) {
+                        models::DataSample<In> *inSampleRow,
+                        WinnerInfo<Out> *winners) {
                 size_t dim = somCodes->getColSize();
 
                 winners[0].diff = -1;
@@ -36,7 +36,7 @@ namespace kohonen {
 
                 Out maxDifference = std::numeric_limits<Out>::max();
 
-                for (size_t r=0; r<somCodes->getRowSize(); ++r) {
+                for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
                     size_t masked = 0;
                     Out difference = 0;
                     /* Compute the distance between codebook and input entry */
@@ -68,7 +68,7 @@ namespace kohonen {
                     }
                 }
 
-                if (winners[0].index<0) {
+                if (winners[0].index < 0) {
                     /* TODO: can't find winner */
                     danger_text("EuclideanWinnerSearch: can't find winner");
                 }
