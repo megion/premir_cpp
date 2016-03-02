@@ -23,7 +23,7 @@
 #include "file/stream/StreamReader.h"
 #include "kohonen/alphafunc/AlphaFunction.h"
 #include "kohonen/neighadap/NeighborAdaptation.h"
-#include "models/DataSample.h"
+#include "models/models.h"
 #include "utils/console_colors.h"
 
 namespace kohonen {

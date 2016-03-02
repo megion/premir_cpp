@@ -1,7 +1,3 @@
-//
-// Created by ilya on 1/8/16.
-//
-
 #ifndef SRC_FILE_CSVFILEREADER_H
 #define SRC_FILE_CSVFILEREADER_H
 

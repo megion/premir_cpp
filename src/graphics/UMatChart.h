@@ -10,7 +10,7 @@
 #include "ChartColormap.h"
 #include "ChartData.h"
 #include "Chart.h"
-#include "models/DataSample.h"
+#include "models/models.h"
 #include "utils/RMatrix.h"
 
 namespace graphics {

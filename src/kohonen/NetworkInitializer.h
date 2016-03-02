@@ -23,19 +23,20 @@
 #include "RandomGenerator.h"
 #include "utils/console_colors.h"
 #include "file/stream/StreamReader.h"
-#include "models/DataSample.h"
+#include "file/CsvFileSummary.h"
+#include "models/models.h"
 
 namespace kohonen {
 
-    template<typename In, typename Out>
+    template<typename InRow, typename InNum, typename Out>
     class NetworkInitializer {
     public:
 
         typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
 
-        NetworkInitializer(file::stream::StreamReader<models::DataSample<In>>
-                           *streamReader)
-                : dataReader(streamReader) {
+        NetworkInitializer(file::stream::StreamReader<InRow, InNum> *streamReader,
+                           file::CsvFileSummary<InRow, InNum> *_summary)
+                : dataReader(streamReader), summary(summary) {
             randomEngine = new RandomGenerator();
         }
 
@@ -86,8 +87,7 @@ namespace kohonen {
                 Out yf = 4.0 * (Out) (r / xdim) / (ydim - 1.0) - 2.0;
 
                 for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
-                    (*resultsMatrix)(r, c) =
-                            mean[c] + xf * eigen1[c] + yf * eigen2[c];
+                    (*resultsMatrix)(r, c) = mean[c] + xf * eigen1[c] + yf * eigen2[c];
                 }
             }
 
@@ -98,7 +98,8 @@ namespace kohonen {
 
     private:
         // поток входных данных
-        file::stream::StreamReader<models::DataSample<In>> *dataReader;
+        file::stream::StreamReader<InRow, InNum> *dataReader;
+        file::CsvFileSummary<InRow, InNum> *summary;
         // генератор псевдо случайных чисел
         RandomGenerator *randomEngine;
 

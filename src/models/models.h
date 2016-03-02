@@ -1,5 +1,5 @@
-#ifndef SRC_MODELS_DATASAMPLE_H
-#define SRC_MODELS_DATASAMPLE_H
+#ifndef SRC_MODELS_MODELS_H
+#define SRC_MODELS_MODELS_H
 
 #include <cstdio>
 
@@ -11,6 +11,18 @@ namespace models {
     struct DataSample {
         T value; // значение
         bool skipped; // true значение пропущено или неопределенно
+    };
+
+    /**
+     * Хранит некоторую статистику для одной колонки. Статистика собирается только по допустимым значениям.
+     */
+    template<typename T>
+    struct ColSummary {
+        T min; // минимальное допустимое значение
+        T max; // максимальное (допустимое) значение в колонке
+        double sum; // сумма допустимых значений в колонке
+        double average; // среднее значение sum/count
+        size_t count; // число допустимых значенией в колонке (не все значения являются допустимыми)
     };
 
     /**

@@ -62,7 +62,7 @@ namespace test {
         void test_line_initialization() {
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, 5,
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, 5,
                                                                      false);
 
             kohonen::NetworkInitializer<float, float> initializer(&dataReader);
@@ -95,7 +95,7 @@ namespace test {
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
                                                                      true);
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
@@ -130,8 +130,7 @@ namespace test {
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                                                                     true);
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, true);
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
@@ -199,8 +198,7 @@ namespace test {
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                                                                     true);
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, true);
 
             OutCodes *somTrainedMatrix =
                     read_codes_file("../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
@@ -232,8 +230,7 @@ namespace test {
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                                                                     true);
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, true);
 
             OutCodes *somTrainedMatrix =
                     read_codes_file("../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
@@ -268,8 +265,7 @@ namespace test {
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
-            file::stream::CsvFileArrayStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim,
-                                                                     false);
+            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, false);
 
             kohonen::NetworkInitializer<float, float> initializer(&dataReader);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();

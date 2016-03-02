@@ -222,6 +222,20 @@ namespace utils {
             }
         }
 
+        void copyRow(Row& dest, const Row& src) {
+            // copy data
+            memcpy(&(dest.data), &(src.data), sTypeSizeof);
+            // copy points array
+            memcpy(dest.points, src.points, colSize * tTypeSizeof);
+        }
+
+        void copyRow(S& destData, T* destPoints, const Row& src) {
+            // copy data
+            memcpy(&(destData), &(src.data), sTypeSizeof);
+            // copy points array
+            memcpy(destPoints, src.points, colSize * tTypeSizeof);
+        }
+
     private:
         Row *matrix;
         size_t rowSize;
@@ -243,13 +257,6 @@ namespace utils {
                 throw std::runtime_error(std::strerror(errno));
             }
             matrix = newMatrix;
-        }
-
-        void copyRow(Row& dest, const Row& src) {
-            // copy data
-            memcpy(&(dest.data), &(src.data), sTypeSizeof);
-            // copy points array
-            memcpy(dest.points, src.points, colSize * tTypeSizeof);
         }
     };
 }

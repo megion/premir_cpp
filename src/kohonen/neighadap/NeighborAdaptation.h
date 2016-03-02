@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include "utils/RMatrix.h"
-#include "models/DataSample.h"
+#include "models/models.h"
 
 namespace kohonen {
     namespace neighadap {
@@ -24,20 +24,14 @@ namespace kohonen {
                     xdim(_xdim), ydim(_ydim) {
             }
 
-            virtual void adaptation(
-                    utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                    models::DataSample<In> *inSampleRow,
-                    long bx, long by,
-                    Out radius, Out alpha) = 0;
+            virtual void adaptation(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
+                                    models::DataSample<In> *inSampleRow, long bx, long by, Out radius, Out alpha) = 0;
 
-            void recalculateCodeVector(Out *codeVector,
-                                       models::DataSample<In> *inSampleRow,
-                                       size_t dim, Out alpha) {
+            void recalculateCodeVector(Out *codeVector, models::DataSample<In> *inSampleRow, size_t dim, Out alpha) {
                 for (size_t i = 0; i < dim; ++i) {
                     // TODO: ignore skipped vector components
                     if (!inSampleRow[i].skipped) {
-                        codeVector[i] +=
-                                alpha * (inSampleRow[i].value - codeVector[i]);
+                        codeVector[i] += alpha * (inSampleRow[i].value - codeVector[i]);
                     }
                 }
             }

@@ -3,111 +3,91 @@
 
 #include <cstdio>
 #include <cmath>
+#include <limits>
 
 #include "file/CsvFileReader.h"
+#include "file/CsvFileRowParser.h"
+#include "file/stream/CsvFileStreamReader.h"
 #include "utils/CArrayList.h"
+#include "models/models.h"
 
 namespace file {
 
-    namespace stream {
+    template<typename Row, typename Num>
+    class CsvFileSummary {
+    public:
 
+        CsvFileSummary(file::CsvFileReader<char> *_csvReader,
+                       file::CsvFileRowParser<Row, Num> *_rowParser, size_t colSize) :
+                csvReader(_csvReader), rowParser(_rowParser) {
+            summary = new utils::CArrayList<models::ColSummary<Num>>(colSize, 1, colSize);
+        }
 
-        template<typename T>
-        class CsvFileSummary {
-        public:
+        ~CsvFileSummary() {
+            delete summary;
+            summary = nullptr;
+        }
 
-            /**
-             * Хранит некоторую статистику для одной колонки. Статистика собирается только по допустимым значениям.
-             */
-            struct ColSummary {
-                T min; // минимальное допустимое значение
-                T max; // максимальное (допустимое) значение в колонке
-                double sum; // сумма допустимых значений в колонке
-                size_t count; // число допустимых значенией в колонке (не все значения являются допустимыми)
-            };
-
-            CsvFileSummary(file::CsvFileReader<char> *_csvReader, size_t colSize) :
-                    csvReader(_csvReader) {
-                summary = new utils::CArrayList<ColSummary>(colSize);
+        /**
+         * Если rowsLimit > 0 тогда статистика будет посчитана только для этого количества строк.
+         */
+        void collectSummary(size_t rowsLimit = 0) {
+            file::stream::CsvFileStreamReader<Row, Num> reader(csvReader, rowParser);
+            size_t colSize = summary->size();
+            Num min = std::numeric_limits<Num>::min();
+            Num max = std::numeric_limits<Num>::max();
+            // initialization
+            for (size_t i = 0; i < colSize; ++i) {
+                models::ColSummary<Num>& colSummary = (*summary)[i];
+                colSummary.count = 0;
+                colSummary.sum = 0;
+                colSummary.average = 0;
+                colSummary.max = min; // init max by min value
+                colSummary.min = max; // init mim by max value
             }
 
-            ~CsvFileSummary() {
-                delete summary;
-                summary = nullptr;
-            }
-
-            void collectSummary() {
-                while (dataReader->readNext(inRow, colSize)) {
-                    for (size_t i = 0; i < colSize; ++i) {
-                        if (!inRow[i].skipped) {
-                            colMedians[i] += inRow[i].value;
-                            k2[i]++;
+            Row row;
+            models::DataSample<Num> samples[colSize];
+            size_t rowIndex = 0;
+            while (reader.readNext(row, samples) && (rowsLimit==0 || (rowIndex<rowsLimit))) {
+                for (size_t i = 0; i < colSize; ++i) {
+                    models::ColSummary<Num>& colSummary = (*summary)[i];
+                    models::DataSample<Num>& sample = samples[i];
+                    if (!sample.skipped) {
+                        colSummary.count++;
+                        colSummary.sum += sample.value;
+                        if (sample.value > colSummary.max) {
+                            colSummary.max = sample.value;
+                        }
+                        if (sample.value < colSummary.min) {
+                            colSummary.min = sample.value;
                         }
                     }
+                    colSummary.count = 0;
+                    colSummary.sum = 0;
+                    colSummary.max = min; // init max by min value
+                    colSummary.min = max; // init mim by max value
                 }
+                rowIndex++;
             }
 
-            size_t readNextDataSample(models::DataSample<float> &sample) {
-                char buffer[64];
-                *buffer = '\0';
-                size_t bytesRead = csvReader->read(buffer, 64);
-                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
-                    sample.skipped = true;
-                } else {
-                    sample.skipped = false;
-                    sample.value = std::atof(buffer);
-                }
-                return bytesRead;
+            // вычислим среднее
+            for (size_t i = 0; i < colSize; ++i) {
+                models::ColSummary<Num>& colSummary = (*summary)[i];
+                colSummary.average = colSummary.sum/colSummary.count;
             }
+        }
 
-            size_t readNextDataSample(models::DataSample<double> &sample) {
-                char buffer[64];
-                *buffer = '\0';
-                size_t bytesRead = csvReader->read(buffer, 64);
-                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
-                    sample.skipped = true;
-                } else {
-                    sample.skipped = false;
-                    sample.value = std::atof(buffer);
-                }
-                return bytesRead;
-            }
-
-            bool readNext(models::DataSample <T> *a, size_t arraySize) {
-                if (useBuffer && rowIndex < bufferMatrix->getRowSize()) {
-                    models::DataSample <T> *row = bufferMatrix->getRow(rowIndex);
-                    memcpy(a, row, arraySize * typeSizeof);
-                    rowIndex++;
-                    return true;
-                }
-
-                if (!csvReader->hasNext()) {
-                    return false;
-                }
-
-                for (size_t i = 0; i < arraySize; ++i) {
-                    readNextDataSample(a[i]);
-                }
-
-                if (csvReader->isEmptyRead()) {
-                    // были считаны пустые данные, значит их использовать нельзя
-                    // останавливаем чтение
-                    return false;
-                } else {
-                    if (useBuffer) {
-                        bufferMatrix->pushRow(a);
-                        rowIndex++;
-                    }
-                    return true;
-                }
-            }
+        utils::CArrayList<models::ColSummary<Num>>* getSummary() {
+            return summary;
+        }
 
 
-        private:
-            file::CsvFileReader<char> *csvReader;
-            utils::CArrayList<ColSummary> *summary;
-        };
-    }
+    private:
+        file::CsvFileReader<char> *csvReader;
+        file::CsvFileRowParser<Row, Num> *rowParser;
+        utils::CArrayList<models::ColSummary<Num>> *summary;
+    };
 
 }
 

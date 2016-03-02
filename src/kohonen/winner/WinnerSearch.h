@@ -4,7 +4,7 @@
 #include <cstdio>
 
 #include "utils/RMatrix.h"
-#include "models/DataSample.h"
+#include "models/models.h"
 
 namespace kohonen {
     namespace winner {
