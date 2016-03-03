@@ -52,7 +52,7 @@ namespace kohonen {
         /**
          * Обучение указанное teachSize число раз
          */
-        bool training(OutCodes *initializedSom, InReader *inDataStreamReader,
+        bool training(OutCodes *initializedSom, InReader *inDataStreamReader, bool isScale,
                       file::CsvFileSummary<InRow, InNum> *summary, size_t teachSize) {
             // установить поток на начало
             inDataStreamReader->rewindReader();
@@ -79,7 +79,7 @@ namespace kohonen {
                     }
                 }
 
-                if (summary) {
+                if (isScale) {
                     summary->scaleSamples(samples);
                 }
 
@@ -123,7 +123,7 @@ namespace kohonen {
          * Вычисление ошибки квантования
          */
         QuantumError quantizationError(OutCodes *trainedSom, InReader *inDataStreamReader,
-                                       file::CsvFileSummary<InRow, InNum> *summary,
+                                       bool isScale, file::CsvFileSummary<InRow, InNum> *summary,
                                        size_t rowsLimit = 0) {
             QuantumError qError = {0, 0};
 
@@ -137,7 +137,7 @@ namespace kohonen {
             InRow rowData;
             size_t rowIndex = 0;
             while (inDataStreamReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
-                if (summary) {
+                if (isScale) {
                     summary->scaleSamples(samples);
                 }
                 winner::WinnerInfo <Out> wInfo[winnerSize];

@@ -23,13 +23,18 @@ namespace models {
         T max; // максимальное (допустимое) значение в колонке
         double sum; // сумма допустимых значений в колонке
         double average; // среднее значение sum/count
+        double scaledAverage; // нормализованное среднее значение
         size_t count; // число допустимых значенией в колонке (не все значения являются допустимыми)
+
+        const double& getAverage(const bool& isScale) const {
+            return isScale? scaledAverage:average;
+        }
     };
 
     template<typename T>
     std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val) {
         os << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " << val.average <<
-        ", count " << val.count << std::endl;
+        ", scaledAverage " << val.scaledAverage << ", count " << val.count << std::endl;
         return os;
     }
 

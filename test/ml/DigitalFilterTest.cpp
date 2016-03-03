@@ -1,23 +1,23 @@
 #include "DigitalFilterTest.h"
 
 void test_filter_charts() {
-    graphics::PointChart chartSignalTemplate(710, 460);
+    graphics::PointChart chartSignalTemplate(false, 710, 460);
     chartSignalTemplate.setWindowTitle("Signal template");
     graphics::ChartThread<bool> chartSignalTemplateThread(&chartSignalTemplate);
 
-    graphics::PointChart chartSignalIn(710, 460);
+    graphics::PointChart chartSignalIn(false, 710, 460);
     chartSignalIn.setWindowTitle("Signal+noise");
     graphics::ChartThread<bool> chartSignalInThread(&chartSignalIn);
 
-    graphics::PointChart chartNoiseEval(710, 460);
+    graphics::PointChart chartNoiseEval(false, 710, 460);
     chartNoiseEval.setWindowTitle("Noise eval");
     graphics::ChartThread<bool> chartNoiseEvalThread(&chartNoiseEval);
 
-    graphics::PointChart chartSignalOut(710, 460);
+    graphics::PointChart chartSignalOut(false, 710, 460);
     chartSignalOut.setWindowTitle("Signal out");
     graphics::ChartThread<bool> chartSignalOutThread(&chartSignalOut);
 
-    graphics::PointChart chartFilterWeights(710, 460);
+    graphics::PointChart chartFilterWeights(false, 710, 460);
     chartFilterWeights.setWindowTitle("Weights");
     graphics::ChartThread<bool> chartFilterWeightsThread(&chartFilterWeights);
 

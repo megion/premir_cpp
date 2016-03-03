@@ -90,8 +90,7 @@ namespace graphics {
                     }
                 }
 
-                xcb_poly_arc(connection, window, arcsContext,
-                             outRow.pointSize, arcs);
+                xcb_poly_arc(connection, pixmap, arcsContext, outRow.pointSize, arcs);
             }
 
             for (size_t r = 0; r < yPolyLines.getRowSize(); ++r) {

@@ -31,7 +31,7 @@ namespace file {
         /**
          * Если rowsLimit > 0 тогда статистика будет посчитана только для этого количества строк.
          */
-        void collectSummary(bool isScaleSamples, size_t rowsLimit = 0) {
+        void collectSummary(size_t rowsLimit) {
             file::stream::CsvFileStreamReader<Row, Num> reader(csvReader, rowParser);
             size_t colSize = summary->size();
             Num min = std::numeric_limits<Num>::min();
@@ -42,6 +42,7 @@ namespace file {
                 colSummary.count = 0;
                 colSummary.sum = 0;
                 colSummary.average = 0;
+                colSummary.scaledAverage = 0;
                 colSummary.max = min; // init max by min value
                 colSummary.min = max; // init mim by max value
             }
@@ -71,9 +72,7 @@ namespace file {
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary<Num> &colSummary = (*summary)[i];
                 colSummary.average = colSummary.sum / colSummary.count;
-                if (isScaleSamples) {
-                    colSummary.average = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
-                }
+                colSummary.scaledAverage = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
             }
         }
 

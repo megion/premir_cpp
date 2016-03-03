@@ -73,10 +73,9 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize, bool isScaleSamples,
-                                     size_t rowsLimit = 0) {
+        OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize, bool isScale, size_t rowsLimit = 0) {
             utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
-            utils::SMatrix<Out> *eigens = findEigenVectors(2, colSize, isScaleSamples, rowsLimit);
+            utils::SMatrix<Out> *eigens = findEigenVectors(2, colSize, isScale, rowsLimit);
             Out *eigen1 = eigens->getRow(0);
             Out *eigen2 = eigens->getRow(1);
 
@@ -88,7 +87,7 @@ namespace kohonen {
                 Out yf = 4.0 * (Out) (r / xdim) / (ydim - 1.0) - 2.0;
 
                 for (size_t c = 0; c < resultsMatrix->getColSize(); ++c) {
-                    (*resultsMatrix)(r, c) = stats[c].average + xf * eigen1[c] + yf * eigen2[c];
+                    (*resultsMatrix)(r, c) = stats[c].getAverage(isScale) + xf * eigen1[c] + yf * eigen2[c];
                 }
             }
 
@@ -108,7 +107,7 @@ namespace kohonen {
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount, size_t colSize, bool isScaleSamples,
+        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount, size_t colSize, bool isScale,
                                               size_t rowsLimit) {
             utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
 
@@ -129,7 +128,7 @@ namespace kohonen {
             InRow rowData;
             size_t rowIndex = 0;
             while (dataReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
-                if (isScaleSamples) {
+                if (isScale) {
                     summary->scaleSamples(samples);
                 }
                 for (size_t i = 0; i < colSize; ++i) {
@@ -138,8 +137,9 @@ namespace kohonen {
                     }
                     for (size_t j = i; j < colSize; ++j) {
                         if (!samples[j].skipped) {
-                            squareMatrix(i, j) = squareMatrix(i, j) + (samples[i].value - stats[i].average) *
-                                                                      (samples[j].value - stats[j].average);
+                            squareMatrix(i, j) =
+                                    squareMatrix(i, j) + (samples[i].value - stats[i].getAverage(isScale)) *
+                                                         (samples[j].value - stats[j].getAverage(isScale));
                         }
                     }
                 }
