@@ -35,7 +35,7 @@
 #include "graphics/UMatChart.h"
 
 namespace test {
-    namespace kohonen {
+    namespace kohonen_test {
 
         struct DemoInRow {
             bool value1;
@@ -43,12 +43,41 @@ namespace test {
 
         class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
 
-            bool parseRow(DemoInRow& row, models::DataSample<float>* samples, file::CsvFileReader<char> *csvReader) {
+            bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader<char> *csvReader) {
+                size_t colSize = 5;
+                for (size_t i = 0; i < colSize; ++i) {
+                    readNextDataSample(samples[i], csvReader);
+                }
+
                 return true;
             }
 
             void initReadFile(file::CsvFileReader<char> *csvReader) {
+                // skip first line
+                csvReader->toEndLine();
+            }
 
+        private:
+
+            bool isSampleSkipped(char *buffer, size_t bytesRead) {
+                if (bytesRead == 0 || buffer[0] == 'x' || buffer[0] == 'X') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader<char> *csvReader) {
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
+                    sample.skipped = true;
+                } else {
+                    sample.skipped = false;
+                    sample.value = std::atof(buffer);
+                }
+                return bytesRead;
             }
 
         };

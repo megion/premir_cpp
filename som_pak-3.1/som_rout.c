@@ -259,8 +259,12 @@ struct data_entry *find_eigenvectors(struct entries *data)
 
   if (k<3) goto everror;
 
-  for (i=0; i<n; i++)
-    m[i]/=k2[i];
+  printf("\n");
+  for (i=0; i<n; i++) {
+    printf("%d, ", k2[i]);
+    m[i] /= k2[i];
+  }
+  printf("\n");
 
   free(k2); k2 = NULL;
 

@@ -63,10 +63,6 @@ namespace file {
                             colSummary.min = sample.value;
                         }
                     }
-                    colSummary.count = 0;
-                    colSummary.sum = 0;
-                    colSummary.max = min; // init max by min value
-                    colSummary.min = max; // init mim by max value
                 }
                 rowIndex++;
             }

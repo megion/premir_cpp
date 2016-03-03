@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     test::matrix_gramSchmidt::gramSchmidt_test();
     test::file_reader::file_reader_test();
     test::sspy::sspy_data_read_test();
-    test::kohonen::kohonen_test();
+    test::kohonen_test::kohonen_test();
     test::coursera::coursera_test();
     matrix_utils_test();
 	digitalFilter_test();

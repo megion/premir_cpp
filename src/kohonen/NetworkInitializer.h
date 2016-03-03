@@ -74,7 +74,7 @@ namespace kohonen {
          *
          */
         OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize, size_t rowsLimit = 0) {
-            utils::CArrayList<models::ColSummary<Out>> stats = (*summary->getSummary());
+            utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
             utils::SMatrix<Out> *eigens = findEigenVectors(2, colSize, rowsLimit);
             Out *eigen1 = eigens->getRow(0);
             Out *eigen2 = eigens->getRow(1);
@@ -108,7 +108,7 @@ namespace kohonen {
          * собствннными значениями.
          */
         utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount, size_t colSize, size_t rowsLimit) {
-            utils::CArrayList<models::ColSummary<Out>> stats = (*summary->getSummary());
+            utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
 
             // квадратная матрица
             utils::SMatrix<Out> squareMatrix(colSize, colSize);

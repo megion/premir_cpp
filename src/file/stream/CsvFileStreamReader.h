@@ -25,6 +25,7 @@ namespace file {
                     useBuffer(false),
                     rowIndex(0),
                     bufferMatrix(nullptr) {
+                csvReader->rewindReader();
                 rowParser->initReadFile(csvReader);
             }
 
@@ -38,6 +39,7 @@ namespace file {
                 if (useBuffer) {
                     bufferMatrix = new utils::RMatrix<Row, models::DataSample<Num>>(0, colSize);
                 }
+                csvReader->rewindReader();
                 rowParser->initReadFile(csvReader);
             }
 
@@ -48,42 +50,10 @@ namespace file {
                 }
             }
 
-//            bool readNext(models::DataSample<T> &a) {
-//                return true;
-//            }
-
-//            size_t readNextDataSample(models::DataSample<float> &sample) {
-//                char buffer[64];
-//                *buffer = '\0';
-//                size_t bytesRead = csvReader->read(buffer, 64);
-//                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
-//                    sample.skipped = true;
-//                } else {
-//                    sample.skipped = false;
-//                    sample.value = std::atof(buffer);
-//                }
-//                return bytesRead;
-//            }
-//
-//            size_t readNextDataSample(models::DataSample<double> &sample) {
-//                char buffer[64];
-//                *buffer = '\0';
-//                size_t bytesRead = csvReader->read(buffer, 64);
-//                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
-//                    sample.skipped = true;
-//                } else {
-//                    sample.skipped = false;
-//                    sample.value = std::atof(buffer);
-//                }
-//                return bytesRead;
-//            }
-
             bool readNext(Row &row, models::DataSample<Num> *samples) {
                 if (useBuffer && rowIndex < bufferMatrix->getRowSize()) {
                     const MatrixRow& mr = bufferMatrix->getRow(rowIndex);
                     bufferMatrix->copyRow(row, samples, mr);
-//                    models::DataSample<T> *row = bufferMatrix->getRow(rowIndex);
-//                    memcpy(a, row, arraySize * typeSizeof);
                     rowIndex++;
                     return true;
                 }
@@ -100,10 +70,6 @@ namespace file {
                     // TODO: строка прочитана не доконца, тогда прочитать до конца
                     csvReader->toEndLine();
                 }
-
-//                for (size_t i = 0; i < arraySize; ++i) {
-//                    readNextDataSample(a[i]);
-//                }
 
                 if (csvReader->isEmptyRead()) {
                     // были считаны пустые данные, значит их использовать нельзя
@@ -128,28 +94,16 @@ namespace file {
                 } else {
                     csvReader->rewindReader();
                     rowParser->initReadFile(csvReader);
-//                    readInitialization(csvReader);
                 }
             }
-
-//            size_t getMaxColSize() {
-//                return maxColSize;
-//            }
 
         private:
             file::CsvFileReader<char> *csvReader;
             file::CsvFileRowParser<Row, Num> *rowParser;
 
-            // указатель на функцию инициализации чтения
-//            void (*readInitialization)(file::CsvFileReader<char> *);
-
-            // указатель на функцию проверки прочитанного значения
-//            bool (*isSampleSkipped)(char *, size_t);
-
             // buffering
             utils::RMatrix<Row, models::DataSample<Num>> *bufferMatrix;
             size_t rowIndex;
-//            size_t colSize;
             bool useBuffer;
             size_t typeSizeof;
         };

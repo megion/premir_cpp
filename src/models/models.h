@@ -2,6 +2,7 @@
 #define SRC_MODELS_MODELS_H
 
 #include <cstdio>
+#include <iostream>
 
 namespace models {
     /**
@@ -23,7 +24,16 @@ namespace models {
         double sum; // сумма допустимых значений в колонке
         double average; // среднее значение sum/count
         size_t count; // число допустимых значенией в колонке (не все значения являются допустимыми)
+
+//        friend std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val);
     };
+
+    template<typename T>
+    std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val) {
+        os << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " << val.average <<
+        ", count " << val.count << std::endl;
+        return os;
+    }
 
     /**
      * Хранит некоторую информацию о нейроне.

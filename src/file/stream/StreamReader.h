@@ -3,6 +3,8 @@
 
 #include <cstdio>
 
+#include "models/models.h"
+
 namespace file {
     namespace stream {
 
