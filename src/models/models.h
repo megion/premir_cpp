@@ -24,8 +24,6 @@ namespace models {
         double sum; // сумма допустимых значений в колонке
         double average; // среднее значение sum/count
         size_t count; // число допустимых значенией в колонке (не все значения являются допустимыми)
-
-//        friend std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val);
     };
 
     template<typename T>

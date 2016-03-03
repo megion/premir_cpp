@@ -33,9 +33,9 @@ namespace kohonen {
         typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
 
         SomTrainer(alphafunc::AlphaFunction<Out> *_alphaFunction,
-                winner::WinnerSearch<InNum, Out> *_winnerSearcher,
-                neighadap::NeighborAdaptation<InNum, Out> *_neighborAdaptation,
-                Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
+                   winner::WinnerSearch <InNum, Out> *_winnerSearcher,
+                   neighadap::NeighborAdaptation<InNum, Out> *_neighborAdaptation,
+                   Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
                 : alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher),
                   neighborAdaptation(_neighborAdaptation),
@@ -52,7 +52,8 @@ namespace kohonen {
         /**
          * Обучение указанное teachSize число раз
          */
-        bool training(OutCodes *initializedSom, InReader *inDataStreamReader, size_t teachSize) {
+        bool training(OutCodes *initializedSom, InReader *inDataStreamReader,
+                      file::CsvFileSummary<InRow, InNum> *summary, size_t teachSize) {
             // установить поток на начало
             inDataStreamReader->rewindReader();
 
@@ -78,7 +79,11 @@ namespace kohonen {
                     }
                 }
 
-                winner::WinnerInfo<Out> winners[winnerSize];
+                if (summary) {
+                    summary->scaleSamples(samples);
+                }
+
+                winner::WinnerInfo <Out> winners[winnerSize];
                 bool ok = trainingBySample(initializedSom, samples, winners, teachSize, le);
                 if (!ok) {
                     std::cerr << "skip empty sample " << le << std::endl;
@@ -89,7 +94,7 @@ namespace kohonen {
 
         bool trainingBySample(OutCodes *initializedSom,
                               models::DataSample<InNum> *sampleVector,
-                              winner::WinnerInfo<Out> *winners,
+                              winner::WinnerInfo <Out> *winners,
                               size_t teachSize, size_t index) {
             /* Radius decreases linearly to one */
             Out trad = 1 + (radius - 1) * ((Out) (teachSize - index)) / (Out) teachSize;
@@ -117,7 +122,9 @@ namespace kohonen {
         /**
          * Вычисление ошибки квантования
          */
-        QuantumError quantizationError(OutCodes *trainedSom, InReader *inDataStreamReader, size_t rowsLimit = 0) {
+        QuantumError quantizationError(OutCodes *trainedSom, InReader *inDataStreamReader,
+                                       file::CsvFileSummary<InRow, InNum> *summary,
+                                       size_t rowsLimit = 0) {
             QuantumError qError = {0, 0};
 
             // установить поток на начало
@@ -129,8 +136,11 @@ namespace kohonen {
             models::DataSample<InNum> samples[colSize];
             InRow rowData;
             size_t rowIndex = 0;
-            while (inDataStreamReader->readNext(rowData, samples) && (rowsLimit==0 || (rowIndex<rowsLimit))) {
-                winner::WinnerInfo<Out> wInfo[winnerSize];
+            while (inDataStreamReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
+                if (summary) {
+                    summary->scaleSamples(samples);
+                }
+                winner::WinnerInfo <Out> wInfo[winnerSize];
                 bool ok = winnerSearcher->search(trainedSom, samples, wInfo);
                 // TODO ok == false только если весь вектор пуст
                 if (ok) {
@@ -158,7 +168,7 @@ namespace kohonen {
         size_t xdim;
         size_t ydim;
 
-        winner::WinnerSearch<InNum, Out> *winnerSearcher;
+        winner::WinnerSearch <InNum, Out> *winnerSearcher;
         neighadap::NeighborAdaptation<InNum, Out> *neighborAdaptation;
     };
 }

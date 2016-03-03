@@ -69,7 +69,7 @@ namespace test {
             KohonenDemoCsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
             file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary();
+            summary.collectSummary(false);
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
@@ -80,7 +80,7 @@ namespace test {
             randomEngine->setNextValue(1);
             //randomEngine->initGenerator();
 
-            OutCodes *resultsMatrix = initializer.lineInitialization(xdim, ydim, dim);
+            OutCodes *resultsMatrix = initializer.lineInitialization(xdim, ydim, dim, false);
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
             // данные матрицы должны быть практически идентичными
@@ -110,7 +110,7 @@ namespace test {
             kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3.0,
                                                                  xdim, ydim);
 
-            trainer.training(somCodesMatrix, &dataReader, 10000);
+            trainer.training(somCodesMatrix, &dataReader, nullptr, 10000);
 
             OutCodes *expectedCodesMatrix = read_codes_file(
                     "../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
@@ -118,8 +118,8 @@ namespace test {
             // данные матрицы должны быть практически идентичными
             assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001, true));
 
-            kohonen::SomTrainer<DemoInRow, float, float>::QuantumError qe = trainer.quantizationError(somCodesMatrix,
-                                                                                                      &dataReader);
+            kohonen::SomTrainer<DemoInRow, float, float>::QuantumError qe =
+                    trainer.quantizationError(somCodesMatrix, &dataReader, nullptr);
 
             assert_range(qe.sumWinnerDistance / qe.samplesSize, 4.7287, 0.0001);
 
@@ -147,7 +147,7 @@ namespace test {
             kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3, xdim,
                                                                  ydim);
 
-            trainer.training(somCodesMatrix, &dataReader, 10000);
+            trainer.training(somCodesMatrix, &dataReader, nullptr, 10000);
 
             OutCodes *expectedCodesMatrix = read_codes_file(
                     "../test/datafiles/kohonen/som_trained_10000_eucw_gaussian_rect_16_12.cod", 1);
@@ -250,16 +250,17 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 260;
-            size_t ydim = 260;
+            size_t xdim = 60;
+            size_t ydim = 60;
             size_t dim = 5;
+            bool isScale = false;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
             KohonenDemoCsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
             file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary();
+            summary.collectSummary(isScale);
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
 //            file::stream::CsvFileStreamReader<float> dataReader(&csvReader, readInitializer, isSkipSample, dim, false);
@@ -267,14 +268,15 @@ namespace test {
 //            kohonen::NetworkInitializer<float, float> initializer(&dataReader);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
-            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim);
+            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
             kohonen::mapdist::HexaMapDistance<float> mapDist;
 
             kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3.0, xdim, ydim);
+            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 3.0,
+                                                                 xdim, ydim);
 
             //
             graphics::PointChart qErrorChart(710, 460);
@@ -284,16 +286,15 @@ namespace test {
             size_t winnerSize = winnerSearcher.getWinnerSize();
             size_t colSize = somCodesMatrix->getColSize();
 
-            size_t teachSize = 40000;
+            size_t teachSize = 10000;
             double qerror = 0;
             int step = 10000;
             int step2 = 6000;
 
-//            graphics::SammonMapChart sammonChart(xdim, 1200, 700);
-//            sammonChart.setWindowTitle("Sammon Map");
-//            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
-
-//            buildAndShowSammonMap(somCodesMatrix, sammonChart);
+            graphics::SammonMapChart<float> sammonChart(xdim, 1200, 700);
+            sammonChart.setWindowTitle("Sammon Map");
+            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
 
 
@@ -307,6 +308,11 @@ namespace test {
                     dataReader.rewindReader();
                     // читаем первую стоку данных
                     dataReader.readNext(rowData, samples);
+                }
+
+                // нормализация
+                if (isScale) {
+                    summary.scaleSamples(samples);
                 }
 
                 kohonen::winner::WinnerInfo<float> winners[winnerSize];
@@ -330,16 +336,16 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float> umatChart(6740, 6740);
+            graphics::UMatChart<float> umatChart(500, 740);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
             umatChart.saveImage("u-matrix-big5.png");
 
-//            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
-//            sammonChart2.setWindowTitle("Sammon Map2");
-//            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
-//            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
+            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
+            sammonChart2.setWindowTitle("Sammon Map2");
+            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
+            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
 
             delete somCodesMatrix;
         }
@@ -465,8 +471,8 @@ namespace test {
             mytest(eucw_bubble_hexa_16_12_sammon);
 
 //            mytest(sammon_visible);
-            mytest(umatrix_visible);
-//            mytest(visible_som_training);
+//            mytest(umatrix_visible);
+            mytest(visible_som_training);
         }
     }
 }

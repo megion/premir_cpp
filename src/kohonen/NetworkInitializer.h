@@ -73,9 +73,10 @@ namespace kohonen {
          * Полсле этого можно продолжать обучение с фазы сходимости.
          *
          */
-        OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize, size_t rowsLimit = 0) {
+        OutCodes *lineInitialization(size_t xdim, size_t ydim, size_t colSize, bool isScaleSamples,
+                                     size_t rowsLimit = 0) {
             utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
-            utils::SMatrix<Out> *eigens = findEigenVectors(2, colSize, rowsLimit);
+            utils::SMatrix<Out> *eigens = findEigenVectors(2, colSize, isScaleSamples, rowsLimit);
             Out *eigen1 = eigens->getRow(0);
             Out *eigen2 = eigens->getRow(1);
 
@@ -107,7 +108,8 @@ namespace kohonen {
          * Найти два собственных вектора с наибольшими
          * собствннными значениями.
          */
-        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount, size_t colSize, size_t rowsLimit) {
+        utils::SMatrix<Out> *findEigenVectors(size_t eigenVectorsCount, size_t colSize, bool isScaleSamples,
+                                              size_t rowsLimit) {
             utils::CArrayList<models::ColSummary<Out>> stats = *(summary->getSummary());
 
             // квадратная матрица
@@ -126,7 +128,10 @@ namespace kohonen {
             models::DataSample<InNum> samples[colSize];
             InRow rowData;
             size_t rowIndex = 0;
-            while (dataReader->readNext(rowData, samples) && (rowsLimit==0 || (rowIndex<rowsLimit))) {
+            while (dataReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
+                if (isScaleSamples) {
+                    summary->scaleSamples(samples);
+                }
                 for (size_t i = 0; i < colSize; ++i) {
                     if (samples[i].skipped) {
                         continue;

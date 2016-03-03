@@ -31,14 +31,14 @@ namespace file {
         /**
          * Если rowsLimit > 0 тогда статистика будет посчитана только для этого количества строк.
          */
-        void collectSummary(size_t rowsLimit = 0) {
+        void collectSummary(bool isScaleSamples, size_t rowsLimit = 0) {
             file::stream::CsvFileStreamReader<Row, Num> reader(csvReader, rowParser);
             size_t colSize = summary->size();
             Num min = std::numeric_limits<Num>::min();
             Num max = std::numeric_limits<Num>::max();
             // initialization
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num>& colSummary = (*summary)[i];
+                models::ColSummary<Num> &colSummary = (*summary)[i];
                 colSummary.count = 0;
                 colSummary.sum = 0;
                 colSummary.average = 0;
@@ -49,10 +49,10 @@ namespace file {
             Row row;
             models::DataSample<Num> samples[colSize];
             size_t rowIndex = 0;
-            while (reader.readNext(row, samples) && (rowsLimit==0 || (rowIndex<rowsLimit))) {
+            while (reader.readNext(row, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
                 for (size_t i = 0; i < colSize; ++i) {
-                    models::ColSummary<Num>& colSummary = (*summary)[i];
-                    models::DataSample<Num>& sample = samples[i];
+                    models::ColSummary<Num> &colSummary = (*summary)[i];
+                    models::DataSample<Num> &sample = samples[i];
                     if (!sample.skipped) {
                         colSummary.count++;
                         colSummary.sum += sample.value;
@@ -69,13 +69,33 @@ namespace file {
 
             // вычислим среднее
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num>& colSummary = (*summary)[i];
-                colSummary.average = colSummary.sum/colSummary.count;
+                models::ColSummary<Num> &colSummary = (*summary)[i];
+                colSummary.average = colSummary.sum / colSummary.count;
+                if (isScaleSamples) {
+                    colSummary.average = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
+                }
             }
         }
 
-        utils::CArrayList<models::ColSummary<Num>>* getSummary() {
+        utils::CArrayList<models::ColSummary<Num>> *getSummary() {
             return summary;
+        }
+
+        /**
+         * val = (val - min) / (max - min)
+         */
+        void scaleSamples(models::DataSample<Num> *samples) {
+            size_t colSize = summary->size();
+            for (size_t i = 0; i < colSize; ++i) {
+                models::ColSummary<Num> &colSummary = (*summary)[i];
+                samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);
+                if (samples[i].value > 1) {
+                    samples[i].value = 1;
+                }
+                if (samples[i].value < 0) {
+                    samples[i].value = 0;
+                }
+            }
         }
 
 
