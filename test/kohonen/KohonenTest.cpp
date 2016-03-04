@@ -250,11 +250,11 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 160;
-            size_t ydim = 120;
+            size_t xdim = 40;
+            size_t ydim = 40;
             size_t dim = 5;
-            size_t teachSize = 100000;
-            bool isScale = false;
+            size_t teachSize = 800000;
+            bool isScale = true;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader<char> csvReader("../test/datafiles/kohonen/ex.dat", ' ');
@@ -262,7 +262,7 @@ namespace test {
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
             file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
             summary.collectSummary(0); // 0 - значит без ограничений
-            summary.getSummary()->print();
+//            summary.getSummary()->print();
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
@@ -332,11 +332,11 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float> umatChart(500, 740);
+            graphics::UMatChart<float> umatChart(4000, 4000);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
-            umatChart.saveImage("u-matrix-big6.png");
+            umatChart.saveImage("u-matrix-big10.png");
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
 //            sammonChart2.setWindowTitle("Sammon Map2");
