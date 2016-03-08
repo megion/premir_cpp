@@ -4,8 +4,7 @@ namespace test {
     namespace coursera {
 
         void test_titanic() {
-            file::CsvFileReader<char> reader(
-                    "../test/datafiles/coursera/titanic.csv", ',');
+            file::CsvFileReader reader("../test/datafiles/coursera/titanic.csv", ',');
             reader.setStrQuote('\"');
             reader.toEndLine();
             std::string male("male");

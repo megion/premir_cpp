@@ -39,8 +39,8 @@ namespace graphics {
                           mask, values22);
 
             // создадим 1000 оттенков серого
-//            Chart<Out>::colormap->createGrayColors(1000);
-            Chart<Out>::colormap->createWavelengthColors(4000);
+            Chart<Out>::colormap->createGrayColors(1000);
+//            Chart<Out>::colormap->createWavelengthColors(4000);
         }
 
         ~UMatChart() {
@@ -126,7 +126,8 @@ namespace graphics {
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
-                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
+                uint32_t values[] = {Chart<Out>::colormap->getScaledGrayColor(outRow.data)->pixel};
+//                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
                 xcb_change_gc(Chart<Out>::connection, cellBackgroundContext, mask, values);
                 xcb_fill_poly(Chart<Out>::connection, pixmap, cellBackgroundContext,

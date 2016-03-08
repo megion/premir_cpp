@@ -26,7 +26,7 @@ namespace test {
         }
 
         void test_csv_parse_sspy_data_file() {
-            file::CsvFileReader<char> reader(
+            file::CsvFileReader reader(
                     "/home/ilya/share/Documents/ml/SmartSpy/[Content]", ' ');
             while (reader.hasNext() && reader.getLineNumber() < 10) {
                 SspyData row;

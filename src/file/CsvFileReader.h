@@ -16,11 +16,10 @@
 
 namespace file {
 
-    template<typename Ch>
     class CsvFileReader {
     public:
-        CsvFileReader(const char *filename, const Ch sep) :
-                separator(sep), chSizeof(sizeof(Ch)), lineNumber(0),
+        CsvFileReader(const char *filename, const char sep) :
+                separator(sep), chSizeof(sizeof(char)), lineNumber(0),
                 isEnd(false), emptyRead(false) {
             fp = fopen(filename, "r");
             if (fp == NULL) {
@@ -30,13 +29,13 @@ namespace file {
             }
         }
 
-        CsvFileReader(const CsvFileReader<Ch> &) = delete;
+        CsvFileReader(const CsvFileReader &) = delete;
 
-        CsvFileReader(CsvFileReader<Ch> &&) = delete;
+        CsvFileReader(CsvFileReader &&) = delete;
 
-        CsvFileReader<Ch> &operator=(const CsvFileReader<Ch> &) = delete;
+        CsvFileReader &operator=(const CsvFileReader &) = delete;
 
-        CsvFileReader<Ch> &operator=(CsvFileReader<Ch> &&) = delete;
+        CsvFileReader &operator=(CsvFileReader &&) = delete;
 
         ~CsvFileReader() {
             close();
@@ -100,7 +99,7 @@ namespace file {
         }
 
         size_t read(double &v) {
-            Ch buffer[64];
+            char buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
 //            if(bytesRead>0) {
@@ -111,7 +110,7 @@ namespace file {
         }
 
         size_t read(float &v) {
-            Ch buffer[64];
+            char buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
             v = std::atof(buffer);
@@ -119,7 +118,7 @@ namespace file {
         }
 
         size_t read(int &v) {
-            Ch buffer[64];
+            char buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
             v = std::atoi(buffer);
@@ -127,7 +126,7 @@ namespace file {
         }
 
         size_t read(size_t &v) {
-            Ch buffer[64];
+            char buffer[64];
             *buffer = '\0';
             size_t bytesRead = nextValue(buffer, 64);
             v = std::atol(buffer);
@@ -135,7 +134,7 @@ namespace file {
         }
 
         size_t read(char &v) {
-            Ch buffer[2];
+            char buffer[2];
             *buffer = '\0';
             size_t num = nextValue(buffer, 2);
             v = buffer[0];
@@ -156,10 +155,10 @@ namespace file {
         size_t lineNumber;
         bool isEnd; // end of file
         bool emptyRead; // no read data
-        Ch separator;
+        char separator;
         char strQuote;
 
-        size_t nextValue(Ch *buffer, size_t bufferSize, bool useStrQuote = false) {
+        size_t nextValue(char *buffer, size_t bufferSize, bool useStrQuote = false) {
             size_t i = 0;
             int ch;
             for (; ;) {

@@ -1,5 +1,5 @@
-#ifndef TEST_KOHONEN_KOHONENTEST_H
-#define TEST_KOHONEN_KOHONENTEST_H
+#ifndef TEST_KOHONEN_KOHONENDEMOTEST_H
+#define TEST_KOHONEN_KOHONENDEMOTEST_H
 
 #include <iostream>
 #include <cmath>
@@ -35,51 +35,11 @@
 #include "graphics/UMatChart.h"
 
 namespace test {
-    namespace kohonen_test {
+    namespace kohonen_demos_test {
 
         struct DemoInRow {
-            bool value1;
-        };
-
-        class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
-
-            bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
-                size_t colSize = 5;
-                for (size_t i = 0; i < colSize; ++i) {
-                    readNextDataSample(samples[i], csvReader);
-                }
-
-                return true;
-            }
-
-            void initReadFile(file::CsvFileReader *csvReader) {
-                // skip first line
-                csvReader->toEndLine();
-            }
-
-        private:
-
-            bool isSampleSkipped(char *buffer, size_t bytesRead) {
-                if (bytesRead == 0 || buffer[0] == 'x' || buffer[0] == 'X') {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
-                char buffer[64];
-                *buffer = '\0';
-                size_t bytesRead = csvReader->read(buffer, 64);
-                if (bytesRead == 0 || isSampleSkipped(buffer, bytesRead)) {
-                    sample.skipped = true;
-                } else {
-                    sample.skipped = false;
-                    sample.value = std::atof(buffer);
-                }
-                return bytesRead;
-            }
-
+//            bool value1;
+            char label;
         };
 
         class KohonenDemo2CsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
@@ -89,6 +49,15 @@ namespace test {
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
                 }
+                // get label
+                char buffer[2];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 2);
+                if (bytesRead == 0) {
+                    row.label = '\0';
+                } else {
+                    row.label = buffer[0];
+                }
 
                 return true;
             }
@@ -116,7 +85,7 @@ namespace test {
 
         };
 
-        void kohonen_test();
+        void kohonen_demos_test();
     }
 }
 

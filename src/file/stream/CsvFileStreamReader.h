@@ -20,7 +20,7 @@ namespace file {
 
             typedef typename utils::RMatrix<Row, models::DataSample<Num>>::Row MatrixRow;
 
-            CsvFileStreamReader(file::CsvFileReader<char> *_csvReader, file::CsvFileRowParser<Row, Num> *_rowParser):
+            CsvFileStreamReader(file::CsvFileReader *_csvReader, file::CsvFileRowParser<Row, Num> *_rowParser):
                     csvReader(_csvReader), rowParser(_rowParser),
                     useBuffer(false),
                     rowIndex(0),
@@ -29,7 +29,7 @@ namespace file {
                 rowParser->initReadFile(csvReader);
             }
 
-            CsvFileStreamReader(file::CsvFileReader<char> *_csvReader,
+            CsvFileStreamReader(file::CsvFileReader *_csvReader,
                                 file::CsvFileRowParser<Row, Num> *_rowParser,
                                 size_t colSize, bool _useBuffer) :
                     csvReader(_csvReader), rowParser(_rowParser),
@@ -98,7 +98,7 @@ namespace file {
             }
 
         private:
-            file::CsvFileReader<char> *csvReader;
+            file::CsvFileReader *csvReader;
             file::CsvFileRowParser<Row, Num> *rowParser;
 
             // buffering

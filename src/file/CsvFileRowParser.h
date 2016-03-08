@@ -15,12 +15,12 @@ namespace file {
         /**
          * Разбор строки в объект row и в числовой массив samples
          */
-        virtual bool parseRow(Row& row, models::DataSample<Num>* samples, CsvFileReader<char> *csvReader) = 0;
+        virtual bool parseRow(Row& row, models::DataSample<Num>* samples, CsvFileReader *csvReader) = 0;
 
         /**
          * Инициализация чтения файла. Может быть необходима например пропустить часть строчек в начале файла.
          */
-        virtual void initReadFile(CsvFileReader<char> *csvReader) = 0;
+        virtual void initReadFile(CsvFileReader *csvReader) = 0;
 
     };
 

@@ -33,8 +33,8 @@ namespace models {
 
     template<typename T>
     std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val) {
-        os << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " << val.average <<
-        ", scaledAverage " << val.scaledAverage << ", count " << val.count << std::endl;
+        os << std::endl << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " << val.average <<
+        ", scaledAverage " << val.scaledAverage << ", count " << val.count;
         return os;
     }
 

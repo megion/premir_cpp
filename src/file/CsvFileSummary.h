@@ -17,7 +17,7 @@ namespace file {
     class CsvFileSummary {
     public:
 
-        CsvFileSummary(file::CsvFileReader<char> *_csvReader,
+        CsvFileSummary(file::CsvFileReader *_csvReader,
                        file::CsvFileRowParser<Row, Num> *_rowParser, size_t colSize) :
                 csvReader(_csvReader), rowParser(_rowParser) {
             summary = new utils::CArrayList<models::ColSummary<Num>>(colSize, 1, colSize);
@@ -99,7 +99,7 @@ namespace file {
 
 
     private:
-        file::CsvFileReader<char> *csvReader;
+        file::CsvFileReader *csvReader;
         file::CsvFileRowParser<Row, Num> *rowParser;
         utils::CArrayList<models::ColSummary<Num>> *summary;
     };

@@ -46,11 +46,14 @@ namespace utils {
         }
 
         R3DMatrix(size_t _rowSize, size_t _colSize) : rowSize(0), matrix(nullptr),
-                      rTypeSizeof(sizeof(R)), cTypeSizeof(sizeof(C)), tTypeSizeof(sizeof(T)),
-                      rowTypeSizeof(sizeof(Row)), cellTypeSizeof(sizeof(Cell)) {
+                                                      rTypeSizeof(sizeof(R)), cTypeSizeof(sizeof(C)),
+                                                      tTypeSizeof(sizeof(T)),
+                                                      rowTypeSizeof(sizeof(Row)), cellTypeSizeof(sizeof(Cell)) {
             initializeRowMemory(_rowSize);
-            for (size_t r=0; r<rowSize; ++r) {
-                initializeCellsMemory(matrix[r], _colSize);
+            if (_colSize > 0) {
+                for (size_t r = 0; r < rowSize; ++r) {
+                    initializeCellsMemory(matrix[r], _colSize);
+                }
             }
         }
 
@@ -184,7 +187,7 @@ namespace utils {
         void writePoints(size_t rowIndex, size_t colIndex, T *points, size_t pointSize) {
             if (rowIndex < rowSize) {
                 if (colIndex < matrix[rowIndex].cellSize) {
-                    Cell& cell = matrix[rowIndex].cells[colIndex];
+                    Cell &cell = matrix[rowIndex].cells[colIndex];
                     if (cell.pointSize < pointSize) {
                         initializePointsMemory(cell, pointSize);
                     } else {
@@ -217,7 +220,7 @@ namespace utils {
             std::cout << "R3DMatrix[" << rowSize << "]" << std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < matrix[r].cellSize; ++c) {
-                    std::cout << "["<< r << ","<< c << "]: ";
+                    std::cout << "[" << r << "," << c << "]: ";
                     for (size_t p = 0; p < matrix[r].cells[c].pointSize; ++p) {
                         std::cout << matrix[r].cells[c].points[p] << ", ";
                     }
@@ -260,7 +263,7 @@ namespace utils {
             rowSize = newRowSize;
         }
 
-        void initializeCellsMemory(Row& row, size_t cellSize) {
+        void initializeCellsMemory(Row &row, size_t cellSize) {
             size_t cellsAmount = cellTypeSizeof * cellSize;
             Cell *newCells;
             if (row.cells) {
@@ -282,7 +285,7 @@ namespace utils {
             row.cellSize = cellSize;
         }
 
-        void initializePointsMemory(Cell& cell, size_t pointsSize) {
+        void initializePointsMemory(Cell &cell, size_t pointsSize) {
             size_t pointsAmount = tTypeSizeof * pointsSize;
             T *newPoints;
             if (cell.points) {

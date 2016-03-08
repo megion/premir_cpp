@@ -23,6 +23,7 @@ add_executable(dummy_executable
         test/matrix/DeterminantTest.cpp
         test/matrix/GramSchmidtTest.cpp
         test/file/FileReaderTest.cpp
+        test/file/CsvFileSummaryTest.cpp
         test/ml/DigitalFilterTest.cpp
         test/sspy/SspyTest.cpp
         test/kohonen/KohonenTest.cpp
