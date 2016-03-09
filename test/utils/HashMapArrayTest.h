@@ -11,6 +11,19 @@ namespace test {
     namespace utils_hashMapArray {
 
         void hashMapArray_test();
+
+        struct MyValue {
+            int count;
+            int value2;
+        };
+
+        class MyValueUpdater : public utils::ValueUpdater<MyValue> {
+
+            void update(MyValue& oldValue, const MyValue& newValue, const size_t valueSizeof) const {
+                oldValue.count++;
+            }
+
+        };
     }
 }
 

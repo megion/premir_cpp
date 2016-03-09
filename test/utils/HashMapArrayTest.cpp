@@ -35,54 +35,30 @@ namespace test {
             assert((*b.getValue(0, mystr)) == 42);
         }
 
-//        void test_init_in_constructor() {
-//            int rNum = 160;
-//            int cNum = 12;
-//            utils::R3DMatrix<bool, bool, int> a(rNum, cNum);
-//
-//            int i = 0;
-//            for (int r = 0; r < rNum; ++r) {
-//                assert(a[r].cellSize == cNum);
-//                for (int c = 0; c < cNum; ++c) {
-//                    assert(a[r].cells[c].pointSize == 0);
-//                    assert(a[r].cells[c].points == nullptr);
-//
-//                    int points[] = {1, 2};
-//                    a.writePoints(r, c, points, 2);
-//                    assert(a[r][c][1] == 2);
-//                    ++i;
-//                }
-//            }
-//
-//            assert(i == rNum * cNum);
-//        }
-//
-//        void test_write_to_end() {
-//            utils::R3DMatrix<bool, bool, int> b(6, 0);
-//            int points1[] = {1, 2};
-//            b.writePoints(0, 4, points1, 2);
-//            int points2[] = {11, 12};
-//            b.writePoints(0, 4, points2, 2, true);
-//            assert(b[0][4].pointSize == 4);
-//            assert(b[0][4][0] == 1);
-//            assert(b[0][4][3] == 12);
-//
-//            int points3[] = {33, 44, 66};
-//            b.writePoints(10, 6, points3, 3, true);
-//            assert(b[10][6].pointSize == 3);
-//            b.writePoints(10, 6, points3, 3, true);
-//            assert(b[10][6].pointSize == 6);
-//            assert(b[10][6][0] == 33);
-//            assert(b[10][6][5] == 66);
-//
-//        }
+        void test_push_or_update_value() {
+            utils::hash::StringHash<char*> strHash;
+            utils::HashMapArray<char*, MyValue> b(&strHash, 6, 10);
+            MyValueUpdater updater;
+            MyValue v1 = {1, 11};
+            char mykey[] = "my key1";
+            b.pushValue(0, mykey, v1, &updater);
+            MyValue v2 = {1, 22};
+            b.pushValue(0, mykey, v2, &updater);
+            MyValue v3 = {1, 33};
+            b.pushValue(0, mykey, v3, &updater);
+            assert((*b.getValue(0, mykey)).count == 3);
+            assert((*b.getValue(0, mykey)).value2 == 11);
+
+            char mykey2[] = "my key2";
+            b.pushValue(0, mykey2, v1, &updater);
+            assert((*b.getValue(0, mykey)).count == 3);
+            assert((*b.getValue(0, mykey2)).count == 1);
+        }
 
         void hashMapArray_test() {
             suite("HashMapArray");
             mytest(push_value);
-//            mytest(comparison_with_error);
-//            mytest(init_in_constructor);
-//            mytest(write_to_end);
+            mytest(push_or_update_value);
         }
     }
 }

@@ -15,23 +15,24 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "utils/RDMatrix.h"
+#include "utils/HashMapArray.h"
+#include "utils/hash/HashEngine.h"
 #include "models/models.h"
 #include "utils/console_colors.h"
 
 namespace kohonen {
     namespace labeling {
 
-        template<typename InRow, typename InNum, typename Out>
+        template<typename InRow, typename InNum, typename Out, typename Label>
         class SomLabeling {
         public:
 
-            SomLabeling(size_t _xdim, size_t _ydim) : xdim(_xdim), ydim(_ydim) {
+            SomLabeling(size_t _xdim, size_t _ydim, utils::hash::HashEngine<Label> *hashEngine)
+                    : xdim(_xdim), ydim(_ydim) {
             }
 
         private:
-
-//            utils::RDMatrix<bool, Point> InPoint;
+            utils::HashMapArray<Label, size_t> *winnerLabels;
 
             size_t xdim;
             size_t ydim;
