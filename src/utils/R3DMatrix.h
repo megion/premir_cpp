@@ -184,15 +184,31 @@ namespace utils {
             return matrix[r];
         }
 
-        void writePoints(size_t rowIndex, size_t colIndex, T *points, size_t pointSize) {
+        void writePoints(size_t rowIndex, size_t colIndex, T *points, size_t pointSize, bool toEnd = false) {
             if (rowIndex < rowSize) {
                 if (colIndex < matrix[rowIndex].cellSize) {
                     Cell &cell = matrix[rowIndex].cells[colIndex];
-                    if (cell.pointSize < pointSize) {
-                        initializePointsMemory(cell, pointSize);
+                    if (toEnd) {
+                        // запись точек в конец
+                        // добавим значения в конец существующей строки
+                        size_t oldPointSize = cell.pointSize;
+                        size_t newPointSize = oldPointSize + pointSize;
+
+                        // re-initialize points memory
+                        initializePointsMemory(cell, newPointSize);
+
+                        memcpy(cell.points + oldPointSize, points, pointSize * tTypeSizeof);
                     } else {
-                        // TODO: в случае если текущий размер точек больше или равен новому то размер ни как не меняем
-                        // и точки просто будут записаны в начало массива.
+                        // запись точек в начало
+                        if (cell.pointSize < pointSize) {
+                            initializePointsMemory(cell, pointSize);
+                        } else {
+                            // TODO: в случае если текущий размер точек больше или равен новому то размер ни как не меняем
+                            // и точки просто будут записаны в начало массива.
+                        }
+
+                        // copy points array (dest, src, size)
+                        memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
                     }
                 } else {
                     // re-initialize cells and points
@@ -200,6 +216,9 @@ namespace utils {
                     initializeCellsMemory(matrix[rowIndex], cellSize);
 
                     initializePointsMemory(matrix[rowIndex].cells[colIndex], pointSize);
+
+                    // copy points array (dest, src, size)
+                    memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
                 }
             } else {
                 // re-initialize row memory
@@ -210,10 +229,11 @@ namespace utils {
                 initializeCellsMemory(matrix[rowIndex], cellSize);
 
                 initializePointsMemory(matrix[rowIndex].cells[colIndex], pointSize);
+
+                // copy points array (dest, src, size)
+                memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
             }
 
-            // copy points array (dest, src, size)
-            memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
         }
 
         void print() const {

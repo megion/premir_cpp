@@ -28,6 +28,17 @@ namespace utils {
                 return h;
             }
         };
+
+
+        class CharHash : public HashEngine<char> {
+        public:
+            CharHash() {
+            }
+
+            size_t hashCode(const char &value) const {
+                return value % HashEngine<char>::indexSize;
+            }
+        };
     }
 }
 

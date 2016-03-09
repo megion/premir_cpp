@@ -94,11 +94,32 @@ namespace test {
             assert(i == rNum * cNum);
         }
 
+        void test_write_to_end() {
+            utils::R3DMatrix<bool, bool, int> b(6, 0);
+            int points1[] = {1, 2};
+            b.writePoints(0, 4, points1, 2);
+            int points2[] = {11, 12};
+            b.writePoints(0, 4, points2, 2, true);
+            assert(b[0][4].pointSize == 4);
+            assert(b[0][4][0] == 1);
+            assert(b[0][4][3] == 12);
+
+            int points3[] = {33, 44, 66};
+            b.writePoints(10, 6, points3, 3, true);
+            assert(b[10][6].pointSize == 3);
+            b.writePoints(10, 6, points3, 3, true);
+            assert(b[10][6].pointSize == 6);
+            assert(b[10][6][0] == 33);
+            assert(b[10][6][5] == 66);
+
+        }
+
         void r3DMatrix_test() {
             suite("R3DMatrix");
             mytest(write_row);
             mytest(comparison_with_error);
             mytest(init_in_constructor);
+            mytest(write_to_end);
         }
     }
 }

@@ -5,6 +5,7 @@
 #include "utils/RMatrixTest.h"
 #include "utils/RDMatrixTest.h"
 #include "utils/R3DMatrixTest.h"
+#include "utils/HashMapArrayTest.h"
 #include "utils/ArrayUtilsTest.h"
 #include "utils/IntBitSetTest.h"
 #include "utils/CHashSetTest.h"
@@ -33,6 +34,7 @@ int main(int argc, char **argv) {
     test::utils_rmatrix::rMatrix_test();
     test::utils_rdmatrix::rDMatrix_test();
     test::utils_r3dmatrix::r3DMatrix_test();
+    test::utils_hashMapArray::hashMapArray_test();
     test::utils_intBitSet::intBitSet_test();
     test::utils_cHashSet::cHashSet_test();
     test::matrix_determinant::determinant_test();
@@ -40,11 +42,12 @@ int main(int argc, char **argv) {
     test::file_reader::file_reader_test();
     test::sspy::sspy_data_read_test();
     test::kohonen_test::kohonen_test();
-    test::kohonen_demos_test::kohonen_demos_test();
+
     test::file_csvfilesummary::file_csvFileSummary_test();
     test::coursera::coursera_test();
     matrix_utils_test();
 	digitalFilter_test();
+//    test::kohonen_demos_test::kohonen_demos_test();
 
     return 0;
 
