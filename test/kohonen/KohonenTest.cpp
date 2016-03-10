@@ -450,6 +450,13 @@ namespace test {
             delete somCodesMatrix;
         }
 
+        void test_som_labeling() {
+            size_t xdim = 100;
+            size_t ydim = 100;
+
+            kohonen::labeling::SomLabeling<DemoInRow, char> somLabeling();
+        }
+
         void kohonen_test() {
             suite("Kohonen");
             mytest(line_initialization);

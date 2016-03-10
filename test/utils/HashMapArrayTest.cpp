@@ -5,7 +5,7 @@ namespace test {
 
         void test_push_value() {
             utils::hash::CharHash shash;
-            utils::HashMapArray<char, int> a(&shash, 6, 10);
+            utils::HashMapArray<char, int> a(10, &shash, 6);
 
             a.pushValue(0, 'K', 4);
             assert(a.getValue(0, 'K') != nullptr);
@@ -24,7 +24,7 @@ namespace test {
             assert(a.getValue(0, 'M') == nullptr);
 
             utils::hash::StringHash<char*> strHash;
-            utils::HashMapArray<char*, int> b(&strHash, 6, 10);
+            utils::HashMapArray<char*, int> b(10, &strHash, 6);
 
             char mystr[] = "my string";
             b.pushValue(0, mystr, 4);
@@ -37,7 +37,7 @@ namespace test {
 
         void test_push_or_update_value() {
             utils::hash::StringHash<char*> strHash;
-            utils::HashMapArray<char*, MyValue> b(&strHash, 6, 10);
+            utils::HashMapArray<char*, MyValue> b(10, &strHash, 6);
             MyValueUpdater updater;
             MyValue v1 = {1, 11};
             char mykey[] = "my key1";

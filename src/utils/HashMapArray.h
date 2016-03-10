@@ -35,16 +35,9 @@ namespace utils {
     class HashMapArray {
     public:
 
-//        struct Entry {
-//            K key;
-//            V value;
-//        }
-
-//        typedef typename utils::R3DMatrix<bool, bool, Entry>::Row Row;
-
         typedef typename utils::R3DMatrix<bool, bool, Entry<K, V>>::Cell Cell;
 
-        HashMapArray(hash::HashEngine<K>* _hashEngine, size_t _tableSize, size_t rowSize) :
+        HashMapArray(size_t rowSize, hash::HashEngine<K>* _hashEngine, size_t _tableSize=DEFAULT_TABLE_SIZE) :
                 tableSize(_tableSize), hashEngine(_hashEngine), valueSizeof(sizeof(V)) {
             hashEngine->setIndexSize(tableSize);
             matrix = new utils::R3DMatrix<bool, bool, Entry<K, V>>(rowSize, 0);
@@ -137,6 +130,10 @@ namespace utils {
         size_t tableSize; // размер hash table
 
         size_t valueSizeof; // saved value sizeof Entry
+
+        // наилучшее случайное распределние занений хэш функции получается,
+        // если размер таблицы индексов равен простому числу
+        const static size_t DEFAULT_TABLE_SIZE = 1021;
 
 
     };

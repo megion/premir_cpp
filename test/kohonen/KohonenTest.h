@@ -24,6 +24,7 @@
 
 #include "kohonen/SomTrainer.h"
 #include "kohonen/SammonMap.h"
+#include "kohonen/labeling/SomLabeling.h"
 
 #include "kohonen/umat/UMat.h"
 #include "kohonen/umat/RectUMat.h"
@@ -39,6 +40,7 @@ namespace test {
 
         struct DemoInRow {
             bool value1;
+            char label;
         };
 
         class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
