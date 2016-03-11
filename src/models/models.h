@@ -57,6 +57,32 @@ namespace models {
             return !((*this) == other);
         }
     };
+
+    struct LabelInfo {
+        size_t count;
+        double scaledCount;
+
+        friend std::ostream &operator<<(std::ostream &os, const LabelInfo &val) {
+            os << "count " << val.count << ", scaledCount " << val.scaledCount;
+            return os;
+        }
+    };
+
+
+
+
+    struct LabelSummary {
+        size_t minCount;
+        size_t maxCount;
+
+        friend std::ostream &operator<<(std::ostream &os, const LabelSummary &val) {
+            os << "minCount " << val.minCount << ", maxCount " << val.maxCount;
+            return os;
+        }
+    };
+
+
+
 }
 
 

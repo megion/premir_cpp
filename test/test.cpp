@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     test::coursera::coursera_test();
     matrix_utils_test();
 	digitalFilter_test();
-//    test::kohonen_demos_test::kohonen_demos_test();
+    test::kohonen_demos_test::kohonen_demos_test();
 
     return 0;
 

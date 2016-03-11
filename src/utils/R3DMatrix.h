@@ -70,14 +70,7 @@ namespace utils {
                 // remove all row array
                 for (size_t r = 0; r < rowSize; ++r) {
                     // remove all points array for each cell
-                    for (size_t c = 0; c < matrix[r].cellSize; ++c) {
-                        if (matrix[r].cells[c].points) {
-                            std::free(matrix[r].cells[c].points);
-                            // set to null each array pointer
-                            matrix[r].cells[c].points = nullptr;
-                            matrix[r].cells[c].pointSize = 0;
-                        }
-                    }
+                    removeRowPoints(r);
                     if (matrix[r].cells) {
                         std::free(matrix[r].cells);
                         // set to null each array pointer
@@ -88,6 +81,21 @@ namespace utils {
                 std::free(matrix);
                 matrix = nullptr;
                 rowSize = 0;
+            }
+        }
+
+        /**
+         * remove all points array for each cells specified row.
+         * Cells array for specified row not removed.
+         */
+        void removeRowPoints(const size_t &r) {
+            for (size_t c = 0; c < matrix[r].cellSize; ++c) {
+                if (matrix[r].cells[c].points) {
+                    std::free(matrix[r].cells[c].points);
+                    // set to null each array pointer
+                    matrix[r].cells[c].points = nullptr;
+                    matrix[r].cells[c].pointSize = 0;
+                }
             }
         }
 

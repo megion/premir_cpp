@@ -172,7 +172,7 @@ namespace test {
         }
 
         void drawUMat(OutCodes *somTrainedMatrix,
-                      graphics::UMatChart<float> &chart, size_t xdim, size_t ydim, size_t dim) {
+                      graphics::UMatChart<float, char> &chart, size_t xdim, size_t ydim, size_t dim) {
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
@@ -301,6 +301,41 @@ namespace test {
             delete expectedUMatrix;
         }
 
+        void test_som_labeling() {
+            size_t xdim = 10;
+            size_t ydim = 10;
+
+            utils::hash::CharHash cHash;
+            kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
+            char labelA = 'A';
+            somLabeling.addWinner(2, labelA);
+            somLabeling.addWinner(2, labelA);
+            somLabeling.addWinner(3, labelA);
+            char labelB = 'B';
+            somLabeling.addWinner(2, labelB);
+            somLabeling.addWinner(4, labelB);
+            somLabeling.addWinner(4, labelB);
+            somLabeling.addWinner(4, labelB);
+
+            assert(somLabeling.getWinnerLabels()->getValue(2, 'A')->count == 2);
+            assert(somLabeling.getWinnerLabels()->getValue(3, 'A')->count == 1);
+            assert(somLabeling.getWinnerLabels()->getValue(2, 'B')->count == 1);
+            assert(somLabeling.getWinnerLabels()->getValue(4, 'B')->count == 3);
+
+            somLabeling.collectSummary();
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'A')->maxCount == 2);
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'A')->minCount == 1);
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'B')->maxCount == 3);
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'B')->minCount == 1);
+
+            somLabeling.addWinner(4, labelB);
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'B')->maxCount == 3);
+            somLabeling.collectSummary();
+            somLabeling.collectSummary();
+            somLabeling.collectSummary();
+            assert(somLabeling.getSummaryLabels()->getValue(0, 'B')->maxCount == 4);
+        }
+
         void test_umatrix_visible() {
             size_t xdim = 16;
             size_t ydim = 12;
@@ -313,20 +348,20 @@ namespace test {
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
 
-            graphics::UMatChart<float> umatChart(500, 740);
+            graphics::UMatChart<float, char> umatChart(500, 740);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> chartThread(&umatChart);
             umatChart.addHexaUMatPoints(umat.getUMatrix());
             umatChart.drawOnWindow();
 
-            graphics::UMatChart<float> umatAChart(500, 740);
+            graphics::UMatChart<float, char> umatAChart(500, 740);
             umatAChart.setWindowTitle("UMatA");
             graphics::ChartThread<float> chartThreadA(&umatAChart);
             umat.averageUMatrix();
             umatAChart.addHexaUMatPoints(umat.getUMatrix());
             umatAChart.drawOnWindow();
 
-            graphics::UMatChart<float> umatAMChart(500, 740);
+            graphics::UMatChart<float, char> umatAMChart(500, 740);
             umatAMChart.setWindowTitle("UMatM");
             graphics::ChartThread<float> chartThreadAM(&umatAMChart);
             umat.medianUMatrix();
@@ -393,7 +428,7 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float> umatChart(700, 700);
+            graphics::UMatChart<float, char> umatChart(700, 700);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
@@ -436,7 +471,7 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float> umatChart2(4000, 4000);
+            graphics::UMatChart<float, char> umatChart2(4000, 4000);
             umatChart2.setWindowTitle("UMat2");
             graphics::ChartThread<float> umchartThread2(&umatChart2);
             drawUMat(somCodesMatrix, umatChart2, xdim, ydim, dim);
@@ -450,13 +485,6 @@ namespace test {
             delete somCodesMatrix;
         }
 
-        void test_som_labeling() {
-            size_t xdim = 100;
-            size_t ydim = 100;
-
-            kohonen::labeling::SomLabeling<DemoInRow, char> somLabeling();
-        }
-
         void kohonen_test() {
             suite("Kohonen");
             mytest(line_initialization);
@@ -466,6 +494,7 @@ namespace test {
             mytest(umatrix_hexa_average);
             mytest(umatrix_hexa_median);
             mytest(eucw_bubble_hexa_16_12_sammon);
+            mytest(som_labeling);
 
 //            mytest(sammon_visible);
 //            mytest(umatrix_visible);

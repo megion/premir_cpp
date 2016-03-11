@@ -11,6 +11,7 @@
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
+#include "utils/hash/StringHash.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"

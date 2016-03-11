@@ -21,14 +21,17 @@ namespace test {
         }
 
         void drawUMat(OutCodes *somTrainedMatrix,
-                      graphics::UMatChart<float> &chart, size_t xdim, size_t ydim, size_t dim) {
+                      kohonen::labeling::SomLabeling<char> &somLabeling,
+                      graphics::UMatChart<float, char> &chart, size_t xdim, size_t ydim, size_t dim) {
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
-            umat.medianUMatrix();
+//            umat.medianUMatrix();
 //            umat.averageUMatrix();
 
             chart.removeDataSafely();
+
+            somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
             chart.drawOnWindow();
         }
@@ -62,6 +65,10 @@ namespace test {
             kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 0.0,
                                                                  xdim, ydim);
 
+            // init labeling
+            utils::hash::CharHash cHash;
+            kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
+
             //
             graphics::PointChart qErrorChart(true, 710, 460);
             qErrorChart.setWindowTitle("Quantum error");
@@ -80,17 +87,17 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float> umatChart(700, 700);
+            graphics::UMatChart<float, char> umatChart(700, 700);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<float> umchartThread(&umatChart);
-            drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+            drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
 
             for (size_t le = 0; le < teachSize; ++le) {
                 models::DataSample<float> samples[colSize];
                 DemoInRow rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
-                    drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+                    drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
 
                     // значит достигли конца данных, начинаем читать с начала
                     // установить поток на начало
@@ -108,6 +115,7 @@ namespace test {
                 kohonen::winner::WinnerInfo<float> winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
+                    somLabeling.addWinner(winners[0].index, rowData.label);
 //                    int cnt = le % step;
                     qerror += std::sqrt(winners[0].diff);
                     if (le % step==0 && le!=0) {
@@ -126,10 +134,10 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float> umatChart2(2000, 2000);
+            graphics::UMatChart<float, char> umatChart2(2000, 2000);
             umatChart2.setWindowTitle("UMat2");
             graphics::ChartThread<float> umchartThread2(&umatChart2);
-            drawUMat(somCodesMatrix, umatChart2, xdim, ydim, dim);
+            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim);
             umatChart2.saveImage("u-matrix-speech-final.png");
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);

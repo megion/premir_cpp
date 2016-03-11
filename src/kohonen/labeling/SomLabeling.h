@@ -23,32 +23,18 @@
 namespace kohonen {
     namespace labeling {
 
-        struct LabelInfo {
-            size_t count;
-            double scaledCount;
-        };
+        class IncreaseCounterUpdater : public utils::ValueUpdater<models::LabelInfo> {
 
-        struct LabelSummary {
-            size_t minCount;
-            size_t maxCount;
-        };
-
-        template<typename InRow, typename Label>
-        class KeyLabelResolver {
-        public:
-            virtual Label &getKeyLabel(InRow &inDataRow) const = 0;
-        };
-
-        class IncreaseCounterUpdater : public utils::ValueUpdater<LabelInfo> {
-
-            void update(LabelInfo &oldValue, const LabelInfo &newValue, const size_t valueSizeof) const {
+            void update(models::LabelInfo &oldValue, const models::LabelInfo &newValue,
+                        const size_t valueSizeof) const {
                 oldValue.count++;
             }
 
         };
 
-        class SummaryUpdater : public utils::ValueUpdater<LabelSummary> {
-            void update(LabelSummary &oldValue, const LabelSummary &newValue, const size_t valueSizeof) const {
+        class SummaryUpdater : public utils::ValueUpdater<models::LabelSummary> {
+            void update(models::LabelSummary &oldValue, const models::LabelSummary &newValue,
+                        const size_t valueSizeof) const {
                 if (oldValue.minCount > newValue.minCount) {
                     oldValue.minCount = newValue.minCount;
                 }
@@ -58,53 +44,62 @@ namespace kohonen {
             }
         };
 
-        template<typename InRow, typename Label>
+        template<typename Label>
         class SomLabeling {
         public:
-            typedef typename utils::Entry<Label, LabelInfo> InfoEntry;
-            typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Row Row;
-            typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Cell Cell;
+            typedef typename utils::Entry<Label, models::LabelInfo> InfoEntry;
+            typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Row InfoRow;
+            typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Cell InfoCell;
 
-            SomLabeling(size_t xdim, size_t ydim, utils::hash::HashEngine<Label> *hashEngine,
-                        KeyLabelResolver<InRow, Label> *_keyResolver) :
-                    winnerLabelsUpdater(IncreaseCounterUpdater()),
-                    keyResolver(_keyResolver) {
+            SomLabeling(size_t xdim, size_t ydim, utils::hash::HashEngine<Label> *hashEngine) :
+                    winnerLabelsUpdater(IncreaseCounterUpdater()) {
                 size_t nCount = xdim * ydim;
-                winnerLabels = new utils::HashMapArray<Label, LabelInfo>(nCount, hashEngine);
-                summaryLabels = new utils::HashMapArray<Label, LabelSummary>(1, hashEngine);
+                winnerLabels = new utils::HashMapArray<Label, models::LabelInfo>(nCount, hashEngine);
+                summaryLabels = new utils::HashMapArray<Label, models::LabelSummary>(1, hashEngine, 7);
             }
 
-            void addWinner(size_t winnerIndex, InRow &inDataRow) {
-                LabelInfo info = {1, 0};
-                winnerLabels->pushValue(winnerIndex, keyResolver->getKeyLabel(inDataRow), info, &winnerLabelsUpdater);
+            void addWinner(size_t winnerIndex, Label &label) {
+                models::LabelInfo info = {1, 0};
+                winnerLabels->pushValue(winnerIndex, label, info, &winnerLabelsUpdater);
             }
 
-            void scale() {
+            void collectSummary() {
+                // 0. clean prev summary
+//                summaryLabels->getMatrix()->removeRowPoints(0);
+
                 SummaryUpdater summaryUpdater;
                 // 1. collect statistics
                 for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
-                    Row &row = (*winnerLabels->getMatrix())[r];
+                    InfoRow &row = (*winnerLabels->getMatrix())[r];
                     for (size_t c = 0; c < row.cellSize; ++c) {
-                        Cell &cell = row[c];
+                        InfoCell &cell = row[c];
                         for (size_t p = 0; p < cell.pointSize; ++p) {
                             InfoEntry &e = cell[p];
-                            LabelSummary summary = {e.value.count, e.value.count};
+                            models::LabelSummary summary = {e.value.count, e.value.count};
                             summaryLabels->pushValue(0, e.key, summary, &summaryUpdater);
                         }
                     }
                 }
+                summaryLabels->getMatrix()->print();
 
                 // 2. scale label count values
                 for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
-                    Row &row = (*winnerLabels->getMatrix())[r];
+                    InfoRow &row = (*winnerLabels->getMatrix())[r];
                     for (size_t c = 0; c < row.cellSize; ++c) {
-                        Cell &cell = row[c];
+                        InfoCell &cell = row[c];
                         for (size_t p = 0; p < cell.pointSize; ++p) {
                             InfoEntry &e = cell[p];
-                            LabelSummary *summary = summaryLabels->getValue(0, e.key);
+                            models::LabelSummary *summary = summaryLabels->getValue(0, e.key);
+                            if (!summary) {
+                                e.value.scaledCount =
+                                        (e.value.count - (*summary).minCount) / ((*summary).maxCount - (*summary).minCount);
+                                std::cout << "key found {" << e.key << "}" << std::endl;
+                            } else {
+                                danger_text("summary not found for key: ");
+                                std::cout << "{" << e.key << "}" << std::endl;
+                            }
 
-                            e.value.scaledCount =
-                                    (e.value.count - (*summary).minCount) / ((*summary).maxCount - (*summary).minCount);
+
                         }
                     }
                 }
@@ -115,10 +110,17 @@ namespace kohonen {
                 delete summaryLabels;
             }
 
+            utils::HashMapArray<Label, models::LabelInfo> *getWinnerLabels() const {
+                return winnerLabels;
+            };
+
+            utils::HashMapArray<Label, models::LabelSummary> *getSummaryLabels() const {
+                return summaryLabels;
+            };
+
         private:
-            utils::HashMapArray<Label, LabelInfo> *winnerLabels;
-            utils::HashMapArray<Label, LabelSummary> *summaryLabels;
-            KeyLabelResolver<InRow, Label> *keyResolver;
+            utils::HashMapArray<Label, models::LabelInfo> *winnerLabels;
+            utils::HashMapArray<Label, models::LabelSummary> *summaryLabels;
             IncreaseCounterUpdater winnerLabelsUpdater;
 
         };

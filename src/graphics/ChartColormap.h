@@ -14,8 +14,7 @@ namespace graphics {
     public:
 
         ChartColormap(xcb_connection_t *_connection, xcb_screen_t *_screen, xcb_window_t _window) :
-                connection(_connection), screen(_screen), window(_window),
-                grayColors(nullptr), waveColors(nullptr) {
+                connection(_connection), screen(_screen), window(_window) {
 
             colormapId = screen->default_colormap;
 
@@ -34,21 +33,21 @@ namespace graphics {
             std::free(green);
             std::free(gray);
 
-            if (grayColors) {
-                for (size_t i = 0; i < grayColors->size(); ++i) {
-                    std::free((*grayColors)[i]);
-                }
-                delete grayColors;
-                grayColors = nullptr;
-            }
-
-            if (waveColors) {
-                for (size_t i = 0; i < waveColors->size(); ++i) {
-                    std::free((*waveColors)[i]);
-                }
-                delete waveColors;
-                waveColors = nullptr;
-            }
+//            if (grayColors) {
+//                for (size_t i = 0; i < grayColors->size(); ++i) {
+//                    std::free((*grayColors)[i]);
+//                }
+//                delete grayColors;
+//                grayColors = nullptr;
+//            }
+//
+//            if (waveColors) {
+//                for (size_t i = 0; i < waveColors->size(); ++i) {
+//                    std::free((*waveColors)[i]);
+//                }
+//                delete waveColors;
+//                waveColors = nullptr;
+//            }
         }
 
         xcb_alloc_color_reply_t *getGreen() {
@@ -59,12 +58,10 @@ namespace graphics {
             return gray;
         }
 
-        void createGrayColors(uint16_t colorsSize) {
-            if (grayColors) {
-                throw std::runtime_error("Gray colors already created");
-            }
+        utils::CArrayList<xcb_alloc_color_reply_t *> *createGrayColors(uint16_t colorsSize) {
             uint16_t step = 65535 / colorsSize;
-            grayColors = new utils::CArrayList<xcb_alloc_color_reply_t *>(colorsSize, 1, colorsSize);
+            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+                    colorsSize, 1, colorsSize);
             for (uint16_t i = 0; i < colorsSize; ++i) {
                 uint16_t colComp = i * step; // компонента цвета
                 xcb_generic_error_t *error = NULL;
@@ -74,19 +71,14 @@ namespace graphics {
                 if (error) {
                     throw std::runtime_error("Cannot create colormap");
                 }
-                (*grayColors)[i] = color;
+                (*colors)[i] = color;
             }
+            return colors;
         }
 
-        void createWavelengthColors(size_t colorsSize) {
-            if (waveColors) {
-                throw std::runtime_error("Wave colors already created");
-            }
-
-//            uint16_t maxBand = 65535;
-//
-//            uint16_t step = 65535 / colorsSize;
-            waveColors = new utils::CArrayList<xcb_alloc_color_reply_t *>(colorsSize, 1, colorsSize);
+        utils::CArrayList<xcb_alloc_color_reply_t *> *createWavelengthColors(size_t colorsSize) {
+            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+                    colorsSize, 1, colorsSize);
             for (size_t i = 0; i < colorsSize; ++i) {
                 uint16_t r, g, b;
 //                calculateWavelengthColor(i, 0, colorsSize - 1, r, g, b);
@@ -99,26 +91,28 @@ namespace graphics {
                 if (error) {
                     throw std::runtime_error("Cannot create colormap");
                 }
-                (*waveColors)[i] = color;
+                (*colors)[i] = color;
             }
+
+            return colors;
         }
 
 
         /**
          * Параметр color должен принимать значение от 0 ... 1
          */
-        xcb_alloc_color_reply_t *getScaledGrayColor(double color) {
-            size_t index = (grayColors->size() - 1) * color;
-//            std::cout<<"index: " << index << std::endl;
-            return (*grayColors)[index];
+        xcb_alloc_color_reply_t *getScaledColor(utils::CArrayList<xcb_alloc_color_reply_t *> *colors,
+                                                const double &color) const {
+            size_t index = (colors->size() - 1) * color;
+            return (*colors)[index];
         }
 
-        xcb_alloc_color_reply_t *getWavelengthColor(double color) {
-            size_t index = (waveColors->size() - 1) * (color);
-//            std::cout<<"index: " << index << std::endl;
-            return (*waveColors)[index];
+        void freeColors(utils::CArrayList<xcb_alloc_color_reply_t *> *colors) {
+            for (size_t i = 0; i < colors->size(); ++i) {
+                std::free((*colors)[i]);
+            }
+            delete colors;
         }
-
 
     private:
         xcb_connection_t *connection;
@@ -129,11 +123,6 @@ namespace graphics {
 
         xcb_alloc_color_reply_t *green;
         xcb_alloc_color_reply_t *gray;
-
-        // коллекция серых цветов: от белого до черного
-        utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
-        // цвета радуги :)
-        utils::CArrayList<xcb_alloc_color_reply_t *> *waveColors;
 
 
         uint16_t adjustColor(double color, double factor) {
@@ -337,7 +326,6 @@ namespace graphics {
             r = intensityMax * XX / max3(XX, YY, ZZ);
             g = intensityMax * YY / max3(XX, YY, ZZ);
             b = intensityMax * ZZ / max3(XX, YY, ZZ);
-
         }
 
         double max3(double x, double y, double z) {

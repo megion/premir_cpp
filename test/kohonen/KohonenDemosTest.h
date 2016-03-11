@@ -11,6 +11,7 @@
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
+#include "utils/hash/StringHash.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"
@@ -24,6 +25,7 @@
 
 #include "kohonen/SomTrainer.h"
 #include "kohonen/SammonMap.h"
+#include "kohonen/labeling/SomLabeling.h"
 
 #include "kohonen/umat/UMat.h"
 #include "kohonen/umat/RectUMat.h"
@@ -38,7 +40,6 @@ namespace test {
     namespace kohonen_demos_test {
 
         struct DemoInRow {
-//            bool value1;
             char label;
         };
 

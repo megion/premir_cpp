@@ -12,10 +12,11 @@
 #include "Chart.h"
 #include "models/models.h"
 #include "utils/RMatrix.h"
+#include "utils/HashMapArray.h"
 
 namespace graphics {
 
-    template<typename Out>
+    template<typename Out, typename Label>
     class UMatChart : public Chart<Out> {
     public:
 
@@ -23,6 +24,8 @@ namespace graphics {
         typedef typename ChartData<Out>::Point OutPoint;
         typedef typename utils::RDMatrix<Out, xcb_point_t> OutMatrix;
         typedef typename OutMatrix::Row OutRow;
+
+        typedef utils::HashMapArray<Label, models::LabelInfo> LabelsMatrix;
 
         UMatChart(uint16_t _width, uint16_t _height) : Chart<Out>(_width, _height) {
             // arcs context
@@ -39,13 +42,18 @@ namespace graphics {
                           mask, values22);
 
             // создадим 1000 оттенков серого
-            Chart<Out>::colormap->createGrayColors(1000);
+            grayColors = Chart<Out>::colormap->createGrayColors(1000);
 //            Chart<Out>::colormap->createWavelengthColors(4000);
         }
 
         ~UMatChart() {
             cellBorderContext = 0;
             cellBackgroundContext = 0;
+
+            if(grayColors) {
+                Chart<Out>::colormap->freeColors(grayColors);
+                grayColors = nullptr;
+            }
         }
 
         void draw(const xcb_drawable_t& pixmap) const {
@@ -54,6 +62,10 @@ namespace graphics {
 //            drawAxesLabels();
             drawUMat(pixmap);
             Chart<Out>::flush();
+        }
+
+        void setUMatWinnerLabels(LabelsMatrix* winnerLabels) {
+
         }
         
         void addHexaUMatPoints(UMatCodes *uMatrix) {
@@ -126,7 +138,7 @@ namespace graphics {
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
-                uint32_t values[] = {Chart<Out>::colormap->getScaledGrayColor(outRow.data)->pixel};
+                uint32_t values[] = {Chart<Out>::colormap->getScaledColor(grayColors, outRow.data)->pixel};
 //                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
                 xcb_change_gc(Chart<Out>::connection, cellBackgroundContext, mask, values);
@@ -140,6 +152,12 @@ namespace graphics {
 
         xcb_gcontext_t cellBorderContext;
         xcb_gcontext_t cellBackgroundContext;
+
+        // коллекция серых цветов: от белого до черного
+        utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
+
+//        // цвета радуги :)
+//        utils::CArrayList<xcb_alloc_color_reply_t *> *waveColors;
 
     };
 

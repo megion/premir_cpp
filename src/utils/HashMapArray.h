@@ -29,7 +29,12 @@ namespace utils {
     struct Entry {
         K key;
         V value;
+        friend std::ostream &operator<<(std::ostream &os, const Entry<K, V> &val) {
+            os << "key {" << val.key << "}, value {" << val.value << "}";
+            return os;
+        }
     };
+
 
     template<typename K, typename V>
     class HashMapArray {
