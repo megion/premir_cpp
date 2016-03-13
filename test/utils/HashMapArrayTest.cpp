@@ -5,7 +5,8 @@ namespace test {
 
         void test_push_value() {
             utils::hash::CharHash shash;
-            utils::HashMapArray<char, int> a(10, &shash, 6);
+            shash.setIndexSize(6);
+            utils::HashMapArray<char, int> a(10, &shash);
 
             a.pushValue(0, 'K', 4);
             assert(a.getValue(0, 'K') != nullptr);
@@ -23,10 +24,12 @@ namespace test {
             assert((*a.getValue(0, 'P')) == 55);
             assert(a.getValue(0, 'M') == nullptr);
 
-            utils::hash::StringHash<char*> strHash;
-            utils::HashMapArray<char*, int> b(10, &strHash, 6);
+            MyStringKeyHash strHash;
+            strHash.setIndexSize(6);
+            utils::HashMapArray<MyStringKey, int> b(10, &strHash);
 
-            char mystr[] = "my string";
+            MyStringKey mystr;
+            mystr.setLabel("my string");
             b.pushValue(0, mystr, 4);
             assert(b.getValue(0, mystr) != nullptr);
             assert((*b.getValue(0, mystr)) == 4);
@@ -36,11 +39,13 @@ namespace test {
         }
 
         void test_push_or_update_value() {
-            utils::hash::StringHash<char*> strHash;
-            utils::HashMapArray<char*, MyValue> b(10, &strHash, 6);
+            MyStringKeyHash strHash;
+            utils::HashMapArray<MyStringKey, MyValue> b(10, &strHash);
             MyValueUpdater updater;
             MyValue v1 = {1, 11};
-            char mykey[] = "my key1";
+
+            MyStringKey mykey;
+            mykey.setLabel("my key1");
             b.pushValue(0, mykey, v1, &updater);
             MyValue v2 = {1, 22};
             b.pushValue(0, mykey, v2, &updater);
@@ -49,7 +54,8 @@ namespace test {
             assert((*b.getValue(0, mykey)).count == 3);
             assert((*b.getValue(0, mykey)).value2 == 11);
 
-            char mykey2[] = "my key2";
+            MyStringKey mykey2;
+            mykey2.setLabel("my key2");
             b.pushValue(0, mykey2, v1, &updater);
             assert((*b.getValue(0, mykey)).count == 3);
             assert((*b.getValue(0, mykey2)).count == 1);

@@ -22,10 +22,13 @@ namespace graphics {
 
         typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
         typedef typename ChartData<Out>::Point OutPoint;
-        typedef typename utils::RDMatrix<Out, xcb_point_t> OutMatrix;
+        typedef utils::RDMatrix<Out, xcb_point_t> OutMatrix;
         typedef typename OutMatrix::Row OutRow;
 
         typedef utils::HashMapArray<Label, models::LabelInfo> LabelsMatrix;
+        typedef typename utils::Entry<Label, models::LabelInfo> LabelsEntry;
+        typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Row LabelsRow;
+        typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Cell LabelsCell;
 
         UMatChart(uint16_t _width, uint16_t _height) : Chart<Out>(_width, _height) {
             // arcs context
@@ -43,7 +46,7 @@ namespace graphics {
 
             // создадим 1000 оттенков серого
             grayColors = Chart<Out>::colormap->createGrayColors(1000);
-//            Chart<Out>::colormap->createWavelengthColors(4000);
+            labelsColors = Chart<Out>::colormap->createCubehelixColors(1000, 2.0, 0.5, 2.0, 1.0);
         }
 
         ~UMatChart() {
@@ -53,6 +56,11 @@ namespace graphics {
             if(grayColors) {
                 Chart<Out>::colormap->freeColors(grayColors);
                 grayColors = nullptr;
+            }
+
+            if(labelsColors) {
+                Chart<Out>::colormap->freeColors(labelsColors);
+                labelsColors = nullptr;
             }
         }
 
@@ -64,7 +72,20 @@ namespace graphics {
             Chart<Out>::flush();
         }
 
-        void setUMatWinnerLabels(LabelsMatrix* winnerLabels) {
+        void setUMatWinnerLabels(LabelsMatrix* winnerLabels, size_t xdim) {
+//            (*Chart<Out>::data->getOutpoints())[index].data = uvalue[i][j];
+            for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
+                LabelsRow &row = (*winnerLabels->getMatrix())[r];
+                for (size_t c = 0; c < row.cellSize; ++c) {
+                    LabelsCell &cell = row[c];
+                    for (size_t p = 0; p < cell.pointSize; ++p) {
+                        LabelsEntry &e = cell[p];
+
+                        long xind = r % xdim;
+                        long yind = r / xdim;
+                    }
+                }
+            }
 
         }
         
@@ -155,6 +176,7 @@ namespace graphics {
 
         // коллекция серых цветов: от белого до черного
         utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
+        utils::CArrayList<xcb_alloc_color_reply_t *> *labelsColors;
 
 //        // цвета радуги :)
 //        utils::CArrayList<xcb_alloc_color_reply_t *> *waveColors;

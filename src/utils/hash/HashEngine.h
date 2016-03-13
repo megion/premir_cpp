@@ -10,6 +10,9 @@ namespace utils {
         class HashEngine {
         public:
 
+            HashEngine(size_t _indexSize=DEFAULT_TABLE_SIZE) : indexSize(_indexSize) {
+            }
+
             virtual size_t hashCode(const T& value) const = 0;
 
             size_t setIndexSize(size_t _indexSize) {
@@ -18,6 +21,11 @@ namespace utils {
 
         protected:
             size_t indexSize;
+
+        public:
+            // наилучшее случайное распределние занений хэш функции получается,
+            // если размер таблицы индексов равен простому числу
+            const static size_t DEFAULT_TABLE_SIZE = 1021;
 
         };
     }

@@ -12,12 +12,11 @@ namespace utils {
         class FloatHash : public HashEngine<T> {
         public:
             FloatHash(double _start, double _end) :
-                    start(_start), end(_end) {
+                    start(_start), end(_end), HashEngine<T>::HashEngine() {
             }
 
             size_t hashCode(const T &value) const {
-                return (size_t) HashEngine<T>::indexSize * (value - start) /
-                       (end - start);
+                return (size_t) HashEngine<T>::indexSize * (value - start) / (end - start);
             }
 
         private:

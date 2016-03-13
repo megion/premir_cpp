@@ -55,7 +55,7 @@ namespace kohonen {
                     winnerLabelsUpdater(IncreaseCounterUpdater()) {
                 size_t nCount = xdim * ydim;
                 winnerLabels = new utils::HashMapArray<Label, models::LabelInfo>(nCount, hashEngine);
-                summaryLabels = new utils::HashMapArray<Label, models::LabelSummary>(1, hashEngine, 7);
+                summaryLabels = new utils::HashMapArray<Label, models::LabelSummary>(1, hashEngine);
             }
 
             void addWinner(size_t winnerIndex, Label &label) {
@@ -65,7 +65,7 @@ namespace kohonen {
 
             void collectSummary() {
                 // 0. clean prev summary
-//                summaryLabels->getMatrix()->removeRowPoints(0);
+                summaryLabels->getMatrix()->removeRowPoints(0);
 
                 SummaryUpdater summaryUpdater;
                 // 1. collect statistics
@@ -80,7 +80,7 @@ namespace kohonen {
                         }
                     }
                 }
-                summaryLabels->getMatrix()->print();
+//                summaryLabels->getMatrix()->print();
 
                 // 2. scale label count values
                 for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
@@ -90,19 +90,16 @@ namespace kohonen {
                         for (size_t p = 0; p < cell.pointSize; ++p) {
                             InfoEntry &e = cell[p];
                             models::LabelSummary *summary = summaryLabels->getValue(0, e.key);
-                            if (!summary) {
-                                e.value.scaledCount =
-                                        (e.value.count - (*summary).minCount) / ((*summary).maxCount - (*summary).minCount);
-                                std::cout << "key found {" << e.key << "}" << std::endl;
+                            if ((*summary).maxCount==0 || (*summary).maxCount==1) {
+                                e.value.scaledCount = 0;
                             } else {
-                                danger_text("summary not found for key: ");
-                                std::cout << "{" << e.key << "}" << std::endl;
+                                e.value.scaledCount = ((double)e.value.count) / (*summary).maxCount;
                             }
-
-
                         }
                     }
                 }
+
+//                winnerLabels->getMatrix()->print(false);
             }
 
             ~SomLabeling() {

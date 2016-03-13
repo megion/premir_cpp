@@ -18,7 +18,7 @@ namespace utils {
         template<typename T>
         class NumberHash : public HashEngine<T> {
         public:
-            NumberHash() {
+            NumberHash() : HashEngine<T>::HashEngine() {
             }
 
             size_t hashCode(const T& value) const {

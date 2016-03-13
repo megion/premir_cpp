@@ -81,9 +81,28 @@ namespace graphics {
                     colorsSize, 1, colorsSize);
             for (size_t i = 0; i < colorsSize; ++i) {
                 uint16_t r, g, b;
-//                calculateWavelengthColor(i, 0, colorsSize - 1, r, g, b);
+                calculateWavelengthColor(i, 0, colorsSize - 1, r, g, b);
 //                calculateBlackbodyColor(i, 0, colorsSize - 1, r, g, b);
-                calculateCubehelixColor(i, 0, colorsSize - 1, r, g, b);
+                xcb_generic_error_t *error = NULL;
+                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
+                                                                       xcb_alloc_color(connection, colormapId, r,
+                                                                                       g, b), &error);
+                if (error) {
+                    throw std::runtime_error("Cannot create colormap");
+                }
+                (*colors)[i] = color;
+            }
+
+            return colors;
+        }
+
+        utils::CArrayList<xcb_alloc_color_reply_t *> *createCubehelixColors(size_t colorsSize, double start,
+                                                                            double rots, double hue, double gamma) {
+            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+                    colorsSize, 1, colorsSize);
+            for (size_t i = 0; i < colorsSize; ++i) {
+                uint16_t r, g, b;
+                calculateCubehelixColor(i, 0, colorsSize - 1, r, g, b, start, rots, hue, gamma);
                 xcb_generic_error_t *error = NULL;
                 xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
                                                                        xcb_alloc_color(connection, colormapId, r,
@@ -339,18 +358,20 @@ namespace graphics {
         /**
          * Calculate Cubehelix color
          * http://www.mrao.cam.ac.uk/~dag/CUBEHELIX/cubetry.html
+         *
+         * start = 0.5; // start color 0.5 is purple
+         * double rots = -1.5; // rotations in colour (typically -1.5 to 1.5, e.g. -1.0 is one blue->green->red cycle)
+         * double hue = 1.0; // intensity scaling (in the range 0.0 (B+W) to 1.0 to be strictly correct,
+         * larger values may be OK with particular start/end colours) default 1
+         * double gamma = 1.0; // gamma correction for intensit (default 1)
          */
-        void calculateCubehelixColor(double val, double minVal, double maxVal, uint16_t &r, uint16_t &g, uint16_t &b) {
-            double minColor = 0.0;
-            double maxColor = 256.0;
-            double v = (val - minVal) * (maxColor - minColor) / (maxVal - minVal) + minColor;
+        void calculateCubehelixColor(double val, double minVal, double maxVal, uint16_t &r, uint16_t &g, uint16_t &b,
+                                     double start = 0.5, double rots = -1.5, double hue = 1.0, double gamma = 1.0) {
+//            double minColor = 0.0;
+//            double maxColor = 256.0;
+//            double v = (val - minVal) * (maxColor - minColor) / (maxVal - minVal) + minColor;
 
-            double fract = cubehelixFract(v, maxColor, 0);
-            double start = 0.5; // start color 0.5 is purple
-            double rots = -1.5; // rotations in colour (typically -1.5 to 1.5, e.g. -1.0 is one blue->green->red cycle)
-            double hue = 6.0; // 6 // intensity scaling (in the range 0.0 (B+W) to 1.0 to be strictly correct,
-            // larger values may be OK with particular start/end colours) default 1
-            double gamma = 10.0; // 10 // gamma correction for intensit (default 1)
+            double fract = (val - minVal) / (maxVal - minVal);//cubehelixFract(v, maxColor, 0);
             double rd = 0, gd = 0, bd = 0;
             cubehelixRGB(fract, start, rots, hue, gamma, rd, gd, bd);
             r = rescaleColor(rd);
@@ -358,13 +379,13 @@ namespace graphics {
             b = rescaleColor(bd);
         }
 
-        double cubehelixFract(double i, double n, double flip) {
-            double fraction = i / (n - 1);
-            if (flip == 1) {
-                fraction = 1.0 - fraction;
-            }
-            return fraction;
-        }
+//        double cubehelixFract(double i, double n, double flip) {
+//            double fraction = i / (n - 1);
+//            if (flip == 1) {
+//                fraction = 1.0 - fraction;
+//            }
+//            return fraction;
+//        }
 
         void cubehelixRGB(double fract, double start, double rots, double hue, double gamma, double &r, double &g,
                           double &b) {

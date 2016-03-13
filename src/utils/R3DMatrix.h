@@ -205,7 +205,7 @@ namespace utils {
                         // re-initialize points memory
                         initializePointsMemory(cell, newPointSize);
 
-                        memcpy(cell.points + oldPointSize, points, pointSize * tTypeSizeof);
+                        std::memcpy(cell.points + oldPointSize, points, pointSize * tTypeSizeof);
                     } else {
                         // запись точек в начало
                         if (cell.pointSize < pointSize) {
@@ -216,7 +216,7 @@ namespace utils {
                         }
 
                         // copy points array (dest, src, size)
-                        memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
+                        std::memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
                     }
                 } else {
                     // re-initialize cells and points
@@ -226,7 +226,7 @@ namespace utils {
                     initializePointsMemory(matrix[rowIndex].cells[colIndex], pointSize);
 
                     // copy points array (dest, src, size)
-                    memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
+                    std::memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
                 }
             } else {
                 // re-initialize row memory
@@ -239,20 +239,22 @@ namespace utils {
                 initializePointsMemory(matrix[rowIndex].cells[colIndex], pointSize);
 
                 // copy points array (dest, src, size)
-                memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
+                std::memcpy(matrix[rowIndex].cells[colIndex].points, points, pointSize * tTypeSizeof);
             }
 
         }
 
-        void print() const {
+        void print(bool printEmpty = true) const {
             std::cout << "R3DMatrix[" << rowSize << "]" << std::endl;
             for (size_t r = 0; r < rowSize; ++r) {
                 for (size_t c = 0; c < matrix[r].cellSize; ++c) {
-                    std::cout << "[" << r << "," << c << "]: ";
-                    for (size_t p = 0; p < matrix[r].cells[c].pointSize; ++p) {
-                        std::cout << matrix[r].cells[c].points[p] << ", ";
+                    if (printEmpty || matrix[r].cells[c].pointSize > 0) {
+                        std::cout << "[" << r << "," << c << "]: ";
+                        for (size_t p = 0; p < matrix[r].cells[c].pointSize; ++p) {
+                            std::cout << matrix[r].cells[c].points[p] << ", ";
+                        }
+                        std::cout << std::endl;
                     }
-                    std::cout << std::endl;
                 }
 
             }

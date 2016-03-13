@@ -16,14 +16,13 @@ namespace utils {
         template<typename T>
         class StringHash : public HashEngine<T> {
         public:
-            StringHash() {
+            StringHash() : HashEngine<T>::HashEngine() {
             }
 
             size_t hashCode(const T &value) const {
-                T temp = value;
-                size_t h = 0, a = 127;
-                for (; *temp != 0; ++temp) {
-                    h = (a * h + *temp) % HashEngine<T>::indexSize;
+                size_t h = 0, a = 127, index = 0;
+                for (; *(value + index) != 0; ++index) {
+                    h = (a * h + *(value + index)) % HashEngine<T>::indexSize;
                 }
                 return h;
             }
@@ -32,7 +31,7 @@ namespace utils {
 
         class CharHash : public HashEngine<char> {
         public:
-            CharHash() {
+            CharHash() : HashEngine<char>::HashEngine(255) {
             }
 
             size_t hashCode(const char &value) const {
