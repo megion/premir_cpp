@@ -33,12 +33,15 @@ namespace test {
 
             somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
+            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim);
+//            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), '#');
+//            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'O');
             chart.drawOnWindow();
         }
 
         void test_speech_signal() {
-            size_t xdim = 68;
-            size_t ydim = 68;
+            size_t xdim = 60;
+            size_t ydim = 80;
             size_t dim = 20;
             size_t teachSize = 80000;
             bool isScale = false;
@@ -62,7 +65,7 @@ namespace test {
 
             kohonen::neighadap::GaussianNeighborAdaptation<float, float> gausAdap(&mapDist, xdim, ydim);
             kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.002, 0.0,
+            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.001, 2.0,
                                                                  xdim, ydim);
 
             // init labeling
@@ -87,9 +90,9 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float, char> umatChart(700, 700);
+            graphics::UMatChart<float, char> umatChart(800, 600);
             umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<float> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
 
             for (size_t le = 0; le < teachSize; ++le) {
@@ -136,7 +139,7 @@ namespace test {
 
             graphics::UMatChart<float, char> umatChart2(2000, 2000);
             umatChart2.setWindowTitle("UMat2");
-            graphics::ChartThread<float> umchartThread2(&umatChart2);
+            graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
             drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim);
             umatChart2.saveImage("u-matrix-speech-final.png");
 

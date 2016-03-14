@@ -32,22 +32,6 @@ namespace graphics {
         ~ChartColormap() {
             std::free(green);
             std::free(gray);
-
-//            if (grayColors) {
-//                for (size_t i = 0; i < grayColors->size(); ++i) {
-//                    std::free((*grayColors)[i]);
-//                }
-//                delete grayColors;
-//                grayColors = nullptr;
-//            }
-//
-//            if (waveColors) {
-//                for (size_t i = 0; i < waveColors->size(); ++i) {
-//                    std::free((*waveColors)[i]);
-//                }
-//                delete waveColors;
-//                waveColors = nullptr;
-//            }
         }
 
         xcb_alloc_color_reply_t *getGreen() {

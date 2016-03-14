@@ -350,20 +350,20 @@ namespace test {
 
             graphics::UMatChart<float, char> umatChart(500, 740);
             umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<float> chartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell<float>> chartThread(&umatChart);
             umatChart.addHexaUMatPoints(umat.getUMatrix());
             umatChart.drawOnWindow();
 
             graphics::UMatChart<float, char> umatAChart(500, 740);
             umatAChart.setWindowTitle("UMatA");
-            graphics::ChartThread<float> chartThreadA(&umatAChart);
+            graphics::ChartThread<graphics::UMatCell<float>> chartThreadA(&umatAChart);
             umat.averageUMatrix();
             umatAChart.addHexaUMatPoints(umat.getUMatrix());
             umatAChart.drawOnWindow();
 
             graphics::UMatChart<float, char> umatAMChart(500, 740);
             umatAMChart.setWindowTitle("UMatM");
-            graphics::ChartThread<float> chartThreadAM(&umatAMChart);
+            graphics::ChartThread<graphics::UMatCell<float>> chartThreadAM(&umatAMChart);
             umat.medianUMatrix();
             umatAMChart.addHexaUMatPoints(umat.getUMatrix());
             umatAMChart.drawOnWindow();
@@ -430,7 +430,7 @@ namespace test {
 
             graphics::UMatChart<float, char> umatChart(700, 700);
             umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<float> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
 
             for (size_t le = 0; le < teachSize; ++le) {
@@ -473,7 +473,7 @@ namespace test {
 
             graphics::UMatChart<float, char> umatChart2(4000, 4000);
             umatChart2.setWindowTitle("UMat2");
-            graphics::ChartThread<float> umchartThread2(&umatChart2);
+            graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
             drawUMat(somCodesMatrix, umatChart2, xdim, ydim, dim);
             umatChart2.saveImage("u-matrix2.png");
 
