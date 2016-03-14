@@ -33,7 +33,7 @@ namespace test {
 
             somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
-            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim);
+            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim);
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), '#');
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'O');
             chart.drawOnWindow();

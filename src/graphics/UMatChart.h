@@ -79,16 +79,19 @@ namespace graphics {
             Chart<UMatCell<Out>>::flush();
         }
 
-        void setUMatWinnerLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim) {
+        void setUMatWinnerLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim, size_t ydim) {
 //            (*Chart<Out>::data->getOutpoints())[index].data = uvalue[i][j];
 
+            size_t umatLen = (2*xdim - 1)*(2*ydim - 1);
+            size_t uxdim = 2*xdim - 1;
+            size_t uydim = 2*ydim - 1;
 
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
 
                 // перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
-                size_t xw = (r) % (xdim);
-                size_t yw = (r) / (xdim);
-                size_t umatIndex = xw + yw*(xdim);
+                size_t xw = (2*r) % (uxdim);
+                size_t yw = (2*r) / (uxdim);
+                size_t umatIndex = xw + 2*yw*(uxdim);
 //                std::cout << "umatIndex: " << umatIndex << std::endl;
 
 //                models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
@@ -116,9 +119,9 @@ namespace graphics {
 
 
 
-                        UMatCell<Out>& ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[2*umatIndex].data;
+                        UMatCell<Out>& ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[umatIndex].data;
 
-//                        if (e.value.scaledCount > 0.9) {
+//                        if (e.value.scaledCount > 0.4) {
                             ucell.labelColor = e.value.scaledCount;
                             ucell.useLabelColor = true;
 //                            std::cout << "ucell.labelColor: " << ucell.labelColor << std::endl;
