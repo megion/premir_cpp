@@ -128,14 +128,16 @@ namespace graphics {
                 size_t ui = 2*xw + 2*yw*uydim;
 
                 models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
+                UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
                 if (lInfo) {
-                    UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[2*r].data;
                     if (keyThreshold<0 || lInfo->scaledCount > keyThreshold) {
                         cell.labelColor = lInfo->scaledCount;
                         cell.useLabelColor = true;
                     } else {
                         cell.useLabelColor = false;
                     }
+                } else {
+                    cell.useLabelColor = false;
                 }
             }
 

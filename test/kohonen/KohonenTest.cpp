@@ -381,8 +381,8 @@ namespace test {
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
-//            umat.medianUMatrix();
-            umat.averageUMatrix();
+            umat.medianUMatrix();
+//            umat.averageUMatrix();
 
             graphics::UMatChart<float, DemoStringKey> umatMChart(500, 740);
             umatMChart.setWindowTitle("UMatM");
@@ -421,6 +421,8 @@ namespace test {
 //            umatMChart.setLabelsForKey(somLabeling.getWinnerLabels(), faultKey, xdim, ydim, -1.0);
             umatMChart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, -1.0);
             umatMChart.drawOnWindow();
+
+            delete somTrainedMatrix;
         }
 
         void test_visible_som_training() {

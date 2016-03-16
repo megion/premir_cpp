@@ -64,7 +64,14 @@ namespace test {
             bool operator!=(const DemoStringKey &other) const {
                 return !((*this) == other);
             }
+
+
         };
+
+//        std::ostream &operator<<(std::ostream &os, const DemoStringKey &val) {
+//            os << "length {" << val.length << "}, label {" << val.label << "}";
+//            return os;
+//        }
 
         class DemoStringKeyHash : public utils::hash::HashEngine<DemoStringKey> {
         public:
@@ -159,7 +166,7 @@ namespace test {
         class DemoFtsCsvFileRowParser : public file::CsvFileRowParser<DemoInRowFts, float> {
 
             bool parseRow(DemoInRowFts &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
-                size_t colSize = 20;
+                size_t colSize = 5;
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
                 }
@@ -170,6 +177,7 @@ namespace test {
                 if (bytesRead == 0) {
                     row.ftsLabel.label[0] = '\0';
                 }
+                row.ftsLabel.length = std::strlen(row.ftsLabel.label);
 
                 return true;
             }
