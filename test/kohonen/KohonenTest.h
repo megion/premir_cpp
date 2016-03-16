@@ -44,6 +44,43 @@ namespace test {
             char label;
         };
 
+        struct DemoStringKey {
+            char label[20];
+            size_t length;
+            void setLabel(const char* val) {
+                size_t len = std::strlen(val);
+                std::memcpy(label, val, len);
+                label[len]='\0';
+                length = len;
+            }
+
+            // compare function for hash map
+            bool operator==(const DemoStringKey &other) const {
+                if(length!=other.length) {
+                    return false;
+                }
+                return std::strncmp(label, other.label, length)==0;
+            }
+            bool operator!=(const DemoStringKey &other) const {
+                return !((*this) == other);
+            }
+        };
+
+        class DemoStringKeyHash : public utils::hash::HashEngine<DemoStringKey> {
+        public:
+            DemoStringKeyHash() : stringHash(utils::hash::StringHash<const char*>()) {
+            }
+            size_t hashCode(const DemoStringKey &value) const {
+                return stringHash.hashCode(value.label);
+            }
+        private:
+            utils::hash::StringHash<const char*> stringHash;
+        };
+
+        struct DemoInRowFts {
+            DemoStringKey ftsLabel;
+        };
+
         class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
 
             bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
@@ -99,6 +136,46 @@ namespace test {
             void initReadFile(file::CsvFileReader *csvReader) {
                 // skip first line
                 csvReader->toEndLine();
+                csvReader->toEndLine();
+            }
+
+        private:
+
+            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0 || buffer[0] == 'x' || buffer[0] == 'X') {
+                    sample.skipped = true;
+                } else {
+                    sample.skipped = false;
+                    sample.value = std::atof(buffer);
+                }
+                return bytesRead;
+            }
+
+        };
+
+        class DemoFtsCsvFileRowParser : public file::CsvFileRowParser<DemoInRowFts, float> {
+
+            bool parseRow(DemoInRowFts &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
+                size_t colSize = 20;
+                for (size_t i = 0; i < colSize; ++i) {
+                    readNextDataSample(samples[i], csvReader);
+                }
+
+                // get label
+                row.ftsLabel.label[0] = '\0';
+                size_t bytesRead = csvReader->read(row.ftsLabel.label, 20);
+                if (bytesRead == 0) {
+                    row.ftsLabel.label[0] = '\0';
+                }
+
+                return true;
+            }
+
+            void initReadFile(file::CsvFileReader *csvReader) {
+                // skip first line
                 csvReader->toEndLine();
             }
 

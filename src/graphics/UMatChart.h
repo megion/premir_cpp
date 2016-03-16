@@ -53,7 +53,8 @@ namespace graphics {
 
             // создадим 1000 оттенков серого
             grayColors = Chart<UMatCell<Out>>::colormap->createGrayColors(1000);
-            labelsColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 2.0, 0.5, 2.0, 1.0);
+//            labelsColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 2.0, 0.5, 2.0, 1.0);
+            labelsColors = Chart<UMatCell<Out>>::colormap->createWavelengthColors(1000);
         }
 
         ~UMatChart() {
@@ -79,53 +80,61 @@ namespace graphics {
             Chart<UMatCell<Out>>::flush();
         }
 
-        void setUMatWinnerLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim, size_t ydim) {
-//            (*Chart<Out>::data->getOutpoints())[index].data = uvalue[i][j];
-
-            size_t umatLen = (2*xdim - 1)*(2*ydim - 1);
+        void setAllLabels(LabelsMatrix* winnerLabels, size_t xdim, size_t ydim, double keyThreshold=-1.0) {
             size_t uxdim = 2*xdim - 1;
             size_t uydim = 2*ydim - 1;
 
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
 
                 // перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
-                size_t xw = (2*r) % (uxdim);
-                size_t yw = (2*r) / (uxdim);
-                size_t umatIndex = xw + 2*yw*(uxdim);
-//                std::cout << "umatIndex: " << umatIndex << std::endl;
+                // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
+                // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
+                size_t xw = r % ydim;
+                size_t yw = r / ydim;
+                size_t ui = 2*xw + 2*yw*uydim;
 
-//                models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
-//                if (lInfo) {
-//                    UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[2*r].data;
-//
-//                    if (lInfo->scaledCount > 0.9) {
-//                        cell.labelColor = lInfo->scaledCount;
-//                        cell.useLabelColor = true;
-//                        std::cout << "cell.labelColor: " << cell.labelColor << std::endl;
-//                    }
-//
-////                    if (cell.useLabelColor) {
-////                        // TODO: назначаем самый
-////                        if (cell.labelColor < lInfo->scaledCount) {
-////                            cell.labelColor = lInfo->scaledCount;
-////                        }
-////                    }
-//                }
                 LabelsRow &row = (*winnerLabels->getMatrix())[r];
                 for (size_t c = 0; c < row.cellSize; ++c) {
                     LabelsCell &cell = row[c];
                     for (size_t p = 0; p < cell.pointSize; ++p) {
                         LabelsEntry &e = cell[p];
-
-
-
-                        UMatCell<Out>& ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[umatIndex].data;
-
-//                        if (e.value.scaledCount > 0.4) {
+                        UMatCell<Out>& ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
+                        if (keyThreshold<0 || e.value.scaledCount > keyThreshold) {
                             ucell.labelColor = e.value.scaledCount;
                             ucell.useLabelColor = true;
-//                            std::cout << "ucell.labelColor: " << ucell.labelColor << std::endl;
-//                        }
+                        } else {
+//                            ucell.labelColor = e.value.scaledCount;
+                            ucell.useLabelColor = false;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        /**
+         * set label
+         */
+        void setLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim, size_t ydim, double keyThreshold=-1.0) {
+            size_t uxdim = 2*xdim - 1;
+            size_t uydim = 2*ydim - 1;
+
+            for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
+                // перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
+                // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
+                // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
+                size_t xw = r % ydim;
+                size_t yw = r / ydim;
+                size_t ui = 2*xw + 2*yw*uydim;
+
+                models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
+                if (lInfo) {
+                    UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[2*r].data;
+                    if (keyThreshold<0 || lInfo->scaledCount > keyThreshold) {
+                        cell.labelColor = lInfo->scaledCount;
+                        cell.useLabelColor = true;
+                    } else {
+                        cell.useLabelColor = false;
                     }
                 }
             }

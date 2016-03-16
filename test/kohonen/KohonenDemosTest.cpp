@@ -22,29 +22,32 @@ namespace test {
 
         void drawUMat(OutCodes *somTrainedMatrix,
                       kohonen::labeling::SomLabeling<char> &somLabeling,
-                      graphics::UMatChart<float, char> &chart, size_t xdim, size_t ydim, size_t dim) {
+                      graphics::UMatChart<float, char> &chart, size_t xdim, size_t ydim, size_t dim, double labelThreshold) {
             kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
-//            umat.medianUMatrix();
+            umat.medianUMatrix();
 //            umat.averageUMatrix();
 
             chart.removeDataSafely();
 
             somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
-            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, labelThreshold);
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), '#');
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'O');
             chart.drawOnWindow();
         }
 
         void test_speech_signal() {
-            size_t xdim = 60;
-            size_t ydim = 80;
+            size_t xdim = 16;
+            size_t ydim = 12;
             size_t dim = 20;
             size_t teachSize = 80000;
+            double radius = 3.0;
+            double alpha = 0.002;
             bool isScale = false;
+            double labelThreshold = -0.5;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex1.dat", ' ');
@@ -65,7 +68,7 @@ namespace test {
 
             kohonen::neighadap::GaussianNeighborAdaptation<float, float> gausAdap(&mapDist, xdim, ydim);
             kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, 0.001, 2.0,
+            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius,
                                                                  xdim, ydim);
 
             // init labeling
@@ -82,7 +85,7 @@ namespace test {
 
 
             double qerror = 0;
-            int step = 10000;
+            int step = 1000;
 //            int step2 = 6000;
 
 //            graphics::SammonMapChart<float> sammonChart(xdim, 1200, 700);
@@ -93,14 +96,16 @@ namespace test {
             graphics::UMatChart<float, char> umatChart(800, 600);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
-            drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
+            drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, labelThreshold);
 
             for (size_t le = 0; le < teachSize; ++le) {
                 models::DataSample<float> samples[colSize];
                 DemoInRow rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
-                    drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
+                    drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, labelThreshold);
+                    // clean drawed data for labels
+                    somLabeling.cleanWinnerLabels();
 
                     // значит достигли конца данных, начинаем читать с начала
                     // установить поток на начало
@@ -118,6 +123,10 @@ namespace test {
                 kohonen::winner::WinnerInfo<float> winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
+//                    somLabeling.addWinner(0, rowData.label);
+//                    char lb = 'A';
+//                    size_t wi = le%(xdim*ydim);
+//                    somLabeling.addWinner(wi, lb);
                     somLabeling.addWinner(winners[0].index, rowData.label);
 //                    int cnt = le % step;
                     qerror += std::sqrt(winners[0].diff);
@@ -140,7 +149,7 @@ namespace test {
             graphics::UMatChart<float, char> umatChart2(2000, 2000);
             umatChart2.setWindowTitle("UMat2");
             graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
-            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim);
+            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim, labelThreshold);
             umatChart2.saveImage("u-matrix-speech-final.png");
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
@@ -153,7 +162,7 @@ namespace test {
 
         void kohonen_demos_test() {
             suite("KohonenDemos");
-            mytest(speech_signal);
+//            mytest(speech_signal);
         }
     }
 }

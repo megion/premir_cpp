@@ -63,6 +63,13 @@ namespace kohonen {
                 winnerLabels->pushValue(winnerIndex, label, info, &winnerLabelsUpdater);
             }
 
+            /**
+             * Clean winner labels hash maps
+             */
+            void cleanWinnerLabels() {
+                winnerLabels->getMatrix()->removeAllRowCells();
+            }
+
             void collectSummary() {
                 // 0. clean prev summary
                 summaryLabels->getMatrix()->removeRowPoints(0);

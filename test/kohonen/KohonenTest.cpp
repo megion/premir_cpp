@@ -367,18 +367,60 @@ namespace test {
             umat.medianUMatrix();
             umatAMChart.addHexaUMatPoints(umat.getUMatrix());
             umatAMChart.drawOnWindow();
-            umatAChart.saveImage("u-mat-m2.png");
+//            umatAChart.saveImage("u-mat-m2.png");
+        }
 
-            // нарисуем медианную матрицу заново
-//            kohonen::umat::HexaUMat<float> umatM(xdim, ydim, dim);
-//            umatM.initializeMat(somTrainedMatrix);
-//            umatM.buildUMatrix();
-//            umatM.medianUMatrix();
-//            graphics::UMatChart<float> umatMChart(500, 740);
-//            umatMChart.setWindowTitle("UMatM");
-//            graphics::ChartThread<float> chartThreadM(&umatMChart);
-//            umatMChart.addHexaUMatPoints(umat.getUMatrix());
-//            umatMChart.draw();
+        void test_umatrix_labeling() {
+            size_t xdim = 16;
+            size_t ydim = 12;
+            size_t dim = 5;
+
+            OutCodes *somTrainedMatrix =
+                    read_codes_file("../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
+
+            kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
+            umat.initializeMat(somTrainedMatrix);
+            umat.buildUMatrix();
+//            umat.medianUMatrix();
+            umat.averageUMatrix();
+
+            graphics::UMatChart<float, DemoStringKey> umatMChart(500, 740);
+            umatMChart.setWindowTitle("UMatM");
+            graphics::ChartThread<graphics::UMatCell<float>> chartThreadAM(&umatMChart);
+            umatMChart.addHexaUMatPoints(umat.getUMatrix());
+            umatMChart.drawOnWindow();
+
+            file::CsvFileReader csvReader("../test/datafiles/kohonen/ex_fts.dat", ' ');
+            DemoFtsCsvFileRowParser demoFtsRowParser;
+            file::stream::CsvFileStreamReader<DemoInRowFts, float> dataReader(&csvReader, &demoFtsRowParser, dim, false);
+
+            // init labeling
+            DemoStringKeyHash strHash;
+            kohonen::labeling::SomLabeling<DemoStringKey> somLabeling(xdim, ydim, &strHash);
+
+
+            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
+            models::DataSample<float> samples[dim];
+            DemoInRowFts rowData;
+            size_t winnerSize = winnerSearcher.getWinnerSize();
+            // поиск победителя
+            std::cout << std::endl;
+            while (dataReader.readNext(rowData, samples)) {
+                kohonen::winner::WinnerInfo<float> winners[winnerSize];
+                bool ok = winnerSearcher.search(somTrainedMatrix, samples, winners);
+                if (ok) {
+                    std::cout << " " << winners[0].index;
+                    somLabeling.addWinner(winners[0].index, rowData.ftsLabel);
+                }
+            }
+            std::cout << std::endl;
+
+            DemoStringKey faultKey;
+            faultKey.setLabel("fault");
+            somLabeling.collectSummary();
+//            umatMChart.setLabelsForKey(somLabeling.getWinnerLabels(), faultKey, xdim, ydim, -1.0);
+            umatMChart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, -1.0);
+            umatMChart.drawOnWindow();
         }
 
         void test_visible_som_training() {
@@ -498,6 +540,7 @@ namespace test {
 
 //            mytest(sammon_visible);
 //            mytest(umatrix_visible);
+            mytest(umatrix_labeling);
 //            mytest(visible_som_training);
         }
     }
