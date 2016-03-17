@@ -80,18 +80,26 @@ namespace graphics {
             Chart<UMatCell<Out>>::flush();
         }
 
-        void setAllLabels(LabelsMatrix* winnerLabels, size_t xdim, size_t ydim, double keyThreshold=-1.0) {
+        /**
+         * перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
+         */
+        size_t toUmatIndexFromWinnerIndex(const size_t& wIndex, const size_t& xdim, const size_t& ydim) {
             size_t uxdim = 2*xdim - 1;
             size_t uydim = 2*ydim - 1;
 
+            // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
+            // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
+            size_t yw = wIndex % ydim;
+            size_t xw = wIndex / ydim;
+            size_t uIndex = 2*yw + 2*xw*uydim;
+//            size_t uIndex = 2*xw + 2*yw*uydim;
+            return uIndex;
+        }
+
+        void setAllLabels(LabelsMatrix* winnerLabels, size_t xdim, size_t ydim, double keyThreshold=-1.0) {
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
 
-                // перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
-                // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
-                // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
-                size_t xw = r % ydim;
-                size_t yw = r / ydim;
-                size_t ui = 2*xw + 2*yw*uydim;
+                size_t ui = toUmatIndexFromWinnerIndex(r, xdim, ydim);
 
                 LabelsRow &row = (*winnerLabels->getMatrix())[r];
                 for (size_t c = 0; c < row.cellSize; ++c) {
@@ -116,16 +124,9 @@ namespace graphics {
          * set label
          */
         void setLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim, size_t ydim, double keyThreshold=-1.0) {
-            size_t uxdim = 2*xdim - 1;
-            size_t uydim = 2*ydim - 1;
-
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
-                // перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
-                // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
-                // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
-                size_t xw = r % ydim;
-                size_t yw = r / ydim;
-                size_t ui = 2*xw + 2*yw*uydim;
+
+                size_t ui = toUmatIndexFromWinnerIndex(r, xdim, ydim);
 
                 models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
                 UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
