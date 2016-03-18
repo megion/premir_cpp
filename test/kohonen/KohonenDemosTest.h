@@ -43,6 +43,16 @@ namespace test {
             char label;
         };
 
+        class SpeechLabelColorMapper : public graphics::LabelColorMapper<char> {
+            graphics::Color labelToColor(const char& label) const {
+                graphics::Color c;
+                int l = (int)label;
+                graphics::calculateWavelengthColor(l, 20, 100, c.r, c.g, c.b);
+                return c;
+            }
+
+        };
+
         class KohonenDemo2CsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
 
             bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {

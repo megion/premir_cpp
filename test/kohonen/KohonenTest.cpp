@@ -419,7 +419,7 @@ namespace test {
             faultKey.setLabel("fault");
             somLabeling.collectSummary();
 //            umatMChart.setLabelsForKey(somLabeling.getWinnerLabels(), faultKey, xdim, ydim, -1.0);
-            umatMChart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, -1.0);
+            umatMChart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, nullptr, -1.0);
             umatMChart.drawOnWindow();
 
             delete somTrainedMatrix;
@@ -542,7 +542,7 @@ namespace test {
 
 //            mytest(sammon_visible);
 //            mytest(umatrix_visible);
-            mytest(umatrix_labeling);
+//            mytest(umatrix_labeling);
 //            mytest(visible_som_training);
         }
     }

@@ -33,15 +33,22 @@ namespace test {
 
             somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
-            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, labelThreshold);
+//            graphics::Color colorA(65535, 0, 0);
+//            graphics::Color colorI(0, 65535, 0);
+//            graphics::Color colorN(0, 0, 65535);
+//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, colorA, labelThreshold);
+//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'I', xdim, ydim, colorI, labelThreshold);
+//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'N', xdim, ydim, colorN, labelThreshold);
+            SpeechLabelColorMapper mapper;
+            chart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, &mapper, labelThreshold);
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), '#');
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'O');
             chart.drawOnWindow();
         }
 
         void test_speech_signal() {
-            size_t xdim = 16;
-            size_t ydim = 12;
+            size_t xdim = 100;
+            size_t ydim = 100;
             size_t dim = 20;
             size_t teachSize = 80000;
             double radius = 3.0;
@@ -93,7 +100,7 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float, char> umatChart(800, 600);
+            graphics::UMatChart<float, char> umatChart(800, 800);
             umatChart.setWindowTitle("UMat");
             graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, labelThreshold);
@@ -162,7 +169,7 @@ namespace test {
 
         void kohonen_demos_test() {
             suite("KohonenDemos");
-//            mytest(speech_signal);
+            mytest(speech_signal);
         }
     }
 }

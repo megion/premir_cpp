@@ -32,5 +32,6 @@ add_executable(dummy_executable
         test/coursera/CourseraTest.cpp
         src/ml/DigitalFilter.cpp
         src/utils/matrix_utils.cpp
+        src/graphics/color_utils.cpp
         test/test.cpp
         )
