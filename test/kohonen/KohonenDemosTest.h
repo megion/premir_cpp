@@ -7,6 +7,7 @@
 #include "test.h"
 #include "kohonen/NetworkInitializer.h"
 #include "file/CsvFileReader.h"
+#include "file/CsvFileWriter.h"
 #include "file/CsvFileRowParser.h"
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
@@ -24,6 +25,7 @@
 #include "kohonen/mapdist/RectMapDistance.h"
 
 #include "kohonen/SomTrainer.h"
+#include "kohonen/SomKeeper.h"
 #include "kohonen/SammonMap.h"
 #include "kohonen/labeling/SomLabeling.h"
 

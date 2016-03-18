@@ -68,6 +68,11 @@ namespace test {
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
+            kohonen::SomKeeper<float> somKeeper;
+            file::CsvFileWriter somInitOutFile("speech_som_initialized.cod");
+            somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
+            somInitOutFile.close();
+
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
             kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
@@ -163,6 +168,10 @@ namespace test {
 //            sammonChart2.setWindowTitle("Sammon Map2");
 //            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
+
+            file::CsvFileWriter trainedOutFile("speech_som_trained.cod");
+            somKeeper.saveSom(somCodesMatrix, &trainedOutFile);
+            trainedOutFile.close();
 
             delete somCodesMatrix;
         }
