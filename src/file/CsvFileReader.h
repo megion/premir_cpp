@@ -133,6 +133,14 @@ namespace file {
             return bytesRead;
         }
 
+        size_t read(long &v) {
+            char buffer[64];
+            *buffer = '\0';
+            size_t bytesRead = nextValue(buffer, 64);
+            v = std::atol(buffer);
+            return bytesRead;
+        }
+
         size_t read(char &v) {
             char buffer[2];
             *buffer = '\0';

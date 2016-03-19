@@ -20,6 +20,9 @@
 
 namespace test {
     namespace sspy {
+
+        // "/home/ilya/share/Documents/ml/SmartSpy/[Content]"
+        const static char* BIG_DATA_FILE_PATH = "/run/media/ilya/Elements/SmartSpy/[Content]";
         void sspy_data_read_test();
     }
 }

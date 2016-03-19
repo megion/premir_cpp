@@ -2,12 +2,13 @@
 
 namespace test {
     namespace sspy {
+
         void test_read_sspy_data_file_by_line() {
 //            file::LineFileReader<char> fr(
 //                    "/home/ilya/share/Documents/ml/SmartSpy/[Content]");
             // 17/11/2014 00:27:13.661
-            file::LineFileReader<char> lineReader(
-                    "/home/ilya/share/Documents/ml/SmartSpy/[Content]");
+            // /run/media/ilya/Elements/SmartSpy/\[Content\]
+            file::LineFileReader<char> lineReader(BIG_DATA_FILE_PATH);
 
             file::LineFileReader<char>::LineBuffer buf;
             while (lineReader.readNextLine(&buf, true) &&
@@ -27,8 +28,7 @@ namespace test {
 
         void test_csv_parse_sspy_data_file() {
             // sudo mount -t vboxsf izadorozhny ~/share
-            file::CsvFileReader reader(
-                    "/home/ilya/share/Documents/ml/SmartSpy/[Content]", ' ');
+            file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             while (reader.hasNext() && reader.getLineNumber() < 10) {
                 SspyData row;
                 reader.read(row.counter);
