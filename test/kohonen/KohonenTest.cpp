@@ -55,8 +55,8 @@ namespace test {
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex.dat", ' ');
             KohonenDemoCsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
-            file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary(0);
+            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            summary.collectSummary(0, &csvReader, &demoRowParser);
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
@@ -436,8 +436,8 @@ namespace test {
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex.dat", ' ');
             KohonenDemo2CsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
-            file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary(0); // 0 - значит без ограничений
+            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            summary.collectSummary(0, &csvReader, &demoRowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);

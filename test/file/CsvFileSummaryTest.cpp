@@ -9,8 +9,8 @@ namespace test {
             file::CsvFileReader csvReader("../test/datafiles/demo_summary.dat", ' ');
             MyCsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<MyInRow, double> dataReader(&csvReader, &demoRowParser);
-            file::CsvFileSummary<MyInRow, double> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary(0);
+            file::CsvFileSummary<MyInRow, double> summary(dim);
+            summary.collectSummary(0, &csvReader, &demoRowParser);
 //            summary.getSummary()->print();
 
             models::ColSummary<double>* stats = summary.getSummary()->getArray();
@@ -33,6 +33,13 @@ namespace test {
 
             assert_range(0.52517, stats[0].scaledAverage, 0.00001);
             assert_range(0.582949, stats[19].scaledAverage, 0.00001);
+
+            utils::CArrayList<models::ColSummary<double>> copySummary(*summary.getSummary());
+            summary.writeSummary("test_csv_file_summary.cod");
+            summary.readSummary("test_csv_file_summary.cod");
+
+            assert_range(copySummary[6].sum, (*summary.getSummary())[6].sum, 0.001);
+            assert_range(copySummary[8].scaledAverage, (*summary.getSummary())[8].scaledAverage, 0.001);
         }
 
         void file_csvFileSummary_test() {

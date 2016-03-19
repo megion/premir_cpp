@@ -57,6 +57,14 @@ namespace file {
             std::fprintf(fp, "%g ", v);
         }
 
+        void write(long &v) {
+            std::fprintf(fp, "%ld ", v);
+        }
+
+        void write(size_t &v) {
+            std::fprintf(fp, "%lu ", v);
+        }
+
     private:
         FILE *fp;
 //        size_t chSizeof; // saved value sizeof

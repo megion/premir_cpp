@@ -53,16 +53,20 @@ namespace test {
             size_t teachSize = 80000;
             double radius = 3.0;
             double alpha = 0.002;
-            bool isScale = false;
+            bool isScale = true;
             double labelThreshold = -0.5;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex1.dat", ' ');
             KohonenDemo2CsvFileRowParser demoRowParser;
             file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
-            file::CsvFileSummary<DemoInRow, float> summary(&csvReader, &demoRowParser, dim);
-            summary.collectSummary(0); // 0 - значит без ограничений
+            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            summary.collectSummary(0, &csvReader, &demoRowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
+
+            // TODO: test summary save
+            summary.writeSummary("test_speech_signal_summary.cod");
+            summary.readSummary("test_speech_signal_summary.cod");
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
@@ -178,7 +182,7 @@ namespace test {
 
         void kohonen_demos_test() {
             suite("KohonenDemos");
-            mytest(speech_signal);
+//            mytest(speech_signal);
         }
     }
 }

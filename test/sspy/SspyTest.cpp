@@ -11,7 +11,7 @@ namespace test {
 
             file::LineFileReader<char>::LineBuffer buf;
             while (lineReader.readNextLine(&buf, true) &&
-                   lineReader.getLineNumber() <= 10) {
+                   lineReader.getLineNumber() <= 3) {
                 std::cout << buf.buffer << std::endl;
                 std::cout << std::endl;
                 std::cout << std::endl;
@@ -26,6 +26,7 @@ namespace test {
         }
 
         void test_csv_parse_sspy_data_file() {
+            // sudo mount -t vboxsf izadorozhny ~/share
             file::CsvFileReader reader(
                     "/home/ilya/share/Documents/ml/SmartSpy/[Content]", ' ');
             while (reader.hasNext() && reader.getLineNumber() < 10) {
@@ -49,8 +50,8 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-//            mytest(read_sspy_data_file_by_line);
-//            mytest(csv_parse_sspy_data_file);
+            mytest(read_sspy_data_file_by_line);
+            mytest(csv_parse_sspy_data_file);
         }
     }
 }
