@@ -48,10 +48,24 @@ namespace test {
             }
         }
 
+        void test_collect_summary_sspy_data_file() {
+            size_t dim = 33;
+            file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
+            SspyRowParser rowParser;
+            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+            file::CsvFileSummary<SspyData, double> summary(dim);
+            summary.collectSummary(0, &reader, &rowParser); // 0 - значит без ограничений
+//            summary.getSummary()->print();
+
+            // TODO: summary save
+            summary.writeSummary("sspy_data_summary_1.cod");
+        }
+
         void sspy_data_read_test() {
             suite("Sspy_test");
             mytest(read_sspy_data_file_by_line);
             mytest(csv_parse_sspy_data_file);
+            mytest(collect_summary_sspy_data_file);
         }
     }
 }
