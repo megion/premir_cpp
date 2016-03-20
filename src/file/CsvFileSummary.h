@@ -58,11 +58,13 @@ namespace file {
             size_t rowIndex = 0;
             while (reader.readNext(row, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
                 // print process
-                if(rowIndex%100000==0) {
-                    std::cout<<".";
-                }
-                if(rowIndex%1000000==0) {
-                    std::cout<<std::endl<<rowIndex<<std::endl;
+                if(rowIndex!=0) {
+                    if (rowIndex%100000==0) {
+                        std::cout<<".";
+                    }
+                    if(rowIndex%1000000==0) {
+                        std::cout<<std::endl<<rowIndex<<std::endl;
+                    }
                 }
 
                 for (size_t i = 0; i < colSize; ++i) {

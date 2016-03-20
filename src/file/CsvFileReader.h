@@ -187,7 +187,7 @@ namespace file {
                 }
 
                 if (i >= bufferSize) {
-                    std::cout<<"buffer: "<<buffer<< " size: "<< bufferSize << " current index: " << i << std::endl;
+                    std::cout<<"buffer: "<<buffer<< " size: "<< bufferSize << std::endl;
                     danger_text("buffer is overfull, use dynamic buffer");
                     throw std::runtime_error("local buffer is overfull");
                 }

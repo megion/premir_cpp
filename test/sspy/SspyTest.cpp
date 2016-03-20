@@ -3,6 +3,15 @@
 namespace test {
     namespace sspy {
 
+        /**
+         * return interval of time (uses time.h)
+         */
+        double get_time() {
+            struct timeval timev;
+            gettimeofday(&timev, NULL);
+            return (double) timev.tv_sec + (((double) timev.tv_usec) / 1000000);
+        }
+
         void test_read_sspy_data_file_by_line() {
 //            file::LineFileReader<char> fr(
 //                    "/home/ilya/share/Documents/ml/SmartSpy/[Content]");
@@ -58,14 +67,17 @@ namespace test {
 //            summary.getSummary()->print();
 
             // TODO: summary save
-            summary.writeSummary("sspy_data_summary_1.cod");
+            summary.writeSummary("sspy_data_summary_2.cod");
         }
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-//            mytest(read_sspy_data_file_by_line);
-//            mytest(csv_parse_sspy_data_file);
-            mytest(collect_summary_sspy_data_file);
+            mytest(read_sspy_data_file_by_line);
+            mytest(csv_parse_sspy_data_file);
+            double start = get_time();
+//            mytest(collect_summary_sspy_data_file);
+            double summaryTime = get_time() - start;
+            printf("Summary time: %f\n", summaryTime);
         }
     }
 }

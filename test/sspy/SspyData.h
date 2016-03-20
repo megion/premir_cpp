@@ -57,7 +57,7 @@ namespace test {
             char stream_type; // Тип медиапотока
             char date[11]; // Дата события DD/MM/YYYY
             char time[13]; // Дата события HH:MM:SS.mmm
-            char interval[10]; // MM:SS.mmm Интервал времени, за который собрана статистика, с точностью до миллисекунд
+            char interval[20]; // MM:SS.mmm Интервал времени, за который собрана статистика, с точностью до миллисекунд
             char mac[18]; // xx:xx:xx:xx:xx:xx
             char stream_addr[16]; // xxx.xxx.xxx.xxx
             long received; // Количество UDP-пакетов, полученных за интервал времени
@@ -149,7 +149,7 @@ namespace test {
                 reader->read(row.stream_type);
                 reader->read(row.date, 11);
                 reader->read(row.time, 13);
-                reader->read(row.interval, 10);
+                reader->read(row.interval, 20);
 
                 double interval = calculateInterval(row);
 //                if (interval==0) {
@@ -324,22 +324,24 @@ namespace test {
         private:
 
             double calculateInterval(SspyData &row) {
-                // calculate interval in msec.
-                char mm[3];
-                mm[0] = row.interval[0];
-                mm[1] = row.interval[1];
-                mm[2] = '\0';
-                char ss[3];
-                ss[0] = row.interval[3];
-                ss[1] = row.interval[4];
-                ss[2] = '\0';
-                char mmm[4];
-                mmm[0] = row.interval[6];
-                mmm[1] = row.interval[7];
-                mmm[2] = row.interval[8];
-                mmm[3] = '\0';
+                // calculate interval in msec. MM:SS.mmm
+                char *token = std::strtok(row.interval, ":.");
 
-                return 60000.0 * std::atof(mm) + 1000.0 * std::atof(ss) + std::atof(mmm);
+                double mm = 0, ss = 0, mmm = 0;
+                short i = 0;
+                while (token != NULL) {
+                    if (i==0) {
+                        mm = std::atof(token);
+                    } else if (i==1) {
+                        ss = std::atof(token);
+                    } else if (i==2) {
+                        mmm = std::atof(token);
+                    }
+                    token = std::strtok(NULL, ":.");
+                    ++i;
+                }
+
+                return 60000.0 * mm + 1000.0 * ss + mmm;
             }
 
             size_t readRequiredSample(models::DataSample<double> &sample, file::CsvFileReader *reader) {
