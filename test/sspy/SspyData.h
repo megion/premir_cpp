@@ -152,10 +152,10 @@ namespace test {
                 reader->read(row.interval, 10);
 
                 double interval = calculateInterval(row);
-                if (interval==0) {
-                    // статистика не доступна
-                    std::cout << "interval == 0. Statistics not available" << std::endl;
-                }
+//                if (interval==0) {
+//                    // статистика не доступна
+//                    std::cout << "interval == 0. Statistics not available" << std::endl;
+//                }
 
                 reader->read(row.mac, 18);
                 reader->read(row.stream_addr, 16);
