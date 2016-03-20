@@ -57,7 +57,6 @@ namespace file {
             models::DataSample<Num> samples[colSize];
             size_t rowIndex = 0;
             while (reader.readNext(row, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
-
                 // print process
                 if(rowIndex%100000==0) {
                     std::cout<<".";

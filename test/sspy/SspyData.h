@@ -88,7 +88,7 @@ namespace test {
             char server_date[11]; // DD/MM/YYYY Дата сервера, в момент получения сообщения от приставки
             char server_time[13]; // HH:MM:SS.mmm Время сервера, в момент получения сообщения от приставки
             char spy_version[64]; // Версия агента Spy на приставке
-            char player_url[64]; // Текущий (последний запущенный) URL в плеере STB X = нет данных
+            char player_url[1024]; // Текущий (последний запущенный) URL в плеере STB X = нет данных
             int content_type; // Тип контента (см. раздел Значения поля CONTENT_TYPE) X = нет данных
             int transport_outer; // Тип транспорта, см раздел Значения поля "Типы транспорта" X = нет данных
             int transport_inner; // Подтип транспорта (внутренний/дополнительный подтип), X = нет данных
@@ -217,7 +217,7 @@ namespace test {
                 reader->read(row.server_date, 11);
                 reader->read(row.server_time, 13);
                 reader->read(row.spy_version, 64);
-                reader->read(row.player_url, 64);
+                reader->read(row.player_url, 1024);
                 reader->read(row.content_type);
                 reader->read(row.transport_outer);
                 reader->read(row.transport_inner);
