@@ -87,8 +87,14 @@ namespace file {
             // вычислим среднее
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary<Num> &colSummary = (*summary)[i];
-                colSummary.average = colSummary.sum / colSummary.count;
-                colSummary.scaledAverage = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
+                if (colSummary.count==0 || (colSummary.max == colSummary.min)) {
+                    // no elements for this column
+                    colSummary.average = 0;
+                    colSummary.scaledAverage = 0;
+                } else {
+                    colSummary.average = colSummary.sum / (double) colSummary.count;
+                    colSummary.scaledAverage = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
+                }
             }
         }
 
@@ -103,13 +109,20 @@ namespace file {
             size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary<Num> &colSummary = (*summary)[i];
-                samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);
-                if (samples[i].value > 1) {
-                    samples[i].value = 1;
-                }
-                if (samples[i].value < 0) {
+                if (colSummary.count==0 || (colSummary.max == colSummary.min)) {
+                    // статистики нет по колонке.
+                    samples[i].skipped = true;
                     samples[i].value = 0;
+                } else {
+                    samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);
+                    if (samples[i].value > 1) {
+                        samples[i].value = 1;
+                    }
+                    if (samples[i].value < 0) {
+                        samples[i].value = 0;
+                    }
                 }
+
             }
         }
 
@@ -151,7 +164,7 @@ namespace file {
 
         void initialization() {
             size_t colSize = summary->size();
-            Num min = std::numeric_limits<Num>::min();
+            Num min = -std::numeric_limits<Num>::max();
             Num max = std::numeric_limits<Num>::max();
             // initialization
             for (size_t i = 0; i < colSize; ++i) {

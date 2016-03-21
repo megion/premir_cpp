@@ -56,7 +56,7 @@ namespace kohonen {
                 UMatCodes &uvalue = (*uMatrix);
 
                 /* find the minimum and maximum values */
-                Out max = std::numeric_limits<Out>::min();
+                Out max = -std::numeric_limits<Out>::max();
                 Out min = std::numeric_limits<Out>::max();
 
                 for (size_t i = 0; i < uxdim; i++) {

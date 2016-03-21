@@ -3,6 +3,8 @@
 namespace test {
     namespace sspy {
 
+        typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
+
         /**
          * return interval of time (uses time.h)
          */
@@ -58,7 +60,8 @@ namespace test {
         }
 
         void test_collect_summary_sspy_data_file() {
-            size_t dim = 33;
+            double start = get_time();
+            size_t dim = 24;
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
             file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
@@ -67,17 +70,47 @@ namespace test {
 //            summary.getSummary()->print();
 
             // TODO: summary save
-            summary.writeSummary("sspy_data_summary_2.cod");
+            summary.writeSummary("sspy_data_summary_5.cod");
+            double summaryTime = get_time() - start;
+            printf("Summary time: %f\n", summaryTime/60.0);
+        }
+
+        void test_initialization_codes_sspy() {
+            double start = get_time();
+            size_t dim = 24;
+            size_t xdim = 160;
+            size_t ydim = 160;
+            bool isScale = true;
+
+            file::CsvFileSummary<SspyData, double> summary(dim);
+            summary.readSummary("sspy_data_summary_5.cod");
+            summary.getSummary()->print();
+
+            file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
+            SspyRowParser rowParser;
+            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+            kohonen::NetworkInitializer<SspyData, double, double> initializer(&dataReader, &summary);
+            kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
+            randomEngine->setNextValue(1);
+            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
+
+            kohonen::SomKeeper<double> somKeeper;
+            file::CsvFileWriter somInitOutFile("sspy_som_initialized_1.cod");
+            somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
+            somInitOutFile.close();
+
+            delete somCodesMatrix;
+
+            double summaryTime = get_time() - start;
+            printf("Initialization time: %f\n", summaryTime/60.0);
         }
 
         void sspy_data_read_test() {
             suite("Sspy_test");
             mytest(read_sspy_data_file_by_line);
             mytest(csv_parse_sspy_data_file);
-            double start = get_time();
 //            mytest(collect_summary_sspy_data_file);
-            double summaryTime = get_time() - start;
-            printf("Summary time: %f\n", summaryTime);
+            mytest(initialization_codes_sspy);
         }
     }
 }
