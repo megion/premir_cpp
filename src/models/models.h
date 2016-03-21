@@ -30,6 +30,10 @@ namespace models {
             return isScale ? scaledAverage : average;
         }
 
+        bool isSkip() const {
+            return (count==0) || (max == min);
+        }
+
         bool operator==(const ColSummary<T> &other) const {
             if ((other.min != min) || (other.max != max) || (other.sum != sum) || (other.average != average) ||
                 (other.scaledAverage != scaledAverage) || (other.count != count)) {

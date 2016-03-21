@@ -23,8 +23,8 @@
 namespace test {
     namespace sspy {
 
-        const static char* BIG_DATA_FILE_PATH = "/home/ilya/share/Documents/ml/SmartSpy/[Content]";
-//        const static char* BIG_DATA_FILE_PATH = "/run/media/ilya/Elements/SmartSpy/[Content]";
+//        const static char* BIG_DATA_FILE_PATH = "/home/ilya/share/Documents/ml/SmartSpy/[Content]";
+        const static char* BIG_DATA_FILE_PATH = "/run/media/ilya/Elements/SmartSpy/[Content]";
         void sspy_data_read_test();
     }
 }

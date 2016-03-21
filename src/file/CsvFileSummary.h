@@ -87,19 +87,21 @@ namespace file {
             // вычислим среднее
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary<Num> &colSummary = (*summary)[i];
-                if (colSummary.count==0 || (colSummary.max == colSummary.min)) {
-                    // no elements for this column
-                    colSummary.average = 0;
-                    colSummary.scaledAverage = 0;
-                } else {
+                if (!colSummary.isSkip()) {
                     colSummary.average = colSummary.sum / (double) colSummary.count;
                     colSummary.scaledAverage = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
                 }
             }
+
+            calculateActualColSize();
         }
 
         utils::CArrayList<models::ColSummary<Num>> *getSummary() {
             return summary;
+        }
+
+        size_t getActualColSize() {
+            return actualColSize;
         }
 
         /**
@@ -140,8 +142,6 @@ namespace file {
                 writer.write(colSummary.sum);
                 writer.endLine();
             }
-
-//            writer.close();
         }
 
         void readSummary(const char *filename) {
@@ -156,11 +156,24 @@ namespace file {
             while ((col < colSize) && dataReader.readNext((*summary)[col], nullptr)) {
                 col++;
             }
+            calculateActualColSize();
         }
 
 
     private:
         utils::CArrayList<models::ColSummary<Num>> *summary;
+        size_t actualColSize; // фактическое число колнок
+
+        void calculateActualColSize() {
+            size_t colSize = summary->size();
+            actualColSize = colSize;
+            for (size_t i = 0; i < colSize; ++i) {
+                models::ColSummary<Num> &colSummary = (*summary)[i];
+                if(colSummary.isSkip()) {
+                    actualColSize--;
+                }
+            }
+        }
 
         void initialization() {
             size_t colSize = summary->size();

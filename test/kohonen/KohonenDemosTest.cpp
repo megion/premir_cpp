@@ -33,14 +33,14 @@ namespace test {
 
             somLabeling.collectSummary();
             chart.addHexaUMatPoints(umat.getUMatrix());
-//            graphics::Color colorA(65535, 0, 0);
-//            graphics::Color colorI(0, 65535, 0);
-//            graphics::Color colorN(0, 0, 65535);
-//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, colorA, labelThreshold);
-//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'I', xdim, ydim, colorI, labelThreshold);
-//            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'N', xdim, ydim, colorN, labelThreshold);
+            graphics::Color colorA(65535, 0, 0);
+            graphics::Color colorI(0, 65535, 0);
+            graphics::Color colorN(0, 0, 65535);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, colorA, labelThreshold);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'I', xdim, ydim, colorI, labelThreshold);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'N', xdim, ydim, colorN, labelThreshold);
             SpeechLabelColorMapper mapper;
-            chart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, &mapper, labelThreshold);
+//            chart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, &mapper, labelThreshold);
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), '#');
 //            chart.setUMatWinnerLabelsForKey(somLabeling.getWinnerLabels(), 'O');
             chart.drawOnWindow();
@@ -53,19 +53,19 @@ namespace test {
             size_t teachSize = 80000;
             double radius = 3.0;
             double alpha = 0.002;
-            bool isScale = true;
+            bool isScale = false;
             double labelThreshold = -0.5;
 
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex1.dat", ' ');
             KohonenDemo2CsvFileRowParser demoRowParser;
-            file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser, dim, false);
+            file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser);
             file::CsvFileSummary<DemoInRow, float> summary(dim);
-            summary.collectSummary(0, &csvReader, &demoRowParser); // 0 - значит без ограничений
+//            summary.collectSummary(0, &csvReader, &demoRowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
 
             // TODO: test summary save
-            summary.writeSummary("test_speech_signal_summary.cod");
+//            summary.writeSummary("test_speech_signal_summary.cod");
             summary.readSummary("test_speech_signal_summary.cod");
 
             kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
@@ -73,9 +73,10 @@ namespace test {
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
             kohonen::SomKeeper<float> somKeeper;
-            file::CsvFileWriter somInitOutFile("speech_som_initialized.cod");
+            file::CsvFileWriter somInitOutFile("speech_som_initialized_2.cod");
             somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
             somInitOutFile.close();
+//            somCodesMatrix->print();
 
 
             kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;

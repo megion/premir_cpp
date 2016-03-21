@@ -128,6 +128,16 @@ namespace kohonen {
             InRow rowData;
             size_t rowIndex = 0;
             while (dataReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
+                // print process
+                if(rowIndex!=0) {
+                    if (rowIndex%100000==0) {
+                        std::cout<<".";
+                    }
+                    if(rowIndex%1000000==0) {
+                        std::cout<<std::endl<<rowIndex<<std::endl;
+                    }
+                }
+
                 if (isScale) {
                     summary->scaleSamples(samples);
                 }
@@ -153,6 +163,8 @@ namespace kohonen {
                     squareMatrix(j, i) = squareMatrix(i, j);
                 }
             }
+
+            squareMatrix.print();
 
             // матрица из двух векторов заполненая случайными нормализованными значениями
             utils::SMatrix<Out> uVectors(eigenVectorsCount, colSize);

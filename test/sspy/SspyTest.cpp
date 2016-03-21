@@ -78,9 +78,9 @@ namespace test {
         void test_initialization_codes_sspy() {
             double start = get_time();
             size_t dim = 24;
-            size_t xdim = 160;
-            size_t ydim = 160;
-            bool isScale = true;
+            size_t xdim = 3;
+            size_t ydim = 2;
+            bool isScale = false;
 
             file::CsvFileSummary<SspyData, double> summary(dim);
             summary.readSummary("sspy_data_summary_5.cod");
@@ -92,10 +92,11 @@ namespace test {
             kohonen::NetworkInitializer<SspyData, double, double> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
-            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
+            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale, 10);
+            somCodesMatrix->print();
 
             kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter somInitOutFile("sspy_som_initialized_1.cod");
+            file::CsvFileWriter somInitOutFile("sspy_som_initialized_2.cod");
             somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
             somInitOutFile.close();
 
@@ -107,8 +108,8 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-            mytest(read_sspy_data_file_by_line);
-            mytest(csv_parse_sspy_data_file);
+//            mytest(read_sspy_data_file_by_line);
+//            mytest(csv_parse_sspy_data_file);
 //            mytest(collect_summary_sspy_data_file);
             mytest(initialization_codes_sspy);
         }
