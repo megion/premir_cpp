@@ -104,7 +104,7 @@ struct entries *remove_identicals(struct entries *codes, int *rem)
     prev = p1.current;
     while (entr1 != NULL) {
       if (distance(entr, entr1, dim) == 0.0) {
-//        printf( "(entries %d, %d), removing one.\n", ii, ij);
+        printf( "(entries %d, %d), removing one.\n", ii, ij);
 	fprintf(stderr, "Identical entries in codebook ");
         fprintf(stderr, "(entries %d, %d), removing one.\n", ii, ij);
         *rem = 1;
@@ -180,7 +180,7 @@ struct entries *sammon_iterate(struct entries *codes, int length)
       dd[mutual] = distance(entr, entr1, dim);
 //      printf("%d x %d  dd[i] %f\n", ii, jj, dd[mutual]);
       if (dd[mutual] == 0.0) {
-//        printf("%d  dd[i] %f\n", mutual, dd[mutual]);
+        printf("%d  dd[i] %f\n", mutual, dd[mutual]);
 	fprintf(stderr, "Identical entries in codebook\n");
       }
       mutual++;
@@ -223,7 +223,7 @@ struct entries *sammon_iterate(struct entries *codes, int length)
       yu[j] = y[j] + MAGIC * e1y / fabs(e2y);
     }
 
-    printf("%d xu[0] %f yu[0] %f\n", i, xu[0], yu[0]);
+//    printf("%d xu[0] %f yu[0] %f\n", i, xu[0], yu[0]);
     
     /* Move the center of mass to the center of picture */
     xx = yy = 0.0;
@@ -255,7 +255,7 @@ struct entries *sammon_iterate(struct entries *codes, int length)
 
 //    if (i==0 || i==1) {
 //    fprintf(stdout, "tot: %f\n", tot);
-//      fprintf(stdout, "Mapping error: %f\n", e);
+      fprintf(stdout, "Mapping error: %f\n", e);
 //    }
 
     ifverbose(2)

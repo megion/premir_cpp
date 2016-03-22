@@ -64,14 +64,15 @@ namespace kohonen {
 
             size_t mutualIndex = 0;
             size_t colSize = trainedSom->getColSize();
-            size_t numIdentical = 0;
+//            size_t numIdentical = 0;
             for (size_t i = 0; i < trainedSom->getRowSize(); ++i) {
                 Neuron &ni = trainedSom->getRow(i);
-                ni.data.skipped = false; // сбросить флаг в начале
+//                ni.data.skipped = false; // сбросить флаг в начале
                 for (size_t j = 0; j < trainedSom->getRowSize(); ++j) {
                     if (i == j) {
                         break;
                     }
+
                     Neuron &nj = trainedSom->getRow(j);
                     Out dist = ArrayUtils::euclideanDistance(ni.points, nj.points, colSize);
                     (*dd)[mutualIndex] = dist;
@@ -79,22 +80,18 @@ namespace kohonen {
 
                     if (dist == 0) {
                         // нейроны идентичны
-                        ni.data.skipped = true;
-                        numIdentical++;
+//                            ni.data.skipped = true;
                         // TODO: необходимо удалять идентичные нейроны, иначе отображение sammon не будет построенно
                         // другими словами среди взаимных расстояний не может быть == 0
-//                        danger_text("skip identical neuron");
-//                        std::cout << "Neuron " << i << " equal neuron " << j << std::endl;
+                        // если нейрон был удален то уже трудно будет построить линии на графике
+                        // (точки при этом строятся в не зависимости был ли удален нейрон или нет)
+                        danger_text("skip identical neuron");
+                        std::cout << "Neuron " << i << " equal neuron " << j << std::endl;
                         // выйдем из цикла и начнем новую итерацию верхнего
                         // цикла
 //                        break;
                     }
                 }
-            }
-
-            if (numIdentical>0) {
-                std::cout << "warning: Found identical neurons: " << numIdentical << " total number: " <<
-                trainedSom->getRowSize() << std::endl;
             }
         }
 
@@ -165,7 +162,7 @@ namespace kohonen {
             }
 
             e /= tot;
-//                std::cout << "Mapping error " << e << std::endl;
+            std::cout << "Mapping error " << e << std::endl;
         }
 
         /**

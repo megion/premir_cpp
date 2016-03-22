@@ -94,7 +94,7 @@ namespace test {
             randomEngine->setNextValue(1);
             sammonMap.initializeMap(somMatrix);
 
-            for (size_t i = 0; i < 200; ++i) {
+            for (size_t i = 0; i < 100; ++i) {
                 sammonChart.removeDataSafely();
                 sammonMap.doOneIteration();
                 sammonChart.addSammonMapPoints(sammonMap.getMapPoints());
@@ -155,7 +155,7 @@ namespace test {
             size_t xdim = 80;
 //            size_t ydim = 80;
 
-            OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", dim, 0);
+            OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", 0, dim);
             graphics::SammonMapChart<double> sammonChart2(xdim, 1200, 700);
             sammonChart2.setWindowTitle("Sammon map for initialized codes");
             graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
