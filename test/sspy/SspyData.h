@@ -185,23 +185,26 @@ namespace test {
 //                }
 //                ++i;
 
-                readUnsignedSample(samples[i], reader); // 5 lost
+//                readUnsignedSample(samples[i], reader); // lost
+//                ++i;
+//
+//                readUnsignedSample(samples[i], reader); // restored
+//                ++i;
+                reader->read(row.lost);
+                reader->read(row.restored);
+
+                readUnsignedSample(samples[i], reader); // 5 overflow
                 ++i;
 
-                readUnsignedSample(samples[i], reader); // 6 restored
+                readUnsignedSample(samples[i], reader); // 6 underflow
                 ++i;
 
-                readUnsignedSample(samples[i], reader); // 7 overflow
+                readUnsignedSample(samples[i], reader); // 7 mdi_df
                 ++i;
 
-                readUnsignedSample(samples[i], reader); // 8 underflow
-                ++i;
-
-                readUnsignedSample(samples[i], reader); // 9 mdi_df
-                ++i;
-
-                readUnsignedSample(samples[i], reader); // 10 mdi_mlr
-                ++i;
+//                readUnsignedSample(samples[i], reader); // mdi_mlr
+//                ++i;
+                reader->read(row.mdi_mlr);
 
                 reader->read(row.plc, 2);
                 // TODO: plc флаг не учитываем
@@ -238,65 +241,69 @@ namespace test {
 //                readUnsignedSample(samples[i], reader);
 //                ++i;
 
-                readMoreZeroSample(samples[i], reader); // 11 uptime
+                readMoreZeroSample(samples[i], reader); // 8 uptime
                 ++i;
 
                 reader->read(row.cas_type);
                 reader->read(row.cas_key_time);
 
-                readMoreZeroSample(samples[i], reader); // 12 vid_frames
+                readMoreZeroSample(samples[i], reader); // 9 vid_frames
                 ++i;
 
-                readMoreZeroSample(samples[i], reader); // 13 vid_decode_errors
+                readMoreZeroSample(samples[i], reader); // 10 vid_decode_errors
                 if (samples[i-1].skipped) {
                     samples[i].skipped = true;
                 }
                 ++i;
 
-                readMoreZeroSample(samples[i], reader); // 14 vid_data_errors
+                readMoreZeroSample(samples[i], reader); // 11 vid_data_errors
                 if (samples[i-1].skipped) {
                     samples[i].skipped = true;
                 }
                 ++i;
 
-                readMoreZeroSample(samples[i], reader); // 15 aud_frames
+                readMoreZeroSample(samples[i], reader); // 12 aud_frames
                 ++i;
 
-                readMoreZeroSample(samples[i], reader); // 16 aud_data_errors
+                readMoreZeroSample(samples[i], reader); // 13 aud_data_errors
                 if (samples[i-1].skipped) {
                     samples[i].skipped = true;
                 }
                 ++i;
 
-                readRequiredSample(samples[i], reader); // 17 av_time_skew
+                readRequiredSample(samples[i], reader); // 14 av_time_skew
                 ++i;
 
-                readRequiredSample(samples[i], reader); // 18 av_period_skew
+                readRequiredSample(samples[i], reader); // 15 av_period_skew
                 ++i;
 
-                readRequiredSample(samples[i], reader); // 19 buf_underruns
+                readRequiredSample(samples[i], reader); // 16 buf_underruns
                 ++i;
 
-                readRequiredSample(samples[i], reader); // 20 buf_overruns
-                ++i;
+                readRequiredSample(samples[i], reader); // 17 buf_overruns
+//                ++i;
 
                 reader->read(row.sdp_object_id);
                 reader->read(row.cas_key_time);
 
-                readRequiredSample(samples[i], reader); // 21 dvb_level_good
-                if (samples[i].skipped || samples[i].value!=0 || samples[i].value!=1) {
-                    samples[i].skipped = true;
-                }
-                ++i;
-
-                readUnsignedSample(samples[i], reader); // 22 dvb_level
-                ++i;
-
-                readUnsignedSample(samples[i], reader); // 23 dvb_frequency
-                ++i;
-
-                readUnsignedSample(samples[i], reader); // 24 cur_bitrate
+//                readRequiredSample(samples[i], reader); // 21 dvb_level_good
+//                if (samples[i].skipped || samples[i].value!=0 || samples[i].value!=1) {
+//                    samples[i].skipped = true;
+//                }
 //                ++i;
+                reader->read(row.dvb_level_good);
+                reader->read(row.dvb_level);
+                reader->read(row.dvb_frequency);
+                reader->read(row.cur_bitrate);
+
+//                readUnsignedSample(samples[i], reader); // dvb_level
+//                ++i;
+//
+//                readUnsignedSample(samples[i], reader); // dvb_frequency
+//                ++i;
+//
+//                readUnsignedSample(samples[i], reader); // cur_bitrate
+////                ++i;
 
                 reader->read(row.stb_tz);
                 reader->read(row.server_tz);
@@ -305,16 +312,16 @@ namespace test {
                 reader->read(row.tv_on_period);
 
 
-//                readMoreZeroSample(samples[i], reader); // 28 vid_misshown_frames
+//                readMoreZeroSample(samples[i], reader); // vid_misshown_frames
 //                ++i;
 
-//                readMoreZeroSample(samples[i], reader); // 29 session_on_period
+//                readMoreZeroSample(samples[i], reader); // session_on_period
 //                ++i;
 
-//                readUnsignedSample(samples[i], reader); // 31 tv_on_period
+//                readUnsignedSample(samples[i], reader); // tv_on_period
 //                ++i;
 
-//                readUnsignedSample(samples[i], reader); // 32 stb_on_period
+//                readUnsignedSample(samples[i], reader); // stb_on_period
 
                 reader->read(row.stb_on_period);
                 reader->read(row.user_idle_period);
@@ -363,7 +370,8 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readRequiredSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader, const double& interval) {
+            size_t readRequiredSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+                                                 const double& interval) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (sample.skipped || interval==0) {
                     sample.skipped = true;
@@ -381,7 +389,8 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readUnsignedSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader, const double& interval) {
+            size_t readUnsignedSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+                                                 const double& interval) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (interval==0 || sample.skipped || sample.value <0) {
                     sample.skipped = true;
@@ -399,7 +408,8 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readMoreZeroSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader, const double& interval) {
+            size_t readMoreZeroSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+                                                 const double& interval, size_t& i) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (interval==0 || sample.skipped || sample.value <=0) {
                     sample.skipped = true;

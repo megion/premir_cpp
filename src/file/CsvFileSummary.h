@@ -93,15 +93,10 @@ namespace file {
                 }
             }
 
-            calculateActualColSize();
         }
 
         utils::CArrayList<models::ColSummary<Num>> *getSummary() {
             return summary;
-        }
-
-        size_t getActualColSize() {
-            return actualColSize;
         }
 
         /**
@@ -111,20 +106,30 @@ namespace file {
             size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary<Num> &colSummary = (*summary)[i];
-                if (colSummary.count==0 || (colSummary.max == colSummary.min)) {
-                    // статистики нет по колонке.
-                    samples[i].skipped = true;
-                    samples[i].value = 0;
-                } else {
-                    samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);
-                    if (samples[i].value > 1) {
-                        samples[i].value = 1;
-                    }
-                    if (samples[i].value < 0) {
-                        samples[i].value = 0;
-                    }
+                if (colSummary.isSkip()) {
+                    danger_text("All data column is skip. Empty col should be removed from samples.");
+                    std::cout<< "col " << i <<std::endl;
                 }
 
+                samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);
+                if (samples[i].value > 1) {
+                    samples[i].value = 1;
+                }
+                if (samples[i].value < 0) {
+                    samples[i].value = 0;
+                }
+            }
+        }
+
+        // TODO need redevelop
+        void skipEmptyColSamples(models::DataSample<Num> *samples) {
+            size_t colSize = summary->size();
+            for (size_t i = 0; i < colSize; ++i) {
+                models::ColSummary<Num> &colSummary = (*summary)[i];
+                if (colSummary.isSkip()) {
+                    // статистики нет по колонке.
+                    samples[i].skipped = true;
+                }
             }
         }
 
@@ -156,24 +161,11 @@ namespace file {
             while ((col < colSize) && dataReader.readNext((*summary)[col], nullptr)) {
                 col++;
             }
-            calculateActualColSize();
         }
 
 
     private:
         utils::CArrayList<models::ColSummary<Num>> *summary;
-        size_t actualColSize; // фактическое число колнок
-
-        void calculateActualColSize() {
-            size_t colSize = summary->size();
-            actualColSize = colSize;
-            for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
-                if(colSummary.isSkip()) {
-                    actualColSize--;
-                }
-            }
-        }
 
         void initialization() {
             size_t colSize = summary->size();

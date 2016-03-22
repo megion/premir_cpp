@@ -426,8 +426,8 @@ namespace test {
         }
 
         void test_visible_som_training() {
-            size_t xdim = 100;
-            size_t ydim = 100;
+            size_t xdim = 80;
+            size_t ydim = 80;
             size_t dim = 20;
             size_t teachSize = 800000;
             bool isScale = true;
@@ -467,10 +467,10 @@ namespace test {
             int step = 10000;
             int step2 = 6000;
 
-//            graphics::SammonMapChart<float> sammonChart(xdim, 1200, 700);
-//            sammonChart.setWindowTitle("Sammon Map");
-//            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
-//            buildAndShowSammonMap(somCodesMatrix, sammonChart);
+            graphics::SammonMapChart<float> sammonChart(xdim, 1200, 700);
+            sammonChart.setWindowTitle("Sammon Map");
+            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
             graphics::UMatChart<float, char> umatChart(700, 700);
             umatChart.setWindowTitle("UMat");

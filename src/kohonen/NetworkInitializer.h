@@ -20,6 +20,8 @@
 #include "utils/SMatrix.h"
 #include "utils/ArrayUtils.h"
 #include "matrix/GramSchmidtNormalized.h"
+#include "matrix/GramSchmidtStream.h"
+#include "matrix/MatrixUtils.h"
 #include "RandomGenerator.h"
 #include "utils/console_colors.h"
 #include "file/stream/StreamReader.h"
@@ -138,6 +140,7 @@ namespace kohonen {
                     }
                 }
 
+//                summary->skipEmptyColSamples(samples);
                 if (isScale) {
                     summary->scaleSamples(samples);
                 }
@@ -164,8 +167,6 @@ namespace kohonen {
                 }
             }
 
-            squareMatrix.print();
-
             // матрица из двух векторов заполненая случайными нормализованными значениями
             utils::SMatrix<Out> uVectors(eigenVectorsCount, colSize);
             Out mu[eigenVectorsCount]; // два собственных значения
@@ -182,6 +183,7 @@ namespace kohonen {
             }
 
             matrix::GramSchmidtNormalized<Out, Out> gramSchmidtCalc;
+
             utils::SMatrix<Out> vVectors(eigenVectorsCount, colSize);
             for (int s = 0; s < 10; ++s) {
                 for (size_t i = 0; i < vVectors.getRowSize(); ++i) {
