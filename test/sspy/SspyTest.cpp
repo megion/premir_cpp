@@ -86,20 +86,35 @@ namespace test {
             }
         }
 
-        void buildAndShowSammonMap(OutCodes *somMatrix,
+        kohonen::SammonMap<double>* buildAndShowSammonMap(OutCodes *somMatrix,
                                    graphics::SammonMapChart<double> &sammonChart) {
-            kohonen::SammonMap<double> sammonMap(somMatrix->getRowSize());
-            kohonen::RandomGenerator *randomEngine = sammonMap.getRandomGenerator();
+            kohonen::SammonMap<double>* sammonMap = new kohonen::SammonMap<double>(somMatrix->getRowSize());
+            kohonen::RandomGenerator *randomEngine = sammonMap->getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
-            sammonMap.initializeMap(somMatrix);
+            sammonMap->initializeMap(somMatrix);
 
             for (size_t i = 0; i < 100; ++i) {
                 sammonChart.removeDataSafely();
-                sammonMap.doOneIteration();
-                sammonChart.addSammonMapPoints(sammonMap.getMapPoints());
+                double e = sammonMap->doOneIteration();
+                std::cout << "Mapping error " << e << std::endl;
+                sammonChart.addSammonMapPoints(sammonMap->getMapPoints());
                 sammonChart.drawOnWindow();
             }
+            return sammonMap;
+        }
+
+        void drawUMat(OutCodes *somMatrix, graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
+                      size_t dim) {
+            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+            umat.initializeMat(somMatrix);
+            umat.buildUMatrix();
+            umat.medianUMatrix();
+//            umat.averageUMatrix();
+
+            chart.removeDataSafely();
+            chart.addHexaUMatPoints(umat.getUMatrix());
+            chart.drawOnWindow();
         }
 
         void test_collect_summary_sspy_data_file() {
@@ -115,7 +130,7 @@ namespace test {
             // TODO: summary save
             summary.writeSummary("sspy_data_summary_6.cod");
             double summaryTime = get_time() - start;
-            printf("Summary time: %f\n", summaryTime/60.0);
+            printf("Summary time: %f\n", summaryTime / 60.0);
         }
 
         void test_initialization_codes_sspy() {
@@ -146,25 +161,136 @@ namespace test {
             delete somCodesMatrix;
 
             double summaryTime = get_time() - start;
-            printf("Initialization time: %f\n", summaryTime/60.0);
+            printf("Initialization time: %f\n", summaryTime / 60.0);
         }
 
         void test_visible_initialized_codes_sspy() {
             double start = get_time();
             size_t dim = 17;
             size_t xdim = 80;
-//            size_t ydim = 80;
+            size_t ydim = 80;
 
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", 0, dim);
-            graphics::SammonMapChart<double> sammonChart2(xdim, 1200, 700);
-            sammonChart2.setWindowTitle("Sammon map for initialized codes");
-            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
-            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
+
+            graphics::UMatChart<double, char> umatChart(1200, 700);
+            umatChart.setWindowTitle("U-Matrix");
+            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+            umatChart.saveImage("sspy_u_matrix_80_80_after_init.png");
+
+            graphics::SammonMapChart<double> sammonChart(xdim, 1200, 700);
+            sammonChart.setWindowTitle("Sammon map for initialized codes");
+            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart);
+
+            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
+            sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
+            graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
+            sammonChart.addSammonMapPoints(sammonMap->getMapPoints());
+            sammonChart.saveImage("sspy_sammon_map_80_80_after_init.png");
+
+            delete somCodesMatrix;
+            delete sammonMap;
+
+            double summaryTime = get_time() - start;
+            printf("Visualization initialized codes time: %f\n", summaryTime / 60.0);
+        }
+
+        void test_trained_codes_sspy() {
+            double start = get_time();
+            size_t dim = 17;
+            size_t xdim = 80;
+            size_t ydim = 80;
+            size_t fileRowCount = 126271598;
+            size_t teachSize = fileRowCount;
+//            size_t teachSize = 2000000;
+            double radius = 3.0;
+            double alpha = 0.002;
+            bool isScale = true;
+
+            double qerror = 0;
+            int stepError = 40000;
+            int stepUmat = 400000;
+
+            // 1. read initialized codes
+            OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", 0, dim);
+
+            // 2. init big data file reader
+            file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
+            SspyRowParser rowParser;
+            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+
+            // 3. create Umat chart
+            graphics::UMatChart<double, char> umatChart(1200, 700);
+            umatChart.setWindowTitle("U-Matrix");
+            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+
+            // 4. create Quantum error chart
+            graphics::PointChart qErrorChart(true, 1200, 700);
+            qErrorChart.setWindowTitle("Quantum error");
+            graphics::ChartThread<bool> chartThread(&qErrorChart);
+
+            // 5. create trainer
+            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
+            kohonen::mapdist::HexaMapDistance<double> mapDist;
+//            kohonen::neighadap::GaussianNeighborAdaptation<double, double> gausAdap(&mapDist, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation<double, double> neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<SspyData, double, double> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius,
+                                                                 xdim, ydim);
+
+            size_t winnerSize = winnerSearcher.getWinnerSize();
+//            size_t colSize = somCodesMatrix->getColSize();
+
+            // load summary
+            file::CsvFileSummary<SspyData, double> summary(dim);
+            summary.readSummary("sspy_data_summary_6.cod");
+
+            for (size_t le = 0; le < teachSize; ++le) {
+                models::DataSample<double> samples[dim];
+                SspyData rowData;
+                bool hasInRow = dataReader.readNext(rowData, samples);
+                if (!hasInRow) {
+                    // значит достигли конца данных, начинаем читать с начала
+                    // установить поток на начало
+                    dataReader.rewindReader();
+                    // читаем первую стоку данных
+                    dataReader.readNext(rowData, samples);
+                }
+
+                // нормализация
+                if (isScale) {
+                    summary.scaleSamples(samples);
+                }
+
+                kohonen::winner::WinnerInfo<double> winners[winnerSize];
+                bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
+                if (ok) {
+                    qerror += std::sqrt(winners[0].diff);
+                    if (le % stepError==0 && le!=0) {
+                        qerror = qerror / stepError;
+                        qErrorChart.redrawNewPoint(le, qerror);
+                        qerror = 0;
+                        std::cout<<".";
+                    }
+
+                    if (le % stepUmat == 0) {
+                        drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+                        std::cout<<std::endl<<le<<std::endl;
+                    }
+
+                }
+            }
+
+            kohonen::SomKeeper<double> somKeeper;
+            file::CsvFileWriter trainedCodesOutFile("sspy_som_trained_1_80_80.cod");
+            somKeeper.saveSom(somCodesMatrix, &trainedCodesOutFile);
+            trainedCodesOutFile.close();
 
             delete somCodesMatrix;
 
             double summaryTime = get_time() - start;
-            printf("Initialization time: %f\n", summaryTime/60.0);
+            printf("Training time: %f\n", summaryTime / 60.0);
         }
 
         void sspy_data_read_test() {
@@ -173,7 +299,8 @@ namespace test {
 //            mytest(csv_parse_sspy_data_file);
 //            mytest(collect_summary_sspy_data_file);
 //            mytest(initialization_codes_sspy);
-            mytest(visible_initialized_codes_sspy);
+//            mytest(visible_initialized_codes_sspy);
+            mytest(trained_codes_sspy);
         }
     }
 }

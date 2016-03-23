@@ -98,7 +98,7 @@ namespace kohonen {
         /**
          * Построение проекций Саммона - одна итерация
          */
-        void doOneIteration() {
+        Out doOneIteration() {
             for (size_t j = 0; j < nLen; ++j) {
                 Out e1x = 0, e1y = 0, e2x = 0, e2y = 0;
                 for (size_t k = 0; k < nLen; ++k) {
@@ -162,7 +162,8 @@ namespace kohonen {
             }
 
             e /= tot;
-            std::cout << "Mapping error " << e << std::endl;
+//            std::cout << "Mapping error " << e << std::endl;
+            return e;
         }
 
         /**
