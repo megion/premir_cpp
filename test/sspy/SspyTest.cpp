@@ -336,7 +336,12 @@ namespace test {
         void test_copy_part_of_sspy_file() {
             double start = get_time();
 
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_100.cod", 100);
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_1000.cod", 1000);
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_10000.cod", 10000);
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_100000.cod", 100000);
             save_part_of_file(BIG_DATA_FILE_PATH, "content_data_400000.cod", 400000);
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_1000000.cod", 1000000);
 
             double summaryTime = get_time() - start;
             printf("Copy part of file time: %f\n", summaryTime / 60.0);
@@ -344,7 +349,7 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-//            mytest(read_sspy_data_file_by_line);
+            mytest(read_sspy_data_file_by_line);
 //            mytest(csv_parse_sspy_data_file);
 //            mytest(collect_summary_sspy_data_file);
 //            mytest(initialization_codes_sspy);
