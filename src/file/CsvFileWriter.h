@@ -49,6 +49,10 @@ namespace file {
             std::fprintf(fp, "\n");
         }
 
+        void write(const char* v) {
+            std::fprintf(fp, "%s ", v);
+        }
+
         void write(double &v) {
             std::fprintf(fp, "%g ", v);
         }

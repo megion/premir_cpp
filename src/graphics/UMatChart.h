@@ -22,14 +22,53 @@ namespace graphics {
     template<typename Label>
     class LabelColorMapper {
     public:
-        virtual Color labelToColor(const Label& label) const = 0;
+        virtual Color labelToColor(const Label &label) const = 0;
+    };
+
+    class CellColorMapper {
+    public:
+        virtual Color getColorByCellValue(const double &cellValue) const = 0;
+    };
+
+    class CubehelixCellColorMapper : public CellColorMapper {
+    public:
+        CubehelixCellColorMapper(size_t _colorSize, double _start, double _rots, double _hue, double _gamma) :
+                colorSize(_colorSize), start(_start), rots(_rots), hue(_hue), gamma(_gamma) {
+        }
+        Color getColorByCellValue(const double &cellValue) const {
+            size_t index = (colorSize - 1) * cellValue;
+            Color c;
+            calculateCubehelixColor(index, 0, colorSize - 1, c.r, c.g, c.b, start, rots, hue, gamma);
+            return c;
+        }
+    private:
+        size_t colorSize;
+        double start, rots, hue, gamma;
+    };
+
+    class DefaultCellColorMapper : public CellColorMapper {
+    public:
+        DefaultCellColorMapper(size_t _colorSize) : colorSize(_colorSize) {
+        }
+        Color getColorByCellValue(const double &cellValue) const {
+            size_t index = (colorSize - 1) * cellValue;
+            uint16_t step = 65535 / colorSize;
+            uint16_t colComp = index * step; // компонента цвета
+            Color c;
+            c.r = colComp;
+            c.g = colComp;
+            c.b = colComp;
+            return c;
+        }
+    private:
+        size_t colorSize;
     };
 
     template<typename Out>
     struct UMatCell {
         Out uValue;
-        double labelColor;
-        bool useLabelColor;
+//        double labelColor;
+//        bool useLabelColor;
 
         xcb_alloc_color_reply_t *color;
     };
@@ -48,7 +87,8 @@ namespace graphics {
         typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Row LabelsRow;
         typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Cell LabelsCell;
 
-        UMatChart(uint16_t _width, uint16_t _height) : Chart<UMatCell<Out>>(_width, _height) {
+        UMatChart(uint16_t _width, uint16_t _height, CellColorMapper *_cellColorMapper = nullptr)
+                : Chart<UMatCell<Out>>(_width, _height), cellColorMapper(_cellColorMapper) {
             // arcs context
             uint32_t values2[] = {Chart<UMatCell<Out>>::colormap->getGreen()->pixel};
             cellBorderContext = xcb_generate_id(Chart<UMatCell<Out>>::connection);
@@ -62,9 +102,18 @@ namespace graphics {
             xcb_create_gc(Chart<UMatCell<Out>>::connection, cellBackgroundContext, Chart<UMatCell<Out>>::screen->root,
                           mask, values22);
 
+            if (!cellColorMapper) {
+                size_t colorSize = 1000;
+                cellColorMapper = new DefaultCellColorMapper(colorSize);
+                useDefaultCellColorMapper = true;
+            } else {
+                useDefaultCellColorMapper = false;
+            }
+
+
             // создадим 1000 оттенков серого
-            grayColors = Chart<UMatCell<Out>>::colormap->createGrayColors(1000);
-//            labelsColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 2.0, 0.5, 2.0, 1.0);
+//            grayColors = Chart<UMatCell<Out>>::colormap->createGrayColors(1000);
+//            grayColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 0.5, -1.5, 1.0, 1.0);
             labelsColors = Chart<UMatCell<Out>>::colormap->createWavelengthColors(1000);
         }
 
@@ -72,18 +121,22 @@ namespace graphics {
             cellBorderContext = 0;
             cellBackgroundContext = 0;
 
-            if(grayColors) {
-                Chart<UMatCell<Out>>::colormap->freeColors(grayColors);
-                grayColors = nullptr;
-            }
+//            if(grayColors) {
+//                Chart<UMatCell<Out>>::colormap->freeColors(grayColors);
+//                grayColors = nullptr;
+//            }
 
-            if(labelsColors) {
+            if (labelsColors) {
                 Chart<UMatCell<Out>>::colormap->freeColors(labelsColors);
                 labelsColors = nullptr;
             }
+
+            if (useDefaultCellColorMapper) {
+                delete cellColorMapper;
+            }
         }
 
-        void draw(const xcb_drawable_t& pixmap) const {
+        void draw(const xcb_drawable_t &pixmap) const {
             Chart<UMatCell<Out>>::drawBackground(pixmap);
 //            drawAxes();
 //            drawAxesLabels();
@@ -94,21 +147,21 @@ namespace graphics {
         /**
          * перевод winnerIndex (r) -> umatIndex (data->getOutpoints)
          */
-        size_t toUmatIndexFromWinnerIndex(const size_t& wIndex, const size_t& xdim, const size_t& ydim) {
-            size_t uxdim = 2*xdim - 1;
-            size_t uydim = 2*ydim - 1;
+        size_t toUmatIndexFromWinnerIndex(const size_t &wIndex, const size_t &xdim, const size_t &ydim) {
+            size_t uxdim = 2 * xdim - 1;
+            size_t uydim = 2 * ydim - 1;
 
             // TODO: используем ydim т.к. umat при построении была перевернута т.е. построение по колонкам,
             // а не по строкам (так реализован алгоритм U-Matrix в SOM-pak)
             size_t yw = wIndex / xdim;
             size_t xw = wIndex % xdim;
             // ui = 2(i%xdim)uydim + 2(i/xdim)
-            size_t uIndex = 2*xw*uydim + 2*yw;
+            size_t uIndex = 2 * xw * uydim + 2 * yw;
             return uIndex;
         }
 
-        void setAllLabels(LabelsMatrix* winnerLabels, size_t xdim, size_t ydim, LabelColorMapper<Label>* mapper,
-                          double keyThreshold=-1.0) {
+        void setAllLabels(LabelsMatrix *winnerLabels, size_t xdim, size_t ydim, LabelColorMapper<Label> *mapper,
+                          double keyThreshold = -1.0) {
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
 
                 size_t ui = toUmatIndexFromWinnerIndex(r, xdim, ydim);
@@ -118,20 +171,21 @@ namespace graphics {
                     LabelsCell &cell = row[c];
                     for (size_t p = 0; p < cell.pointSize; ++p) {
                         LabelsEntry &e = cell[p];
-                        UMatCell<Out>& ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
-                        if (keyThreshold<0 || e.value.scaledCount > keyThreshold) {
-                            ucell.labelColor = e.value.scaledCount;
-                            ucell.useLabelColor = true;
+                        UMatCell<Out> &ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
+                        if (keyThreshold < 0 || e.value.scaledCount > keyThreshold) {
+//                            ucell.labelColor = e.value.scaledCount;
+//                            ucell.useLabelColor = true;
 
-                            if(mapper) {
+                            if (mapper) {
                                 ucell.color = Chart<UMatCell<Out>>::colormap->getColor(mapper->labelToColor(e.key));
                             } else {
                                 ucell.color = Chart<UMatCell<Out>>::colormap->getGreen();
                             }
                         } else {
 //                            ucell.labelColor = e.value.scaledCount;
-                            ucell.color = nullptr;
-                            ucell.useLabelColor = false;
+                            ucell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+                                    ucell.uValue));//nullptr;
+//                            ucell.useLabelColor = false;
                         }
                     }
                 }
@@ -142,20 +196,21 @@ namespace graphics {
         /**
          * set label
          */
-        void setLabelsForKey(LabelsMatrix* winnerLabels, const Label& key, size_t xdim, size_t ydim,
-                             const Color& colorLabel, double keyThreshold=-1.0) {
+        void setLabelsForKey(LabelsMatrix *winnerLabels, const Label &key, size_t xdim, size_t ydim,
+                             const Color &colorLabel, double keyThreshold = -1.0) {
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
                 size_t ui = toUmatIndexFromWinnerIndex(r, xdim, ydim);
-                models::LabelInfo* lInfo = winnerLabels->getValue(r, key);
-                UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
+                models::LabelInfo *lInfo = winnerLabels->getValue(r, key);
+                UMatCell<Out> &cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
                 if (lInfo) {
-                    if (keyThreshold<0 || lInfo->scaledCount > keyThreshold) {
-                        cell.labelColor = lInfo->scaledCount;
-                        cell.useLabelColor = true;
+                    if (keyThreshold < 0 || lInfo->scaledCount > keyThreshold) {
+//                        cell.labelColor = lInfo->scaledCount;
+//                        cell.useLabelColor = true;
                         cell.color = Chart<UMatCell<Out>>::colormap->getColor(colorLabel);
                     } else {
-                        cell.color = nullptr;
-                        cell.useLabelColor = false;
+                        cell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+                                cell.uValue));//nullptr;
+//                        cell.useLabelColor = false;
                     }
                 } else {
 //                    cell.useLabelColor = false;
@@ -163,7 +218,7 @@ namespace graphics {
             }
 
         }
-        
+
         void addHexaUMatPoints(UMatCodes *uMatrix) {
             // TODO: необходимл заблокировать мьютекс перед измененем точек графика
             // иначе поток (событийный цикл draw event loop) иногда может читать изменяемые данные что может привести
@@ -209,9 +264,11 @@ namespace graphics {
                     points[6].y = points[0].y;
 
                     Chart<UMatCell<Out>>::data->addPoints(index, points, 7);
-                    UMatCell<Out>& cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[index].data;
+                    UMatCell<Out> &cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[index].data;
                     cell.uValue = uvalue[i][j];
-                    cell.useLabelColor = false;
+//                    cell.useLabelColor = false;
+                    cell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+                            cell.uValue));
 
                     // k = 2,2,4,4,2,2,4,4...
                     if (j % 2 == 0) {
@@ -231,21 +288,22 @@ namespace graphics {
             }
         }
 
-        void drawUMat(const xcb_drawable_t& pixmap) const {
-            OutMatrix* outMatrix = Chart<UMatCell<Out>>::data->getOutpoints();
+        void drawUMat(const xcb_drawable_t &pixmap) const {
+            OutMatrix *outMatrix = Chart<UMatCell<Out>>::data->getOutpoints();
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
 
-                xcb_alloc_color_reply_t* cellColor;
-                if (outRow.data.useLabelColor) {
+                xcb_alloc_color_reply_t *cellColor = outRow.data.color;
+//                if (outRow.data.useLabelColor) {
 //                    cellColor = Chart<UMatCell<Out>>::colormap->getScaledColor(labelsColors, outRow.data.labelColor);
 //                    cellColor = Chart<UMatCell<Out>>::colormap->getGreen();
 
-                    cellColor = outRow.data.color;
-                } else {
-                    cellColor = Chart<UMatCell<Out>>::colormap->getScaledColor(grayColors, outRow.data.uValue);
-                }
+//                cellColor = outRow.data.color;
+//                } else {
+//                    cellColor = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+//                            outRow.data.uValue));//Chart<UMatCell<Out>>::colormap->getScaledColor(grayColors, outRow.data.uValue);
+//                }
 
                 uint32_t values[] = {cellColor->pixel};
 //                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
@@ -263,8 +321,11 @@ namespace graphics {
         xcb_gcontext_t cellBackgroundContext;
 
         // коллекция серых цветов: от белого до черного
-        utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
+//        utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
         utils::CArrayList<xcb_alloc_color_reply_t *> *labelsColors;
+
+        CellColorMapper *cellColorMapper;
+        bool useDefaultCellColorMapper;
 
 //        // цвета радуги :)
 //        utils::CArrayList<xcb_alloc_color_reply_t *> *waveColors;

@@ -20,11 +20,9 @@
 
 namespace file {
 
-    template<typename T>
     class LineFileReader {
     public:
-        LineFileReader(const char *filename) : typeSizeof(sizeof(T)),
-                                           lineNumber(0) {
+        LineFileReader(const char *filename) : typeSizeof(sizeof(char)), lineNumber(0) {
             fp = fopen(filename, "r");
             if (fp == NULL) {
                 std::string errMsg(std::strerror(errno));
@@ -33,17 +31,20 @@ namespace file {
             }
         }
 
-        LineFileReader(const LineFileReader<T> &) = delete;
-        LineFileReader(LineFileReader<T> &&) = delete;
-        LineFileReader<T> &operator=(const LineFileReader<T> &) = delete;
-        LineFileReader<T> &operator=(LineFileReader<T> &&) = delete;
+        LineFileReader(const LineFileReader &) = delete;
+
+        LineFileReader(LineFileReader &&) = delete;
+
+        LineFileReader &operator=(const LineFileReader &) = delete;
+
+        LineFileReader &operator=(LineFileReader &&) = delete;
 
         ~LineFileReader() {
             close();
         }
 
         struct LineBuffer {
-            T *buffer;
+            char *buffer;
             size_t size;
         };
 
@@ -85,20 +86,19 @@ namespace file {
             }
         }
 
-        bool readNextLine(LineBuffer *result,
-                          bool removeNewLineSymbol = false) {
+        bool readNextLine(LineBuffer *result, bool removeNewLineSymbol = false) {
             // init buffer
             size_t bufferLen = 256;
             size_t increaseBufferValue = 64;
             size_t amount = bufferLen * typeSizeof;
-            T *buffer = (T *) std::malloc(amount);
+            char *buffer = (char *) std::malloc(amount);
             if (buffer == NULL) {
                 throw std::runtime_error(std::strerror(errno));
             }
 
-            T *p = buffer;
+            char *p = buffer;
             *p = '\0'; // set NUL
-            T *end = buffer + bufferLen;
+            char *end = buffer + bufferLen;
             while (std::fgets(p, end - p, fp) != 0) { // fgetws
                 size_t len = std::strlen(p); // std::wcslen
 
@@ -119,7 +119,7 @@ namespace file {
                     size_t off = p - buffer; // save offset value
                     bufferLen += increaseBufferValue;
                     size_t newAmount = bufferLen * typeSizeof;
-                    T *newBuffer = (T *) std::realloc(buffer, newAmount);
+                    char *newBuffer = (char *) std::realloc(buffer, newAmount);
                     if (newBuffer == NULL) {
                         delete buffer;
                         throw std::runtime_error(std::strerror(errno));

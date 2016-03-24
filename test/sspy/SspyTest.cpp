@@ -41,16 +41,23 @@ namespace test {
             return somCodesMatrix;
         }
 
-        void test_read_sspy_data_file_by_line() {
-//            file::LineFileReader<char> fr(
-//                    "/home/ilya/share/Documents/ml/SmartSpy/[Content]");
-            // 17/11/2014 00:27:13.661
-            // /run/media/ilya/Elements/SmartSpy/\[Content\]
-            file::LineFileReader<char> lineReader(BIG_DATA_FILE_PATH);
+        void save_part_of_file(const char *srcFilename, const char *destFilename, size_t lineNumber) {
+            file::LineFileReader reader(srcFilename);
+            file::CsvFileWriter writer(destFilename);
 
-            file::LineFileReader<char>::LineBuffer buf;
-            while (lineReader.readNextLine(&buf, true) &&
-                   lineReader.getLineNumber() <= 3) {
+            file::LineFileReader::LineBuffer buf;
+            while (reader.readNextLine(&buf, true) && reader.getLineNumber() <= lineNumber) {
+                writer.write(buf.buffer);
+                std::free(buf.buffer);
+                writer.endLine();
+            }
+        }
+
+        void test_read_sspy_data_file_by_line() {
+            file::LineFileReader lineReader(BIG_DATA_FILE_PATH);
+
+            file::LineFileReader::LineBuffer buf;
+            while (lineReader.readNextLine(&buf, true) && lineReader.getLineNumber() <= 3) {
                 std::cout << buf.buffer << std::endl;
                 std::cout << std::endl;
                 std::cout << std::endl;
@@ -87,14 +94,14 @@ namespace test {
         }
 
         kohonen::SammonMap<double>* buildAndShowSammonMap(OutCodes *somMatrix,
-                                   graphics::SammonMapChart<double> &sammonChart) {
+                                   graphics::SammonMapChart<double> &sammonChart, size_t numRepeat) {
             kohonen::SammonMap<double>* sammonMap = new kohonen::SammonMap<double>(somMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine = sammonMap->getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
             sammonMap->initializeMap(somMatrix);
 
-            for (size_t i = 0; i < 100; ++i) {
+            for (size_t i = 0; i < numRepeat; ++i) {
                 sammonChart.removeDataSafely();
                 double e = sammonMap->doOneIteration();
                 std::cout << "Mapping error " << e << std::endl;
@@ -181,7 +188,7 @@ namespace test {
             graphics::SammonMapChart<double> sammonChart(xdim, 1200, 700);
             sammonChart.setWindowTitle("Sammon map for initialized codes");
             graphics::ChartThread<bool> sammonChartThread(&sammonChart);
-            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart);
+            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
 
             graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
             sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
@@ -293,6 +300,48 @@ namespace test {
             printf("Training time: %f\n", summaryTime / 60.0);
         }
 
+        void test_visible_trained_codes_sspy() {
+            double start = get_time();
+            size_t dim = 17;
+            size_t xdim = 80;
+            size_t ydim = 80;
+
+            OutCodes *somCodesMatrix = read_matrix_file("sspy_som_trained_1_80_80.cod", 0, dim);
+
+            graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 1.0, 1.0);
+            graphics::UMatChart<double, char> umatChart(733, 733, &cellColor);
+            umatChart.setWindowTitle("U-Matrix");
+            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+            umatChart.saveImage("sspy_u_matrix_80_80_after_trained.png");
+
+            graphics::SammonMapChart<double> sammonChart(xdim, 733, 733);
+            sammonChart.setWindowTitle("Sammon map for trained codes");
+            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
+
+            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
+            sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
+            graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
+            sammonChartImg.addSammonMapPoints(sammonMap->getMapPoints());
+            sammonChartImg.saveImage("sspy_sammon_map_80_80_after_trained_img2.png");
+
+            delete somCodesMatrix;
+            delete sammonMap;
+
+            double summaryTime = get_time() - start;
+            printf("Visualization trained codes time: %f\n", summaryTime / 60.0);
+        }
+
+        void test_copy_part_of_sspy_file() {
+            double start = get_time();
+
+            save_part_of_file(BIG_DATA_FILE_PATH, "content_data_400000.cod", 400000);
+
+            double summaryTime = get_time() - start;
+            printf("Copy part of file time: %f\n", summaryTime / 60.0);
+        }
+
         void sspy_data_read_test() {
             suite("Sspy_test");
 //            mytest(read_sspy_data_file_by_line);
@@ -301,6 +350,9 @@ namespace test {
 //            mytest(initialization_codes_sspy);
 //            mytest(visible_initialized_codes_sspy);
 //            mytest(trained_codes_sspy);
+//            mytest(visible_trained_codes_sspy);
+
+//            mytest(copy_part_of_sspy_file);
         }
     }
 }
