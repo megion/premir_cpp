@@ -283,7 +283,7 @@ namespace test {
             }
 
             kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter trainedCodesOutFile("sspy_som_trained_1_80_80.cod");
+            file::CsvFileWriter trainedCodesOutFile("sspy_som_trained_2_80_80.cod");
             somKeeper.saveSom(somCodesMatrix, &trainedCodesOutFile);
             trainedCodesOutFile.close();
 
@@ -300,7 +300,7 @@ namespace test {
 //            mytest(collect_summary_sspy_data_file);
 //            mytest(initialization_codes_sspy);
 //            mytest(visible_initialized_codes_sspy);
-            mytest(trained_codes_sspy);
+//            mytest(trained_codes_sspy);
         }
     }
 }
