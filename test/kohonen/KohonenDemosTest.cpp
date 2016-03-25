@@ -163,11 +163,11 @@ namespace test {
                 }
             }
 
-            graphics::UMatChart<float, char> umatChart2(2000, 2000);
-            umatChart2.setWindowTitle("UMat2");
-            graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
-            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim, labelThreshold);
-            umatChart2.saveImage("u-matrix-speech-final.png");
+//            graphics::UMatChart<float, char> umatChart2(2000, 2000);
+//            umatChart2.setWindowTitle("UMat2");
+//            graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
+//            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim, labelThreshold);
+//            umatChart2.saveImage("u-matrix-speech-final.png");
 
 //            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
 //            sammonChart2.setWindowTitle("Sammon Map2");

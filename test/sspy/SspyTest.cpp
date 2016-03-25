@@ -111,7 +111,8 @@ namespace test {
             return sammonMap;
         }
 
-        void drawUMat(OutCodes *somMatrix, graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
+        void drawUMat(OutCodes *somMatrix,
+                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
                       size_t dim) {
             kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
             umat.initializeMat(somMatrix);
@@ -121,6 +122,28 @@ namespace test {
 
             chart.removeDataSafely();
             chart.addHexaUMatPoints(umat.getUMatrix());
+            chart.drawOnWindow();
+        }
+
+        void drawUMatWithLabels(OutCodes *somMatrix,
+                      kohonen::labeling::SomLabeling<char> &somLabeling,
+                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
+                      size_t dim) {
+            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+            umat.initializeMat(somMatrix);
+            umat.buildUMatrix();
+            umat.medianUMatrix();
+//            umat.averageUMatrix();
+
+            chart.removeDataSafely();
+            chart.addHexaUMatPoints(umat.getUMatrix());
+
+            somLabeling.collectSummary();
+            somLabeling.getWinnerLabels()->getMatrix()->print(false);
+            chart.addHexaUMatPoints(umat.getUMatrix());
+
+            MsgTypeLabelColorMapper mapper;
+            chart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, &mapper, -1.0);
             chart.drawOnWindow();
         }
 
@@ -308,29 +331,101 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_trained_1_80_80.cod", 0, dim);
 
-            graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 1.0, 1.0);
+            graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 2.0, 2.0);
             graphics::UMatChart<double, char> umatChart(733, 733, &cellColor);
+
             umatChart.setWindowTitle("U-Matrix");
             graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+
             umatChart.saveImage("sspy_u_matrix_80_80_after_trained.png");
 
-            graphics::SammonMapChart<double> sammonChart(xdim, 733, 733);
-            sammonChart.setWindowTitle("Sammon map for trained codes");
-            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
-            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
-
-            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
-            sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
-            graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
-            sammonChartImg.addSammonMapPoints(sammonMap->getMapPoints());
-            sammonChartImg.saveImage("sspy_sammon_map_80_80_after_trained_img2.png");
+//            graphics::SammonMapChart<double> sammonChart(xdim, 733, 733);
+//            sammonChart.setWindowTitle("Sammon map for trained codes");
+//            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+//            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
+//
+//            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
+//            sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
+//            graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
+//            sammonChartImg.addSammonMapPoints(sammonMap->getMapPoints());
+//            sammonChartImg.saveImage("sspy_sammon_map_80_80_after_trained_img2.png");
 
             delete somCodesMatrix;
-            delete sammonMap;
+//            delete sammonMap;
 
             double summaryTime = get_time() - start;
             printf("Visualization trained codes time: %f\n", summaryTime / 60.0);
+        }
+
+        void test_visible_labling_trained_codes_sspy() {
+            double start = get_time();
+            size_t dim = 17;
+            size_t xdim = 80;
+            size_t ydim = 80;
+
+            OutCodes *somCodesMatrix = read_matrix_file("sspy_som_trained_1_80_80.cod", 0, dim);
+
+            graphics::UMatChart<double, char> umatChart(733, 733);
+            umatChart.setWindowTitle("U-Matrix");
+            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+
+            // init reader
+            file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
+            SspyRowParser rowParser;
+            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
+            size_t winnerSize = winnerSearcher.getWinnerSize();
+
+            utils::hash::CharHash cHash;
+            kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
+
+            models::DataSample<double> samples[dim];
+            SspyData rowData;
+            size_t indexRow = 0;
+            while (dataReader.readNext(rowData, samples)) {
+                kohonen::winner::WinnerInfo<double> winners[winnerSize];
+                bool ok = winnerSearcher.search(somCodesMatrix, samples, winners);
+                if (ok) {
+//                    std::cout << " " << winners[0].index;
+                    somLabeling.addWinner(winners[0].index, rowData.msg_type);
+                }
+                if (indexRow!=0 && indexRow%40000==0) {
+                    std::cout<<indexRow<<std::endl;
+                    drawUMatWithLabels(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim);
+                    // clean drawed data for labels
+//                    somLabeling.cleanWinnerLabels();
+                }
+                indexRow++;
+            }
+
+
+
+            umatChart.saveImage("sspy_u_matrix_labeled_80_80_after_trained.png");
+
+            graphics::UMatChart<double, char> umatChart2(8000, 8000);
+            umatChart2.setWindowTitle("U-Matrix");
+            graphics::ChartThread<graphics::UMatCell<double>> umchartThread2(&umatChart2);
+            drawUMatWithLabels(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim);
+            umatChart2.saveImage("sspy_u_matrix_labeled_big_80_80_after_trained.png");
+
+//            graphics::SammonMapChart<double> sammonChart(xdim, 733, 733);
+//            sammonChart.setWindowTitle("Sammon map for trained codes");
+//            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+//            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
+//
+//            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
+//            sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
+//            graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
+//            sammonChartImg.addSammonMapPoints(sammonMap->getMapPoints());
+//            sammonChartImg.saveImage("sspy_sammon_map_80_80_after_trained_img2.png");
+
+            delete somCodesMatrix;
+//            delete sammonMap;
+
+            double summaryTime = get_time() - start;
+            printf("Visualization lableing trained codes time: %f\n", summaryTime / 60.0);
         }
 
         void test_copy_part_of_sspy_file() {
@@ -349,7 +444,7 @@ namespace test {
 
         void sspy_data_read_test() {
             suite("Sspy_test");
-            mytest(read_sspy_data_file_by_line);
+//            mytest(read_sspy_data_file_by_line);
 //            mytest(csv_parse_sspy_data_file);
 //            mytest(collect_summary_sspy_data_file);
 //            mytest(initialization_codes_sspy);
@@ -358,6 +453,8 @@ namespace test {
 //            mytest(visible_trained_codes_sspy);
 
 //            mytest(copy_part_of_sspy_file);
+
+            mytest(visible_labling_trained_codes_sspy);
         }
     }
 }
