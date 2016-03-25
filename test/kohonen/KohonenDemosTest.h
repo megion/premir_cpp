@@ -98,6 +98,55 @@ namespace test {
 
         };
 
+        class HouseVotesCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
+
+            bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
+                // get label
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0) {
+                    row.label = '\0';
+                } else {
+                    row.label = buffer[0];
+                }
+
+                size_t colSize = 16;
+                for (size_t i = 0; i < colSize; ++i) {
+                    readNextDataSample(samples[i], csvReader);
+                }
+
+                return true;
+            }
+
+            void initReadFile(file::CsvFileReader *csvReader) {
+            }
+
+        private:
+
+            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
+                char buffer[64];
+                *buffer = '\0';
+                size_t bytesRead = csvReader->read(buffer, 64);
+                if (bytesRead == 0) {
+                    sample.skipped = true;
+                } else if (buffer[0] == '?') {
+                    sample.skipped = false;
+                    sample.value = 1;
+                } else if (buffer[0] == 'n') {
+                    sample.skipped = false;
+                    sample.value = 0;
+                } else if (buffer[0] == 'y') {
+                    sample.skipped = false;
+                    sample.value = 2;
+                } else {
+                    sample.skipped = true;
+                }
+                return bytesRead;
+            }
+
+        };
+
         void kohonen_demos_test();
     }
 }

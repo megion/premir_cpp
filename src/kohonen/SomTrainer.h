@@ -114,7 +114,7 @@ namespace kohonen {
                 return true;
             } else {
                 // skip inRow for calculation
-                danger_text("skip empty sample vector");
+//                danger_text("skip empty sample vector");
                 return false;
             }
         }

@@ -454,7 +454,7 @@ namespace test {
 
 //            mytest(copy_part_of_sspy_file);
 
-            mytest(visible_labling_trained_codes_sspy);
+//            mytest(visible_labling_trained_codes_sspy);
         }
     }
 }
