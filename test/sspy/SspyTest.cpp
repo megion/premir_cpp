@@ -139,7 +139,7 @@ namespace test {
             chart.addHexaUMatPoints(umat.getUMatrix());
 
             somLabeling.collectSummary();
-            somLabeling.getWinnerLabels()->getMatrix()->print(false);
+//            somLabeling.getWinnerLabels()->getMatrix()->print(false);
             chart.addHexaUMatPoints(umat.getUMatrix());
 
             MsgTypeLabelColorMapper mapper;
