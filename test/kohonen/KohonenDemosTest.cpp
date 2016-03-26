@@ -181,9 +181,125 @@ namespace test {
             delete somCodesMatrix;
         }
 
+        void test_house_votes() {
+            size_t xdim = 32;
+            size_t ydim = 36;
+            size_t dim = 16;
+            size_t teachSize = 10000;
+            int step = 1000;
+            double radius = 4.0;
+            double alpha = 0.002;
+            bool isScale = false;
+
+            // инициализация потока чтения файла с данными
+            file::CsvFileReader csvReader("../test/datafiles/kohonen/house-votes-84.data.txt", ',');
+            HouseVotesCsvFileRowParser rowParser;
+            file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &rowParser);
+            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            summary.collectSummary(0, &csvReader, &rowParser); // 0 - значит без ограничений
+
+            kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
+            kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
+            randomEngine->setNextValue(1);
+            OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
+
+            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
+            kohonen::mapdist::HexaMapDistance<float> mapDist;
+
+            kohonen::neighadap::GaussianNeighborAdaptation<float, float> gausAdap(&mapDist, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius,
+                                                                 xdim, ydim);
+
+            // init labeling
+            utils::hash::CharHash cHash;
+            kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
+
+            //
+            graphics::PointChart qErrorChart(true, 710, 460);
+            qErrorChart.setWindowTitle("Quantum error");
+            graphics::ChartThread<bool> chartThread(&qErrorChart);
+
+            size_t winnerSize = winnerSearcher.getWinnerSize();
+            size_t colSize = somCodesMatrix->getColSize();
+
+
+            double qerror = 0;
+
+//            int step2 = 6000;
+
+//            graphics::SammonMapChart<float> sammonChart(xdim, 1200, 700);
+//            sammonChart.setWindowTitle("Sammon Map");
+//            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
+//            buildAndShowSammonMap(somCodesMatrix, sammonChart);
+
+            graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 2.0, 2.0);
+            graphics::UMatChart<float, char> umatChart(733, 733, &cellColor);
+            umatChart.setWindowTitle("UMat");
+            graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
+            drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, -1.0);
+
+            for (size_t le = 0; le < teachSize; ++le) {
+                models::DataSample<float> samples[colSize];
+                DemoInRow rowData;
+                bool hasInRow = dataReader.readNext(rowData, samples);
+                if (!hasInRow) {
+                    // значит достигли конца данных, начинаем читать с начала
+                    // установить поток на начало
+                    dataReader.rewindReader();
+                    // читаем первую стоку данных
+                    dataReader.readNext(rowData, samples);
+                }
+
+                // нормализация
+                if (isScale) {
+                    summary.scaleSamples(samples);
+                }
+
+                kohonen::winner::WinnerInfo<float> winners[winnerSize];
+                bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
+                if (ok) {
+                    somLabeling.addWinner(winners[0].index, rowData.label);
+//                    int cnt = le % step;
+                    qerror += std::sqrt(winners[0].diff);
+                    if (le % step==0 && le!=0) {
+                        qerror = qerror / step;
+                        qErrorChart.redrawNewPoint(le, qerror);
+                        drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, -1.0);
+                        // clean drawed data for labels
+//                    somLabeling.cleanWinnerLabels();
+                        qerror = 0;
+                    }
+
+//                    if (le % step2 == 0) {
+//                        drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
+//                        buildAndShowSammonMap(somCodesMatrix, sammonChart);
+//                    }
+
+                }
+            }
+
+
+
+//            graphics::UMatChart<float, char> umatChart2(2000, 2000);
+//            umatChart2.setWindowTitle("UMat2");
+//            graphics::ChartThread<graphics::UMatCell<float>> umchartThread2(&umatChart2);
+//            drawUMat(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim, labelThreshold);
+//            umatChart2.saveImage("u-matrix-speech-final.png");
+
+//            graphics::SammonMapChart<float> sammonChart2(xdim, 1200, 700);
+//            sammonChart2.setWindowTitle("Sammon Map2");
+//            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
+//            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
+
+            delete somCodesMatrix;
+        }
+
         void kohonen_demos_test() {
             suite("KohonenDemos");
 //            mytest(speech_signal);
+            mytest(house_votes);
         }
     }
 }
