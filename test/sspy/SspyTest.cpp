@@ -557,7 +557,7 @@ namespace test {
 //            mytest(visible_initialized_codes_sspy);
 //            mytest(trained_codes_sspy);
 //            mytest(trained_codes_sspy2);
-            mytest(visible_trained_codes_sspy);
+//            mytest(visible_trained_codes_sspy);
 
 //            mytest(copy_part_of_sspy_file);
 

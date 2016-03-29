@@ -36,8 +36,8 @@ namespace test {
             graphics::Color colorA(65535, 0, 0);
             graphics::Color colorI(0, 65535, 0);
             graphics::Color colorN(0, 0, 65535);
-            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'A', xdim, ydim, colorA, labelThreshold);
-            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'I', xdim, ydim, colorI, labelThreshold);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'r', xdim, ydim, colorA, labelThreshold);
+            chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'd', xdim, ydim, colorI, labelThreshold);
             chart.setLabelsForKey(somLabeling.getWinnerLabels(), 'N', xdim, ydim, colorN, labelThreshold);
             SpeechLabelColorMapper mapper;
 //            chart.setAllLabels(somLabeling.getWinnerLabels(), xdim, ydim, &mapper, labelThreshold);
@@ -182,12 +182,12 @@ namespace test {
         }
 
         void test_house_votes() {
-            size_t xdim = 32;
-            size_t ydim = 36;
+            size_t xdim = 60;
+            size_t ydim = 60;
             size_t dim = 16;
             size_t teachSize = 10000;
             int step = 1000;
-            double radius = 4.0;
+            double radius = 6.0;
             double alpha = 0.002;
             bool isScale = false;
 
@@ -299,7 +299,7 @@ namespace test {
         void kohonen_demos_test() {
             suite("KohonenDemos");
 //            mytest(speech_signal);
-//            mytest(house_votes);
+            mytest(house_votes);
         }
     }
 }
