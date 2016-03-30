@@ -10,7 +10,6 @@ namespace kohonen {
          * Вычисление расстояния на карте между двумя точками (нейронами)
          * на карте. Вычисление зависит от топологии карты (HEXA или RECT).
          */
-        template<typename T>
         class MapDistance {
         public:
 
@@ -19,7 +18,7 @@ namespace kohonen {
              * должны быть знаковыми т.к. при вычислении расстояния
              * разность может быть отрицательной.
              */
-            virtual T distance(long bx, long by, long tx, long ty) = 0;
+            virtual double distance(long bx, long by, long tx, long ty) = 0;
 
         };
     }

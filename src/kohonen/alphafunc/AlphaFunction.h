@@ -9,11 +9,10 @@ namespace kohonen {
         /**
          * Функция скорости обучения
          */
-        template<typename T>
         class AlphaFunction {
         public:
 
-            virtual T calcAlpha(size_t index, size_t teachSize, T alpha) = 0;
+            virtual double calcAlpha(size_t index, size_t teachSize, double alpha) = 0;
 
         };
     }

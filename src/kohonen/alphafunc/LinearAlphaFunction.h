@@ -14,14 +14,13 @@ namespace kohonen {
          *
          * a(t) = a(0)(1.0 - t/rlen), где C=rlen/100.0
          */
-        template<typename T>
-        class LinearAlphaFunction : public AlphaFunction<T> {
+        class LinearAlphaFunction : public AlphaFunction {
         public:
             LinearAlphaFunction() {
             }
 
-            T calcAlpha(size_t index, size_t teachSize, T alpha) {
-                return (alpha * (T) (teachSize - index) / (T) teachSize);
+            double calcAlpha(size_t index, size_t teachSize, double alpha) {
+                return (alpha * (double) (teachSize - index) / (double) teachSize);
             }
 
         };

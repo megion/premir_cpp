@@ -14,15 +14,14 @@ namespace kohonen {
          *
          * a = a(0)C/(C+t), где C=rlen/100.0
          */
-        template<typename T>
-        class InverseAlphaFunction : public AlphaFunction<T> {
+        class InverseAlphaFunction : public AlphaFunction {
         public:
             InverseAlphaFunction() {
             }
 
-            T calcAlpha(size_t index, size_t teachSize, T alpha) {
+            double calcAlpha(size_t index, size_t teachSize, double alpha) {
                 // INV_ALPHA_CONSTANT 100.0
-                T c = (T) teachSize / (T) 100.0;
+                double c = (double) teachSize / (double) 100.0;
                 return (alpha * c / (c + index));
             }
 

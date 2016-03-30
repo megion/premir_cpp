@@ -24,12 +24,11 @@
 
 namespace kohonen {
 
-    template<typename Out>
     class SomKeeper {
     public:
 
-        typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
-        typedef typename utils::RMatrix<models::NeuronInfo, Out>::Row Neuron;
+        typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
+        typedef typename utils::RMatrix<models::NeuronInfo, double>::Row Neuron;
 
         SomKeeper() {
         }
@@ -37,14 +36,15 @@ namespace kohonen {
         ~SomKeeper() {
         }
 
-        void saveSom(OutCodes *trainedSom, file::CsvFileWriter *csvWriter) {
+        void saveSom(OutCodes *trainedSom, const char *filename) {
+            file::CsvFileWriter writer(filename);
             size_t colSize = trainedSom->getColSize();
             for (size_t i = 0; i < trainedSom->getRowSize(); ++i) {
                 Neuron &ni = trainedSom->getRow(i);
                 for (size_t j = 0; j < colSize; ++j) {
-                    csvWriter->write(ni.points[j]);
+                    writer.write(ni.points[j]);
                 }
-                csvWriter->endLine();
+                writer.endLine();
             }
         }
 

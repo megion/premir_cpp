@@ -33,5 +33,4 @@ add_executable(dummy_executable
         src/ml/DigitalFilter.cpp
         src/utils/matrix_utils.cpp
         src/graphics/color_utils.cpp
-        test/test.cpp
-        )
+        test/test.cpp)

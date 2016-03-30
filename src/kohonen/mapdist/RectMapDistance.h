@@ -11,15 +11,14 @@
 namespace kohonen {
     namespace mapdist {
 
-        template<typename T>
-        class RectMapDistance : public MapDistance<T> {
+        class RectMapDistance : public MapDistance {
         public:
             RectMapDistance() {
             }
 
-            T distance(long bx, long by, long tx, long ty) {
-                T diff = bx - tx;
-                T ret = diff * diff;
+            double distance(long bx, long by, long tx, long ty) {
+                double diff = bx - tx;
+                double ret = diff * diff;
                 diff = by - ty;
                 ret += diff * diff;
                 ret = std::sqrt(ret);

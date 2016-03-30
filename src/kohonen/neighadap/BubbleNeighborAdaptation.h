@@ -13,35 +13,28 @@ namespace kohonen {
         /**
          * Функция адаптация соседей bubble
          */
-        template<typename In, typename Out>
-        class BubbleNeighborAdaptation : public NeighborAdaptation<In, Out> {
+        class BubbleNeighborAdaptation : public NeighborAdaptation {
         public:
-            BubbleNeighborAdaptation(
-                    kohonen::mapdist::MapDistance<Out> *_mapDist,
-                    size_t _xdim, size_t _ydim)
-                    : mapDist(_mapDist),
-                      NeighborAdaptation<In, Out>(_xdim, _ydim) {
+            BubbleNeighborAdaptation(kohonen::mapdist::MapDistance *_mapDist, size_t _xdim, size_t _ydim)
+                    : mapDist(_mapDist), NeighborAdaptation(_xdim, _ydim) {
             }
 
-            void adaptation(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                            models::DataSample<In> *inSampleRow,
-                            long bx, long by,
-                            Out radius, Out alpha) {
+            void adaptation(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
+                            long bx, long by, double radius, double alpha) {
                 for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
-                    long tx = r % NeighborAdaptation<In, Out>::xdim;
-                    long ty = r / NeighborAdaptation<In, Out>::xdim;
+                    long tx = r % NeighborAdaptation::xdim;
+                    long ty = r / NeighborAdaptation::xdim;
 
                     if ((mapDist->distance(bx, by, tx, ty)) <= radius) {
-                        NeighborAdaptation<In, Out>::recalculateCodeVector(
-                                somCodes->getRow(r).points,
-                                inSampleRow, somCodes->getColSize(), alpha);
+                        NeighborAdaptation::recalculateCodeVector(somCodes->getRow(r).points, inSampleRow,
+                                                                  somCodes->getColSize(), alpha);
                     }
                 }
 
             }
 
         private:
-            kohonen::mapdist::MapDistance<Out> *mapDist;
+            kohonen::mapdist::MapDistance *mapDist;
 
         };
     }

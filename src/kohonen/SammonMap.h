@@ -28,20 +28,19 @@
 
 namespace kohonen {
 
-    template<typename Out>
     class SammonMap {
     public:
 
-        typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
-        typedef typename utils::RMatrix<models::NeuronInfo, Out>::Row Neuron;
-        typedef utils::ArrayUtils<Out, Out, Out> ArrayUtils;
+        typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
+        typedef typename utils::RMatrix<models::NeuronInfo, double>::Row Neuron;
+        typedef utils::ArrayUtils<double, double, double> ArrayUtils;
 
         SammonMap(long _nLen) :
                 nLen(_nLen),
                 randomEngine(new RandomGenerator()),
                 mapPoints(new utils::CArrayList<Point>(nLen, 1, nLen)),
                 correctionPoints(new utils::CArrayList<Point>(nLen)),
-                dd(new utils::CArrayList<Out>(nLen * (nLen - 1) / 2)) {
+                dd(new utils::CArrayList<double>(nLen * (nLen - 1) / 2)) {
         }
 
         ~SammonMap() {
@@ -52,14 +51,14 @@ namespace kohonen {
         }
 
         struct Point {
-            Out x;
-            Out y;
+            double x;
+            double y;
         };
 
         void initializeMap(OutCodes *trainedSom) {
             for (size_t i = 0; i < nLen; ++i) {
-                (*mapPoints)[i].x = (Out) (randomEngine->generate() % nLen) / nLen;
-                (*mapPoints)[i].y = (Out) (i) / nLen;
+                (*mapPoints)[i].x = (double) (randomEngine->generate() % nLen) / nLen;
+                (*mapPoints)[i].y = (double) (i) / nLen;
             }
 
             size_t mutualIndex = 0;
@@ -74,7 +73,7 @@ namespace kohonen {
                     }
 
                     Neuron &nj = trainedSom->getRow(j);
-                    Out dist = ArrayUtils::euclideanDistance(ni.points, nj.points, colSize);
+                    double dist = ArrayUtils::euclideanDistance(ni.points, nj.points, colSize);
                     (*dd)[mutualIndex] = dist;
                     mutualIndex++;
 
@@ -98,27 +97,27 @@ namespace kohonen {
         /**
          * Построение проекций Саммона - одна итерация
          */
-        Out doOneIteration() {
+        double doOneIteration() {
             for (size_t j = 0; j < nLen; ++j) {
-                Out e1x = 0, e1y = 0, e2x = 0, e2y = 0;
+                double e1x = 0, e1y = 0, e2x = 0, e2y = 0;
                 for (size_t k = 0; k < nLen; ++k) {
                     if (j != k) {
-                        Out xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
-                        Out yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
+                        double xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
+                        double yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
                         // TODO: непонятно почему к double приводится только
                         // первый слагаемый - если поставить (double)
                         // ко второму то результат будет другим
-                        Out dpj = (Out) std::sqrt((double) xd * xd + yd * yd);
+                        double dpj = std::sqrt(xd * xd + yd * yd);
 
                         /* calculate derivatives */
-                        Out dt;
+                        double dt;
                         if (k > j) {
                             dt = (*dd)[k * (k - 1) / 2 + j];
                         } else {
                             dt = (*dd)[j * (j - 1) / 2 + k];
                         }
-                        Out dq = dt - dpj;
-                        Out dr = dt * dpj;
+                        double dq = dt - dpj;
+                        double dr = dt * dpj;
                         e1x += xd * dq / dr;
                         e1y += yd * dq / dr;
                         e2x += (dq - xd * xd * (1.0 + dq / dpj) / dpj) / dr;
@@ -131,7 +130,7 @@ namespace kohonen {
             }
 
             /* Move the center of mass to the center of picture */
-            Out xx = 0, yy = 0;
+            double xx = 0, yy = 0;
             for (size_t j = 0; j < nLen; ++j) {
                 xx += (*correctionPoints)[j].x;
                 yy += (*correctionPoints)[j].y;
@@ -144,18 +143,18 @@ namespace kohonen {
             }
 
             /* Error in distances */
-            Out e = 0, tot = 0;
+            double e = 0, tot = 0;
             size_t mutualIndex = 0;
             for (size_t j = 1; j < nLen; ++j) {
                 for (size_t k = 0; k < j; ++k) {
-                    Out dist = (*dd)[mutualIndex];
+                    double dist = (*dd)[mutualIndex];
                     tot += dist;
-                    Out xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
-                    Out yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
+                    double xd = (*mapPoints)[j].x - (*mapPoints)[k].x;
+                    double yd = (*mapPoints)[j].y - (*mapPoints)[k].y;
                     // TODO: непонятно почему к double приводится только
                     // первый слагаемый - если поставить (double)
                     // ко второму то результат будет другим
-                    Out ee = dist - (Out) std::sqrt((double) xd * xd + yd * yd);
+                    double ee = dist - std::sqrt(xd * xd + yd * yd);
                     e += (ee * ee / dist);
                     mutualIndex++;
                 }
@@ -192,7 +191,7 @@ namespace kohonen {
         long nLen;
         utils::CArrayList<Point> *mapPoints;
         utils::CArrayList<Point> *correctionPoints;
-        utils::CArrayList<Out> *dd;
+        utils::CArrayList<double> *dd;
 
     };
 }

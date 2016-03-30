@@ -16,18 +16,16 @@ namespace kohonen {
          * Функция сосседства может иметь либо форму пузырька (bubble) либо
          * гауссовскую форму.
          */
-        template<typename In, typename Out>
         class NeighborAdaptation {
         public:
 
-            NeighborAdaptation(size_t _xdim, size_t _ydim) :
-                    xdim(_xdim), ydim(_ydim) {
+            NeighborAdaptation(size_t _xdim, size_t _ydim) : xdim(_xdim), ydim(_ydim) {
             }
 
-            virtual void adaptation(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                                    models::DataSample<In> *inSampleRow, long bx, long by, Out radius, Out alpha) = 0;
+            virtual void adaptation(utils::RMatrix<models::NeuronInfo, double> *somCodes,
+                                    models::DataSample *inSampleRow, long bx, long by, double radius, double alpha) = 0;
 
-            void recalculateCodeVector(Out *codeVector, models::DataSample<In> *inSampleRow, size_t dim, Out alpha) {
+            void recalculateCodeVector(double *codeVector, models::DataSample *inSampleRow, size_t dim, double alpha) {
                 for (size_t i = 0; i < dim; ++i) {
                     // TODO: ignore skipped vector components
                     if (!inSampleRow[i].skipped) {
@@ -43,6 +41,5 @@ namespace kohonen {
         };
     }
 }
-
 
 #endif

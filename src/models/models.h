@@ -8,19 +8,17 @@ namespace models {
     /**
      * Хранить прочитанное значение
      */
-    template<typename T>
     struct DataSample {
-        T value; // значение
+        double value; // значение
         bool skipped; // true значение пропущено или неопределенно
     };
 
     /**
      * Хранит некоторую статистику для одной колонки. Статистика собирается только по допустимым значениям.
      */
-    template<typename T>
     struct ColSummary {
-        T min; // минимальное допустимое значение
-        T max; // максимальное (допустимое) значение в колонке
+        double min; // минимальное допустимое значение
+        double max; // максимальное (допустимое) значение в колонке
         double sum; // сумма допустимых значений в колонке
         double average; // среднее значение sum/count
         double scaledAverage; // нормализованное среднее значение
@@ -34,7 +32,7 @@ namespace models {
             return (count==0) || (max == min);
         }
 
-        bool operator==(const ColSummary<T> &other) const {
+        bool operator==(const ColSummary &other) const {
             if ((other.min != min) || (other.max != max) || (other.sum != sum) || (other.average != average) ||
                 (other.scaledAverage != scaledAverage) || (other.count != count)) {
                 return false;
@@ -46,15 +44,13 @@ namespace models {
         bool operator!=(const ColSummary<T> &other) const {
             return !((*this) == other);
         }
-    };
 
-    template<typename T>
-    std::ostream &operator<<(std::ostream &os, const ColSummary<T> &val) {
-        os << std::endl << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " <<
-        val.average <<
-        ", scaledAverage " << val.scaledAverage << ", count " << val.count;
-        return os;
-    }
+        friend std::ostream &operator<<(std::ostream &os, const ColSummary &val) {
+            os << std::endl << "min " << val.min << ", max " << val.max << ", sum " << val.sum << ", average " <<
+            val.average << ", scaledAverage " << val.scaledAverage << ", count " << val.count;
+            return os;
+        }
+    };
 
     /**
      * Хранит некоторую информацию о нейроне.
