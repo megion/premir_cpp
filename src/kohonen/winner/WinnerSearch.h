@@ -9,22 +9,19 @@
 namespace kohonen {
     namespace winner {
 
-        template<typename Out>
         struct WinnerInfo {
-            Out diff; // вычисленное расстояние
+            double diff; // вычисленное расстояние
             long index; // индекс нейрона победителя
         };
 
-        template<typename In, typename Out>
         class WinnerSearch {
         public:
 
             WinnerSearch(size_t _winnersSize) : winnersSize(_winnersSize) {
             }
 
-            virtual bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                                models::DataSample<In> *inSampleRow,
-                                WinnerInfo<Out> *winners) = 0;
+            virtual bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
+                                WinnerInfo *winners) = 0;
 
             size_t getWinnerSize() {
                 return winnersSize;

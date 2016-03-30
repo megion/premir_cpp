@@ -15,9 +15,9 @@ namespace test {
             char value2[10];
         };
 
-        class MyCsvFileRowParser : public file::CsvFileRowParser<MyInRow, double> {
+        class MyCsvFileRowParser : public file::CsvFileRowParser<MyInRow> {
 
-            bool parseRow(MyInRow &row, models::DataSample<double> *samples, file::CsvFileReader *csvReader) {
+            bool parseRow(MyInRow &row, models::DataSample *samples, file::CsvFileReader *csvReader) {
                 size_t colSize = 20;
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
@@ -34,7 +34,7 @@ namespace test {
 
         private:
 
-            size_t readNextDataSample(models::DataSample<double> &sample, file::CsvFileReader *csvReader) {
+            size_t readNextDataSample(models::DataSample &sample, file::CsvFileReader *csvReader) {
                 char buffer[64];
                 *buffer = '\0';
                 size_t bytesRead = csvReader->read(buffer, 64);

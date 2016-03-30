@@ -8,14 +8,14 @@
 
 namespace file {
 
-    template<typename Row, typename Num>
+    template<typename Row>
     class CsvFileRowParser {
     public:
 
         /**
          * Разбор строки в объект row и в числовой массив samples
          */
-        virtual bool parseRow(Row& row, models::DataSample<Num>* samples, CsvFileReader *csvReader) = 0;
+        virtual bool parseRow(Row& row, models::DataSample* samples, CsvFileReader *csvReader) = 0;
 
         /**
          * Инициализация чтения файла. Может быть необходима например пропустить часть строчек в начале файла.

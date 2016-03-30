@@ -8,14 +8,14 @@
 namespace file {
     namespace stream {
 
-        template<typename Row, typename Num>
+        template<typename Row>
         class StreamReader {
         public:
 
             /**
              * Чтение данных
              */
-            virtual bool readNext(Row& row, models::DataSample<Num>* samples) = 0;
+            virtual bool readNext(Row& row, models::DataSample* samples) = 0;
 
             /**
              * Начать читать поток заново. В случае файла

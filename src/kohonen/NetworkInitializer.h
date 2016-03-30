@@ -36,8 +36,7 @@ namespace kohonen {
 
         typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
 
-        NetworkInitializer(file::stream::StreamReader<InRow, double> *streamReader,
-                           file::CsvFileSummary<InRow, double> *_summary)
+        NetworkInitializer(file::stream::StreamReader<InRow> *streamReader, file::CsvFileSummary<InRow> *_summary)
                 : dataReader(streamReader), summary(_summary) {
             randomEngine = new RandomGenerator();
         }
@@ -100,8 +99,8 @@ namespace kohonen {
 
     private:
         // поток входных данных
-        file::stream::StreamReader<InRow, double> *dataReader;
-        file::CsvFileSummary<InRow, double> *summary;
+        file::stream::StreamReader<InRow> *dataReader;
+        file::CsvFileSummary<InRow> *summary;
         // генератор псевдо случайных чисел
         RandomGenerator *randomEngine;
 

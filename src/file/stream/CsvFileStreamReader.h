@@ -14,13 +14,13 @@ namespace file {
 
     namespace stream {
 
-        template<typename Row, typename Num>
-        class CsvFileStreamReader : public StreamReader<Row, Num> {
+        template<typename Row>
+        class CsvFileStreamReader : public StreamReader<Row> {
         public:
 
-            typedef typename utils::RMatrix<Row, models::DataSample<Num>>::Row MatrixRow;
+            typedef typename utils::RMatrix<Row, models::DataSample>::Row MatrixRow;
 
-            CsvFileStreamReader(file::CsvFileReader *_csvReader, file::CsvFileRowParser<Row, Num> *_rowParser):
+            CsvFileStreamReader(file::CsvFileReader *_csvReader, file::CsvFileRowParser<Row> *_rowParser) :
                     csvReader(_csvReader), rowParser(_rowParser),
                     useBuffer(false),
                     rowIndex(0),
@@ -29,15 +29,14 @@ namespace file {
                 rowParser->initReadFile(csvReader);
             }
 
-            CsvFileStreamReader(file::CsvFileReader *_csvReader,
-                                file::CsvFileRowParser<Row, Num> *_rowParser,
+            CsvFileStreamReader(file::CsvFileReader *_csvReader, file::CsvFileRowParser<Row> *_rowParser,
                                 size_t colSize, bool _useBuffer) :
                     csvReader(_csvReader), rowParser(_rowParser),
                     useBuffer(_useBuffer),
                     rowIndex(0),
                     bufferMatrix(nullptr) {
                 if (useBuffer) {
-                    bufferMatrix = new utils::RMatrix<Row, models::DataSample<Num>>(0, colSize);
+                    bufferMatrix = new utils::RMatrix<Row, models::DataSample>(0, colSize);
                 }
                 csvReader->rewindReader();
                 rowParser->initReadFile(csvReader);
@@ -50,9 +49,9 @@ namespace file {
                 }
             }
 
-            bool readNext(Row &row, models::DataSample<Num> *samples) {
+            bool readNext(Row &row, models::DataSample *samples) {
                 if (useBuffer && rowIndex < bufferMatrix->getRowSize()) {
-                    const MatrixRow& mr = bufferMatrix->getRow(rowIndex);
+                    const MatrixRow &mr = bufferMatrix->getRow(rowIndex);
                     bufferMatrix->copyRow(row, samples, mr);
                     rowIndex++;
                     return true;
@@ -99,10 +98,10 @@ namespace file {
 
         private:
             file::CsvFileReader *csvReader;
-            file::CsvFileRowParser<Row, Num> *rowParser;
+            file::CsvFileRowParser<Row> *rowParser;
 
             // buffering
-            utils::RMatrix<Row, models::DataSample<Num>> *bufferMatrix;
+            utils::RMatrix<Row, models::DataSample> *bufferMatrix;
             size_t rowIndex;
             bool useBuffer;
             size_t typeSizeof;

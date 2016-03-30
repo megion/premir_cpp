@@ -8,12 +8,12 @@ namespace test {
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/demo_summary.dat", ' ');
             MyCsvFileRowParser demoRowParser;
-            file::stream::CsvFileStreamReader<MyInRow, double> dataReader(&csvReader, &demoRowParser);
-            file::CsvFileSummary<MyInRow, double> summary(dim);
+            file::stream::CsvFileStreamReader<MyInRow> dataReader(&csvReader, &demoRowParser);
+            file::CsvFileSummary<MyInRow> summary(dim);
             summary.collectSummary(0, &csvReader, &demoRowParser);
 //            summary.getSummary()->print();
 
-            models::ColSummary<double>* stats = summary.getSummary()->getArray();
+            models::ColSummary* stats = summary.getSummary()->getArray();
 
             assert(38.08 == stats[0].sum);
             assert(1.86 == stats[19].sum);
@@ -34,7 +34,7 @@ namespace test {
             assert_range(0.52517, stats[0].scaledAverage, 0.00001);
             assert_range(0.582949, stats[19].scaledAverage, 0.00001);
 
-            utils::CArrayList<models::ColSummary<double>> copySummary(*summary.getSummary());
+            utils::CArrayList<models::ColSummary> copySummary(*summary.getSummary());
             summary.writeSummary("test_csv_file_summary.cod");
             summary.readSummary("test_csv_file_summary.cod");
 

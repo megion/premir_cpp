@@ -25,17 +25,17 @@
 
 namespace kohonen {
 
-    template<typename InRow, typename InNum, typename Out>
+    template<typename InRow>
     class SomTrainer {
     public:
 
-        typedef file::stream::StreamReader<InRow, InNum> InReader;
-        typedef utils::RMatrix<models::NeuronInfo, Out> OutCodes;
+        typedef file::stream::StreamReader<InRow> InReader;
+        typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
 
-        SomTrainer(alphafunc::AlphaFunction<Out> *_alphaFunction,
-                   winner::WinnerSearch <InNum, Out> *_winnerSearcher,
-                   neighadap::NeighborAdaptation<InNum, Out> *_neighborAdaptation,
-                   Out _alpha, Out _radius, size_t _xdim, size_t _ydim)
+        SomTrainer(alphafunc::AlphaFunction *_alphaFunction,
+                   winner::WinnerSearch *_winnerSearcher,
+                   neighadap::NeighborAdaptation *_neighborAdaptation,
+                   double _alpha, double _radius, size_t _xdim, size_t _ydim)
                 : alphaFunction(_alphaFunction),
                   winnerSearcher(_winnerSearcher),
                   neighborAdaptation(_neighborAdaptation),
@@ -44,7 +44,7 @@ namespace kohonen {
 
         struct QuantumError {
             /* сумма расстояний от каждого входного вектора до победителя */
-            Out sumWinnerDistance;
+            double sumWinnerDistance;
             /* число входных данных на которых посчитана ошибка квантования */
             size_t samplesSize;
         };
@@ -53,7 +53,7 @@ namespace kohonen {
          * Обучение указанное teachSize число раз
          */
         bool training(OutCodes *initializedSom, InReader *inDataStreamReader, bool isScale,
-                      file::CsvFileSummary<InRow, InNum> *summary, size_t teachSize) {
+                      file::CsvFileSummary<InRow> *summary, size_t teachSize) {
             // установить поток на начало
             inDataStreamReader->rewindReader();
 
@@ -61,7 +61,7 @@ namespace kohonen {
             size_t colSize = initializedSom->getColSize();
 
             for (size_t le = 0; le < teachSize; ++le) {
-                models::DataSample<InNum> samples[colSize];
+                models::DataSample samples[colSize];
                 InRow rowData;
                 bool hasInRow = inDataStreamReader->readNext(rowData, samples);
                 if (!hasInRow) {
@@ -83,7 +83,7 @@ namespace kohonen {
                     summary->scaleSamples(samples);
                 }
 
-                winner::WinnerInfo <Out> winners[winnerSize];
+                winner::WinnerInfo winners[winnerSize];
                 bool ok = trainingBySample(initializedSom, samples, winners, teachSize, le);
                 if (!ok) {
                     std::cerr << "skip empty sample " << le << std::endl;
@@ -92,13 +92,11 @@ namespace kohonen {
             return true;
         }
 
-        bool trainingBySample(OutCodes *initializedSom,
-                              models::DataSample<InNum> *sampleVector,
-                              winner::WinnerInfo <Out> *winners,
+        bool trainingBySample(OutCodes *initializedSom, models::DataSample *sampleVector, winner::WinnerInfo *winners,
                               size_t teachSize, size_t index) {
             /* Radius decreases linearly to one */
-            Out trad = 1 + (radius - 1) * ((Out) (teachSize - index)) / (Out) teachSize;
-            Out talp = alphaFunction->calcAlpha(index, teachSize, alpha);
+            double trad = 1 + (radius - 1) * ((double) (teachSize - index)) / (double) teachSize;
+            double talp = alphaFunction->calcAlpha(index, teachSize, alpha);
 
             bool ok = winnerSearcher->search(initializedSom, sampleVector, winners);
             // TODO ok == false только если весь вектор пуст
@@ -123,7 +121,7 @@ namespace kohonen {
          * Вычисление ошибки квантования
          */
         QuantumError quantizationError(OutCodes *trainedSom, InReader *inDataStreamReader,
-                                       bool isScale, file::CsvFileSummary<InRow, InNum> *summary,
+                                       bool isScale, file::CsvFileSummary<InRow> *summary,
                                        size_t rowsLimit = 0) {
             QuantumError qError = {0, 0};
 
@@ -133,14 +131,14 @@ namespace kohonen {
             size_t winnerSize = winnerSearcher->getWinnerSize();
             size_t colSize = trainedSom->getColSize();
 
-            models::DataSample<InNum> samples[colSize];
+            models::DataSample samples[colSize];
             InRow rowData;
             size_t rowIndex = 0;
             while (inDataStreamReader->readNext(rowData, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
                 if (isScale) {
                     summary->scaleSamples(samples);
                 }
-                winner::WinnerInfo <Out> wInfo[winnerSize];
+                winner::WinnerInfo wInfo[winnerSize];
                 bool ok = winnerSearcher->search(trainedSom, samples, wInfo);
                 // TODO ok == false только если весь вектор пуст
                 if (ok) {
@@ -160,16 +158,16 @@ namespace kohonen {
 
     private:
         // альфа функция
-        alphafunc::AlphaFunction<Out> *alphaFunction;
+        alphafunc::AlphaFunction *alphaFunction;
 
         // параметры обучения:
-        Out alpha;
-        Out radius;
+        double alpha;
+        double radius;
         size_t xdim;
         size_t ydim;
 
-        winner::WinnerSearch <InNum, Out> *winnerSearcher;
-        neighadap::NeighborAdaptation<InNum, Out> *neighborAdaptation;
+        winner::WinnerSearch *winnerSearcher;
+        neighadap::NeighborAdaptation *neighborAdaptation;
     };
 }
 

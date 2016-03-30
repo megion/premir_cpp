@@ -23,18 +23,16 @@ namespace kohonen {
          * TODO: KnnWinnerSearch не используется в при обучении в SOM
          * используется она только в LVQ
          */
-        template<typename In, typename Out>
-        class KnnWinnerSearch : public WinnerSearch<In, Out> {
+        class KnnWinnerSearch : public WinnerSearch {
         public:
-            KnnWinnerSearch(size_t _winnersSize) : WinnerSearch<In, Out>(_winnersSize) {
+            KnnWinnerSearch(size_t _winnersSize) : WinnerSearch(_winnersSize) {
             }
 
-            bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                        models::DataSample<In> *inSampleRow,
-                        WinnerInfo<Out> *winners) {
-                size_t knn = WinnerSearch<In, Out>::winnersSize;
+            bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
+                        WinnerInfo *winners) {
+                size_t knn = WinnerSearch::winnersSize;
                 size_t dim = somCodes->getColSize();
-                Out maxDifference = std::numeric_limits<Out>::max();
+                double maxDifference = std::numeric_limits<double>::max();
 
                 for (size_t i = 0; i < winnersSize; ++i) {
                     winners[i].index = -1;
@@ -43,7 +41,7 @@ namespace kohonen {
 
                 for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
                     size_t masked = 0;
-                    Out difference = 0;
+                    double difference = 0;
 
                     /* Compute the distance between codebook and input entry */
                     for (size_t i = 0; i < dim; ++i) {
@@ -53,7 +51,7 @@ namespace kohonen {
                             continue;
                         }
 
-                        Out diff = (*somCodes)(r, i) - inSampleRow[i].value;
+                        double diff = (*somCodes)(r, i) - inSampleRow[i].value;
                         difference += diff * diff;
                         if (difference > winners[knn - 1].diff) {
                             break;

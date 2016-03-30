@@ -14,9 +14,8 @@
 
 namespace file {
 
-    template<typename Num>
-    class SummaryCsvFileRowParser : public file::CsvFileRowParser<models::ColSummary<Num>, bool> {
-        bool parseRow(models::ColSummary<Num> &row, models::DataSample<bool> *samples, file::CsvFileReader *csvReader) {
+    class SummaryCsvFileRowParser : public file::CsvFileRowParser<models::ColSummary> {
+        bool parseRow(models::ColSummary &row, models::DataSample *samples, file::CsvFileReader *csvReader) {
             csvReader->read(row.average);
             csvReader->read(row.scaledAverage);
             csvReader->read(row.count);
@@ -31,12 +30,12 @@ namespace file {
 
     };
 
-    template<typename Row, typename Num>
+    template<typename Row>
     class CsvFileSummary {
     public:
 
         CsvFileSummary(size_t colSize) {
-            summary = new utils::CArrayList<models::ColSummary<Num>>(colSize, 1, colSize);
+            summary = new utils::CArrayList<models::ColSummary>(colSize, 1, colSize);
         }
 
         ~CsvFileSummary() {
@@ -48,13 +47,13 @@ namespace file {
          * Если rowsLimit > 0 тогда статистика будет посчитана только для этого количества строк.
          */
         void collectSummary(size_t rowsLimit, file::CsvFileReader *csvReader,
-                            file::CsvFileRowParser<Row, Num> *rowParser) {
-            file::stream::CsvFileStreamReader<Row, Num> reader(csvReader, rowParser);
+                            file::CsvFileRowParser<Row> *rowParser) {
+            file::stream::CsvFileStreamReader<Row> reader(csvReader, rowParser);
             size_t colSize = summary->size();
             initialization();
 
             Row row;
-            models::DataSample<Num> samples[colSize];
+            models::DataSample samples[colSize];
             size_t rowIndex = 0;
             while (reader.readNext(row, samples) && (rowsLimit == 0 || (rowIndex < rowsLimit))) {
                 // print process
@@ -68,8 +67,8 @@ namespace file {
                 }
 
                 for (size_t i = 0; i < colSize; ++i) {
-                    models::ColSummary<Num> &colSummary = (*summary)[i];
-                    models::DataSample<Num> &sample = samples[i];
+                    models::ColSummary &colSummary = (*summary)[i];
+                    models::DataSample &sample = samples[i];
                     if (!sample.skipped) {
                         colSummary.count++;
                         colSummary.sum += sample.value;
@@ -86,7 +85,7 @@ namespace file {
 
             // вычислим среднее
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
+                models::ColSummary &colSummary = (*summary)[i];
                 if (!colSummary.isSkip()) {
                     colSummary.average = colSummary.sum / (double) colSummary.count;
                     colSummary.scaledAverage = (colSummary.average - colSummary.min) / (colSummary.max - colSummary.min);
@@ -95,17 +94,17 @@ namespace file {
 
         }
 
-        utils::CArrayList<models::ColSummary<Num>> *getSummary() {
+        utils::CArrayList<models::ColSummary> *getSummary() {
             return summary;
         }
 
         /**
          * val = (val - min) / (max - min)
          */
-        void scaleSamples(models::DataSample<Num> *samples) {
+        void scaleSamples(models::DataSample *samples) {
             size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
+                models::ColSummary &colSummary = (*summary)[i];
                 if (colSummary.isSkip()) {
                     danger_text("All data column is skip. Empty col should be removed from samples.");
                     std::cout<< "col " << i <<std::endl;
@@ -122,10 +121,10 @@ namespace file {
         }
 
         // TODO need redevelop
-        void skipEmptyColSamples(models::DataSample<Num> *samples) {
+        void skipEmptyColSamples(models::DataSample *samples) {
             size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
+                models::ColSummary &colSummary = (*summary)[i];
                 if (colSummary.isSkip()) {
                     // статистики нет по колонке.
                     samples[i].skipped = true;
@@ -138,7 +137,7 @@ namespace file {
 
             size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
+                models::ColSummary &colSummary = (*summary)[i];
                 writer.write(colSummary.average);
                 writer.write(colSummary.scaledAverage);
                 writer.write(colSummary.count);
@@ -151,11 +150,11 @@ namespace file {
 
         void readSummary(const char *filename) {
             file::CsvFileReader reader(filename, ' ');
-            SummaryCsvFileRowParser<Num> summaryRowParser;
-            file::stream::CsvFileStreamReader<models::ColSummary<Num>, bool> dataReader(&reader, &summaryRowParser);
+            SummaryCsvFileRowParser summaryRowParser;
+            file::stream::CsvFileStreamReader<models::ColSummary> dataReader(&reader, &summaryRowParser);
 
             initialization();
-            models::ColSummary<Num> row;
+            models::ColSummary row;
             size_t col = 0;
             size_t colSize = summary->size();
             while ((col < colSize) && dataReader.readNext((*summary)[col], nullptr)) {
@@ -165,15 +164,15 @@ namespace file {
 
 
     private:
-        utils::CArrayList<models::ColSummary<Num>> *summary;
+        utils::CArrayList<models::ColSummary> *summary;
 
         void initialization() {
             size_t colSize = summary->size();
-            Num min = -std::numeric_limits<Num>::max();
-            Num max = std::numeric_limits<Num>::max();
+            double min = -std::numeric_limits<double>::max();
+            double max = std::numeric_limits<double>::max();
             // initialization
             for (size_t i = 0; i < colSize; ++i) {
-                models::ColSummary<Num> &colSummary = (*summary)[i];
+                models::ColSummary &colSummary = (*summary)[i];
                 colSummary.count = 0;
                 colSummary.sum = 0;
                 colSummary.average = 0;

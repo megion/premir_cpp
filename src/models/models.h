@@ -41,7 +41,7 @@ namespace models {
             return true;
         }
 
-        bool operator!=(const ColSummary<T> &other) const {
+        bool operator!=(const ColSummary &other) const {
             return !((*this) == other);
         }
 

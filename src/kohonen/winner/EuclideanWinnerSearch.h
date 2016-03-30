@@ -20,25 +20,23 @@ namespace kohonen {
          * successful and 0 when winner could not be found
          * (for example, all components of data vector have been masked off)
          */
-        template<typename In, typename Out>
-        class EuclideanWinnerSearch : public WinnerSearch<In, Out> {
+        class EuclideanWinnerSearch : public WinnerSearch {
         public:
-            EuclideanWinnerSearch() : WinnerSearch<In, Out>(1) {
+            EuclideanWinnerSearch() : WinnerSearch(1) {
             }
 
-            bool search(utils::RMatrix<models::NeuronInfo, Out> *somCodes,
-                        models::DataSample<In> *inSampleRow,
-                        WinnerInfo<Out> *winners) {
+            bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
+                        WinnerInfo *winners) {
                 size_t dim = somCodes->getColSize();
 
                 winners[0].diff = -1;
                 winners[0].index = -1;
 
-                Out maxDifference = std::numeric_limits<Out>::max();
+                double maxDifference = std::numeric_limits<double>::max();
 
                 for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
                     size_t masked = 0;
-                    Out difference = 0;
+                    double difference = 0;
                     /* Compute the distance between codebook and input entry */
                     for (size_t i = 0; i < dim; ++i) {
                         if (inSampleRow[i].skipped) {
@@ -47,7 +45,7 @@ namespace kohonen {
                             continue;
                         }
 
-                        Out diff = (*somCodes)(r, i) - inSampleRow[i].value;
+                        double diff = (*somCodes)(r, i) - inSampleRow[i].value;
                         difference += diff * diff;
                         if (difference > maxDifference) {
                             break;
