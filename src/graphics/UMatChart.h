@@ -35,12 +35,14 @@ namespace graphics {
         CubehelixCellColorMapper(size_t _colorSize, double _start, double _rots, double _hue, double _gamma) :
                 colorSize(_colorSize), start(_start), rots(_rots), hue(_hue), gamma(_gamma) {
         }
+
         Color getColorByCellValue(const double &cellValue) const {
             size_t index = (colorSize - 1) * cellValue;
             Color c;
             calculateCubehelixColor(index, 0, colorSize - 1, c.r, c.g, c.b, start, rots, hue, gamma);
             return c;
         }
+
     private:
         size_t colorSize;
         double start, rots, hue, gamma;
@@ -50,6 +52,7 @@ namespace graphics {
     public:
         DefaultCellColorMapper(size_t _colorSize) : colorSize(_colorSize) {
         }
+
         Color getColorByCellValue(const double &cellValue) const {
             size_t index = (colorSize - 1) * cellValue;
             uint16_t step = 65535 / colorSize;
@@ -60,26 +63,23 @@ namespace graphics {
             c.b = colComp;
             return c;
         }
+
     private:
         size_t colorSize;
     };
 
-    template<typename Out>
     struct UMatCell {
-        Out uValue;
-//        double labelColor;
-//        bool useLabelColor;
-
+        double uValue;
         xcb_alloc_color_reply_t *color;
     };
 
-    template<typename Out, typename Label>
-    class UMatChart : public Chart<UMatCell<Out>> {
+    template<typename Label>
+    class UMatChart : public Chart<UMatCell> {
     public:
 
-        typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
-        typedef typename ChartData<UMatCell<Out>>::Point OutPoint;
-        typedef utils::RDMatrix<UMatCell<Out>, xcb_point_t> OutMatrix;
+        typedef utils::RMatrix<models::NeuronInfo, double> UMatCodes;
+        typedef typename ChartData<UMatCell>::Point OutPoint;
+        typedef utils::RDMatrix<UMatCell, xcb_point_t> OutMatrix;
         typedef typename OutMatrix::Row OutRow;
 
         typedef utils::HashMapArray<Label, models::LabelInfo> LabelsMatrix;
@@ -88,18 +88,18 @@ namespace graphics {
         typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Cell LabelsCell;
 
         UMatChart(uint16_t _width, uint16_t _height, CellColorMapper *_cellColorMapper = nullptr)
-                : Chart<UMatCell<Out>>(_width, _height), cellColorMapper(_cellColorMapper) {
+                : Chart<UMatCell>(_width, _height), cellColorMapper(_cellColorMapper) {
             // arcs context
-            uint32_t values2[] = {Chart<UMatCell<Out>>::colormap->getGreen()->pixel};
-            cellBorderContext = xcb_generate_id(Chart<UMatCell<Out>>::connection);
+            uint32_t values2[] = {Chart<UMatCell>::colormap->getGreen()->pixel};
+            cellBorderContext = xcb_generate_id(Chart<UMatCell>::connection);
             uint32_t mask = XCB_GC_FOREGROUND;
-            xcb_create_gc(Chart<UMatCell<Out>>::connection, cellBorderContext, Chart<UMatCell<Out>>::screen->root,
+            xcb_create_gc(Chart<UMatCell>::connection, cellBorderContext, Chart<UMatCell>::screen->root,
                           mask, values2);
 
-            uint32_t values22[] = {Chart<UMatCell<Out>>::colormap->getGray()->pixel};
+            uint32_t values22[] = {Chart<UMatCell>::colormap->getGray()->pixel};
             uint32_t mask2 = XCB_GC_BACKGROUND;
-            cellBackgroundContext = xcb_generate_id(Chart<UMatCell<Out>>::connection);
-            xcb_create_gc(Chart<UMatCell<Out>>::connection, cellBackgroundContext, Chart<UMatCell<Out>>::screen->root,
+            cellBackgroundContext = xcb_generate_id(Chart<UMatCell>::connection);
+            xcb_create_gc(Chart<UMatCell>::connection, cellBackgroundContext, Chart<UMatCell>::screen->root,
                           mask, values22);
 
             if (!cellColorMapper) {
@@ -114,7 +114,7 @@ namespace graphics {
             // создадим 1000 оттенков серого
 //            grayColors = Chart<UMatCell<Out>>::colormap->createGrayColors(1000);
 //            grayColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 0.5, -1.5, 1.0, 1.0);
-            labelsColors = Chart<UMatCell<Out>>::colormap->createWavelengthColors(1000);
+            labelsColors = Chart<UMatCell>::colormap->createWavelengthColors(1000);
         }
 
         ~UMatChart() {
@@ -127,7 +127,7 @@ namespace graphics {
 //            }
 
             if (labelsColors) {
-                Chart<UMatCell<Out>>::colormap->freeColors(labelsColors);
+                Chart<UMatCell>::colormap->freeColors(labelsColors);
                 labelsColors = nullptr;
             }
 
@@ -137,11 +137,11 @@ namespace graphics {
         }
 
         void draw(const xcb_drawable_t &pixmap) const {
-            Chart<UMatCell<Out>>::drawBackground(pixmap);
+            Chart<UMatCell>::drawBackground(pixmap);
 //            drawAxes();
 //            drawAxesLabels();
             drawUMat(pixmap);
-            Chart<UMatCell<Out>>::flush();
+            Chart<UMatCell>::flush();
         }
 
         /**
@@ -171,19 +171,19 @@ namespace graphics {
                     LabelsCell &cell = row[c];
                     for (size_t p = 0; p < cell.pointSize; ++p) {
                         LabelsEntry &e = cell[p];
-                        UMatCell<Out> &ucell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
+                        UMatCell &ucell = (*Chart<UMatCell>::data->getOutpoints())[ui].data;
                         if (keyThreshold < 0 || e.value.scaledCount > keyThreshold) {
 //                            ucell.labelColor = e.value.scaledCount;
 //                            ucell.useLabelColor = true;
 
                             if (mapper) {
-                                ucell.color = Chart<UMatCell<Out>>::colormap->getColor(mapper->labelToColor(e.key));
+                                ucell.color = Chart<UMatCell>::colormap->getColor(mapper->labelToColor(e.key));
                             } else {
-                                ucell.color = Chart<UMatCell<Out>>::colormap->getGreen();
+                                ucell.color = Chart<UMatCell>::colormap->getGreen();
                             }
                         } else {
 //                            ucell.labelColor = e.value.scaledCount;
-                            ucell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+                            ucell.color = Chart<UMatCell>::colormap->getColor(cellColorMapper->getColorByCellValue(
                                     ucell.uValue));//nullptr;
 //                            ucell.useLabelColor = false;
                         }
@@ -201,15 +201,15 @@ namespace graphics {
             for (size_t r = 0; r < winnerLabels->getMatrix()->getRowSize(); ++r) {
                 size_t ui = toUmatIndexFromWinnerIndex(r, xdim, ydim);
                 models::LabelInfo *lInfo = winnerLabels->getValue(r, key);
-                UMatCell<Out> &cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[ui].data;
+                UMatCell &cell = (*Chart<UMatCell>::data->getOutpoints())[ui].data;
                 if (lInfo) {
                     if (keyThreshold < 0 || lInfo->scaledCount > keyThreshold) {
 //                        cell.labelColor = lInfo->scaledCount;
 //                        cell.useLabelColor = true;
-                        cell.color = Chart<UMatCell<Out>>::colormap->getColor(colorLabel);
+                        cell.color = Chart<UMatCell>::colormap->getColor(colorLabel);
                     } else {
-                        cell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
-                                cell.uValue));//nullptr;
+                        cell.color = Chart<UMatCell>::colormap->getColor(
+                                cellColorMapper->getColorByCellValue(cell.uValue));//nullptr;
 //                        cell.useLabelColor = false;
                     }
                 } else {
@@ -223,7 +223,7 @@ namespace graphics {
             // TODO: необходимл заблокировать мьютекс перед измененем точек графика
             // иначе поток (событийный цикл draw event loop) иногда может читать изменяемые данные что может привести
             // к ошибкам
-            std::lock_guard<std::mutex> guard(*Chart<UMatCell<Out>>::changeDataMutex);
+            std::lock_guard<std::mutex> guard(*Chart<UMatCell>::changeDataMutex);
 
             UMatCodes &uvalue = (*uMatrix);
             size_t uxdim = uvalue.getRowSize();
@@ -263,11 +263,11 @@ namespace graphics {
                     points[6].x = points[0].x;
                     points[6].y = points[0].y;
 
-                    Chart<UMatCell<Out>>::data->addPoints(index, points, 7);
-                    UMatCell<Out> &cell = (*Chart<UMatCell<Out>>::data->getOutpoints())[index].data;
+                    Chart<UMatCell>::data->addPoints(index, points, 7);
+                    UMatCell &cell = (*Chart<UMatCell>::data->getOutpoints())[index].data;
                     cell.uValue = uvalue[i][j];
 //                    cell.useLabelColor = false;
-                    cell.color = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
+                    cell.color = Chart<UMatCell>::colormap->getColor(cellColorMapper->getColorByCellValue(
                             cell.uValue));
 
                     // k = 2,2,4,4,2,2,4,4...
@@ -289,7 +289,7 @@ namespace graphics {
         }
 
         void drawUMat(const xcb_drawable_t &pixmap) const {
-            OutMatrix *outMatrix = Chart<UMatCell<Out>>::data->getOutpoints();
+            OutMatrix *outMatrix = Chart<UMatCell>::data->getOutpoints();
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
@@ -308,8 +308,8 @@ namespace graphics {
                 uint32_t values[] = {cellColor->pixel};
 //                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
-                xcb_change_gc(Chart<UMatCell<Out>>::connection, cellBackgroundContext, mask, values);
-                xcb_fill_poly(Chart<UMatCell<Out>>::connection, pixmap, cellBackgroundContext,
+                xcb_change_gc(Chart<UMatCell>::connection, cellBackgroundContext, mask, values);
+                xcb_fill_poly(Chart<UMatCell>::connection, pixmap, cellBackgroundContext,
                               XCB_POLY_SHAPE_CONVEX, XCB_COORD_MODE_ORIGIN, outRow.pointSize, outRow.points);
 
             }

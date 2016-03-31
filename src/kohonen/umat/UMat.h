@@ -12,13 +12,12 @@ namespace kohonen {
         /**
          * Построение U-матрицы для SOM. Вычисление зависит от топологии карты (HEXA или RECT).
          */
-        template<typename Out>
         class UMat {
         public:
 
-            typedef utils::RMatrix<models::NeuronInfo, Out> SomCodes;
-            typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
-            typedef utils::R3DMatrix<bool, models::NeuronInfo, Out> SOMMatrix;
+            typedef utils::RMatrix<models::NeuronInfo, double> SomCodes;
+            typedef utils::RMatrix<models::NeuronInfo, double> UMatCodes;
+            typedef utils::R3DMatrix<bool, models::NeuronInfo, double> SOMMatrix;
 
             UMat(size_t _xdim, size_t _ydim, size_t _dim) :
                     xdim(_xdim), ydim(_ydim), dim(_dim),
@@ -47,17 +46,17 @@ namespace kohonen {
                 return uMatrix;
             }
 
-            int compar(const void *first, const void *sec) {
-                if (*(Out *) first < *(Out *) sec) return -1;
-                else return *(Out *) first > *(Out *) sec;
-            }
+//            int compar(const void *first, const void *sec) {
+//                if (*(double *) first < *(double *) sec) return -1;
+//                else return *(double *) first > *(double *) sec;
+//            }
 
             void scaleUMatrix(int type = 0) {
                 UMatCodes &uvalue = (*uMatrix);
 
                 /* find the minimum and maximum values */
-                Out max = -std::numeric_limits<Out>::max();
-                Out min = std::numeric_limits<Out>::max();
+                double max = -std::numeric_limits<double>::max();
+                double min = std::numeric_limits<double>::max();
 
                 for (size_t i = 0; i < uxdim; i++) {
                     for (size_t j = 0; j < uydim; j++) {
@@ -73,7 +72,7 @@ namespace kohonen {
 //                std::cout << "minimum distance between elements: " << min << std::endl;
 //                std::cout << "maximum distance between elements: " << max << std::endl;
 
-                Out bw = max - min;
+                double bw = max - min;
                 /* scale values to [0,1] */
                 for (size_t i = 0; i < uxdim; i++) {
                     for (size_t j = 0; j < uydim; j++) {
@@ -97,9 +96,9 @@ namespace kohonen {
 
             ////////////////////////////////////////////////////
             // TODO: should remove by ArrayUtils.median
-            Out median7(Out yy, Out kaa, Out koo, Out nee, Out vii, Out kuu, Out see) {
-                Out array[7];
-                Out tmp;
+            double median7(double yy, double kaa, double koo, double nee, double vii, double kuu, double see) {
+                double array[7];
+                double tmp;
                 int i, j;
 
                 array[0] = yy;
@@ -121,9 +120,9 @@ namespace kohonen {
                 return (array[3]);
             }
 
-            Out median6(Out yy, Out kaa, Out koo, Out nee, Out vii, Out kuu) {
-                Out array[6];
-                Out tmp;
+            double median6(double yy, double kaa, double koo, double nee, double vii, double kuu) {
+                double array[6];
+                double tmp;
                 int i, j;
 
                 array[0] = yy;
@@ -144,9 +143,9 @@ namespace kohonen {
                 return (array[3]);
             }
 
-            Out median5(Out yy, Out kaa, Out koo, Out nee, Out vii) {
-                Out array[5];
-                Out tmp;
+            double median5(double yy, double kaa, double koo, double nee, double vii) {
+                double array[5];
+                double tmp;
                 int i, j;
 
                 array[0] = yy;
@@ -167,9 +166,9 @@ namespace kohonen {
                 return (array[2]);
             }
 
-            Out median4(Out yy, Out kaa, Out koo, Out nee) {
-                Out array[4];
-                Out tmp;
+            double median4(double yy, double kaa, double koo, double nee) {
+                double array[4];
+                double tmp;
                 int i, j;
 
                 array[0] = yy;
@@ -190,9 +189,9 @@ namespace kohonen {
             }
 
 
-            Out median3(Out yy, Out kaa, Out koo) {
-                Out array[3];
-                Out tmp;
+            double median3(double yy, double kaa, double koo) {
+                double array[3];
+                double tmp;
                 int i, j;
 
                 array[0] = yy;

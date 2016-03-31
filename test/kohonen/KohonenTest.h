@@ -88,9 +88,9 @@ namespace test {
             DemoStringKey ftsLabel;
         };
 
-        class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
+        class KohonenDemoCsvFileRowParser : public file::CsvFileRowParser<DemoInRow> {
 
-            bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
+            bool parseRow(DemoInRow &row, models::DataSample *samples, file::CsvFileReader *csvReader) {
                 size_t colSize = 5;
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
@@ -114,7 +114,7 @@ namespace test {
                 }
             }
 
-            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
+            size_t readNextDataSample(models::DataSample &sample, file::CsvFileReader *csvReader) {
                 char buffer[64];
                 *buffer = '\0';
                 size_t bytesRead = csvReader->read(buffer, 64);
@@ -129,9 +129,9 @@ namespace test {
 
         };
 
-        class KohonenDemo2CsvFileRowParser : public file::CsvFileRowParser<DemoInRow, float> {
+        class KohonenDemo2CsvFileRowParser : public file::CsvFileRowParser<DemoInRow> {
 
-            bool parseRow(DemoInRow &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
+            bool parseRow(DemoInRow &row, models::DataSample *samples, file::CsvFileReader *csvReader) {
                 size_t colSize = 20;
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
@@ -148,7 +148,7 @@ namespace test {
 
         private:
 
-            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
+            size_t readNextDataSample(models::DataSample &sample, file::CsvFileReader *csvReader) {
                 char buffer[64];
                 *buffer = '\0';
                 size_t bytesRead = csvReader->read(buffer, 64);
@@ -163,9 +163,9 @@ namespace test {
 
         };
 
-        class DemoFtsCsvFileRowParser : public file::CsvFileRowParser<DemoInRowFts, float> {
+        class DemoFtsCsvFileRowParser : public file::CsvFileRowParser<DemoInRowFts> {
 
-            bool parseRow(DemoInRowFts &row, models::DataSample<float> *samples, file::CsvFileReader *csvReader) {
+            bool parseRow(DemoInRowFts &row, models::DataSample *samples, file::CsvFileReader *csvReader) {
                 size_t colSize = 5;
                 for (size_t i = 0; i < colSize; ++i) {
                     readNextDataSample(samples[i], csvReader);
@@ -189,7 +189,7 @@ namespace test {
 
         private:
 
-            size_t readNextDataSample(models::DataSample<float> &sample, file::CsvFileReader *csvReader) {
+            size_t readNextDataSample(models::DataSample &sample, file::CsvFileReader *csvReader) {
                 char buffer[64];
                 *buffer = '\0';
                 size_t bytesRead = csvReader->read(buffer, 64);

@@ -93,9 +93,9 @@ namespace test {
             }
         }
 
-        kohonen::SammonMap<double>* buildAndShowSammonMap(OutCodes *somMatrix,
-                                   graphics::SammonMapChart<double> &sammonChart, size_t numRepeat) {
-            kohonen::SammonMap<double>* sammonMap = new kohonen::SammonMap<double>(somMatrix->getRowSize());
+        kohonen::SammonMap* buildAndShowSammonMap(OutCodes *somMatrix,
+                                   graphics::SammonMapChart &sammonChart, size_t numRepeat) {
+            kohonen::SammonMap* sammonMap = new kohonen::SammonMap(somMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine = sammonMap->getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
@@ -111,10 +111,8 @@ namespace test {
             return sammonMap;
         }
 
-        void drawUMat(OutCodes *somMatrix,
-                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
-                      size_t dim) {
-            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+        void drawUMat(OutCodes *somMatrix, graphics::UMatChart<char> &chart, size_t xdim, size_t ydim, size_t dim) {
+            kohonen::umat::HexaUMat umat(xdim, ydim, dim);
             umat.initializeMat(somMatrix);
             umat.buildUMatrix();
             umat.medianUMatrix();
@@ -127,9 +125,9 @@ namespace test {
 
         void drawUMatWithLabels(OutCodes *somMatrix,
                       kohonen::labeling::SomLabeling<char> &somLabeling,
-                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
+                      graphics::UMatChart<char> &chart, size_t xdim, size_t ydim,
                       size_t dim) {
-            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+            kohonen::umat::HexaUMat umat(xdim, ydim, dim);
             umat.initializeMat(somMatrix);
             umat.buildUMatrix();
             umat.medianUMatrix();
@@ -152,8 +150,8 @@ namespace test {
             size_t dim = 17;
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.collectSummary(0, &reader, &rowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
 
@@ -170,23 +168,21 @@ namespace test {
             size_t ydim = 80;
             bool isScale = true;
 
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.readSummary("sspy_data_summary_6.cod");
             summary.getSummary()->print();
 
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
-            kohonen::NetworkInitializer<SspyData, double, double> initializer(&dataReader, &summary);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
+            kohonen::NetworkInitializer<SspyData> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 //            somCodesMatrix->print();
 
-            kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter somInitOutFile("sspy_som_initialized_5_80_80.cod");
-            somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
-            somInitOutFile.close();
+            kohonen::SomKeeper somKeeper;
+            somKeeper.saveSom(somCodesMatrix, "sspy_som_initialized_5_80_80.cod");
 
             delete somCodesMatrix;
 
@@ -202,9 +198,9 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", 0, dim);
 
-            graphics::UMatChart<double, char> umatChart(1200, 700);
+            graphics::UMatChart<char> umatChart(1200, 700);
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
             umatChart.saveImage("sspy_u_matrix_80_80_after_init.png");
 

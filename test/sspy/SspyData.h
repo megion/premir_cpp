@@ -138,9 +138,9 @@ namespace test {
 
         };
 
-        class SspyRowParser : public file::CsvFileRowParser<SspyData, double> {
+        class SspyRowParser : public file::CsvFileRowParser<SspyData> {
 
-            bool parseRow(SspyData &row, models::DataSample<double> *samples, file::CsvFileReader *reader) {
+            bool parseRow(SspyData &row, models::DataSample *samples, file::CsvFileReader *reader) {
                 size_t i = 0;
                 readRequiredSample(samples[i], reader); // 1 counter
                 ++i;
@@ -357,7 +357,7 @@ namespace test {
                 return 60000.0 * mm + 1000.0 * ss + mmm;
             }
 
-            size_t readRequiredSample(models::DataSample<double> &sample, file::CsvFileReader *reader) {
+            size_t readRequiredSample(models::DataSample &sample, file::CsvFileReader *reader) {
                 char buffer[64];
                 *buffer = '\0';
                 size_t bytesRead = reader->read(buffer, 64);
@@ -370,7 +370,7 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readRequiredSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+            size_t readRequiredSampleForInterval(models::DataSample &sample, file::CsvFileReader *reader,
                                                  const double& interval) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (sample.skipped || interval==0) {
@@ -381,7 +381,7 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readUnsignedSample(models::DataSample<double> &sample, file::CsvFileReader *reader) {
+            size_t readUnsignedSample(models::DataSample &sample, file::CsvFileReader *reader) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (sample.skipped || sample.value <0) {
                     sample.skipped = true;
@@ -389,7 +389,7 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readUnsignedSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+            size_t readUnsignedSampleForInterval(models::DataSample &sample, file::CsvFileReader *reader,
                                                  const double& interval) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (interval==0 || sample.skipped || sample.value <0) {
@@ -400,7 +400,7 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readMoreZeroSample(models::DataSample<double> &sample, file::CsvFileReader *reader) {
+            size_t readMoreZeroSample(models::DataSample &sample, file::CsvFileReader *reader) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (sample.skipped || sample.value <=0) {
                     sample.skipped = true;
@@ -408,7 +408,7 @@ namespace test {
                 return bytesRead;
             }
 
-            size_t readMoreZeroSampleForInterval(models::DataSample<double> &sample, file::CsvFileReader *reader,
+            size_t readMoreZeroSampleForInterval(models::DataSample &sample, file::CsvFileReader *reader,
                                                  const double& interval, size_t& i) {
                 size_t bytesRead = readRequiredSample(sample, reader);
                 if (interval==0 || sample.skipped || sample.value <=0) {
