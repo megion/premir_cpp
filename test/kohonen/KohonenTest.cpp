@@ -102,7 +102,7 @@ namespace test {
                     "../test/datafiles/kohonen/som_trained_10000_eucw_bubble_hexa_16_12.cod", 1);
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001, true));
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.01, true));
 
             kohonen::SomTrainer<DemoInRow>::QuantumError qe =
                     trainer.quantizationError(somCodesMatrix, &dataReader, false, nullptr);
@@ -138,7 +138,7 @@ namespace test {
                     "../test/datafiles/kohonen/som_trained_10000_eucw_gaussian_rect_16_12.cod", 1);
 
             // данные матрицы должны быть практически идентичными
-            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.001, true));
+            assert(somCodesMatrix->equalsWithError(*expectedCodesMatrix, 0.01, true));
 
             delete expectedCodesMatrix;
             delete somCodesMatrix;
@@ -195,6 +195,7 @@ namespace test {
             sammonMap.getMapPoints();
 
             OutCodes *expectedSammonMatrix = read_sammon_file("../test/datafiles/kohonen/sammon_out_result.sam", 1);
+//            sammonMap.getMapPoints()->print("");
             assert(sammonMap.getMapPoints()->size() == expectedSammonMatrix->getRowSize());
             for (size_t r = 0; r < expectedSammonMatrix->getRowSize(); ++r) {
                 assert_range((*sammonMap.getMapPoints())[r].x, (*expectedSammonMatrix)[r][0], 0.001);

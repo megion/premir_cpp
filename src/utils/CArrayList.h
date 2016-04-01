@@ -260,9 +260,9 @@ namespace utils {
             capacity = 0;
         }
 
-        void print() {
+        void print(const char* separator=", ") {
             for(size_t i=0; i<length; ++i) {
-                std::cout << array[i] << ", ";
+                std::cout << array[i] << separator;
             }
             std::cout << std::endl;
         }
