@@ -93,9 +93,9 @@ namespace test {
             }
         }
 
-        kohonen::SammonMap<double>* buildAndShowSammonMap(OutCodes *somMatrix,
-                                   graphics::SammonMapChart<double> &sammonChart, size_t numRepeat) {
-            kohonen::SammonMap<double>* sammonMap = new kohonen::SammonMap<double>(somMatrix->getRowSize());
+        kohonen::SammonMap* buildAndShowSammonMap(OutCodes *somMatrix,
+                                   graphics::SammonMapChart &sammonChart, size_t numRepeat) {
+            kohonen::SammonMap* sammonMap = new kohonen::SammonMap(somMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine = sammonMap->getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
@@ -111,10 +111,8 @@ namespace test {
             return sammonMap;
         }
 
-        void drawUMat(OutCodes *somMatrix,
-                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
-                      size_t dim) {
-            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+        void drawUMat(OutCodes *somMatrix, graphics::UMatChart<char> &chart, size_t xdim, size_t ydim, size_t dim) {
+            kohonen::umat::HexaUMat umat(xdim, ydim, dim);
             umat.initializeMat(somMatrix);
             umat.buildUMatrix();
             umat.medianUMatrix();
@@ -127,9 +125,9 @@ namespace test {
 
         void drawUMatWithLabels(OutCodes *somMatrix,
                       kohonen::labeling::SomLabeling<char> &somLabeling,
-                      graphics::UMatChart<double, char> &chart, size_t xdim, size_t ydim,
+                      graphics::UMatChart<char> &chart, size_t xdim, size_t ydim,
                       size_t dim) {
-            kohonen::umat::HexaUMat<double> umat(xdim, ydim, dim);
+            kohonen::umat::HexaUMat umat(xdim, ydim, dim);
             umat.initializeMat(somMatrix);
             umat.buildUMatrix();
             umat.medianUMatrix();
@@ -152,8 +150,8 @@ namespace test {
             size_t dim = 17;
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.collectSummary(0, &reader, &rowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
 
@@ -170,23 +168,21 @@ namespace test {
             size_t ydim = 80;
             bool isScale = true;
 
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.readSummary("sspy_data_summary_6.cod");
             summary.getSummary()->print();
 
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
-            kohonen::NetworkInitializer<SspyData, double, double> initializer(&dataReader, &summary);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
+            kohonen::NetworkInitializer<SspyData> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 //            somCodesMatrix->print();
 
-            kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter somInitOutFile("sspy_som_initialized_5_80_80.cod");
-            somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
-            somInitOutFile.close();
+            kohonen::SomKeeper somKeeper;
+            somKeeper.saveSom(somCodesMatrix, "sspy_som_initialized_5_80_80.cod");
 
             delete somCodesMatrix;
 
@@ -202,18 +198,18 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_initialized_5_80_80.cod", 0, dim);
 
-            graphics::UMatChart<double, char> umatChart(1200, 700);
+            graphics::UMatChart<char> umatChart(1200, 700);
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
             umatChart.saveImage("sspy_u_matrix_80_80_after_init.png");
 
-            graphics::SammonMapChart<double> sammonChart(xdim, 1200, 700);
+            graphics::SammonMapChart sammonChart(xdim, 1200, 700);
             sammonChart.setWindowTitle("Sammon map for initialized codes");
             graphics::ChartThread<bool> sammonChartThread(&sammonChart);
-            kohonen::SammonMap<double>* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
+            kohonen::SammonMap* sammonMap = buildAndShowSammonMap(somCodesMatrix, sammonChart, 100);
 
-            graphics::SammonMapChart<double> sammonChartImg(xdim, 8000, 8000);
+            graphics::SammonMapChart sammonChartImg(xdim, 8000, 8000);
             sammonChartImg.setWindowTitle("Sammon map for initialized codes img");
             graphics::ChartThread<bool> sammonChartThread2(&sammonChartImg);
             sammonChart.addSammonMapPoints(sammonMap->getMapPoints());
@@ -248,12 +244,12 @@ namespace test {
             // 2. init big data file reader
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
 
             // 3. create Umat chart
-            graphics::UMatChart<double, char> umatChart(1200, 700);
+            graphics::UMatChart<char> umatChart(1200, 700);
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
 
             // 4. create Quantum error chart
             graphics::PointChart qErrorChart(true, 1200, 700);
@@ -261,23 +257,22 @@ namespace test {
             graphics::ChartThread<bool> chartThread(&qErrorChart);
 
             // 5. create trainer
-            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
-            kohonen::mapdist::HexaMapDistance<double> mapDist;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction alphaFunc;
+            kohonen::mapdist::HexaMapDistance mapDist;
 //            kohonen::neighadap::GaussianNeighborAdaptation<double, double> gausAdap(&mapDist, xdim, ydim);
-            kohonen::neighadap::BubbleNeighborAdaptation<double, double> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<SspyData, double, double> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius,
-                                                                 xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<SspyData> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius, xdim, ydim);
 
             size_t winnerSize = winnerSearcher.getWinnerSize();
 //            size_t colSize = somCodesMatrix->getColSize();
 
             // load summary
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.readSummary("sspy_data_summary_6.cod");
 
             for (size_t le = 0; le < teachSize; ++le) {
-                models::DataSample<double> samples[dim];
+                models::DataSample samples[dim];
                 SspyData rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
@@ -293,7 +288,7 @@ namespace test {
                     summary.scaleSamples(samples);
                 }
 
-                kohonen::winner::WinnerInfo<double> winners[winnerSize];
+                kohonen::winner::WinnerInfo winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
                     qerror += std::sqrt(winners[0].diff);
@@ -312,10 +307,8 @@ namespace test {
                 }
             }
 
-            kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter trainedCodesOutFile("sspy_som_trained_2_80_80.cod");
-            somKeeper.saveSom(somCodesMatrix, &trainedCodesOutFile);
-            trainedCodesOutFile.close();
+            kohonen::SomKeeper somKeeper;
+            somKeeper.saveSom(somCodesMatrix, "sspy_som_trained_2_80_80.cod");
 
             delete somCodesMatrix;
 
@@ -348,13 +341,13 @@ namespace test {
             // 2. init big data file reader
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
 
             // 3. create Umat chart
             graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 2.0, 2.0);
-            graphics::UMatChart<double, char> umatChart(1200, 700, &cellColor);
+            graphics::UMatChart<char> umatChart(1200, 700, &cellColor);
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
 
             // 4. create Quantum error chart
             graphics::PointChart qErrorChart(true, 1200, 700);
@@ -362,19 +355,18 @@ namespace test {
             graphics::ChartThread<bool> chartThread(&qErrorChart);
 
             // 5. create trainer
-            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<double> alphaFunc;
-            kohonen::mapdist::HexaMapDistance<double> mapDist;
-            kohonen::neighadap::GaussianNeighborAdaptation<double, double> gausAdap(&mapDist, xdim, ydim);
-            kohonen::neighadap::BubbleNeighborAdaptation<double, double> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<SspyData, double, double> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius,
-                                                                  xdim, ydim);
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction alphaFunc;
+            kohonen::mapdist::HexaMapDistance mapDist;
+            kohonen::neighadap::GaussianNeighborAdaptation gausAdap(&mapDist, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<SspyData> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius, xdim, ydim);
 
             size_t winnerSize = winnerSearcher.getWinnerSize();
 //            size_t colSize = somCodesMatrix->getColSize();
 
             // load summary
-            file::CsvFileSummary<SspyData, double> summary(dim);
+            file::CsvFileSummary<SspyData> summary(dim);
             summary.readSummary("sspy_data_summary_6.cod");
 
             for (size_t le = 0; le < teachSize; ++le) {
@@ -383,7 +375,7 @@ namespace test {
                 if (stepRepeat!=0 && le%stepRepeat==0) {
                     dataReader.rewindReader();
                 }
-                models::DataSample<double> samples[dim];
+                models::DataSample samples[dim];
                 SspyData rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
@@ -399,7 +391,7 @@ namespace test {
                     summary.scaleSamples(samples);
                 }
 
-                kohonen::winner::WinnerInfo<double> winners[winnerSize];
+                kohonen::winner::WinnerInfo winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
                     qerror += std::sqrt(winners[0].diff);
@@ -418,10 +410,8 @@ namespace test {
                 }
             }
 
-            kohonen::SomKeeper<double> somKeeper;
-            file::CsvFileWriter trainedCodesOutFile("sspy_som_trained_80_80_for_400000_by_10_gaus.cod");
-            somKeeper.saveSom(somCodesMatrix, &trainedCodesOutFile);
-            trainedCodesOutFile.close();
+            kohonen::SomKeeper somKeeper;
+            somKeeper.saveSom(somCodesMatrix, "sspy_som_trained_80_80_for_400000_by_10_gaus.cod");
 
             delete somCodesMatrix;
 
@@ -438,10 +428,10 @@ namespace test {
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_trained_1_80_80.cod", 0, dim);
 
 //            graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 2.0, 2.0);
-            graphics::UMatChart<double, char> umatChart(733, 733);
+            graphics::UMatChart<char> umatChart(733, 733);
 
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
 
             umatChart.saveImage("sspy_u_matrix_80_80_after_trained.png");
@@ -472,26 +462,26 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_matrix_file("sspy_som_trained_1_80_80.cod", 0, dim);
 
-            graphics::UMatChart<double, char> umatChart(733, 733);
+            graphics::UMatChart<char> umatChart(733, 733);
             umatChart.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
 
             // init reader
             file::CsvFileReader reader(BIG_DATA_FILE_PATH, ' ');
             SspyRowParser rowParser;
-            file::stream::CsvFileStreamReader<SspyData, double> dataReader(&reader, &rowParser);
-            kohonen::winner::EuclideanWinnerSearch<double, double> winnerSearcher;
+            file::stream::CsvFileStreamReader<SspyData> dataReader(&reader, &rowParser);
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
             size_t winnerSize = winnerSearcher.getWinnerSize();
 
             utils::hash::CharHash cHash;
             kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
 
-            models::DataSample<double> samples[dim];
+            models::DataSample samples[dim];
             SspyData rowData;
             size_t indexRow = 0;
             while (dataReader.readNext(rowData, samples)) {
-                kohonen::winner::WinnerInfo<double> winners[winnerSize];
+                kohonen::winner::WinnerInfo winners[winnerSize];
                 bool ok = winnerSearcher.search(somCodesMatrix, samples, winners);
                 if (ok) {
 //                    std::cout << " " << winners[0].index;
@@ -510,9 +500,9 @@ namespace test {
 
             umatChart.saveImage("sspy_u_matrix_labeled_80_80_after_trained.png");
 
-            graphics::UMatChart<double, char> umatChart2(8000, 8000);
+            graphics::UMatChart<char> umatChart2(8000, 8000);
             umatChart2.setWindowTitle("U-Matrix");
-            graphics::ChartThread<graphics::UMatCell<double>> umchartThread2(&umatChart2);
+            graphics::ChartThread<graphics::UMatCell> umchartThread2(&umatChart2);
             drawUMatWithLabels(somCodesMatrix, somLabeling, umatChart2, xdim, ydim, dim);
             umatChart2.saveImage("sspy_u_matrix_labeled_big_80_80_after_trained.png");
 

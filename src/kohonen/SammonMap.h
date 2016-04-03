@@ -53,6 +53,12 @@ namespace kohonen {
         struct Point {
             double x;
             double y;
+
+            friend std::ostream &operator<<(std::ostream &os, const Point &val) {
+                os << val.x << " " << val.y;
+                os << std::endl;
+                return os;
+            }
         };
 
         void initializeMap(OutCodes *trainedSom) {

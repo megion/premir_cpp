@@ -11,56 +11,55 @@
 namespace kohonen {
     namespace umat {
 
-        template<typename Out>
-        class RectUMat : public UMat<Out> {
+        class RectUMat : public UMat {
         public:
 
-            typedef utils::RMatrix<models::NeuronInfo, Out> SomCodes;
-            typedef utils::RMatrix<models::NeuronInfo, Out> UMatCodes;
-            typedef utils::R3DMatrix<bool, models::NeuronInfo, Out> SOMMatrix;
+            typedef utils::RMatrix<models::NeuronInfo, double> SomCodes;
+            typedef utils::RMatrix<models::NeuronInfo, double> UMatCodes;
+            typedef utils::R3DMatrix<bool, models::NeuronInfo, double> SOMMatrix;
 
             RectUMat(size_t _xdim, size_t _ydim, size_t _dim) :
-                    UMat<Out>(_xdim, _ydim, _dim) {
+                    UMat(_xdim, _ydim, _dim) {
             }
 
             void buildUMatrix() {
-                SOMMatrix &mvalue = (*UMat<Out>::somMatrix);
-                UMatCodes &uvalue = (*UMat<Out>::uMatrix);
+                SOMMatrix &mvalue = (*UMat::somMatrix);
+                UMatCodes &uvalue = (*UMat::uMatrix);
 
-                size_t xdim = UMat<Out>::xdim;
-                size_t ydim = UMat<Out>::ydim;
-                size_t dim = UMat<Out>::dim;
-                size_t uxdim = UMat<Out>::uxdim;
-                size_t uydim = UMat<Out>::uydim;
+                size_t xdim = UMat::xdim;
+                size_t ydim = UMat::ydim;
+                size_t dim = UMat::dim;
+                size_t uxdim = UMat::uxdim;
+                size_t uydim = UMat::uydim;
 
                 for (size_t j = 0; j < ydim; ++j) {
                     for (size_t i = 0; i < xdim; ++i) {
-                        Out dx = 0, dy = 0, dz1 = 0, dz2 = 0;
+                        double dx = 0, dy = 0, dz1 = 0, dz2 = 0;
                         long count = 0, bx = 0, by = 0, bz = 0;
 
 
                         for (size_t k = 0; k < dim; k++) {
 
                             if (i < (xdim - 1)) {
-                                Out temp = (mvalue[i][j][k] - mvalue[i + 1][j][k]);
+                                double temp = (mvalue[i][j][k] - mvalue[i + 1][j][k]);
                                 dx += temp * temp;
                                 bx = 1;
                             }
                             if (j < (ydim - 1)) {
-                                Out temp = (mvalue[i][j][k] - mvalue[i][j + 1][k]);
+                                double temp = (mvalue[i][j][k] - mvalue[i][j + 1][k]);
                                 dy += temp * temp;
                                 by = 1;
                             }
 
                             if (j < (ydim - 1) && i < (xdim - 1)) {
-                                Out temp = (mvalue[i][j][k] - mvalue[i + 1][j + 1][k]);
+                                double temp = (mvalue[i][j][k] - mvalue[i + 1][j + 1][k]);
                                 dz1 += temp * temp;
                                 temp = (mvalue[i][j + 1][k] - mvalue[i + 1][j][k]);
                                 dz2 += temp * temp;
                                 bz = 1;
                             }
                         }
-                        Out dz = (sqrt(dz1) / std::sqrt((double) 2.0) + std::sqrt(dz2) / std::sqrt((double) 2.0)) / 2;
+                        double dz = (sqrt(dz1) / std::sqrt((double) 2.0) + std::sqrt(dz2) / std::sqrt((double) 2.0)) / 2;
                         if (bx) {
                             uvalue[2 * i + 1][2 * j] = std::sqrt(dx);
                         }
@@ -75,7 +74,8 @@ namespace kohonen {
                 }
 
                 /* medians of the 4-neighborhood */
-                Out medtable[4];
+                sort::HeapSort<double> hsort;
+                double medtable[4];
                 for (size_t j = 0; j < uydim; j += 2) {
                     for (size_t i = 0; i < uxdim; i += 2) {
                         if (i > 0 && j > 0 && i < (uxdim - 1) && j < (uydim - 1)) {
@@ -84,7 +84,8 @@ namespace kohonen {
                             medtable[1] = uvalue[i + 1][j];
                             medtable[2] = uvalue[i][j - 1];
                             medtable[3] = uvalue[i][j + 1];
-                            std::qsort((void *) medtable, 4, sizeof(*medtable), UMat<Out>::compar);
+                            hsort.sort(medtable, 6);
+//                            std::qsort((void *) medtable, 4, sizeof(*medtable), compar);
                             /* Actually mean of two median values */
                             uvalue[i][j] = (medtable[1] + medtable[2]) / 2.0;
                         } else if (j == 0 && i > 0 && i < uxdim - 1) {
@@ -92,28 +93,32 @@ namespace kohonen {
                             medtable[0] = uvalue[i - 1][j];
                             medtable[1] = uvalue[i + 1][j];
                             medtable[2] = uvalue[i][j + 1];
-                            std::qsort((void *) medtable, 3, sizeof(*medtable), UMat<Out>::compar);
+                            hsort.sort(medtable, 3);
+//                            std::qsort((void *) medtable, 3, sizeof(*medtable), compar);
                             uvalue[i][j] = medtable[1];
                         } else if (j == (uydim - 1) && i > 0 && i < (uxdim - 1)) {
                             /* in the lower edge */
                             medtable[0] = uvalue[i - 1][j];
                             medtable[1] = uvalue[i + 1][j];
                             medtable[2] = uvalue[i][j - 1];
-                            std::qsort((void *) medtable, 3, sizeof(*medtable), UMat<Out>::compar);
+                            hsort.sort(medtable, 3);
+//                            std::qsort((void *) medtable, 3, sizeof(*medtable), UMat::compar);
                             uvalue[i][j] = medtable[1];
                         } else if (i == 0 && j > 0 && j < (uydim - 1)) {
                             /* in the left edge */
                             medtable[0] = uvalue[i + 1][j];
                             medtable[1] = uvalue[i][j - 1];
                             medtable[2] = uvalue[i][j + 1];
-                            qsort((void *) medtable, 3, sizeof(*medtable), UMat<Out>::compar);
+                            hsort.sort(medtable, 3);
+//                            qsort((void *) medtable, 3, sizeof(*medtable), UMat::compar);
                             uvalue[i][j] = medtable[1];
                         } else if (i == (uxdim - 1) && j > 0 && j < (uydim - 1)) {
                             /* in the right edge */
                             medtable[0] = uvalue[i - 1][j];
                             medtable[1] = uvalue[i][j - 1];
                             medtable[2] = uvalue[i][j + 1];
-                            std::qsort((void *) medtable, 3, sizeof(*medtable), UMat<Out>::compar);
+                            hsort.sort(medtable, 3);
+//                            std::qsort((void *) medtable, 3, sizeof(*medtable), UMat::compar);
                             uvalue[i][j] = medtable[1];
                         } else if (i == 0 && j == 0)
                             /* the upper left-hand corner */
@@ -131,18 +136,18 @@ namespace kohonen {
                     }
                 }
 
-                UMat<Out>::scaleUMatrix();
+                UMat::scaleUMatrix();
             }
 
             void averageUMatrix() {
-//                SOMMatrix &mvalue = (*UMat<Out>::somMatrix);
-                UMatCodes &uvalue = (*UMat<Out>::uMatrix);
+//                SOMMatrix &mvalue = (*UMat::somMatrix);
+                UMatCodes &uvalue = (*UMat::uMatrix);
 
-                size_t xdim = UMat<Out>::xdim;
-                size_t ydim = UMat<Out>::ydim;
-                size_t dim = UMat<Out>::dim;
-                size_t uxdim = UMat<Out>::uxdim;
-                size_t uydim = UMat<Out>::uydim;
+                size_t xdim = UMat::xdim;
+                size_t ydim = UMat::ydim;
+                size_t dim = UMat::dim;
+                size_t uxdim = UMat::uxdim;
+                size_t uydim = UMat::uydim;
 
                 UMatCodes umat2(uxdim, uydim); // temp
 
@@ -188,14 +193,14 @@ namespace kohonen {
             }
 
             void medianUMatrix() {
-                SOMMatrix &mvalue = (*UMat<Out>::somMatrix);
-                UMatCodes &uvalue = (*UMat<Out>::uMatrix);
+                SOMMatrix &mvalue = (*UMat::somMatrix);
+                UMatCodes &uvalue = (*UMat::uMatrix);
 
-                size_t xdim = UMat<Out>::xdim;
-                size_t ydim = UMat<Out>::ydim;
-                size_t dim = UMat<Out>::dim;
-                size_t uxdim = UMat<Out>::uxdim;
-                size_t uydim = UMat<Out>::uydim;
+                size_t xdim = UMat::xdim;
+                size_t ydim = UMat::ydim;
+                size_t dim = UMat::dim;
+                size_t uxdim = UMat::uxdim;
+                size_t uydim = UMat::uydim;
 
                 UMatCodes umat2(uxdim, uydim); // temp
 

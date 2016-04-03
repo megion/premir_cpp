@@ -3,10 +3,10 @@
 namespace test {
     namespace kohonen_demos_test {
 
-        typedef utils::RMatrix<models::NeuronInfo, float> OutCodes;
+        typedef utils::RMatrix<models::NeuronInfo, double> OutCodes;
 
-        void buildAndShowSammonMap(OutCodes *somTrainedMatrix, graphics::SammonMapChart<float> &sammonChart) {
-            kohonen::SammonMap<float> sammonMap(somTrainedMatrix->getRowSize());
+        void buildAndShowSammonMap(OutCodes *somTrainedMatrix, graphics::SammonMapChart &sammonChart) {
+            kohonen::SammonMap sammonMap(somTrainedMatrix->getRowSize());
             kohonen::RandomGenerator *randomEngine = sammonMap.getRandomGenerator();
             // для теста псевдоинициализация
             randomEngine->setNextValue(1);
@@ -22,8 +22,8 @@ namespace test {
 
         void drawUMat(OutCodes *somTrainedMatrix,
                       kohonen::labeling::SomLabeling<char> &somLabeling,
-                      graphics::UMatChart<float, char> &chart, size_t xdim, size_t ydim, size_t dim, double labelThreshold) {
-            kohonen::umat::HexaUMat<float> umat(xdim, ydim, dim);
+                      graphics::UMatChart<char> &chart, size_t xdim, size_t ydim, size_t dim, double labelThreshold) {
+            kohonen::umat::HexaUMat umat(xdim, ydim, dim);
             umat.initializeMat(somTrainedMatrix);
             umat.buildUMatrix();
             umat.medianUMatrix();
@@ -59,8 +59,8 @@ namespace test {
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/kohonen/ex1.dat", ' ');
             KohonenDemo2CsvFileRowParser demoRowParser;
-            file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &demoRowParser);
-            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            file::stream::CsvFileStreamReader<DemoInRow> dataReader(&csvReader, &demoRowParser);
+            file::CsvFileSummary<DemoInRow> summary(dim);
 //            summary.collectSummary(0, &csvReader, &demoRowParser); // 0 - значит без ограничений
 //            summary.getSummary()->print();
 
@@ -68,25 +68,20 @@ namespace test {
 //            summary.writeSummary("test_speech_signal_summary.cod");
             summary.readSummary("test_speech_signal_summary.cod");
 
-            kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
+            kohonen::NetworkInitializer<DemoInRow> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
-            kohonen::SomKeeper<float> somKeeper;
-            file::CsvFileWriter somInitOutFile("speech_som_initialized_2.cod");
-            somKeeper.saveSom(somCodesMatrix, &somInitOutFile);
-            somInitOutFile.close();
-//            somCodesMatrix->print();
+            kohonen::SomKeeper somKeeper;
+            somKeeper.saveSom(somCodesMatrix, "speech_som_initialized_2.cod");
 
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction alphaFunc;
+            kohonen::mapdist::HexaMapDistance mapDist;
 
-            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
-            kohonen::mapdist::HexaMapDistance<float> mapDist;
-
-            kohonen::neighadap::GaussianNeighborAdaptation<float, float> gausAdap(&mapDist, xdim, ydim);
-            kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius,
-                                                                 xdim, ydim);
+            kohonen::neighadap::GaussianNeighborAdaptation gausAdap(&mapDist, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<DemoInRow> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius, xdim, ydim);
 
             // init labeling
             utils::hash::CharHash cHash;
@@ -110,13 +105,13 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread(&sammonChart);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
-            graphics::UMatChart<float, char> umatChart(800, 800);
+            graphics::UMatChart<char> umatChart(800, 800);
             umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, labelThreshold);
 
             for (size_t le = 0; le < teachSize; ++le) {
-                models::DataSample<float> samples[colSize];
+                models::DataSample samples[colSize];
                 DemoInRow rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
@@ -137,7 +132,7 @@ namespace test {
                 }
 
 //                std::cout << "le: " << le << " " << rowData.label << std::endl;
-                kohonen::winner::WinnerInfo<float> winners[winnerSize];
+                kohonen::winner::WinnerInfo winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
 //                    somLabeling.addWinner(0, rowData.label);
@@ -174,9 +169,7 @@ namespace test {
 //            graphics::ChartThread<bool> sammonChartThread2(&sammonChart2);
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart2);
 
-            file::CsvFileWriter trainedOutFile("speech_som_trained.cod");
-            somKeeper.saveSom(somCodesMatrix, &trainedOutFile);
-            trainedOutFile.close();
+            somKeeper.saveSom(somCodesMatrix, "speech_som_trained.cod");
 
             delete somCodesMatrix;
         }
@@ -194,23 +187,22 @@ namespace test {
             // инициализация потока чтения файла с данными
             file::CsvFileReader csvReader("../test/datafiles/kohonen/house-votes-84.data.txt", ',');
             HouseVotesCsvFileRowParser rowParser;
-            file::stream::CsvFileStreamReader<DemoInRow, float> dataReader(&csvReader, &rowParser);
-            file::CsvFileSummary<DemoInRow, float> summary(dim);
+            file::stream::CsvFileStreamReader<DemoInRow> dataReader(&csvReader, &rowParser);
+            file::CsvFileSummary<DemoInRow> summary(dim);
             summary.collectSummary(0, &csvReader, &rowParser); // 0 - значит без ограничений
 
-            kohonen::NetworkInitializer<DemoInRow, float, float> initializer(&dataReader, &summary);
+            kohonen::NetworkInitializer<DemoInRow> initializer(&dataReader, &summary);
             kohonen::RandomGenerator *randomEngine = initializer.getRandomGenerator();
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 
-            kohonen::winner::EuclideanWinnerSearch<float, float> winnerSearcher;
-            kohonen::alphafunc::LinearAlphaFunction<float> alphaFunc;
-            kohonen::mapdist::HexaMapDistance<float> mapDist;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::alphafunc::LinearAlphaFunction alphaFunc;
+            kohonen::mapdist::HexaMapDistance mapDist;
 
-            kohonen::neighadap::GaussianNeighborAdaptation<float, float> gausAdap(&mapDist, xdim, ydim);
-            kohonen::neighadap::BubbleNeighborAdaptation<float, float> neiAdap(&mapDist, xdim, ydim);
-            kohonen::SomTrainer<DemoInRow, float, float> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius,
-                                                                 xdim, ydim);
+            kohonen::neighadap::GaussianNeighborAdaptation gausAdap(&mapDist, xdim, ydim);
+            kohonen::neighadap::BubbleNeighborAdaptation neiAdap(&mapDist, xdim, ydim);
+            kohonen::SomTrainer<DemoInRow> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius, xdim, ydim);
 
             // init labeling
             utils::hash::CharHash cHash;
@@ -235,13 +227,13 @@ namespace test {
 //            buildAndShowSammonMap(somCodesMatrix, sammonChart);
 
             graphics::CubehelixCellColorMapper cellColor(200, 0.5, -1.5, 2.0, 2.0);
-            graphics::UMatChart<float, char> umatChart(733, 733, &cellColor);
+            graphics::UMatChart<char> umatChart(733, 733, &cellColor);
             umatChart.setWindowTitle("UMat");
-            graphics::ChartThread<graphics::UMatCell<float>> umchartThread(&umatChart);
+            graphics::ChartThread<graphics::UMatCell> umchartThread(&umatChart);
             drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, -1.0);
 
             for (size_t le = 0; le < teachSize; ++le) {
-                models::DataSample<float> samples[colSize];
+                models::DataSample samples[colSize];
                 DemoInRow rowData;
                 bool hasInRow = dataReader.readNext(rowData, samples);
                 if (!hasInRow) {
@@ -257,7 +249,7 @@ namespace test {
                     summary.scaleSamples(samples);
                 }
 
-                kohonen::winner::WinnerInfo<float> winners[winnerSize];
+                kohonen::winner::WinnerInfo winners[winnerSize];
                 bool ok = trainer.trainingBySample(somCodesMatrix, samples, winners, teachSize, le);
                 if (ok) {
                     somLabeling.addWinner(winners[0].index, rowData.label);

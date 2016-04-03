@@ -13,11 +13,10 @@
 
 namespace graphics {
 
-    template<typename Out>
     class SammonMapChart : public Chart<bool> {
     public:
 
-        typedef typename kohonen::SammonMap<Out>::Point SPoint;
+        typedef typename kohonen::SammonMap::Point SPoint;
         typedef utils::CArrayList<SPoint> SammonPoints;
         typedef utils::CArrayList<graphics::ChartData<bool>::Point> ChartPoints;
 
@@ -96,9 +95,7 @@ namespace graphics {
             for (size_t r = 0; r < yPolyLines.getRowSize(); ++r) {
                 utils::RDMatrix<bool, xcb_point_t>::Row &row =
                         yPolyLines.getRow(r);
-                xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN,
-                              window, arcsContext, row.pointSize,
-                              row.points);
+                xcb_poly_line(connection, XCB_COORD_MODE_ORIGIN, window, arcsContext, row.pointSize, row.points);
             }
 
             flush();
