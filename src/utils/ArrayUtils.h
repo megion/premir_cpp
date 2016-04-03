@@ -118,10 +118,23 @@ namespace utils {
          * Евклидовое расстояние массивов A и B.
          * result = sum( (a(i)-b(i))*(a(i)-b(i)) ) where i = 0...N-1
          */
-        static Out euclideanDistance(const InA *a, const InB *b,
-                                     size_t sizeArray) {
+        static Out euclideanDistance(const InA *a, const InB *b, size_t sizeArray) {
             Out res = 0;
             Out diff = 0;
+            for (size_t i = 0; i < sizeArray; ++i) {
+                diff = a[i] - b[i];
+                res = res + diff * diff;
+            }
+            return std::sqrt(res);
+        }
+
+        /**
+         * Коэффициент корреляции Пирсона массивов A и B.
+         */
+        static Out pearsonCorrelation(const InA *a, const InB *b, size_t sizeArray) {
+            Out res = 0;
+            Out averA = 0;
+
             for (size_t i = 0; i < sizeArray; ++i) {
                 diff = a[i] - b[i];
                 res = res + diff * diff;

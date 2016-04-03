@@ -3,7 +3,7 @@
 namespace test {
     namespace coursera {
 
-        void test_titanic() {
+        void test_lesson1_titanic_1_2_3_4() {
             file::CsvFileReader reader("../test/datafiles/coursera/titanic.csv", ',');
             reader.setStrQuote('\"');
             reader.toEndLine();
@@ -26,7 +26,6 @@ namespace test {
                 reader.read(sex, 7);
                 size_t ageCR = reader.read(row.Age);
 
-
                 if (male == sex) {
                     row.Sex = MALE;
                 } else if (female == sex) {
@@ -34,6 +33,9 @@ namespace test {
                 } else {
                     row.Sex = NO;
                 }
+
+                reader.read(row.SibSp);
+                reader.read(row.Parch);
 
                 reader.toEndLine();
                 if (!reader.isEmptyRead()) {
@@ -53,7 +55,7 @@ namespace test {
                         ages.push(row.Age);
                     }
 //                    std::cout << "PassengerId: " << row.PassengerId <<
-//                    " age: " << row.Age << std::endl;
+//                    " SibSp: " << row.SibSp << " Parch: " << row.Parch << std::endl;
                 }
             }
 
@@ -80,11 +82,14 @@ namespace test {
             " firstClass %: " << firstClassPer << std::endl;
             std::cout << "med: " << med <<
             " aver: " << aver << std::endl;
+
+            // 5. Коррелируют ли число братьев/сестер/супругов с числом родителей/детей?
+            // Посчитайте корреляцию Пирсона между признаками SibSp и Parch.
         }
 
         void coursera_test() {
-            suite("Sspy_test");
-            mytest(titanic);
+            suite("Coursera");
+            mytest(lesson1_titanic_1_2_3_4);
         }
     }
 }

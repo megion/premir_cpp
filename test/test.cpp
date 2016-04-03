@@ -44,10 +44,12 @@ int main(int argc, char **argv) {
     test::kohonen_test::kohonen_test();
 
     test::file_csvfilesummary::file_csvFileSummary_test();
-    test::coursera::coursera_test();
+
     matrix_utils_test();
 	digitalFilter_test();
     test::kohonen_demos_test::kohonen_demos_test();
+
+    test::coursera::coursera_test();
 
     return 0;
 

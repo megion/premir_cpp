@@ -1,5 +1,5 @@
-#ifndef SRC_ML_DIGITAL_FILTER_H_
-#define SRC_ML_DIGITAL_FILTER_H_
+#ifndef SRC_ML_DIGITAL_FILTER_H
+#define SRC_ML_DIGITAL_FILTER_H
 
 #include <iostream>
 
@@ -10,10 +10,8 @@ namespace ml {
 
 class DigitalFilter {
 public:
-	DigitalFilter(size_t _dimension, double _speedStability,
-			double _defaultWeight = 0.0) :
-			dimension(_dimension), speedStability(_speedStability), //
-			defaultWeight(_defaultWeight) {
+	DigitalFilter(size_t _dimension, double _speedStability, double _defaultWeight = 0.0) :
+			dimension(_dimension), speedStability(_speedStability), defaultWeight(_defaultWeight) {
 		inputsQueue = new utils::LinkedList<double>();
 		weightsArray = new utils::CArrayList<double>(dimension);
 	}
@@ -40,8 +38,7 @@ public:
 	 * Пересчет весов фильтра по алгоритму наименьших квадратов Уидроу-Хоффа
 	 * и вернуть оценку ошибки e = signalAndNoise - filterOutSum
 	 */
-	double updateFilterWeightsByLeastSquaresAlgorithm(double signalAndNoise,
-			double filterOutSum);
+	double updateFilterWeightsByLeastSquaresAlgorithm(double signalAndNoise, double filterOutSum);
 
 private:
 	double defaultWeight = 0.0; // default weight = 0.0
@@ -56,4 +53,4 @@ private:
 
 }
 
-#endif /* SRC_ML_DIGITAL_FILTER_H_ */
+#endif

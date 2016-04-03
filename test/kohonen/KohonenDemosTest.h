@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include "test.h"
-#include "kohonen/NetworkInitializer.h"
+
 #include "file/CsvFileReader.h"
 #include "file/CsvFileWriter.h"
 #include "file/CsvFileRowParser.h"
@@ -13,6 +13,8 @@
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
 #include "utils/hash/StringHash.h"
+
+#include "kohonen/NetworkInitializer.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"
