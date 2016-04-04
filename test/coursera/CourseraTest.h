@@ -10,7 +10,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
-#include <regex>
+#include <regex.h>
 
 #include "test.h"
 
@@ -25,6 +25,8 @@
 #include "utils/CArrayList.h"
 #include "utils/ArrayUtils.h"
 #include "utils/hash/StringHash.h"
+
+#include "ml/MlUtils.h"
 
 
 namespace test {
@@ -55,17 +57,19 @@ namespace test {
                 size_t i = 0;
                 reader->read(row.PassengerId);
 
-                // Survived
+                // Survived - 0
                 readNextDataSample(samples[i], reader);
+                row.Survived = samples[i].value;
                 i++;
 
-                // Pclass
+                // Pclass - 1
                 readNextDataSample(samples[i], reader);
+                row.Pclass = samples[i].value;
                 i++;
 
                 reader->read(row.Name, 256, true);
 
-                // Sex
+                // Sex - 2
                 char sex[7];
                 size_t numReads = reader->read(sex, 7);
                 if (numReads>0) {
@@ -85,16 +89,19 @@ namespace test {
                 }
                 i++;
 
-                // age
+                // Age - 3
                 readNextDataSample(samples[i], reader);
+                row.Age = samples[i].value;
                 i++;
 
-                // SibSp
+                // SibSp - 4
                 readNextDataSample(samples[i], reader);
+                row.SibSp = samples[i].value;
                 i++;
 
-                // Parch
+                // Parch - 5
                 readNextDataSample(samples[i], reader);
+                row.Parch = samples[i].value;
                 i++;
 
                 return true;
@@ -119,20 +126,6 @@ namespace test {
                 }
                 return bytesRead;
             }
-
-        };
-
-        /**
-         * Хранит некоторую статистику
-         *
-         */
-        struct TitanicSummary {
-            size_t maleCount = 0;
-            size_t femaleCount = 0;
-            size_t survivedCount = 0;
-            size_t firstClassCount = 0;
-            size_t totalCount = 0;
-
 
         };
     }

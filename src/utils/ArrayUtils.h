@@ -2,8 +2,8 @@
  * Утилиты для векторов
  */
 
-#ifndef SRC_UTILS_VECTORUTILS_H
-#define SRC_UTILS_VECTORUTILS_H
+#ifndef SRC_UTILS_ARRAYUTILS_H
+#define SRC_UTILS_ARRAYUTILS_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -127,22 +127,6 @@ namespace utils {
             }
             return std::sqrt(res);
         }
-
-        /**
-         * Коэффициент корреляции Пирсона массивов A и B.
-         */
-        static Out pearsonCorrelation(const InA *a, const InB *b, size_t sizeArray) {
-            Out res = 0;
-            Out averA = 0;
-
-            for (size_t i = 0; i < sizeArray; ++i) {
-                diff = a[i] - b[i];
-                res = res + diff * diff;
-            }
-            return std::sqrt(res);
-        }
-
-
 
     };
 }
