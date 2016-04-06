@@ -16,6 +16,8 @@
 
 #include "kohonen/NetworkInitializer.h"
 #include "kohonen/RandomGenerator.h"
+#include "kohonen/winner/WinnerDistance.h"
+#include "kohonen/winner/DefaultWinnerDistance.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"
 #include "kohonen/alphafunc/LinearAlphaFunction.h"
@@ -145,6 +147,41 @@ namespace test {
                     sample.skipped = true;
                 }
                 return bytesRead;
+            }
+
+        };
+
+        class HouseVotesWinnerDistance : public kohonen::winner::WinnerDistance {
+        public:
+            HouseVotesWinnerDistance() : kohonen::winner::WinnerDistance() {
+            }
+
+            bool distance(double *somNeuronCodes, models::DataSample *samples, size_t dim, double &difference,
+                          const double &maxDifference) const {
+                size_t masked = 0;
+                difference = 0;
+                /* Compute the distance between codebook and input entry */
+                for (size_t i = 0; i < dim; ++i) {
+                    if (samples[i].skipped) {
+                        masked++;
+                        /* ignore vector components that skipped */
+                        continue;
+                    }
+
+                    double diff = somNeuronCodes[i] - samples[i].value;
+                    difference += diff * diff;
+                    if (difference > maxDifference) {
+                        break;
+                    }
+                }
+
+                if (masked == dim) {
+                    /* TODO: can't calculate winner, empty data vector */
+//                    danger_text("can't calculate winner, empty data vector");
+                    return false;
+                }
+
+                return true;
             }
 
         };

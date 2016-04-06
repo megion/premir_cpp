@@ -5,6 +5,7 @@
 
 #include "utils/RMatrix.h"
 #include "models/models.h"
+#include "WinnerDistance.h"
 
 namespace kohonen {
     namespace winner {
@@ -17,7 +18,9 @@ namespace kohonen {
         class WinnerSearch {
         public:
 
-            WinnerSearch(size_t _winnersSize) : winnersSize(_winnersSize) {
+            WinnerSearch(size_t _winnersSize, WinnerDistance *_winnerDistance) :
+                    winnersSize(_winnersSize),
+                    winnerDistance(_winnerDistance) {
             }
 
             virtual bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
@@ -29,6 +32,8 @@ namespace kohonen {
 
         protected:
             size_t winnersSize;
+
+            WinnerDistance *winnerDistance;
 
         };
     }

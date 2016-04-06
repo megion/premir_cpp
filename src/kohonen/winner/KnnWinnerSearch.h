@@ -25,7 +25,8 @@ namespace kohonen {
          */
         class KnnWinnerSearch : public WinnerSearch {
         public:
-            KnnWinnerSearch(size_t _winnersSize) : WinnerSearch(_winnersSize) {
+            KnnWinnerSearch(size_t _winnersSize, WinnerDistance *_winnerDistance) :
+                    WinnerSearch(_winnersSize, _winnerDistance) {
             }
 
             bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
@@ -44,21 +45,9 @@ namespace kohonen {
                     double difference = 0;
 
                     /* Compute the distance between codebook and input entry */
-                    for (size_t i = 0; i < dim; ++i) {
-                        if (inSampleRow[i].skipped) {
-                            masked++;
-                            /* ignore vector components that skipped */
-                            continue;
-                        }
+                    bool ok = winnerDistance->distance((*somCodes)[r], inSampleRow, dim, difference, maxDifference);
 
-                        double diff = (*somCodes)(r, i) - inSampleRow[i].value;
-                        difference += diff * diff;
-                        if (difference > winners[knn - 1].diff) {
-                            break;
-                        }
-                    }
-
-                    if (masked == dim) {
+                    if (!ok) {
                         /* TODO: can't calculate winner, empty data vector */
                         danger_text("can't calculate winner, empty data vector");
                         return false;

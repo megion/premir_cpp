@@ -22,7 +22,7 @@ namespace kohonen {
          */
         class EuclideanWinnerSearch : public WinnerSearch {
         public:
-            EuclideanWinnerSearch() : WinnerSearch(1) {
+            EuclideanWinnerSearch(WinnerDistance *_winnerDistance) : WinnerSearch(1, _winnerDistance) {
             }
 
             bool search(utils::RMatrix<models::NeuronInfo, double> *somCodes, models::DataSample *inSampleRow,
@@ -35,24 +35,9 @@ namespace kohonen {
                 double maxDifference = std::numeric_limits<double>::max();
 
                 for (size_t r = 0; r < somCodes->getRowSize(); ++r) {
-                    size_t masked = 0;
                     double difference = 0;
-                    /* Compute the distance between codebook and input entry */
-                    for (size_t i = 0; i < dim; ++i) {
-                        if (inSampleRow[i].skipped) {
-                            masked++;
-                            /* ignore vector components that skipped */
-                            continue;
-                        }
-
-                        double diff = (*somCodes)(r, i) - inSampleRow[i].value;
-                        difference += diff * diff;
-                        if (difference > maxDifference) {
-                            break;
-                        }
-                    }
-
-                    if (masked == dim) {
+                    bool ok = winnerDistance->distance((*somCodes)[r], inSampleRow, dim, difference, maxDifference);
+                    if (!ok) {
                         /* TODO: can't calculate winner, empty data vector */
                         danger_text("can't calculate winner, empty data vector");
                         return false;

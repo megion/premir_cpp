@@ -22,13 +22,13 @@ namespace test {
 //            std::regex pieces_regex("([a-z]+)\\,([a-z]+)");
 //            std::smatch pieces_match;
 
-            regex_t regex;
+//            regex_t regex;
             /* Compile regular expression */
-            int reti = regcomp(&regex, "Cann,", 0);
-            if (reti) {
-                fprintf(stderr, "Could not compile regex\n");
-                exit(1);
-            }
+//            int reti = regcomp(&regex, "Cann,", 0);
+//            if (reti) {
+//                fprintf(stderr, "Could not compile regex\n");
+//                exit(1);
+//            }
 
             TitanicCsvFileRowParser rowParser;
             file::stream::CsvFileStreamReader<Titanic> dataReader(&reader, &rowParser);
@@ -66,16 +66,16 @@ namespace test {
 //                }
 
                 /* Execute regular expression */
-                reti = regexec(&regex, row.Name, 0, NULL, 0);
-                if (!reti) {
-                    std::cout << "Match " << '\n';
-                } else if (reti == REG_NOMATCH) {
-//                    std::cout << "No Match " << '\n';
-                } else {
-                    regerror(reti, &regex, msgbuf, sizeof(msgbuf));
-                    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
-                    exit(1);
-                }
+//                reti = regexec(&regex, row.Name, 0, NULL, 0);
+//                if (!reti) {
+//                    std::cout << "Match " << '\n';
+//                } else if (reti == REG_NOMATCH) {
+////                    std::cout << "No Match " << '\n';
+//                } else {
+//                    regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+//                    fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+//                    exit(1);
+//                }
 
 //                std::cout << "Id: " << row.PassengerId << " S: " << row.SibSp << " P: " << row.Parch << std::endl;
 
@@ -83,7 +83,7 @@ namespace test {
             }
 
             /* Free memory allocated to the pattern buffer by regcomp() */
-            regfree(&regex);
+//            regfree(&regex);
 
 //            std::string s = "Some people, when confronted with a problem, think "
 //                    "\"I know, I'll use regular expressions.\" "

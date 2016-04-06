@@ -75,7 +75,8 @@ namespace test {
             kohonen::SomKeeper somKeeper;
             somKeeper.saveSom(somCodesMatrix, "speech_som_initialized_2.cod");
 
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             kohonen::alphafunc::LinearAlphaFunction alphaFunc;
             kohonen::mapdist::HexaMapDistance mapDist;
 
@@ -196,7 +197,8 @@ namespace test {
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             kohonen::alphafunc::LinearAlphaFunction alphaFunc;
             kohonen::mapdist::HexaMapDistance mapDist;
 
@@ -291,7 +293,7 @@ namespace test {
         void kohonen_demos_test() {
             suite("KohonenDemos");
 //            mytest(speech_signal);
-//            mytest(house_votes);
+            mytest(house_votes);
         }
     }
 }

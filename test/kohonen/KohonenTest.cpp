@@ -89,7 +89,8 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             kohonen::alphafunc::LinearAlphaFunction alphaFunc;
             kohonen::mapdist::HexaMapDistance mapDist;
 
@@ -125,7 +126,8 @@ namespace test {
 
             OutCodes *somCodesMatrix = read_some_initilized_codes();
 
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             kohonen::alphafunc::LinearAlphaFunction alphaFunc;
             kohonen::mapdist::RectMapDistance mapDist;
 
@@ -396,8 +398,8 @@ namespace test {
             DemoStringKeyHash strHash;
             kohonen::labeling::SomLabeling<DemoStringKey> somLabeling(xdim, ydim, &strHash);
 
-
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             models::DataSample samples[dim];
             DemoInRowFts rowData;
             size_t winnerSize = winnerSearcher.getWinnerSize();
@@ -443,7 +445,8 @@ namespace test {
             randomEngine->setNextValue(1);
             OutCodes *somCodesMatrix = initializer.lineInitialization(xdim, ydim, dim, isScale);
 
-            kohonen::winner::EuclideanWinnerSearch winnerSearcher;
+            kohonen::winner::DefaultWinnerDistance winnerDistance;
+            kohonen::winner::EuclideanWinnerSearch winnerSearcher(&winnerDistance);
             kohonen::alphafunc::LinearAlphaFunction alphaFunc;
             kohonen::mapdist::HexaMapDistance mapDist;
 

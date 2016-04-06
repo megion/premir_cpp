@@ -14,7 +14,6 @@
 #include "matrix/GramSchmidtTest.h"
 #include "file/FileReaderTest.h"
 #include "file/CsvFileSummaryTest.h"
-#include "sspy/SspyTest.h"
 #include "kohonen/KohonenTest.h"
 #include "kohonen/KohonenDemosTest.h"
 #include "coursera/CourseraTest.h"
@@ -40,7 +39,6 @@ int main(int argc, char **argv) {
     test::matrix_determinant::determinant_test();
     test::matrix_gramSchmidt::gramSchmidt_test();
     test::file_reader::file_reader_test();
-    test::sspy::sspy_data_read_test();
     test::kohonen_test::kohonen_test();
 
     test::file_csvfilesummary::file_csvFileSummary_test();

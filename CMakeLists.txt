@@ -26,7 +26,6 @@ add_executable(dummy_executable
         test/file/FileReaderTest.cpp
         test/file/CsvFileSummaryTest.cpp
         test/ml/DigitalFilterTest.cpp
-        test/sspy/SspyTest.cpp
         test/kohonen/KohonenTest.cpp
         test/kohonen/KohonenDemosTest.cpp
         test/coursera/CourseraTest.cpp

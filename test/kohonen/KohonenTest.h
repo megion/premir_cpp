@@ -13,6 +13,7 @@
 #include "utils/RMatrix.h"
 #include "utils/hash/StringHash.h"
 #include "kohonen/RandomGenerator.h"
+#include "kohonen/winner/DefaultWinnerDistance.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
 #include "kohonen/alphafunc/InverseAlphaFunction.h"
 #include "kohonen/alphafunc/LinearAlphaFunction.h"
