@@ -1,5 +1,5 @@
-#ifndef TEST_ML_DIGITAL_FILTER_TEST_H_
-#define TEST_ML_DIGITAL_FILTER_TEST_H_
+#ifndef TEST_ML_DIGITAL_FILTER_TEST_H
+#define TEST_ML_DIGITAL_FILTER_TEST_H
 
 #include <cmath>
 #include <random>
@@ -13,6 +13,13 @@
 
 # define MY_PI		3.14159265358979323846	/* pi */
 
-void digitalFilter_test();
+namespace test {
+    namespace ml_test {
+
+        void digital_filter_test();
+
+        void decision_tree_test();
+    }
+}
 
 #endif

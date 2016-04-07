@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
     test::file_csvfilesummary::file_csvFileSummary_test();
 
     matrix_utils_test();
-	digitalFilter_test();
+    test::ml_test::digital_filter_test();
+    test::ml_test::decision_tree_test();
     test::kohonen_demos_test::kohonen_demos_test();
 
     test::coursera::coursera_test();
