@@ -25,7 +25,7 @@ namespace utils {
     class HashMap {
     public:
 
-        typedef typename utils::RDMatrix<bool, bool, Entry<K, V>>::Row Row;
+        typedef typename utils::RDMatrix<bool, Entry<K, V>>::Row Row;
 
         HashMap(hash::HashEngine<K> *_hashEngine) :
                 hashEngine(_hashEngine), valueSizeof(sizeof(V)) {
@@ -36,7 +36,7 @@ namespace utils {
         HashMap<K, V> &operator=(const HashMap<K, V> &) = delete; // assign operator
         HashMap<K, V> &operator=(HashMap<K, V> &&) = delete; // replacement operator
 
-        ~HashMapArray() {
+        ~HashMap() {
             delete matrix;
             matrix = nullptr;
         }

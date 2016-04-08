@@ -501,7 +501,7 @@ namespace test {
                     qerror += std::sqrt(winners[0].diff);
                     if (cnt == 0 && le != 0) {
                         qerror = qerror / step;
-                        qErrorChart.redrawNewPoint(le, qerror);
+                        qErrorChart.redrawNewPoint(0, le, qerror);
                         drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
                         qerror = 0;
 //                        std::this_thread::sleep_for(std::chrono::milliseconds(20));

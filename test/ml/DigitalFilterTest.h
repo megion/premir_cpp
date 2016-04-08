@@ -8,6 +8,8 @@
 #include "graphics/ChartThread.h"
 #include "graphics/PointChart.h"
 #include "ml/DigitalFilter.h"
+#include "ml/Entropy.h"
+#include "utils/hash/StringHash.h"
 
 #include "test.h"
 

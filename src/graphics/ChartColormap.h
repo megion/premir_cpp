@@ -113,79 +113,79 @@ namespace graphics {
             return gray;
         }
 
-        utils::CArrayList<xcb_alloc_color_reply_t *> *createGrayColors(uint16_t colorsSize) {
-            uint16_t step = 65535 / colorsSize;
-            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
-                    colorsSize, 1, colorsSize);
-            for (uint16_t i = 0; i < colorsSize; ++i) {
-                uint16_t colComp = i * step; // компонента цвета
-                xcb_generic_error_t *error = NULL;
-                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
-                                                                       xcb_alloc_color(connection, colormapId, colComp,
-                                                                                       colComp, colComp), &error);
-                if (error) {
-                    throw std::runtime_error("Cannot create colormap");
-                }
-                (*colors)[i] = color;
-            }
-            return colors;
-        }
-
-        utils::CArrayList<xcb_alloc_color_reply_t *> *createWavelengthColors(size_t colorsSize) {
-            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
-                    colorsSize, 1, colorsSize);
-            for (size_t i = 0; i < colorsSize; ++i) {
-                uint16_t r, g, b;
-                calculateWavelengthColor(i, 0, colorsSize - 1, r, g, b);
-                xcb_generic_error_t *error = NULL;
-                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
-                                                                       xcb_alloc_color(connection, colormapId, r,
-                                                                                       g, b), &error);
-                if (error) {
-                    throw std::runtime_error("Cannot create colormap");
-                }
-                (*colors)[i] = color;
-            }
-
-            return colors;
-        }
-
-        utils::CArrayList<xcb_alloc_color_reply_t *> *createCubehelixColors(size_t colorsSize, double start,
-                                                                            double rots, double hue, double gamma) {
-            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
-                    colorsSize, 1, colorsSize);
-            for (size_t i = 0; i < colorsSize; ++i) {
-                uint16_t r, g, b;
-                calculateCubehelixColor(i, 0, colorsSize - 1, r, g, b, start, rots, hue, gamma);
-                xcb_generic_error_t *error = NULL;
-                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
-                                                                       xcb_alloc_color(connection, colormapId, r,
-                                                                                       g, b), &error);
-                if (error) {
-                    throw std::runtime_error("Cannot create colormap");
-                }
-                (*colors)[i] = color;
-            }
-
-            return colors;
-        }
+//        utils::CArrayList<xcb_alloc_color_reply_t *> *createGrayColors(uint16_t colorsSize) {
+//            uint16_t step = 65535 / colorsSize;
+//            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+//                    colorsSize, 1, colorsSize);
+//            for (uint16_t i = 0; i < colorsSize; ++i) {
+//                uint16_t colComp = i * step; // компонента цвета
+//                xcb_generic_error_t *error = NULL;
+//                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
+//                                                                       xcb_alloc_color(connection, colormapId, colComp,
+//                                                                                       colComp, colComp), &error);
+//                if (error) {
+//                    throw std::runtime_error("Cannot create colormap");
+//                }
+//                (*colors)[i] = color;
+//            }
+//            return colors;
+//        }
+//
+//        utils::CArrayList<xcb_alloc_color_reply_t *> *createWavelengthColors(size_t colorsSize) {
+//            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+//                    colorsSize, 1, colorsSize);
+//            for (size_t i = 0; i < colorsSize; ++i) {
+//                uint16_t r, g, b;
+//                calculateWavelengthColor(i, 0, colorsSize - 1, r, g, b);
+//                xcb_generic_error_t *error = NULL;
+//                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
+//                                                                       xcb_alloc_color(connection, colormapId, r,
+//                                                                                       g, b), &error);
+//                if (error) {
+//                    throw std::runtime_error("Cannot create colormap");
+//                }
+//                (*colors)[i] = color;
+//            }
+//
+//            return colors;
+//        }
+//
+//        utils::CArrayList<xcb_alloc_color_reply_t *> *createCubehelixColors(size_t colorsSize, double start,
+//                                                                            double rots, double hue, double gamma) {
+//            utils::CArrayList<xcb_alloc_color_reply_t *> *colors = new utils::CArrayList<xcb_alloc_color_reply_t *>(
+//                    colorsSize, 1, colorsSize);
+//            for (size_t i = 0; i < colorsSize; ++i) {
+//                uint16_t r, g, b;
+//                calculateCubehelixColor(i, 0, colorsSize - 1, r, g, b, start, rots, hue, gamma);
+//                xcb_generic_error_t *error = NULL;
+//                xcb_alloc_color_reply_t *color = xcb_alloc_color_reply(connection,
+//                                                                       xcb_alloc_color(connection, colormapId, r,
+//                                                                                       g, b), &error);
+//                if (error) {
+//                    throw std::runtime_error("Cannot create colormap");
+//                }
+//                (*colors)[i] = color;
+//            }
+//
+//            return colors;
+//        }
 
 
         /**
          * Параметр color должен принимать значение от 0 ... 1
          */
-        xcb_alloc_color_reply_t *getScaledColor(utils::CArrayList<xcb_alloc_color_reply_t *> *colors,
-                                                const double &color) const {
-            size_t index = (colors->size() - 1) * color;
-            return (*colors)[index];
-        }
-
-        void freeColors(utils::CArrayList<xcb_alloc_color_reply_t *> *colors) {
-            for (size_t i = 0; i < colors->size(); ++i) {
-                std::free((*colors)[i]);
-            }
-            delete colors;
-        }
+//        xcb_alloc_color_reply_t *getScaledColor(utils::CArrayList<xcb_alloc_color_reply_t *> *colors,
+//                                                const double &color) const {
+//            size_t index = (colors->size() - 1) * color;
+//            return (*colors)[index];
+//        }
+//
+//        void freeColors(utils::CArrayList<xcb_alloc_color_reply_t *> *colors) {
+//            for (size_t i = 0; i < colors->size(); ++i) {
+//                std::free((*colors)[i]);
+//            }
+//            delete colors;
+//        }
 
     private:
         xcb_connection_t *connection;

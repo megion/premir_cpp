@@ -82,8 +82,7 @@ namespace ml {
 
     private:
         T &min3(T &a, T &b, T &c) const {
-            return ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b)
-                                                                     : (c)));
+            return ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)));
         }
 
     };

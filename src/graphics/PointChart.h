@@ -1,5 +1,5 @@
-#ifndef SRC_GRAPHICS_POINTCHART_H_
-#define SRC_GRAPHICS_POINTCHART_H_
+#ifndef SRC_GRAPHICS_POINTCHART_H
+#define SRC_GRAPHICS_POINTCHART_H
 
 #include <xcb/xcb.h>
 #include <exception>
@@ -29,23 +29,31 @@ namespace graphics {
 
             // оптимизация выделения памяти
             getData()->getOutpoints()->setPointCapacityIncrease(40);
+
+            seriesColors = new utils::CArrayList<xcb_alloc_color_reply_t *>();
         }
 
         ~PointChart() {
             pointsContext = 0;
             cleanPointsContext = 0;
+            delete seriesColors;
         }
 
-        void drawPoints(const xcb_drawable_t& pixmap) const {
+        void addSeriesColor(size_t seriesIndex, const Color& color) {
+            xcb_alloc_color_reply_t * pColor = colormap->getColor(color);
+            seriesColors->write(seriesIndex, pColor);
+        }
+
+        void drawPoints(const xcb_drawable_t &pixmap) const {
             drawPointsOnContext(pixmap, pointsContext);
         }
 
-        void drawCleanPoints(const xcb_drawable_t& pixmap) const {
+        void drawCleanPoints(const xcb_drawable_t &pixmap) const {
             drawPointsOnContext(pixmap, cleanPointsContext);
         }
 
-        void drawPointsOnContext(const xcb_drawable_t& pixmap, const xcb_gcontext_t& gContext) const {
-            if(isFatPoint) {
+        void drawPointsOnContext(const xcb_drawable_t &pixmap, const xcb_gcontext_t &gContext) const {
+            if (isFatPoint) {
                 for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                     utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
                     utils::CArrayList<xcb_arc_t> arcs(outPoint.pointSize, 1, outPoint.pointSize);
@@ -62,7 +70,16 @@ namespace graphics {
                 }
             } else {
                 for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
+
                     utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
+
+                    if (r<(seriesColors->size())) {
+                        xcb_alloc_color_reply_t *cellColor = seriesColors->getArray()[r];
+                        uint32_t values[] = {cellColor->pixel};
+                        uint32_t mask = XCB_GC_FOREGROUND;
+                        xcb_change_gc(connection, pointsContext, mask, values);
+                    }
+
                     xcb_poly_point(connection, XCB_COORD_MODE_ORIGIN, pixmap, gContext, outPoint.pointSize,
                                    outPoint.points);
                 }
@@ -75,9 +92,9 @@ namespace graphics {
          * 2. add new points and update all points position
          * 3. draw updated current points
          */
-        void redrawNewPoints(ChartData<bool>::Point *points, size_t len) const {
+        void redrawNewPoints(size_t seriesIndex, ChartData<bool>::Point *points, size_t len) const {
             drawCleanPoints(window);
-            data->addPoints(0, points, len);
+            data->addPoints(seriesIndex, points, len);
             drawPoints(window);
 
             if (data->size() % 36 == 0) { // оптимизация :)
@@ -88,13 +105,13 @@ namespace graphics {
             flush();
         }
 
-        void redrawNewPoint(double x, double y) {
+        void redrawNewPoint(size_t seriesIndex, double x, double y) const {
             drawCleanPoints(window);
 
             ChartData<bool>::Point points[1];
             points[0].x = x;
             points[0].y = y;
-            data->addPoints(0, points, 1);
+            data->addPoints(seriesIndex, points, 1);
             drawPoints(window);
 
             if (data->size() % 36 == 0) { // оптимизация :)
@@ -105,7 +122,7 @@ namespace graphics {
             flush();
         }
 
-        void draw(const xcb_drawable_t& pixmap) const {
+        void draw(const xcb_drawable_t &pixmap) const {
             drawBackground(pixmap);
             drawAxes(pixmap);
             drawAxesLabels(pixmap);
@@ -118,6 +135,8 @@ namespace graphics {
 
         xcb_gcontext_t pointsContext;
         xcb_gcontext_t cleanPointsContext;
+
+        utils::CArrayList<xcb_alloc_color_reply_t *> *seriesColors;
 
     };
 

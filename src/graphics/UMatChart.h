@@ -109,12 +109,6 @@ namespace graphics {
             } else {
                 useDefaultCellColorMapper = false;
             }
-
-
-            // создадим 1000 оттенков серого
-//            grayColors = Chart<UMatCell<Out>>::colormap->createGrayColors(1000);
-//            grayColors = Chart<UMatCell<Out>>::colormap->createCubehelixColors(1000, 0.5, -1.5, 1.0, 1.0);
-            labelsColors = Chart<UMatCell>::colormap->createWavelengthColors(1000);
         }
 
         ~UMatChart() {
@@ -126,10 +120,10 @@ namespace graphics {
 //                grayColors = nullptr;
 //            }
 
-            if (labelsColors) {
-                Chart<UMatCell>::colormap->freeColors(labelsColors);
-                labelsColors = nullptr;
-            }
+//            if (labelsColors) {
+//                Chart<UMatCell>::colormap->freeColors(labelsColors);
+//                labelsColors = nullptr;
+//            }
 
             if (useDefaultCellColorMapper) {
                 delete cellColorMapper;
@@ -266,9 +260,7 @@ namespace graphics {
                     Chart<UMatCell>::data->addPoints(index, points, 7);
                     UMatCell &cell = (*Chart<UMatCell>::data->getOutpoints())[index].data;
                     cell.uValue = uvalue[i][j];
-//                    cell.useLabelColor = false;
-                    cell.color = Chart<UMatCell>::colormap->getColor(cellColorMapper->getColorByCellValue(
-                            cell.uValue));
+                    cell.color = Chart<UMatCell>::colormap->getColor(cellColorMapper->getColorByCellValue(cell.uValue));
 
                     // k = 2,2,4,4,2,2,4,4...
                     if (j % 2 == 0) {
@@ -293,20 +285,8 @@ namespace graphics {
             size_t rowSize = outMatrix->getRowSize();
             for (size_t r = 0; r < rowSize; ++r) {
                 OutRow &outRow = (*outMatrix)[r];
-
                 xcb_alloc_color_reply_t *cellColor = outRow.data.color;
-//                if (outRow.data.useLabelColor) {
-//                    cellColor = Chart<UMatCell<Out>>::colormap->getScaledColor(labelsColors, outRow.data.labelColor);
-//                    cellColor = Chart<UMatCell<Out>>::colormap->getGreen();
-
-//                cellColor = outRow.data.color;
-//                } else {
-//                    cellColor = Chart<UMatCell<Out>>::colormap->getColor(cellColorMapper->getColorByCellValue(
-//                            outRow.data.uValue));//Chart<UMatCell<Out>>::colormap->getScaledColor(grayColors, outRow.data.uValue);
-//                }
-
                 uint32_t values[] = {cellColor->pixel};
-//                uint32_t values[] = {Chart<Out>::colormap->getWavelengthColor(outRow.data)->pixel};
                 uint32_t mask = XCB_GC_FOREGROUND;
                 xcb_change_gc(Chart<UMatCell>::connection, cellBackgroundContext, mask, values);
                 xcb_fill_poly(Chart<UMatCell>::connection, pixmap, cellBackgroundContext,
@@ -316,20 +296,11 @@ namespace graphics {
         }
 
     private:
-
         xcb_gcontext_t cellBorderContext;
         xcb_gcontext_t cellBackgroundContext;
 
-        // коллекция серых цветов: от белого до черного
-//        utils::CArrayList<xcb_alloc_color_reply_t *> *grayColors;
-        utils::CArrayList<xcb_alloc_color_reply_t *> *labelsColors;
-
         CellColorMapper *cellColorMapper;
         bool useDefaultCellColorMapper;
-
-//        // цвета радуги :)
-//        utils::CArrayList<xcb_alloc_color_reply_t *> *waveColors;
-
     };
 
 }

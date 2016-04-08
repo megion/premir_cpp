@@ -51,10 +51,10 @@ namespace test {
                     double signalEval = df.updateFilterWeightsByLeastSquaresAlgorithm(
                             signalAndNoise, noiseEval);
 
-                    chartSignalTemplate.redrawNewPoint(i, signal);
-                    chartNoiseEval.redrawNewPoint(i, noiseEval);
-                    chartSignalIn.redrawNewPoint(i, signalAndNoise);
-                    chartSignalOut.redrawNewPoint(i, signalEval);
+                    chartSignalTemplate.redrawNewPoint(0, i, signal);
+                    chartNoiseEval.redrawNewPoint(0, i, noiseEval);
+                    chartSignalIn.redrawNewPoint(0, i, signalAndNoise);
+                    chartSignalOut.redrawNewPoint(0, i, signalEval);
 
                     ///////// draw filter weight
                     chartFilterWeights.removeDataSafely();
@@ -84,6 +84,30 @@ namespace test {
 
         void decision_tree_test() {
             suite("Decision tree");
+
+            utils::hash::CharHash shash;
+            shash.setIndexSize(6);
+
+            graphics::PointChart entropyChart(true, 710, 460);
+            entropyChart.setWindowTitle("Entropy");
+            graphics::ChartThread<bool> entropyChartThread(&entropyChart);
+
+            graphics::Color color1(65535, 0, 0);
+            entropyChart.addSeriesColor(0, color1);
+
+            for (int i = 0; i < 100; i++) {
+                ml::Entropy<char> ep(&shash);
+                for (int k = 0; k < 100; k++) {
+                    if (k > i) {
+                        ep.addValue('A');
+                    } else {
+                        ep.addValue('B');
+                    }
+                }
+
+                double v = ep.calculateEntropy();
+                entropyChart.redrawNewPoint(0, i, v);
+            }
         }
     }
 }

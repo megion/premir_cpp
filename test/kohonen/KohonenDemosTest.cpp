@@ -145,7 +145,7 @@ namespace test {
                     qerror += std::sqrt(winners[0].diff);
                     if (le % step==0 && le!=0) {
                         qerror = qerror / step;
-                        qErrorChart.redrawNewPoint(le, qerror);
+                        qErrorChart.redrawNewPoint(0, le, qerror);
 //                        drawUMat(somCodesMatrix, umatChart, xdim, ydim, dim);
                         qerror = 0;
 //                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -259,7 +259,7 @@ namespace test {
                     qerror += std::sqrt(winners[0].diff);
                     if (le % step==0 && le!=0) {
                         qerror = qerror / step;
-                        qErrorChart.redrawNewPoint(le, qerror);
+                        qErrorChart.redrawNewPoint(0, le, qerror);
                         drawUMat(somCodesMatrix, somLabeling, umatChart, xdim, ydim, dim, -1.0);
                         // clean drawed data for labels
 //                    somLabeling.cleanWinnerLabels();
