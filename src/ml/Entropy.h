@@ -74,6 +74,22 @@ namespace ml {
             return std::log2(w)/(double)totalCounter;
         }
 
+        /**
+         * Вычисление энтропии Шенонна
+         */
+        double calculateShenonEntropy() {
+            double sm = 0;
+            for (size_t r = 0; r < valueCounters->getMatrix()->getRowSize(); ++r) {
+                VRow &row = (*valueCounters->getMatrix())[r];
+                for (size_t p = 0; p < row.pointSize; ++p) {
+                    VEntry &e = row[p];
+                    double pi = (double)e.value.count/(double)totalCounter;
+                    sm += pi*std::log2(pi);
+                }
+            }
+            return -sm;
+        }
+
     private:
         utils::HashMap<V, EntropyValueInfo> *valueCounters;
         size_t totalCounter;

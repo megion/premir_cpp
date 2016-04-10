@@ -93,7 +93,9 @@ namespace test {
             graphics::ChartThread<bool> entropyChartThread(&entropyChart);
 
             graphics::Color color1(65535, 0, 0);
-            entropyChart.addSeriesColor(0, color1);
+            entropyChart.pushSeriesColor(color1);
+            graphics::Color color2(0, 65535, 0);
+            entropyChart.pushSeriesColor(color2);
 
             for (int i = 0; i < 100; i++) {
                 ml::Entropy<char> ep(&shash);
@@ -107,6 +109,9 @@ namespace test {
 
                 double v = ep.calculateEntropy();
                 entropyChart.redrawNewPoint(0, i, v);
+
+                double v2 = ep.calculateShenonEntropy();
+                entropyChart.redrawNewPoint(1, i, v2);
             }
         }
     }

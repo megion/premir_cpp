@@ -39,9 +39,9 @@ namespace graphics {
             delete seriesColors;
         }
 
-        void addSeriesColor(size_t seriesIndex, const Color& color) {
+        void pushSeriesColor(const Color& color) {
             xcb_alloc_color_reply_t * pColor = colormap->getColor(color);
-            seriesColors->write(seriesIndex, pColor);
+            seriesColors->push(pColor);
         }
 
         void drawPoints(const xcb_drawable_t &pixmap) const {
@@ -66,6 +66,14 @@ namespace graphics {
                         arcs[i].angle1 = 0;
                         arcs[i].angle2 = 360 << 6;
                     }
+
+                    if (r<(seriesColors->size())) {
+                        xcb_alloc_color_reply_t *cellColor = seriesColors->getArray()[r];
+                        uint32_t values[] = {cellColor->pixel};
+                        uint32_t mask = XCB_GC_FOREGROUND;
+                        xcb_change_gc(connection, pointsContext, mask, values);
+                    }
+
                     xcb_poly_arc(connection, pixmap, gContext, outPoint.pointSize, arcs.getArray());
                 }
             } else {
