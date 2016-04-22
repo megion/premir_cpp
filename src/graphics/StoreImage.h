@@ -9,8 +9,6 @@
 #include <cstring>
 
 #include <png.h>
-#include <pngconf.h>
-#include <pnglibconf.h>
 
 namespace graphics {
 
@@ -55,12 +53,14 @@ namespace graphics {
 
             png_infop png_info_ptr = png_create_info_struct(png_ptr);
             if (png_info_ptr == NULL) {
+            	png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
                 fprintf(stderr, "Could not allocate info struct\n");
                 return;
             }
 
             // setup exception handling
             if (setjmp(png_jmpbuf(png_ptr))) {
+            	png_destroy_write_struct(&png_ptr, &png_info_ptr);
                 fprintf(stderr, "Error during png creation\n");
                 return;
             }

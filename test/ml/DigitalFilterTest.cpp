@@ -113,6 +113,8 @@ namespace test {
                 double v2 = ep.calculateShenonEntropy();
                 entropyChart.redrawNewPoint(1, i, v2);
             }
+
+            entropyChart.saveImage("etropy.png");
         }
     }
 }
