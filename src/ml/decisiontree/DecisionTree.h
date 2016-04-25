@@ -8,7 +8,18 @@
 namespace ml {
     namespace decisiontree {
 
+        struct TreeItem {
+
+        };
+
         class DecisionTree {
+
+        	void buildTree() {
+
+        		// 1. split result -> matchedItems, notMatchedItems, rule
+
+        		// 2.
+        	}
 
         };
     }
