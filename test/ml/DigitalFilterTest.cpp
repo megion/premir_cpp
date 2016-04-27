@@ -114,7 +114,7 @@ namespace test {
                 entropyChart.redrawNewPoint(1, i, v2);
             }
 
-            entropyChart.saveImage("etropy.png");
+//            entropyChart.saveImage("etropy.png");
         }
     }
 }
