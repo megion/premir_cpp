@@ -5,6 +5,11 @@
 #ifndef SRC_ML_DECISIONTREE_DECISIONTREE_H
 #define SRC_ML_DECISIONTREE_DECISIONTREE_H
 
+#include <cstdio>
+
+#include "utils/CArrayList.h"
+
+
 namespace ml {
     namespace decisiontree {
 
@@ -12,13 +17,16 @@ namespace ml {
 
         };
 
+        template<typename In>
         class DecisionTree {
 
-        	void buildTree() {
+        	void buildTree(utils::CArrayList<In> *items) {
 
         		// 1. split result -> matchedItems, notMatchedItems, rule
 
-        		// 2.
+        		for () {
+
+        		}
         	}
 
         };
