@@ -9,30 +9,45 @@
 
 #include "utils/CArrayList.h"
 
-
 namespace ml {
-    namespace decisiontree {
+	namespace decisiontree {
 
-        struct TreeItem {
+		struct TreeItem {
 
-        };
+		};
 
-        template<typename In>
-        class DecisionTree {
+		template<typename In>
+		class DecisionTree {
 
-        	void buildTree(utils::CArrayList<In> *items) {
+			void buildTree(utils::CArrayList<In> *items) {
 
-        		// 1. split result -> matchedItems, notMatchedItems, rule
+				// 1. split result -> matchedItems, notMatchedItems, rule
 
-        		for () {
+				size_t itemsSize = items->size();
+				for (size_t i = 0; i < itemsSize; ++i) {
+					In &itemA = (*items)[i];
 
-        		}
-        	}
+				}
 
-        };
-    }
+				// match mutual items
+	            for (size_t i = 0; i < items->size(); ++i) {
+	            	In &itemA = (*items)[i];
+
+	                for (size_t j = 0; j < items->size(); ++j) {
+	                    if (i == j) {
+	                        break;
+	                    }
+
+	                    In &itemB = (*items)[i];
+
+	                    // match itemA with itemB
+
+	                }
+	            }
+			}
+
+		};
+	}
 }
-
-
 
 #endif
