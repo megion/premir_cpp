@@ -8,6 +8,7 @@
 #include "graphics/ChartThread.h"
 #include "graphics/PointChart.h"
 #include "ml/DigitalFilter.h"
+#include "ml/decisiontree/DecisionTree.h"
 #include "ml/Entropy.h"
 #include "utils/hash/StringHash.h"
 
@@ -16,12 +17,22 @@
 # define MY_PI		3.14159265358979323846	/* pi */
 
 namespace test {
-    namespace ml_test {
+	namespace ml_test {
 
-        void digital_filter_test();
+		struct MyItem {
+			int val1;
+		};
 
-        void decision_tree_test();
-    }
+		class MyMatcher: public ml::decisiontree::SplitMatcher<MyItem> {
+			bool match(MyItem& itemA, MyItem& itemB) {
+				return true;
+			}
+		};
+
+		void digital_filter_test();
+
+		void decision_tree_test();
+	}
 }
 
 #endif

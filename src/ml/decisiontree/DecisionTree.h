@@ -8,16 +8,17 @@
 #include <cstdio>
 
 #include "utils/CArrayList.h"
+#include "SplitMatcher.h"
 
 namespace ml {
 	namespace decisiontree {
 
-		struct TreeItem {
-
-		};
-
 		template<typename In>
 		class DecisionTree {
+		public:
+
+			DecisionTree(SplitMatcher<In>* _matcher) : matcher(_matcher) {
+			}
 
 			void buildTree(utils::CArrayList<In> *items) {
 
@@ -26,25 +27,28 @@ namespace ml {
 				size_t itemsSize = items->size();
 				for (size_t i = 0; i < itemsSize; ++i) {
 					In &itemA = (*items)[i];
-
 				}
 
 				// match mutual items
-	            for (size_t i = 0; i < items->size(); ++i) {
-	            	In &itemA = (*items)[i];
+				for (size_t i = 0; i < items->size(); ++i) {
+					In &itemA = (*items)[i];
 
-	                for (size_t j = 0; j < items->size(); ++j) {
-	                    if (i == j) {
-	                        break;
-	                    }
+					for (size_t j = 0; j < items->size(); ++j) {
+						if (i == j) {
+							break;
+						}
 
-	                    In &itemB = (*items)[i];
+						In &itemB = (*items)[i];
+					}
 
-	                    // match itemA with itemB
+					// match itemA with itemB
+					matcher->match();
 
-	                }
-	            }
+				}
 			}
+
+		private:
+			SplitMatcher<In> *matcher;
 
 		};
 	}

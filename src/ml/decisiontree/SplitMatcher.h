@@ -7,13 +7,14 @@
 namespace ml {
 	namespace decisiontree {
 
+		template<typename In>
         class SplitMatcher {
         public:
 
         	SplitMatcher() {
             }
 
-            virtual void adaptation() = 0;
+            virtual bool match(In& itemA, In& itemB) = 0;
 
         protected:
 
