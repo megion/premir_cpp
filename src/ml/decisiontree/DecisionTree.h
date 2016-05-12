@@ -17,7 +17,8 @@ namespace ml {
 		class DecisionTree {
 		public:
 
-			DecisionTree(SplitMatcher<In>* _matcher) : matcher(_matcher) {
+			DecisionTree(SplitMatcher<In>* _matcher) :
+					matcher(_matcher) {
 			}
 
 			void buildTree(utils::CArrayList<In> *items) {
@@ -39,10 +40,10 @@ namespace ml {
 						}
 
 						In &itemB = (*items)[i];
-					}
 
-					// match itemA with itemB
-					matcher->match();
+						// match itemA with itemB
+						matcher->match(itemA, itemB);
+					}
 
 				}
 			}
