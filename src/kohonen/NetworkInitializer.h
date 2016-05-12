@@ -177,6 +177,7 @@ namespace kohonen {
                     // т.е. каждая строка должна быть различна
                     row[j] = randomEngine->generate() / 16384.0 - 1.0;
                 }
+
                 utils::ArrayUtils<double, double, double>::normalization(row, uVectors.getColSize());
                 mu[i] = 1.0;
             }
