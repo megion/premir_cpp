@@ -1,4 +1,4 @@
-#Tue May 24 01:01:54 MSK 2016
+#Wed May 25 00:48:31 MSK 2016
 \!/=
 /configuration/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
 /configuration/org.eclipse.ui.ide/MAX_RECENT_WORKSPACES=10
@@ -220,7 +220,7 @@
 /instance/org.eclipse.cdt.core/build.all.configs.enabled=false
 /instance/org.eclipse.cdt.core/build.proj.ref.configs.enabled=false
 /instance/org.eclipse.cdt.core/errorparser.default.ids=org.eclipse.cdt.autotools.core.ErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.VCErrorParser;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.MakeErrorParser
-/instance/org.eclipse.cdt.core/language.settings.providers.workspace.prefs.toggle=true
+/instance/org.eclipse.cdt.core/language.settings.providers.workspace.prefs.toggle=false
 /instance/org.eclipse.cdt.core/macros/workspace=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<macros/>\n
 /instance/org.eclipse.cdt.core/org.eclipse.cdt.core.formatter.alignment_for_arguments_in_method_invocation=16
 /instance/org.eclipse.cdt.core/org.eclipse.cdt.core.formatter.alignment_for_assignment=16
@@ -392,8 +392,10 @@
 /instance/org.eclipse.cdt.ui.prj-premir_cpp/buildConsole/logLocation=/home/ilya/workspaces/neon1/.metadata/.plugins/org.eclipse.cdt.ui/premir_cpp.build.log
 /instance/org.eclipse.cdt.ui/c_keyword=0,0,128
 /instance/org.eclipse.cdt.ui/c_multi_line_comment=128,128,128
+/instance/org.eclipse.cdt.ui/c_multi_line_comment_italic=true
 /instance/org.eclipse.cdt.ui/c_numbers=0,0,255
 /instance/org.eclipse.cdt.ui/c_single_line_comment=128,128,128
+/instance/org.eclipse.cdt.ui/c_single_line_comment_italic=true
 /instance/org.eclipse.cdt.ui/c_string=0,128,0
 /instance/org.eclipse.cdt.ui/c_string_bold=true
 /instance/org.eclipse.cdt.ui/c_type=0,0,128
@@ -441,11 +443,19 @@
 /instance/org.eclipse.cdt.ui/semanticHighlighting.class.color=0,128,128
 /instance/org.eclipse.cdt.ui/semanticHighlighting.enum.color=0,128,128
 /instance/org.eclipse.cdt.ui/semanticHighlighting.enum.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.enumerator.bold=true
 /instance/org.eclipse.cdt.ui/semanticHighlighting.enumerator.color=102,13,122
+/instance/org.eclipse.cdt.ui/semanticHighlighting.externalSDK.color=0,0,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.externalSDK.italic=true
 /instance/org.eclipse.cdt.ui/semanticHighlighting.field.color=102,13,122
 /instance/org.eclipse.cdt.ui/semanticHighlighting.function.bold=false
 /instance/org.eclipse.cdt.ui/semanticHighlighting.function.enabled=true
 /instance/org.eclipse.cdt.ui/semanticHighlighting.functionDeclaration.bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.macroDefinition.bold=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.macroDefinition.color=31,84,46
+/instance/org.eclipse.cdt.ui/semanticHighlighting.macroDefinition.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.macroSubstitution.bold=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.macroSubstitution.color=31,84,46
 /instance/org.eclipse.cdt.ui/semanticHighlighting.method.enabled=true
 /instance/org.eclipse.cdt.ui/semanticHighlighting.methodDeclaration.bold=false
 /instance/org.eclipse.cdt.ui/semanticHighlighting.namespace.color=0,128,128
@@ -454,10 +464,11 @@
 /instance/org.eclipse.cdt.ui/semanticHighlighting.overloadedOperator.enabled=true
 /instance/org.eclipse.cdt.ui/semanticHighlighting.templateParameter.bold=false
 /instance/org.eclipse.cdt.ui/semanticHighlighting.templateParameter.color=55,31,128
-/instance/org.eclipse.cdt.ui/semanticHighlighting.typedef.color=32,74,135
+/instance/org.eclipse.cdt.ui/semanticHighlighting.typedef.color=55,31,128
 /instance/org.eclipse.cdt.ui/sourceHoverBackgroundColor=238,238,236
 /instance/org.eclipse.cdt.ui/sourceHoverBackgroundColor.SystemDefault=false
 /instance/org.eclipse.cdt.ui/spelling_locale_initialized=true
+/instance/org.eclipse.cdt.ui/spelling_user_dictionary=/home/ilya/Downloads/ru.dictionary
 /instance/org.eclipse.cdt.ui/spelling_user_dictionary_encoding=
 /instance/org.eclipse.cdt.ui/useAnnotationsPrefPage=true
 /instance/org.eclipse.cdt.ui/useQuickDiffPrefPage=true
@@ -530,7 +541,12 @@
 /instance/org.eclipse.rse.core/org.eclipse.rse.systemtype.local.systemType.defaultUserId=ilya
 /instance/org.eclipse.rse.core/useridperkey=round.Local\=ilya;
 /instance/org.eclipse.rse.ui/org.eclipse.rse.preferences.order.connections=round.Local
+/instance/org.eclipse.search/org.eclipse.search.defaultPerspective=org.eclipse.cdt.ui.CPerspective
 /instance/org.eclipse.team.ui/org.eclipse.team.ui.first_time=false
+/instance/org.eclipse.ui.browser/browsers=<?xml version\="1.0" encoding\="UTF-8"?>\n<web-browsers current\="0">\n<system/>\n<external location\="/usr/bin/firefox" name\="Firefox"/>\n<external location\="/usr/bin/google-chrome" name\="Chrome"/>\n</web-browsers>
+/instance/org.eclipse.ui.editors/AbstractTextEditor.Color.Background.SystemDefault=false
+/instance/org.eclipse.ui.editors/nocoverage_stylePreferences=NONE
+/instance/org.eclipse.ui.editors/nocoverage_text=false
 /instance/org.eclipse.ui.editors/overviewRuler_migration=migrated_3.1
 /instance/org.eclipse.ui.editors/printMargin=true
 /instance/org.eclipse.ui.editors/printMarginColumn=120
@@ -644,8 +660,10 @@
 @org.eclipse.oomph.workingsets=1.4.0.v20160426-0423
 @org.eclipse.rse.core=3.3.100.201407181907
 @org.eclipse.rse.ui=3.3.100.201503112018
+@org.eclipse.search=3.11.0.v20160505-0931
 @org.eclipse.team.ui=3.8.0.v20160418-1534
 @org.eclipse.ui=3.108.0.v20160505-1310
+@org.eclipse.ui.browser=3.5.0.v20160505-1310
 @org.eclipse.ui.editors=3.10.0.v20160505-0931
 @org.eclipse.ui.ide=3.12.0.v20160511-1235
 @org.eclipse.ui.workbench=3.108.0.v20160511-1235
