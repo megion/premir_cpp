@@ -38,7 +38,8 @@ namespace graphics {
             std::free(image);
 
             if (fclose(fp) < 0) {
-                throw std::runtime_error(std::strerror(errno));
+            	fprintf(stderr, "Could not close image file: %s\n", std::strerror(errno));
+//                throw std::runtime_error(std::strerror(errno));
             }
             fp = nullptr;
         }
