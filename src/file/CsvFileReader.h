@@ -20,7 +20,7 @@ namespace file {
     public:
         CsvFileReader(const char *filename, const char sep) :
                 separator(sep), chSizeof(sizeof(char)), lineNumber(0),
-                isEnd(false), emptyRead(false) {
+                isEnd(false), emptyRead(false), strQuote('\"') {
             fp = fopen(filename, "r");
             if (fp == NULL) {
                 std::string errMsg(std::strerror(errno));
