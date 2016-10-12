@@ -12,19 +12,33 @@ namespace sort {
 	class BacktrackSearch {
 	public:
 
-		BacktrackSearch() {
+		BacktrackSearch() : finished(false) {
 		}
 
-		void sort(T * const arr, size_t arrSize) {
-			for (size_t i = 1; i < arrSize; ++i) {
-				for (size_t j = i; ((j>0) && (arr[j]<arr[j-1])); j=j-1) {
-//					swap();
-				}
+		void backtrack(T* const arr, size_t arrSize/*, data input*/) {
+			if (isSolution(arr, arrSize)) {
+				processSolution(arr, arrSize);
+			} else {
+				++arrSize;
+
 			}
 		}
 
 	private:
-		bool finished;
+		bool finished; // all solutions have been found
+
+		/**
+		 * return true if k elements of vector 'arr' are full solution
+		 */
+		bool isSolution(T* const arr, size_t k) {
+			return false;
+		}
+
+		/**
+		 * process full solution
+		 */
+		void processSolution(T* const arr, size_t k) {
+		}
 
 	};
 }
