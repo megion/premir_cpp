@@ -15,17 +15,18 @@ namespace sort {
 		BacktrackSearch() : finished(false) {
 		}
 
-		void backtrack(T* const arr, size_t arrSize/*, data input*/) {
-			if (isSolution(arr, arrSize)) {
-				processSolution(arr, arrSize);
+		void backtrack(T* const arr, size_t k/*, data input*/) {
+			if (isSolution(arr, k)) {
+				processSolution(arr, k);
 			} else {
-				++arrSize;
+				++k;
 
 			}
 		}
 
 	private:
 		bool finished; // all solutions have been found
+		const static size_t MAX_CANDIDATES = 1000; // max count candidates for next position
 
 		/**
 		 * return true if k elements of vector 'arr' are full solution
