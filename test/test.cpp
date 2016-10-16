@@ -18,6 +18,7 @@
 #include "kohonen/KohonenTest.h"
 #include "kohonen/KohonenDemosTest.h"
 #include "coursera/CourseraTest.h"
+#include "comb/CombinatoricsTest.h"
 #include "ml/DigitalFilterTest.h"
 
 int main(int argc, char **argv) {
@@ -51,6 +52,8 @@ int main(int argc, char **argv) {
     test::kohonen_demos_test::kohonen_demos_test();
 
     test::coursera::coursera_test();
+
+    test::combinatorics::combinatorics_test();
 
     return 0;
 

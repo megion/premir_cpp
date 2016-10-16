@@ -15,7 +15,7 @@ namespace utils {
 
             virtual size_t hashCode(const T& value) const = 0;
 
-            size_t setIndexSize(size_t _indexSize) {
+            void setIndexSize(size_t _indexSize) {
                 indexSize = _indexSize;
             }
 
