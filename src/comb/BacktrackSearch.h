@@ -53,7 +53,7 @@ namespace comb {
 		 * write full set off candidates to candidates array for 'k' position of vector 'arr'
 		 */
 		virtual void constractCandidates(T* const arr, size_t k, T* const candidates,
-				const size_t &numCandidates, const In& input) = 0;
+				size_t &numCandidates, const In& input) = 0;
 
 		/**
 		 * data modification
@@ -63,7 +63,7 @@ namespace comb {
 		/**
 		 * data modification
 		 */
-		virtual void unmakeMmove(T* const arr, size_t k, const In& input) = 0;
+		virtual void unmakeMove(T* const arr, size_t k, const In& input) = 0;
 
 	protected:
 		bool finished; // all solutions have been found
