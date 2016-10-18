@@ -4,8 +4,9 @@ namespace test {
 	namespace combinatorics {
 
 		void test_subset_backtrack_search() {
-			comb::SubsetBacktrackSearch sb;
-			bool arrA[100]; // = {1, 2, 2, 8, 9, 3, 4, 5, 3, 3, 6, 7};
+			comb::SubsetBacktrackSearch sb(2);
+//			bool arrA[100]; // = {1, 2, 2, 8, 9, 3, 4, 5, 3, 3, 6, 7};
+			bool arrA[] = {false, false, false, false, false, false, false, false, false, false};
 			size_t input = 3;
 			std::cout << "back track start: " << std::endl;
 			sb.backtrack(arrA, 0, input);

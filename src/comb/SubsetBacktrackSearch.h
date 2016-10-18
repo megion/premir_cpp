@@ -17,18 +17,22 @@ namespace comb {
 				BacktrackSearch<bool, size_t>::BacktrackSearch() {
 		}
 
+		SubsetBacktrackSearch(size_t _maxCandidates) :
+				BacktrackSearch<bool, size_t>::BacktrackSearch(_maxCandidates) {
+		}
+
 		bool isSolution(bool* const arr, size_t k, const size_t& input) {
 			return k == input;
 		}
 
 		void processSolution(bool* const arr, size_t k, const size_t& input) {
-			std::cout << "{";
-			for (size_t i = 0; i < k; i++) {
+			std::cout << k << " {";
+			for (size_t i = 1; i <= k; i++) {
 				if (arr[i] == true) {
 					std::cout << " " << i;
 				}
 			}
-			std::cout << "}" << std::endl;
+			std::cout << " }" << std::endl;
 		}
 
 		void constractCandidates(bool* const arr, size_t k, bool* const candidates, size_t &numCandidates,

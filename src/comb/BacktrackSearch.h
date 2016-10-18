@@ -20,17 +20,29 @@ namespace comb {
 				finished(false), maxCandidates(_maxCandidates) {
 		}
 
+		/**
+		 * arr - vector of solutions, 'arr[i]' store 'true' if current set contains element 'i'
+		 * k - index of iteration
+		 */
 		void backtrack(T* const arr, size_t k, const In& input) {
+			std::cout << "backtrack " << k << " {";
+			for (size_t i = 0; i < 10; i++) {
+				std::cout << " " << arr[i];
+			}
+			std::cout << " }" << std::endl;
+
+
 			if (isSolution(arr, k, input)) {
 				processSolution(arr, k, input);
 			} else {
-				T candidates[MAX_CANDIDATES]; // candidates for next position
+				T candidates[maxCandidates]; // candidates for next position
 				size_t numCandidates; // number of candidates for next position
 				++k;
 				constractCandidates(arr, k, candidates, numCandidates, input);
 				for (size_t i = 0; i < numCandidates; ++i) {
+					arr[k] = candidates[i];
 					makeMove(arr, k, input);
-					arr[i] = candidates[i];
+					backtrack(arr, k, input);
 					unmakeMove(arr, k, input);
 					if (finished) {
 						return;
