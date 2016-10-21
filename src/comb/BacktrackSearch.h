@@ -24,7 +24,7 @@ namespace comb {
 
 		/**
 		 * solutionsVector - vector of solutions, 'arr[i]' store 'true' if current set contains element 'i'
-		 * k - index of iteration
+		 * k - deep of tree
 		 *
 		 * На каждом этапе алгоритма перебора с возвратом мы пытаемся расширить данное
 		 * частичное решение a = (a[1], a[2], ..., a[k]) добавляя следующий элемент в конец
@@ -38,8 +38,8 @@ namespace comb {
 		 * соответствует процессу обхода в глубину дерева перебора с возвратом.
 		 */
 		void backtrack(T* const solutionsVector, size_t k, const In& input) {
-			std::cout << "backtrack k = " << k << " ";
-			printSolutionsVector(solutionsVector, 10);
+//			std::cout << "backtrack k = " << k << " ";
+//			printSolutionsVector(solutionsVector, 10);
 			if (isSolution(solutionsVector, k, input)) {
 				processSolution(solutionsVector, k, input);
 			} else {
@@ -47,6 +47,7 @@ namespace comb {
 				size_t numCandidates; // number of candidates for next position
 				++k;
 				constractCandidates(solutionsVector, k, candidates, numCandidates, input);
+//				std::cout << "+++ start iterate candidates"  << std::endl;
 				for (size_t i = 0; i < numCandidates; ++i) {
 					solutionsVector[k] = candidates[i];
 					makeMove(solutionsVector, k, input);
@@ -56,11 +57,12 @@ namespace comb {
 						return;
 					}
 				}
+//				std::cout << "--- end iterate candidates"  << std::endl;
 			}
 		}
 
 		void printSolutionsVector(T* const solutionsVector, size_t vectorSize) {
-			std::cout << "solutionsVector " << " {";
+			std::cout << "solutionsVector {";
 			for (size_t i = 0; i < vectorSize; i++) {
 				std::cout << " " << solutionsVector[i];
 			}

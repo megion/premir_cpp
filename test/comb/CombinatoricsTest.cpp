@@ -9,7 +9,8 @@ namespace test {
 			bool arrA[] = {false, false, false, false, false, false, false, false, false, false};
 			size_t input = 3;
 			std::cout << "back track start: " << std::endl;
-			sb.backtrack(arrA, 0, input);
+			size_t k = 0;
+			sb.backtrack(arrA, k, input);
 		}
 
 		void combinatorics_test() {
