@@ -15,8 +15,8 @@ namespace test {
 		void test_permutation_backtrack_search() {
 			comb::PermutationBacktrackSearch sb(80);
 
-			size_t arrA[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-			size_t inputN = 3;
+			size_t arrA[] = { 0, 0, 0, 0, 0 };
+			size_t inputN = 4;
 			size_t k = 0;
 			sb.backtrack(arrA, k, inputN);
 		}
