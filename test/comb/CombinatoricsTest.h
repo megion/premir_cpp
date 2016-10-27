@@ -15,6 +15,7 @@
 #include "test.h"
 
 #include "comb/SubsetBacktrackSearch.h"
+#include "comb/PermutationBacktrackSearch.h"
 
 
 namespace test {

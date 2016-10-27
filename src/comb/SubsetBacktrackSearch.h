@@ -8,7 +8,7 @@
 
 namespace comb {
 	/**
-	 * Генерирование всех подмножеств для числа указанного в input
+	 * Генерирование всех подмножеств для числа указанного в inputN
 	 *
 	 * generate all subset
 	 *
@@ -30,11 +30,11 @@ namespace comb {
 				BacktrackSearch<bool, size_t>::BacktrackSearch(_maxCandidates) {
 		}
 
-		bool isSolution(bool* const solutionsVector, size_t k, const size_t& input) {
-			return k == input;
+		bool isSolution(bool* const solutionsVector, size_t k, const size_t& inputN) {
+			return k == inputN;
 		}
 
-		void processSolution(bool* const solutionsVector, size_t k, const size_t& input) {
+		void processSolution(bool* const solutionsVector, size_t k, const size_t& inputN) {
 			std::cout << "{";
 			for (size_t i = 1; i <= k; i++) {
 				if (solutionsVector[i] == true) {
@@ -45,16 +45,16 @@ namespace comb {
 		}
 
 		void constractCandidates(bool* const solutionsVector, size_t k, bool* const candidates, size_t &numCandidates,
-				const size_t& input) {
+				const size_t& inputN) {
 			numCandidates = 2;
 			candidates[0] = true;
 			candidates[1] = false;
 		}
 
-		void makeMove(bool* const solutionsVector, size_t k, const size_t& input) {
+		void makeMove(bool* const solutionsVector, size_t k, const size_t& inputN) {
 		}
 
-		void unmakeMove(bool* const solutionsVector, size_t k, const size_t& input) {
+		void unmakeMove(bool* const solutionsVector, size_t k, const size_t& inputN) {
 		}
 
 	};

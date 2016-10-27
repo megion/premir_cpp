@@ -5,17 +5,28 @@ namespace test {
 
 		void test_subset_backtrack_search() {
 			comb::SubsetBacktrackSearch sb(2);
-//			bool arrA[100]; // = {1, 2, 2, 8, 9, 3, 4, 5, 3, 3, 6, 7};
-			bool arrA[] = {false, false, false, false, false, false, false, false, false, false};
-			size_t input = 3;
-			std::cout << "back track start: " << std::endl;
+
+			bool arrA[] = { false, false, false, false, false, false, false, false, false, false };
+			size_t inputN = 3;
 			size_t k = 0;
-			sb.backtrack(arrA, k, input);
+			sb.backtrack(arrA, k, inputN);
+		}
+
+		void test_permutation_backtrack_search() {
+			comb::PermutationBacktrackSearch sb(80);
+
+			size_t arrA[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+			size_t inputN = 3;
+			size_t k = 0;
+			sb.backtrack(arrA, k, inputN);
 		}
 
 		void combinatorics_test() {
 			suite("SubsetBacktrackSearch");
 			mytest(subset_backtrack_search);
+
+			suite("PermutationBacktrackSearch");
+			mytest(permutation_backtrack_search);
 		}
 
 	}
