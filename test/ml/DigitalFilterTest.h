@@ -17,7 +17,7 @@
 # define MY_PI		3.14159265358979323846	/* pi */
 
 namespace test {
-	namespace ml_test {
+	namespace ml_digital_filter {
 
 		struct MyItem {
 			int val1;

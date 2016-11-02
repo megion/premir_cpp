@@ -8,7 +8,7 @@
 
 namespace comb {
 	/**
-	 * Генерирование всех подмножеств для числа указанного в inputN
+	 * Генерирование всех подмножеств для числа указанного в solutionSize
 	 *
 	 * generate all subset
 	 *
@@ -17,26 +17,26 @@ namespace comb {
 	 * содержит ли данное подмножество i-й элемент.
 	 *
 	 * В данном случае у каждой вершины дерева будет по два дочерних узла (т.к. возможные кандидаты true,false)
-	 * и глубина дерева будет равна 'k
+	 * и глубина дерева будет равна 'treeDepth'
 	 */
-	class SubsetBacktrackSearch: public BacktrackSearch<bool, size_t> {
+	class SubsetBacktrackSearch: public BacktrackSearch<bool> {
 	public:
 
 		SubsetBacktrackSearch() :
-				BacktrackSearch<bool, size_t>::BacktrackSearch() {
+				BacktrackSearch<bool>::BacktrackSearch() {
 		}
 
 		SubsetBacktrackSearch(size_t _maxCandidates) :
-				BacktrackSearch<bool, size_t>::BacktrackSearch(_maxCandidates) {
+				BacktrackSearch<bool>::BacktrackSearch(_maxCandidates) {
 		}
 
-		bool isSolution(bool* const solutionsVector, size_t k, const size_t& inputN) {
-			return k == inputN;
+		bool isSolution(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
+			return treeDepth == solutionSize;
 		}
 
-		void processSolution(bool* const solutionsVector, size_t k, const size_t& inputN) {
+		void processSolution(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 			std::cout << "{";
-			for (size_t i = 1; i <= k; i++) {
+			for (size_t i = 0; i < treeDepth; i++) {
 				if (solutionsVector[i] == true) {
 					std::cout << " " << i;
 				}
@@ -44,17 +44,17 @@ namespace comb {
 			std::cout << " }" << std::endl;
 		}
 
-		void constractCandidates(bool* const solutionsVector, size_t k, bool* const candidates, size_t &numCandidates,
-				const size_t& inputN) {
+		void constractCandidates(bool* const solutionsVector, size_t treeDepth, bool* const candidates, size_t &numCandidates,
+				const size_t& solutionSize) {
 			numCandidates = 2;
 			candidates[0] = true;
 			candidates[1] = false;
 		}
 
-		void makeMove(bool* const solutionsVector, size_t k, const size_t& inputN) {
+		void makeMove(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 		}
 
-		void unmakeMove(bool* const solutionsVector, size_t k, const size_t& inputN) {
+		void unmakeMove(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 		}
 
 	};

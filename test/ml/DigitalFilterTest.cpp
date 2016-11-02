@@ -1,7 +1,7 @@
 #include "DigitalFilterTest.h"
 
 namespace test {
-    namespace ml_test {
+    namespace ml_digital_filter {
 
         void test_filter_charts() {
             graphics::PointChart chartSignalTemplate(false, 710, 460);

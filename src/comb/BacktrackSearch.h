@@ -7,11 +7,10 @@ namespace comb {
 	/**
 	 * realization algorithm return search
 	 * T - type of solution vector and candidates
-	 * In - type of any common input data. For example specify size of a solution.
 	 *
 	 * Алгоритм перебора с возвратом
 	 */
-	template<typename T, typename In>
+	template<typename T>
 	class BacktrackSearch {
 	public:
 
@@ -28,7 +27,7 @@ namespace comb {
 
 		/**
 		 * solutionsVector - vector of solutions, 'arr[i]' store 'true' if current set contains element 'i'
-		 * k - deep of tree (initialize with 0)
+		 * treeDepth - deep of tree (initialize with 0)
 		 *
 		 * На каждом этапе алгоритма перебора с возвратом мы пытаемся расширить данное
 		 * частичное решение a = (a[1], a[2], ..., a[k]) добавляя следующий элемент в конец
@@ -41,22 +40,23 @@ namespace comb {
 		 * взгляд на перебор с возвратом, т. к. процесс создания решений в точности
 		 * соответствует процессу обхода в глубину дерева перебора с возвратом.
 		 */
-		void backtrack(T* const solutionsVector, size_t k, const In& inputN) {
-//			std::cout << "backtrack k = " << k << " ";
-//			printSolutionsVector(solutionsVector, 10);
-			if (isSolution(solutionsVector, k, inputN)) {
-				processSolution(solutionsVector, k, inputN);
+		void backtrack(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
+			std::cout << "backtrack k = " << treeDepth << " ";
+			printSolutionsVector(solutionsVector, solutionSize);
+			if (isSolution(solutionsVector, treeDepth, solutionSize)) {
+				processSolution(solutionsVector, treeDepth, solutionSize);
 			} else {
+				size_t currTreeDepth = treeDepth; // current tree depth
+				++treeDepth; // increase depth
 				T candidates[maxCandidates]; // candidates for next position
 				size_t numCandidates; // number of candidates for next position
-				++k;
-				constractCandidates(solutionsVector, k, candidates, numCandidates, inputN);
+				constractCandidates(solutionsVector, currTreeDepth, candidates, numCandidates, solutionSize);
 //				std::cout << "+++ start iterate candidates"  << std::endl;
 				for (size_t i = 0; i < numCandidates; ++i) {
-					solutionsVector[k] = candidates[i];
-					makeMove(solutionsVector, k, inputN);
-					backtrack(solutionsVector, k, inputN);
-					unmakeMove(solutionsVector, k, inputN);
+					solutionsVector[currTreeDepth] = candidates[i];
+					makeMove(solutionsVector, currTreeDepth, solutionSize);
+					backtrack(solutionsVector, treeDepth, solutionSize);
+					unmakeMove(solutionsVector, currTreeDepth, solutionSize);
 					if (finished) { // forced exit
 						return;
 					}
@@ -65,9 +65,9 @@ namespace comb {
 			}
 		}
 
-		void printSolutionsVector(T* const solutionsVector, size_t vectorSize) {
+		void printSolutionsVector(T* const solutionsVector, const size_t& solutionSize) {
 			std::cout << "solutionsVector {";
-			for (size_t i = 0; i < vectorSize; i++) {
+			for (size_t i = 0; i < solutionSize; i++) {
 				std::cout << " " << solutionsVector[i];
 			}
 			std::cout << " }" << std::endl;
@@ -76,28 +76,28 @@ namespace comb {
 		/**
 		 * return true if k elements of vector 'solutionsVector' are full solution
 		 */
-		virtual bool isSolution(T* const solutionsVector, size_t k, const In& inputN) = 0;
+		virtual bool isSolution(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) = 0;
 
 		/**
 		 * process full solution
 		 */
-		virtual void processSolution(T* const solutionsVector, size_t k, const In& inputN) = 0;
+		virtual void processSolution(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) = 0;
 
 		/**
-		 * write full set off candidates to candidates array for 'k' position of vector 'solutionsVector'
+		 * write full set off candidates to candidates array for 'treeDepth' position of vector 'solutionsVector'
 		 */
-		virtual void constractCandidates(T* const solutionsVector, size_t k, T* const candidates, size_t &numCandidates,
-				const In& inputN) = 0;
-
-		/**
-		 * data modification
-		 */
-		virtual void makeMove(T* const solutionsVector, size_t k, const In& inputN) = 0;
+		virtual void constractCandidates(T* const solutionsVector, size_t treeDepth, T* const candidates,
+				size_t &numCandidates, const size_t& solutionSize) = 0;
 
 		/**
 		 * data modification
 		 */
-		virtual void unmakeMove(T* const solutionsVector, size_t k, const In& inputN) = 0;
+		virtual void makeMove(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) = 0;
+
+		/**
+		 * data modification
+		 */
+		virtual void unmakeMove(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) = 0;
 
 	protected:
 		bool finished; // all solutions have been found

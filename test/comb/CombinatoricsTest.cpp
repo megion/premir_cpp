@@ -26,7 +26,7 @@ namespace test {
 			mytest(subset_backtrack_search);
 
 			suite("PermutationBacktrackSearch");
-			mytest(permutation_backtrack_search);
+//			mytest(permutation_backtrack_search);
 		}
 
 	}

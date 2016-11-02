@@ -11,8 +11,8 @@ namespace test {
             const wchar_t *str2 = L"моя руrсская стро21";
             int d1 = ld.wld(str1, str2, wcslen(str1), wcslen(str2));
             int d2 = ld.wldOptimazed(str1, str2, wcslen(str1), wcslen(str2));
-//            std::cout << "d1: " << d1 << std::endl;
-//            std::cout << "d2: " << d2 << std::endl;
+            std::cout << "d1: " << d1 << std::endl;
+            std::cout << "d2: " << d2 << std::endl;
 
 
 //            const wchar_t * str = L"моя руссская строка";
@@ -45,16 +45,12 @@ namespace test {
             numberHashChart.setWindowTitle("Number hash");
             graphics::ChartThread<bool> numberHashChartThread(&numberHashChart);
 
-            graphics::PointChart floatHashChart(false, 710, 460);
-            floatHashChart.setWindowTitle("Float hash");
-            graphics::ChartThread<bool> floatHashChartThread(&floatHashChart);
-
             utils::hash::NumberHash<double> nflash;
-            utils::CHashSet<double> numSet(&nflash);
-            for (double i = -1000; i < 1000; i = i + 0.1) {
-                size_t h = numSet.hash(i);
+//            utils::CHashSet<double> numSet(&nflash);
+            for (double i = -100; i < 100; i = i + 0.1) {
+                size_t h = nflash.hashCode(i);
                 numberHashChart.redrawNewPoint(0, i, h);
-                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
 
@@ -68,15 +64,15 @@ namespace test {
             for (double i = 1.2; i < 1.6; i = i + 0.0001) {
                 size_t h = floatSet.hash(i);
                 floatHashChart.redrawNewPoint(0, i, h);
-                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
 
         void cHashSet_test() {
             suite("CHashSetTest");
             mytest(hash_set);
-//            test(number_hash_charts);
-//            test(float_hash_charts);
+//            mytest(number_hash_charts);
+//            mytest(float_hash_charts);
         }
     }
 }

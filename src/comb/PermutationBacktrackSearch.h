@@ -8,45 +8,45 @@
 
 namespace comb {
 	/**
-	 * generate all permutations for set {1,..., n} where n=inputN
+	 * generate all permutations for set {1,..., n} where n=solutionSize
 	 */
-	class PermutationBacktrackSearch: public BacktrackSearch<size_t, size_t> {
+	class PermutationBacktrackSearch: public BacktrackSearch<size_t> {
 	public:
 
 		PermutationBacktrackSearch() :
-				BacktrackSearch<size_t, size_t>::BacktrackSearch() {
+				BacktrackSearch<size_t>::BacktrackSearch() {
 		}
 
 		PermutationBacktrackSearch(size_t _maxCandidates) :
-				BacktrackSearch<size_t, size_t>::BacktrackSearch(_maxCandidates) {
+				BacktrackSearch<size_t>::BacktrackSearch(_maxCandidates) {
 		}
 
-		bool isSolution(size_t* const solutionsVector, size_t k, const size_t& inputN) {
-			return k == inputN;
+		bool isSolution(size_t* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
+			return treeDepth == (solutionSize-1);
 		}
 
-		void processSolution(size_t* const solutionsVector, size_t k, const size_t& inputN) {
+		void processSolution(size_t* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 			std::cout << "{";
-			for (size_t i = 1; i <= k; i++) {
+			for (size_t i = 0; i < treeDepth; i++) {
 				std::cout << " " << solutionsVector[i];
 			}
 			std::cout << " }" << std::endl;
 		}
 
-		void constractCandidates(size_t* const solutionsVector, size_t k, size_t* const candidates,
-				size_t &numCandidates, const size_t& inputN) {
+		void constractCandidates(size_t* const solutionsVector, size_t treeDepth, size_t* const candidates,
+				size_t &numCandidates, const size_t& solutionSize) {
 			bool inPerm[maxCandidates]; // what is element in permutation ?
 			for (size_t i = 0; i < maxCandidates; i++) {
 				inPerm[i] = false;
 			}
 
-			for (size_t i = 0; i < k; i++) {
+			for (size_t i = 0; i < treeDepth; i++) {
 //				std::cout << "k " << k << " i " << i <<" set to true inPerm[" << solutionsVector[i] << "]" << std::endl;
 				inPerm[solutionsVector[i]] = true;
 			}
 
 			numCandidates = 0;
-			for (size_t i = 1; i <= inputN; i++) {
+			for (size_t i = 0; i < solutionSize; i++) {
 				if (inPerm[i] == false) {
 					candidates[numCandidates] = i;
 					++numCandidates;
@@ -54,10 +54,10 @@ namespace comb {
 			}
 		}
 
-		void makeMove(size_t* const solutionsVector, size_t k, const size_t& inputN) {
+		void makeMove(size_t* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 		}
 
-		void unmakeMove(size_t* const solutionsVector, size_t k, const size_t& inputN) {
+		void unmakeMove(size_t* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
 		}
 
 	};
