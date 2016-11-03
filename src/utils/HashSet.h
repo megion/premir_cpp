@@ -25,7 +25,8 @@ namespace utils {
 
 		typedef typename utils::RDMatrix<bool, K>::Row Row;
 
-		HashSet(hash::HashEngine<K> *_hashEngine) : hashEngine(_hashEngine)) {
+		HashSet(hash::HashEngine<K> *_hashEngine) :
+				hashEngine(_hashEngine) {
 			matrix = new utils::RDMatrix<bool, K>();
 		}
 
@@ -60,7 +61,7 @@ namespace utils {
 				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
 				Row &row = (*matrix)[rowIndex];
 				for (size_t i = 0; i < row.pointSize; ++i) {
-					if (row[i].key == value) {
+					if (row[i] == value) {
 						// найдено значение с уже имеющимся ключом - exit
 						return false;
 					}
@@ -81,7 +82,7 @@ namespace utils {
 				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
 				Row &row = (*matrix)[rowIndex];
 				for (size_t i = 0; i < row.pointSize; ++i) {
-					if (row[i].key == value) {
+					if (row[i] == value) {
 						return true;
 					}
 				}

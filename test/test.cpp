@@ -1,3 +1,4 @@
+#include <HashSetTest.h>
 #include "utils/LinkedListTest.h"
 #include "utils/CArrayListTest.h"
 #include "utils/CMatrixTest.h"
@@ -9,7 +10,6 @@
 #include "utils/HashMapArrayTest.h"
 #include "utils/ArrayUtilsTest.h"
 #include "utils/IntBitSetTest.h"
-#include "utils/CHashSetTest.h"
 #include "utils/matrix_utils_test.h"
 #include "matrix/DeterminantTest.h"
 #include "matrix/GramSchmidtTest.h"
@@ -36,10 +36,10 @@ int main(int argc, char **argv) {
     test::utils_rmatrix::rMatrix_test();
     test::utils_rdmatrix::rDMatrix_test();
     test::utils_r3dmatrix::r3DMatrix_test();
-    test::utils_hashMap::hashMap_test();
-    test::utils_hashMapArray::hashMapArray_test();
+    test::utils_hash_map::hashMap_test();
+    test::utils_hash_map_array::hashMapArray_test();
     test::utils_intBitSet::intBitSet_test();
-    test::utils_cHashSet::cHashSet_test();
+    test::utils_hash_set::hashSet_test();
     test::matrix_determinant::determinant_test();
     test::matrix_gramSchmidt::gramSchmidt_test();
     test::file_reader::file_reader_test();

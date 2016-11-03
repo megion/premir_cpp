@@ -1,7 +1,7 @@
 #include "HashMapTest.h"
 
 namespace test {
-	namespace utils_hashMap {
+	namespace utils_hash_map {
 
 		void test_push_value() {
 			utils::hash::CharHash shash;

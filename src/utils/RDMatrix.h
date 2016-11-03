@@ -21,6 +21,12 @@ namespace utils {
     public:
 
         struct Row {
+        	Row() : points(nullptr), pointSize(0), pointCapacity(1) {
+        	}
+
+        	Row(T* const _points, const size_t _pointSize) : points(_points), pointSize(_pointSize), pointCapacity(1){
+        	}
+
             size_t pointSize;
             size_t pointCapacity;
             R data; // произвольные данные строки
@@ -182,10 +188,8 @@ namespace utils {
             copyRow(matrix[rowIndex], value);
         }
 
-        void writeRow(size_t rowIndex, T *points, size_t pointSize) {
-            Row value;
-            value.points = points;
-            value.pointSize = pointSize;
+        void writeRow(size_t rowIndex, T* points, size_t pointSize) {
+            Row value(points, pointSize);
             writeRow(rowIndex, value);
         }
 
@@ -193,17 +197,15 @@ namespace utils {
             writeRow(rowSize, value);
         }
 
-        void pushRow(T *points, size_t pointSize) {
-            Row value;
-            value.points = points;
-            value.pointSize = pointSize;
+        void pushRow(T* points, size_t pointSize) {
+        	Row value(points, pointSize);
             pushRow(value);
         }
 
         /**
          * Записать значения в конец строки
          */
-        void writeToEndRow(size_t rowIndex, T *arr, size_t arrSize) {
+        void writeToEndRow(size_t rowIndex, T* arr, size_t arrSize) {
             if (rowIndex < rowSize) {
                 // добавим значения в конец существующей строки
                 size_t oldPointSize = matrix[rowIndex].pointSize;

@@ -103,7 +103,7 @@ namespace graphics {
             inrange.yMin = 0;
         }
 
-        void addPoints(size_t rowIndex, Point* points, size_t len) {
+        void addPoints(const size_t rowIndex, Point* const points, const size_t len) {
             // 1. add point
             inpoints->writeToEndRow(rowIndex, points, len);
 

@@ -1,7 +1,7 @@
 #include "HashMapArrayTest.h"
 
 namespace test {
-    namespace utils_hashMapArray {
+    namespace utils_hash_map_array {
 
         void test_push_value() {
             utils::hash::CharHash shash;
@@ -24,11 +24,11 @@ namespace test {
             assert((*a.getValue(0, 'P')) == 55);
             assert(a.getValue(0, 'M') == nullptr);
 
-            MyStringKeyHash strHash;
+            utils_hash_map::MyStringKeyHash strHash;
             strHash.setIndexSize(6);
-            utils::HashMapArray<MyStringKey, int> b(10, &strHash);
+            utils::HashMapArray<utils_hash_map::MyStringKey, int> b(10, &strHash);
 
-            MyStringKey mystr;
+            utils_hash_map::MyStringKey mystr;
             mystr.setLabel("my string");
             b.pushValue(0, mystr, 4);
             assert(b.getValue(0, mystr) != nullptr);
@@ -39,22 +39,22 @@ namespace test {
         }
 
         void test_push_or_update_value() {
-            MyStringKeyHash strHash;
-            utils::HashMapArray<MyStringKey, MyValue> b(10, &strHash);
-            MyValueUpdater updater;
-            MyValue v1 = {1, 11};
+        	utils_hash_map::MyStringKeyHash strHash;
+            utils::HashMapArray<utils_hash_map::MyStringKey, utils_hash_map::MyValue> b(10, &strHash);
+            utils_hash_map::MyValueUpdater updater;
+            utils_hash_map::MyValue v1 = {1, 11};
 
-            MyStringKey mykey;
+            utils_hash_map::MyStringKey mykey;
             mykey.setLabel("my key1");
             b.pushValue(0, mykey, v1, &updater);
-            MyValue v2 = {1, 22};
+            utils_hash_map::MyValue v2 = {1, 22};
             b.pushValue(0, mykey, v2, &updater);
-            MyValue v3 = {1, 33};
+            utils_hash_map::MyValue v3 = {1, 33};
             b.pushValue(0, mykey, v3, &updater);
             assert((*b.getValue(0, mykey)).count == 3);
             assert((*b.getValue(0, mykey)).value2 == 11);
 
-            MyStringKey mykey2;
+            utils_hash_map::MyStringKey mykey2;
             mykey2.setLabel("my key2");
             b.pushValue(0, mykey2, v1, &updater);
             assert((*b.getValue(0, mykey)).count == 3);
