@@ -14,8 +14,8 @@ namespace test {
 			assert(a.contains('K') == true);
 
 			assert(a.contains('A') == false);
-			assert(a.push('K')==true);
-			assert(a.push('K')==false);
+			assert(a.push('A')==true);
+			assert(a.push('A')==false);
 			assert(a.contains('A') == true);
 			assert(a.contains('K') == true);
 

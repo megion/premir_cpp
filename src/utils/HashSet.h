@@ -54,6 +54,11 @@ namespace utils {
 			return matrix;
 		}
 
+		bool push(K &value) {
+			const K copyValue = value;
+			return push(copyValue);
+		}
+
 		bool push(const K &value) {
 			size_t rowIndex = hashEngine->hashCode(value);
 
@@ -73,7 +78,6 @@ namespace utils {
 				matrix->writeRow(rowIndex, &value, 1);
 				return true;
 			}
-
 		}
 
 		bool contains(const K &value) {
