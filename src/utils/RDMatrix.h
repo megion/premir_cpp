@@ -21,14 +21,6 @@ namespace utils {
 	public:
 
 		struct Row {
-			Row() :
-					points(nullptr), pointSize(0), pointCapacity(1) {
-			}
-
-			Row(T* _points, size_t _pointSize) :
-					points(_points), pointSize(_pointSize), pointCapacity(1) {
-			}
-
 			size_t pointSize;
 			size_t pointCapacity;
 			R data; // произвольные данные строки
@@ -202,14 +194,14 @@ namespace utils {
 			writeRow(rowSize, value);
 		}
 
-		void pushRow(T* points, size_t pointSize) {
+		void pushRow(const T* points, size_t pointSize) {
 			writeRow(rowSize, points, pointSize);
 		}
 
 		/**
 		 * Записать значения в конец строки
 		 */
-		void writeToEndRow(size_t rowIndex, T* arr, size_t arrSize) {
+		void writeToEndRow(size_t rowIndex, const T* arr, size_t arrSize) {
 			if (rowIndex < rowSize) {
 				// добавим значения в конец существующей строки
 				size_t oldPointSize = matrix[rowIndex].pointSize;
@@ -230,8 +222,7 @@ namespace utils {
 		}
 
 		void writeToEndRow(size_t rowIndex, const T& val) {
-			T copyVal = val;// call copy constructor
-			writeToEndRow(rowIndex, &copyVal, 1);
+			writeToEndRow(rowIndex, &val, 1);
 		}
 
 		void print() const {
@@ -311,14 +302,7 @@ namespace utils {
 			row.pointSize = newPointsSize;
 			row.pointCapacity = newPointsCapacity;
 		}
-
-//		void copyRow(Row &dest, const Row &src) {
-////            dest.pointSize = src.pointSize;
-//			// copy data
-//			memcpy(&(dest.data), &(src.data), rTypeSizeof);
-//			// copy points array
-//			memcpy(dest.points, src.points, dest.pointSize * tTypeSizeof);
-//		}
+		
 	};
 }
 

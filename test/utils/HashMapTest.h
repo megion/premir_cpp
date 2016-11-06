@@ -21,6 +21,7 @@ namespace test {
 		struct MyStringKey {
 			char label[256];
 			size_t length;
+			int count2;
 			void setLabel(const char* val) {
 				size_t len = std::strlen(val);
 				std::memcpy(label, val, len);
@@ -56,6 +57,14 @@ namespace test {
 
 			void update(MyValue& oldValue, const MyValue& newValue, const size_t valueSizeof) const {
 				oldValue.count++;
+			}
+
+		};
+
+		class MyKeyUpdater: public utils::ValueUpdater<MyStringKey> {
+
+			void update(MyStringKey& oldValue, const MyStringKey& newValue, const size_t valueSizeof) const {
+				oldValue.count2++;
 			}
 
 		};

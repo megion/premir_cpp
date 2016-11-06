@@ -16,6 +16,7 @@
 
 #include "utils/RDMatrix.h"
 #include "utils/hash/HashEngine.h"
+#include "HashMapArray.h"
 
 namespace utils {
 
@@ -26,7 +27,7 @@ namespace utils {
 		typedef typename utils::RDMatrix<bool, K>::Row Row;
 
 		HashSet(hash::HashEngine<K> *_hashEngine) :
-				hashEngine(_hashEngine) {
+				hashEngine(_hashEngine), keySizeof(sizeof(K)) {
 			matrix = new utils::RDMatrix<bool, K>();
 		}
 
@@ -54,12 +55,7 @@ namespace utils {
 			return matrix;
 		}
 
-		bool push(K &value) {
-			const K copyValue = value;
-			return push(copyValue);
-		}
-
-		bool push(const K &value) {
+		bool push(const K &value, const ValueUpdater<K> *updater = nullptr) {
 			size_t rowIndex = hashEngine->hashCode(value);
 
 			if (rowIndex < matrix->getRowSize()) {
@@ -68,6 +64,10 @@ namespace utils {
 				for (size_t i = 0; i < row.pointSize; ++i) {
 					if (row[i] == value) {
 						// найдено значение с уже имеющимся ключом - exit
+						if (updater) {
+							// custom update function
+							updater->update(row[i], value, keySizeof);
+						}
 						return false;
 					}
 				}
@@ -99,6 +99,7 @@ namespace utils {
 	private:
 		utils::RDMatrix<bool, K> *matrix;
 		hash::HashEngine<K> *hashEngine;
+		size_t keySizeof; // saved value sizeof Entry
 	};
 }
 
