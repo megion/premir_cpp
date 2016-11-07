@@ -96,6 +96,22 @@ namespace utils {
 			}
 		}
 
+		K *getValue(const K &value) {
+			size_t rowIndex = hashEngine->hashCode(value);
+			if (rowIndex < matrix->getRowSize()) {
+				Row &row = (*matrix)[rowIndex];
+				for (size_t i = 0; i < row.pointSize; ++i) {
+					K &val = row[i];
+					if (val == value) {
+						return &val;
+					}
+				}
+				return nullptr;
+			} else {
+				return nullptr;
+			}
+		}
+
 	private:
 		utils::RDMatrix<bool, K> *matrix;
 		hash::HashEngine<K> *hashEngine;

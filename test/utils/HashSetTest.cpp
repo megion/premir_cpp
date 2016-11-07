@@ -50,15 +50,16 @@ namespace test {
 			mykey3.count2 = 1;
 			b.push(mykey3, &updater);
 
-			assert(mykey1.count2 == 3);
+			assert((b.getValue(mykey1))!=nullptr);
+			assert((b.getValue(mykey1))->count2==3);
 
 			utils_hash_map::MyStringKey mykey4;
 			mykey4.setLabel("my key2");
 			mykey4.count2 = 1;
 			b.push(mykey4, &updater);
 
-			assert(mykey1.count2 == 3);
-			assert(mykey4.count2 == 1);
+			assert((b.getValue(mykey1))->count2==3);
+			assert((b.getValue(mykey4))->count2==1);
 		}
 
 		void hashSet_test() {
