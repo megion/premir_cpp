@@ -115,7 +115,7 @@ namespace utils {
 	private:
 		utils::RDMatrix<bool, K> *matrix;
 		hash::HashEngine<K> *hashEngine;
-		size_t keySizeof; // saved value sizeof Entry
+		size_t keySizeof; // saved value sizeof type of set
 	};
 }
 

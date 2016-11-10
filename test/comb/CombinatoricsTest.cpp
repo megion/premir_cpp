@@ -21,6 +21,16 @@ namespace test {
 			sb.backtrack(arrA, k, inputN);
 		}
 
+		void test_generate_symbols() {
+			size_t totalLen = 800;
+			size_t lineLen = 80;
+			for (size_t i = 0; i < totalLen; i++) {
+				char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
+				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'
+				};
+			}
+		}
+
 		void combinatorics_test() {
 			suite("SubsetBacktrackSearch");
 			mytest(subset_backtrack_search);
