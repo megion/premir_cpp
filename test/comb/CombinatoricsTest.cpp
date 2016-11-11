@@ -24,10 +24,22 @@ namespace test {
 		void test_generate_symbols() {
 			size_t totalLen = 800;
 			size_t lineLen = 80;
+			char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
+                                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+                                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+                        };
+                        char apperSymbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
+                                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+                                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+                        };
+};
+
 			for (size_t i = 0; i < totalLen; i++) {
 				char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
-				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'
+				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 
+				'z', 'x', 'c', 'v', 'b', 'n', 'm'
 				};
+				char apperSymbols[] = {}; 
 			}
 		}
 
