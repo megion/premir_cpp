@@ -28,11 +28,11 @@ namespace test {
                                 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
                                 'z', 'x', 'c', 'v', 'b', 'n', 'm'
                         };
-                        char apperSymbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
-                                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-                                'z', 'x', 'c', 'v', 'b', 'n', 'm'
+                        char apperSymbols[] = {'Q', 'W', 'E', 'R', 'Y', 'I', 'O', 'P',
+                                'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+                                'Z', 'X', 'C', 'V', 'B', 'N', 'M'
                         };
-};
+			char otherSymbols[] = {';', '''};
 
 			for (size_t i = 0; i < totalLen; i++) {
 				char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
