@@ -43,6 +43,7 @@ build
 .idea
 .project
 .cproject
+*.swp
 
 lvq_pak-3.1/*.o
 som_pak-3.1/*.o

@@ -1,0 +1,24 @@
+========== Text entry
+a Append text following current cursor position
+A Append text to the end of current line
+
+i Insert text before the current cursor position
+I Insert text at the beginning of the cursor line
+
+o Open up a new line following the current line and add text there
+O Open up a new line in front of the current line and add text there
+
+========== Cursor movement
+^ Move cursor to the start of current line
+$ Move cursor to the end of current line
+
+^F (CTRl F) Forward screenful
+^B Backward screenful
+
+^f One page forward
+^b One page backward
+
+^U Up half screenful
+^D Down half screenful
+
+
