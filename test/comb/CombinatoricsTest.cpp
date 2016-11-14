@@ -24,23 +24,24 @@ namespace test {
 		void test_generate_symbols() {
 			size_t totalLen = 800;
 			size_t lineLen = 80;
-			char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
+			char letters[] = {'q', 'w', 'e', 'r', 't', 'y','u', 'i', 'o', 'p',
                                 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
                                 'z', 'x', 'c', 'v', 'b', 'n', 'm'
                         };
-                        char apperSymbols[] = {'Q', 'W', 'E', 'R', 'Y', 'I', 'O', 'P',
+                        char apperLetters[] = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
                                 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
                                 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
                         };
-			char otherSymbols[] = {';', '''};
+			size_t lettersCount = 26;
+			char symbols[] = {';', '''};
+			size_t symbolsCount = 2;
+			double apperLettersProb = 0.2;
+			std:cout<< 
 
 			for (size_t i = 0; i < totalLen; i++) {
-				char symbols[] = {'q', 'w', 'e', 'r', 'y', 'i', 'o', 'p',
-				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 
-				'z', 'x', 'c', 'v', 'b', 'n', 'm'
-				};
-				char apperSymbols[] = {}; 
+				std:cout<<
 			}
+
 		}
 
 		void combinatorics_test() {
