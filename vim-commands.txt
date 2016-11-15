@@ -21,4 +21,34 @@ $ Move cursor to the end of current line
 ^U Up half screenful
 ^D Down half screenful
 
+ma Create bookmark with name 'a'
+'a Move cursor to the bookmark 'a'
+
+ctrl-o Move cursor to back
+ctrl-i Move cursor to next
+
+========== Code
+:ab sout std::cout<< [Create abbreviation for 'sout']
+~ Conver text to upper case
+
+u Cancel changes
+ctrl-r Recovery changes
+
+x Remove symbol
+dd Remove line
+d$ Remove to end of line
+d^ Remove to start of line
+dl Remove one symbol
+dw Remove word
+
+y Copy (yank)
+yy Copy line
+
+p Insert after current cursor position
+P Insert before cuposition
+
+r Replace current symbol
+R Replace consecutive symbols
+s Remove current symbol and input to insertion mode
+S Remove current line and input to insertion mode 
 
