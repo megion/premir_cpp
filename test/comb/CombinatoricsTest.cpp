@@ -36,6 +36,7 @@ namespace test {
 			char symbols[] = {';', '''};
 			size_t symbolsCount = 2;
 			double apperLettersProb = 0.2;
+
 			std:cout<< 
 
 			for (size_t i = 0; i < totalLen; i++) {

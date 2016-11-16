@@ -52,3 +52,13 @@ R Replace consecutive symbols
 s Remove current symbol and input to insertion mode
 S Remove current line and input to insertion mode 
 
+"a Use register 'a'. Example "a4yy - use register "a for 4 lines copy
+:registers Show registers content
+
+ctrl-v Rectangle select text
+
+=========== Buffers (views)
+:b 1 Select buffer 1
+:ls Show list buffers
+:bd 1 Remove buffer 1
+
