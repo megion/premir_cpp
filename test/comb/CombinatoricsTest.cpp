@@ -36,11 +36,11 @@ namespace test {
 			char symbols[] = {';', '''};
 			size_t symbolsCount = 2;
 			double apperLettersProb = 0.2;
-
-			std:cout<< 
-
+			
+			std::default_random_engine generator;
+			std::normal_distribution<double> distribution(0.0, 0.1);
 			for (size_t i = 0; i < totalLen; i++) {
-				std:cout<<
+				std:cout<<distribution(generator);
 			}
 
 		}
@@ -51,6 +51,9 @@ namespace test {
 
 			suite("PermutationBacktrackSearch");
 //			mytest(permutation_backtrack_search);
+//
+			suite("Generate symbols");
+			mytest(generate_symbols);
 		}
 
 	}
