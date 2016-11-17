@@ -12,6 +12,10 @@
 #include <iostream>
 #include <regex.h>
 
+#include <cmath>
+#include <random>
+#include <chrono>         // std::chrono::seconds
+
 #include "test.h"
 
 #include "comb/SubsetBacktrackSearch.h"

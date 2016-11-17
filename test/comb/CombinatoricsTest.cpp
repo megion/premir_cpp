@@ -33,14 +33,14 @@ namespace test {
                                 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
                         };
 			size_t lettersCount = 26;
-			char symbols[] = {';', '''};
+			char symbols[] = {';', ':'};
 			size_t symbolsCount = 2;
 			double apperLettersProb = 0.2;
 			
 			std::default_random_engine generator;
 			std::normal_distribution<double> distribution(0.0, 0.1);
 			for (size_t i = 0; i < totalLen; i++) {
-				std:cout<<distribution(generator);
+				std::cout<<distribution(generator)<<std::endl;
 			}
 
 		}
