@@ -88,5 +88,13 @@ gt Go to next tab
 gT Go to prev tab
 :tabc Close tab
 
+========== Navigations
+gf Go to file on current cursor position
+gF Open file in same window
+ctrl-w gF Open file in new tab
+ctrl-w F Open file in new window
+:bf Go to back after 'gf' command
+
+
 
 

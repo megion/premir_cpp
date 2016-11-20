@@ -25,13 +25,13 @@ namespace test {
 			size_t totalLen = 800;
 			size_t lineLen = 80;
 			char letters[] = {'q', 'w', 'e', 'r', 't', 'y','u', 'i', 'o', 'p',
-                                'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-                                'z', 'x', 'c', 'v', 'b', 'n', 'm'
-                        };
-                        char apperLetters[] = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
-                                'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
-                                'Z', 'X', 'C', 'V', 'B', 'N', 'M'
-                        };
+				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+				'z', 'x', 'c', 'v', 'b', 'n', 'm'
+			};
+            char apperLetters[] = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+				'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+				'Z', 'X', 'C', 'V', 'B', 'N', 'M'
+			};
 			size_t lettersCount = 26;
 			char symbols[] = {';', ':'};
 			size_t symbolsCount = 2;
