@@ -127,6 +127,9 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'morhetz/gruvbox' " gruvbox colorscheme
 Plugin 'octol/vim-cpp-enhanced-highlight' " cpp syntax enhanced
 Plugin 'dracula/vim'
+"Plugin 'taglist.vim' " ctags
+"Plugin 'snippetsEmu' " snippets
+"Plugin 'project.tar.gz'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required

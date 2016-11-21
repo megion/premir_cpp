@@ -98,6 +98,8 @@ gF Open file in same window
 ctrl-w gF Open file in new tab
 ctrl-w F Open file in new window
 :bf Go to back after 'gf' command
+:Vex Open file manager in vertical window
+:Sex Open file manager in horizontal window 
 
 
 
