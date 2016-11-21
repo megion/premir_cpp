@@ -66,7 +66,7 @@ if has("autocmd")
   " Use the default filetype settings, so that mail gets 'tw' set to 72,
   " 'cindent' is on in C files, etc.
   " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
+  "filetype plugin indent on
 
   " Put these in an autocmd group, so that we can delete them easily.
   augroup vimrcEx
@@ -114,17 +114,33 @@ endif
 packadd matchit
 
 " My customization
-" To save, ctrl-s.
-"nmap <c-s> :w<CR>
-"imap <c-s> <Esc>:w<CR>a
+set nocompatible              " be iMproved, required
+filetype off                  " required
 
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" Add plugins here
+Plugin 'morhetz/gruvbox' " gruvbox colorscheme
+Plugin 'octol/vim-cpp-enhanced-highlight' " cpp syntax enhanced
+Plugin 'dracula/vim'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
 
 set ignorecase
 set smartcase
 set smartindent
 
-set background=dark
-colorscheme solarized
+colorscheme gruvbox
+set background=dark    " Setting dark mode
+"colorscheme solarized
 
 " Read additional .vimrc file in current directory
 set exrc

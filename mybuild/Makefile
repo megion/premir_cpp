@@ -7,12 +7,12 @@
 # 	<команда1>
 # 	<команда2>
 
-CC := g++
+CC := clang++ #g++
 # -lxcb for xcb lib
 # -lX11 for X11 lib
 # -g for include debugging symbols
 # -pthread enable multithreading
-CCFLAGS := -std=c++11 -lxcb -g -pthread -lpng
+CCFLAGS := -std=c++11 -lxcb -g -pthread -lpng 
 
 # список каталогов с исходыми кодами
 SRC_DIRS := $(shell find ../src -type d)

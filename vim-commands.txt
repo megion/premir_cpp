@@ -56,6 +56,10 @@ S Remove current line and input to insertion mode
 :registers Show registers content
 
 ctrl-v Rectangle select text
+% Go to block start/end '{' -> '}'
+gd Go to variable declaration
+gD Go to global decalartion
+[I Show all lines where exist word under cursor
 
 =========== Buffers (views)
 :e file1.txt Open buffer 1
