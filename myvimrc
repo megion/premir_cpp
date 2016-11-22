@@ -131,6 +131,7 @@ Plugin 'dracula/vim'
 "Plugin 'snippetsEmu' " snippets
 "Plugin 'project.tar.gz'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/nerdcommenter'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -145,11 +146,6 @@ set smartindent
 colorscheme gruvbox
 set background=dark    " Setting dark mode
 "colorscheme solarized
-
-" YCM settings {{{
-let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
-" }}}
-
 
 " Read additional .vimrc file in current directory
 set exrc

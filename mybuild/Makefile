@@ -7,7 +7,7 @@
 # 	<команда1>
 # 	<команда2>
 
-CC := clang++ #g++
+CC := g++ #clang++ #g++
 # -lxcb for xcb lib
 # -lX11 for X11 lib
 # -g for include debugging symbols

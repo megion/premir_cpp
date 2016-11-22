@@ -15,10 +15,10 @@ set noexpandtab
 set colorcolumn=120
 highlight ColorColumn ctermbg=darkgray
 
-augroup project
-	autocmd!
-	autocmd BufRead,BufNewFile *.h,*.c set filetype=c.doxygen
-augroup End
+"augroup project
+"	autocmd!
+"	autocmd BufRead,BufNewFile *.h,*.c set filetype=c.doxygen
+"augroup End
 
 " let $path.="~/workspaces/neon/premir_cpp/src,test,/usr/include/AL,"
 
