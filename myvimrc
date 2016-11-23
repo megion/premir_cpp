@@ -130,7 +130,8 @@ Plugin 'dracula/vim'
 "Plugin 'taglist.vim' " ctags
 "Plugin 'snippetsEmu' " snippets
 "Plugin 'project.tar.gz'
-Plugin 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
+Plugin 'oblitum/YouCompleteMe' " fork YouCompleteMe for complete function arguments
 Plugin 'scrooloose/nerdcommenter'
 
 " All of your Plugins must be added before the following line
