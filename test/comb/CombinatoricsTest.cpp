@@ -36,11 +36,15 @@ namespace test {
 			char symbols[] = {';', ':'};
 			size_t symbolsCount = 2;
 			double apperLettersProb = 0.2;
+
+			std::random_device rd;     // only used once to initialise (seed) engine
+			std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+			std::uniform_int_distribution<size_t> uni(0, lettersCount); // guaranteed unbiased
 			
 			std::default_random_engine generator;
 			std::normal_distribution<double> distribution(0.0, 0.1);
 			for (size_t i = 0; i < totalLen; i++) {
-				std::cout<<distribution(generator)<<std::endl;
+				std::cout<<uni(rng)<<std::endl;
 			}
 
 		}

@@ -131,8 +131,9 @@ Plugin 'dracula/vim'
 "Plugin 'snippetsEmu' " snippets
 "Plugin 'project.tar.gz'
 "Plugin 'Valloric/YouCompleteMe'
-Plugin 'oblitum/YouCompleteMe' " fork YouCompleteMe for complete function arguments
+Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'jlanzarotta/bufexplorer'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -147,6 +148,8 @@ set smartindent
 colorscheme gruvbox
 set background=dark    " Setting dark mode
 "colorscheme solarized
+
+nnoremap <silent> <F5> :BufExplorer<CR>
 
 " Read additional .vimrc file in current directory
 set exrc
