@@ -44,7 +44,7 @@ namespace test {
 			std::default_random_engine generator;
 			std::normal_distribution<double> distribution(0.0, 0.1);
 			for (size_t i = 0; i < totalLen; i++) {
-				std::cout<<uni(rng)<<std::endl;
+				//std::cout<<uni(rng)<<std::endl;
 			}
 
 		}
