@@ -104,6 +104,9 @@ ctrl-w F Open file in new window
 
 ===========NERDtree
 cd change CWD to selected tree node 
-
+shift-t change CWD to selected node and open in tabnew
+:NERDTreeProjectSave <name>
+:NERDTreeProjectLoad <name>
+:NERDTreeProjectLoadFromCWD
 
 
