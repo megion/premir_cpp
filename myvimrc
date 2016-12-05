@@ -130,10 +130,20 @@ Plugin 'dracula/vim'
 "Plugin 'taglist.vim' " ctags
 "Plugin 'snippetsEmu' " snippets
 "Plugin 'project.tar.gz'
-"Plugin 'Valloric/YouCompleteMe'
 Plugin 'Valloric/YouCompleteMe'
+"Plugin 'ternjs/tern_for_vim'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/nerdtree'
+Plugin 'scrooloose/nerdtree-project-plugin'
 Plugin 'jlanzarotta/bufexplorer'
+Plugin 'romainl/Apprentice'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'KeitaNakamura/neodark.vim'
+Plugin 'junegunn/seoul256.vim'
+Plugin 'sjl/badwolf'
+Plugin 'jonathanfilip/vim-lucius'
+Plugin 'xolox/vim-session'
+Plugin 'xolox/vim-misc'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -144,14 +154,35 @@ filetype plugin indent on    " required
 set ignorecase
 set smartcase
 set smartindent
+set number
+set tabstop=4 " count of space which show tab
+set softtabstop=4 " count of space which show tab when it added
+set shiftwidth=4 " count of space add by commands '>>' and '<<'
+set noexpandtab
+syntax enable
 
-colorscheme gruvbox
+"colorscheme gruvbox
 set background=dark    " Setting dark mode
-"colorscheme solarized
+let g:solarized_termcolors=256
+colorscheme gruvbox 
 
-nnoremap <silent> <F5> :BufExplorer<CR>
+" open buf explorer
+" default key: <leader>be
+" when bufexplorer opend, select buf and type 'o' for open
+"nnoremap <silent> <F5> :BufExplorer<CR>
+
+" open new tab
+nnoremap <F4> :tabnew<CR>
+inoremap <F4> :tabnew<CR>
+vnoremap <F4> :tabnew<CR>
+
+" open nerdtree
+nnoremap <F3> :NERDTreeToggle<CR>
+inoremap <F3> :NERDTreeToggle<CR>
+vnoremap <F3> :NERDTreeToggle<CR>
 
 " Read additional .vimrc file in current directory
 set exrc
 set secure
+
 
