@@ -53,7 +53,7 @@ VPATH := $(TEST_DIRS)
 # и файлы, включаемые с помощью директивы #include "имя_файла"  
 %.o: %.cpp
 	$(CC) $(CCFLAGS) -c -MMD $(addprefix -I, $(TEST_DIRS)) $<
-	@printf "\e[36m$(CC)\e[90m %s\e[0m\n" $@
+	@printf "\e[36m$(CC)\e[32m %s\e[0m\n" $@
 include $(wildcard *.d)
 
 # очистка	
