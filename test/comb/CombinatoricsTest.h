@@ -25,6 +25,13 @@
 namespace test {
     namespace combinatorics {
 
+		struct SplitterInfo {
+			bool isNewLine;
+			bool isNewWord;
+			size_t wordCharIndex;
+			size_t lineCharIndex;
+		};
+
         void combinatorics_test();
     }
 }
