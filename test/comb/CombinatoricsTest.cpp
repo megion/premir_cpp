@@ -21,37 +21,41 @@ namespace test {
 			sb.backtrack(arrA, k, inputN);
 		}
 
-		void printWordSplitter(size_t wordCharIndex, size_t& wordLen, SplitterInfo& info,
-				const size_t newWordLen) {
-			if (wordCharIndex == (wordLen-1)) {
+		void printWordSplitter(SplitterInfo& info) {
+			if (info.wordCharIndex == (info.wordLen-1)) {
 				std::cout << " "; // end of word 
 				info.isNewWord = true;
-				wordLen = newWordLen;
+				info.wordLen = info.newWordLen;
+				info.wordCharIndex = 0;
 			} else {
 				info.isNewWord = false;
+				info.wordCharIndex++;
 			}
 		}
 
-		void printLineSplitter(size_t lineCharIndex, size_t lineLen, SplitterInfo& info) {
-			if (lineCharIndex == (lineLen-1)) {
+		void printLineSplitter(SplitterInfo& info) {
+			if (info.lineCharIndex == (info.lineLen-1)) {
 				std::cout << std::endl; // end of line
 				info.isNewLine = true;
+				info.lineCharIndex = 0;
+				info.wordCharIndex = 0;
+				info.linesCount++;
 			} else {
 				info.isNewLine = false;
+				info.lineCharIndex++;
 			}
 		}
 		
-		void printSplitters(size_t wordCharIndex, size_t lineCharIndex, size_t lineLen, size_t& wordLen, SplitterInfo& info,
-				const size_t newWordLen) {
-			printLineSplitter(lineCharIndex, lineLen, info);
+		void printSplitters(SplitterInfo& info) {
+			printLineSplitter(info);
 			if (!info.isNewLine) {
-				printWordSplitter(wordCharIndex, wordLen, info, newWordLen);
+				printWordSplitter(info);
 			}
 		}
 		
 		void test_generate_symbols() {
 			//size_t totalLen = 800;
-			size_t lineLen = 80;
+			size_t lineLen = 60;
 			size_t wordLen = 8;
 			char letters[] = {'q', 'w', 'e', 'r', 't', 'y','u', 'i', 'o', 'p',
 				'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
@@ -77,38 +81,29 @@ namespace test {
 			
 			//std::default_random_engine generator;
 			//std::normal_distribution<double> distribution(0.0, 0.1);
-			SplitterInfo spInfo={false, false};
-			size_t charIndex = 0;
+			SplitterInfo spInfo={false, false, 0, 0, wordLen, lineLen, wordLen, 0};
+			//size_t charIndex = 0;
 			size_t totalLines = 10;
-			size_t linesCount = 0;
-			while (linesCount < totalLines) {
+			//size_t linesCount = 0;
+			while (spInfo.linesCount < totalLines) {
 				size_t lettersIndex = uni(rng);
    				if (upperFreqRandom(rng)==0) {
 					size_t uLetterIndex = uni(rng);
 					std::cout << upperLetters[uLetterIndex];
-					charIndex++;
-					printSplitters(charIndex, lineLen, wordLen, spInfo, wordLenRandom(rng)); 
-					if (spInfo.isNewLine) {
-						linesCount++;
-					}
+					spInfo.newWordLen = wordLenRandom(rng);
+					printSplitters(spInfo); 
 				}
 
 				if (symbolsFreqRandom(rng)==0) {
 					size_t symbolsIndex = symbolsRandom(rng);
 					std::cout << symbols[symbolsIndex];
-					charIndex++;
-					printSplitters(charIndex, lineLen, wordLen, spInfo, wordLenRandom(rng)); 
-					if (spInfo.isNewLine) {
-						linesCount++;
-					}
+					spInfo.newWordLen = wordLenRandom(rng);
+					printSplitters(spInfo); 
 				}
 				
 				std::cout<<letters[lettersIndex];
-				charIndex++;
-				printSplitters(charIndex, lineLen, wordLen, spInfo, wordLenRandom(rng)); 
-				if (spInfo.isNewLine) {
-					linesCount++;
-				}
+				spInfo.newWordLen = wordLenRandom(rng);
+				printSplitters(spInfo); 
 			}
 			std::cout << std::endl; // end of line
 		}

@@ -30,6 +30,10 @@ namespace test {
 			bool isNewWord;
 			size_t wordCharIndex;
 			size_t lineCharIndex;
+			size_t wordLen;
+			size_t lineLen;
+			size_t newWordLen; 
+			size_t linesCount;
 		};
 
         void combinatorics_test();
