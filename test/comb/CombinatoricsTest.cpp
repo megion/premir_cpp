@@ -9,7 +9,9 @@ namespace test {
 			bool arrA[] = { false, false, false, false, false, false, false, false, false, false };
 			size_t inputN = 3;
 			size_t k = 0;
-			sb.backtrack(arrA, k, inputN);
+			utils::RDMatrix<bool, size_t> results; 
+			sb.backtrack(arrA, k, inputN, &results);
+			assert(results.getRowSize() == 8);
 		}
 
 		void test_permutation_backtrack_search() {
@@ -18,7 +20,8 @@ namespace test {
 			size_t arrA[] = { 0, 0, 0, 0, 0 };
 			size_t inputN = 4;
 			size_t k = 0;
-			sb.backtrack(arrA, k, inputN);
+			utils::RDMatrix<bool, size_t> results; 
+			sb.backtrack(arrA, k, inputN, &results);
 		}
 
 		void printWordSplitter(SplitterInfo& info) {
@@ -113,10 +116,10 @@ namespace test {
 			mytest(subset_backtrack_search);
 
 			suite("PermutationBacktrackSearch");
-//			mytest(permutation_backtrack_search);
+			mytest(permutation_backtrack_search);
 //
-			suite("Generate symbols");
-			mytest(generate_symbols);
+			//suite("Generate symbols");
+			//mytest(generate_symbols);
 		}
 
 	}

@@ -2,6 +2,7 @@
 #define SRC_COMB_BACKTRACK_SEARCH_H
 
 #include <cstdio>
+#include "utils/RDMatrix.h"
 
 namespace comb {
 	/**
@@ -40,11 +41,12 @@ namespace comb {
 		 * взгляд на перебор с возвратом, т. к. процесс создания решений в точности
 		 * соответствует процессу обхода в глубину дерева перебора с возвратом.
 		 */
-		void backtrack(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
+		void backtrack(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize,
+				utils::RDMatrix<bool, size_t>* solutionResults) {
 			std::cout << "backtrack k = " << treeDepth << " ";
 			printSolutionsVector(solutionsVector, solutionSize);
 			if (isSolution(solutionsVector, treeDepth, solutionSize)) {
-				processSolution(solutionsVector, treeDepth, solutionSize);
+				processSolution(solutionsVector, treeDepth, solutionSize, solutionResults);
 			} else {
 				size_t currTreeDepth = treeDepth; // current tree depth
 				++treeDepth; // increase depth
@@ -55,7 +57,7 @@ namespace comb {
 				for (size_t i = 0; i < numCandidates; ++i) {
 					solutionsVector[currTreeDepth] = candidates[i];
 					makeMove(solutionsVector, currTreeDepth, solutionSize);
-					backtrack(solutionsVector, treeDepth, solutionSize);
+					backtrack(solutionsVector, treeDepth, solutionSize, solutionResults);
 					unmakeMove(solutionsVector, currTreeDepth, solutionSize);
 					if (finished) { // forced exit
 						return;
@@ -81,7 +83,8 @@ namespace comb {
 		/**
 		 * process full solution
 		 */
-		virtual void processSolution(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize) = 0;
+		virtual void processSolution(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize,
+				utils::RDMatrix<bool, size_t>* solutionResults) = 0;
 
 		/**
 		 * write full set off candidates to candidates array for 'treeDepth' position of vector 'solutionsVector'

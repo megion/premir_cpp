@@ -34,13 +34,19 @@ namespace comb {
 			return treeDepth == solutionSize;
 		}
 
-		void processSolution(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize) {
+		void processSolution(bool* const solutionsVector, size_t treeDepth, const size_t& solutionSize,
+				utils::RDMatrix<bool, size_t>* solutionResults) {
 			std::cout << "{";
+			size_t resultLen = 0;
+			size_t resultVec[treeDepth]; // vector result set max size = tree depth
 			for (size_t i = 0; i < treeDepth; i++) {
 				if (solutionsVector[i] == true) {
 					std::cout << " " << i;
+					resultVec[resultLen] = i;
+					resultLen++;
 				}
 			}
+			solutionResults->pushRow(resultVec, resultLen);
 			std::cout << " }" << std::endl;
 		}
 
