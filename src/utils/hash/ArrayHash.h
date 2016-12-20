@@ -1,12 +1,10 @@
 //
-// Created by ilya on 1/6/16.
-// hash code for types:
-// 1) integer value
-// 2) float number value if float range number is not defined
+// Created by ilya 
+// hash code for type array of T  
 //
 
-#ifndef SRC_UTILS_HASH_NUMBERHASH_H
-#define SRC_UTILS_HASH_NUMBERHASH_H
+#ifndef SRC_UTILS_HASH_ARRAYHASH_H
+#define SRC_UTILS_HASH_ARRAYHASH_H
 
 #include <cstdio>
 
@@ -15,7 +13,7 @@
 namespace utils {
     namespace hash {
 
-        template<typename T>
+        template<typename HashEngine<T>>
         class NumberHash : public HashEngine<T> {
         public:
             NumberHash() : HashEngine<T>::HashEngine() {

@@ -184,6 +184,16 @@ namespace test {
             assert(ab[15].pointCapacity==19);
         }
 
+		void test_push_with_distruction_class() {
+            utils::RDMatrix<bool, WithDistruction> a;
+			WithDistruction arrObjects[3];
+			std::cout<<"3 objects array is created" << std::endl;
+		
+			a.pushRow(arrObjects, 3);
+			std::cout<<"3 object array pushed" << std::endl;
+
+            
+        }
         void rDMatrix_test() {
             suite("RDMatrix");
             mytest(push_row);
@@ -192,6 +202,7 @@ namespace test {
             mytest(get_row);
             mytest(append_values);
             mytest(capacity);
+			mytest(push_with_distruction_class);
         }
     }
 }

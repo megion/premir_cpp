@@ -9,6 +9,17 @@
 namespace test {
     namespace utils_rdmatrix {
 
+		class WithDistruction {
+			public:
+				WithDistruction(): value(0) {
+					std::cout << "Call constructor WithDistruction class" << std::endl;
+				}
+				~WithDistruction() {
+					std::cout << "Call destuction ~WithDistruction class" << std::endl;
+				}
+			private:
+				int value;
+		};
         void rDMatrix_test();
     }
 }
