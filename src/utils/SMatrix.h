@@ -22,9 +22,10 @@ namespace utils {
     class SMatrix {
     public:
 
-        SMatrix(const size_t &_rowSize, const size_t &_colSize) :
-                rowSize(_rowSize), colSize(_colSize), matrix(nullptr),
-                typeSizeof(sizeof(T)), ptypeSizeof(sizeof(T *)) {
+        SMatrix(size_t _rowSize, size_t _colSize) :
+			rowSize(_rowSize), colSize(_colSize), matrix(nullptr), typeSizeof(sizeof(T)),
+		   	ptypeSizeof(sizeof(T *)) {
+
             if (rowSize > 0) {
                 initializeRowMemory(rowSize);
                 size_t cAmount = typeSizeof * colSize;
@@ -57,11 +58,11 @@ namespace utils {
             }
         }
 
-        T &operator()(const size_t &r, const size_t &c) const {
+        T &operator()(size_t r, size_t c) const {
             return matrix[r][c];//*(*(matrix + r) + c);
         }
 
-        T* operator[](const size_t &r) const {
+        T* operator[](size_t r) const {
             return matrix[r];
         }
 
@@ -86,8 +87,7 @@ namespace utils {
             return !((*this) == other);
         }
 
-        bool equalsWithError(const SMatrix<T> &other,
-                             const double &error) const {
+        bool equalsWithError(const SMatrix<T> &other, double error) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
@@ -120,7 +120,7 @@ namespace utils {
             return matrix;
         }
 
-        T *getRow(const size_t &r) const {
+        T *getRow(size_t r) const {
             return matrix[r];
         }
 

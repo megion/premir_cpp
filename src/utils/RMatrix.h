@@ -25,10 +25,9 @@ namespace utils {
             T* points; // массив однотипных данных строки
         };
 
-        RMatrix(const size_t &_rowSize, const size_t &_colSize) :
+        RMatrix(size_t _rowSize, size_t _colSize) :
                 rowSize(_rowSize), colSize(_colSize), matrix(nullptr),
-                tTypeSizeof(sizeof(T)), rTypeSizeof(sizeof(Row)),
-                sTypeSizeof(sizeof(S)) {
+                tTypeSizeof(sizeof(T)), rTypeSizeof(sizeof(Row)), sTypeSizeof(sizeof(S)) {
             if (rowSize > 0) {
                 initializeRowMemory(rowSize);
                 size_t cAmount = tTypeSizeof * colSize;
@@ -62,11 +61,11 @@ namespace utils {
             }
         }
 
-        T &operator()(const size_t &r, const size_t &c) const {
+        T &operator()(size_t r, size_t c) const {
             return matrix[r].points[c];
         }
 
-        T* operator[](const size_t &r) const {
+        T* operator[](size_t r) const {
             return matrix[r].points;
         }
 
@@ -96,7 +95,7 @@ namespace utils {
         }
 
         bool equalsWithError(const RMatrix<S, T> &other,
-                             const double &error, bool skipCompareData=false) const {
+                             double error, bool skipCompareData=false) const {
             if (other.getRowSize() != rowSize) {
                 return false;
             }
@@ -133,11 +132,11 @@ namespace utils {
             return matrix;
         }
 
-        Row& getRow(const size_t &r) const {
+        Row& getRow(size_t r) const {
             return matrix[r];
         }
 
-        T* getRowPoints(const size_t &r) const {
+        T* getRowPoints(size_t r) const {
             return matrix[r].points;
         }
 

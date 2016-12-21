@@ -95,7 +95,7 @@ namespace utils {
          * remove all points array for each cells specified row.
          * Cells array for specified row not removed.
          */
-        void removeRowPoints(const size_t &r) {
+        void removeRowPoints(size_t r) {
             for (size_t c = 0; c < matrix[r].cellSize; ++c) {
                 if (matrix[r].cells[c].points) {
                     std::free(matrix[r].cells[c].points);
@@ -106,11 +106,11 @@ namespace utils {
             }
         }
 
-        T &operator()(const size_t &r, const size_t &c, const size_t &p) const {
+        T &operator()(size_t r, size_t c, size_t p) const {
             return matrix[r].cells[c].points[p];
         }
 
-        Row &operator[](const size_t &r) const {
+        Row &operator[](size_t r) const {
             return matrix[r];
         }
 
@@ -151,7 +151,7 @@ namespace utils {
         }
 
         bool equalsWithError(const R3DMatrix<R, C, T> &other,
-                             const double &error,
+                             double error,
                              bool skipCompareData = false) const {
             if (other.getRowSize() != rowSize) {
                 return false;
@@ -195,7 +195,7 @@ namespace utils {
             return matrix;
         }
 
-        Row &getRow(const size_t &r) const {
+        Row &getRow(size_t r) const {
             return matrix[r];
         }
 

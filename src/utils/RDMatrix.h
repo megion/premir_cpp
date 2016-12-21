@@ -32,20 +32,25 @@ namespace utils {
 		};
 
 		RDMatrix() :
-				rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1), matrix(nullptr), tTypeSizeof(
-						sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
+			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1), matrix(nullptr),
+			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
+			isCallItemDestructorOnClear(false) 	{
 		}
 
 		RDMatrix(size_t _rowSize, size_t _rowCapacityIncrease, size_t _pointCapacityIncrease) :
-				rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(_rowCapacityIncrease), pointCapacityIncrease(
-						_pointCapacityIncrease), matrix(nullptr), tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(
-						sizeof(R)) {
+			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(_rowCapacityIncrease),
+		   	pointCapacityIncrease(_pointCapacityIncrease), matrix(nullptr), tTypeSizeof(sizeof(T)),
+		   	rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
+			isCallItemDestructorOnClear(false)	{
+
 			initializeRowMemory(_rowSize);
 		}
 
 		RDMatrix(size_t _rowSize, size_t _pointSize) :
-				rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1), matrix(nullptr), tTypeSizeof(
-						sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
+			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1),	matrix(nullptr),
+			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
+			isCallItemDestructorOnClear(false)	{
+
 			initializeRowMemory(_rowSize);
 			for (size_t r = 0; r < rowSize; ++r) {
 				initializePointsMemory(matrix[r], _pointSize);
@@ -68,16 +73,27 @@ namespace utils {
 			pointCapacityIncrease = _pointCapacityIncrease;
 		}
 
+		void setIsCallItemDestructorOnClear(bool _isCallItemDestructorOnClear) {
+			isCallItemDestructorOnClear = _isCallItemDestructorOnClear;
+		}
+
 		void removeAll() {
 			if (matrix) {
 				// remove all row array
 				for (size_t r = 0; r < rowCapacity; ++r) {
-					if (matrix[r].points) {
-						std::free(matrix[r].points);
+					Row& row = matrix[r];
+					if (row.points) {
+						if (isCallItemDestructorOnClear) {
+							for (size_t p = 0; p < row.pointSize; p++) {
+								// call destructor for each object
+								(row.points[p]).~T();
+							}
+						}
+						std::free(row.points);
 						// set to null each array pointer
-						matrix[r].points = nullptr;
-						matrix[r].pointSize = 0;
-						matrix[r].pointCapacity = 0;
+						row.points = nullptr;
+						row.pointSize = 0;
+						row.pointCapacity = 0;
 					}
 				}
 				std::free(matrix);
@@ -87,11 +103,11 @@ namespace utils {
 			}
 		}
 
-		T &operator()(const size_t &r, const size_t &c) const {
+		T &operator()(size_t r, size_t c) const {
 			return matrix[r].points[c];
 		}
 
-		Row &operator[](const size_t &r) const {
+		Row &operator[](size_t r) const {
 			return matrix[r];
 		}
 
@@ -120,7 +136,7 @@ namespace utils {
 			return !((*this) == other);
 		}
 
-		bool equalsWithError(const RDMatrix<R, T> &other, const double &error, bool skipCompareData = false) const {
+		bool equalsWithError(const RDMatrix<R, T> &other, double error, bool skipCompareData = false) const {
 			if (other.getRowSize() != rowSize) {
 				return false;
 			}
@@ -153,11 +169,11 @@ namespace utils {
 			return matrix;
 		}
 
-		Row &getRow(const size_t &r) const {
+		Row &getRow(size_t r) const {
 			return matrix[r];
 		}
 
-		T *getRowPoints(const size_t &r) const {
+		T *getRowPoints(size_t r) const {
 			return matrix[r].points;
 		}
 
@@ -246,6 +262,8 @@ namespace utils {
 		size_t tTypeSizeof; // saved value sizeof T
 		size_t rTypeSizeof; // saved value sizeof R
 		size_t rowTypeSizeof; // saved value sizeof Row
+
+		bool isCallItemDestructorOnClear;
 
 		void initializeRowMemory(size_t newRowSize) {
 			size_t newRowCapacity = 0;
