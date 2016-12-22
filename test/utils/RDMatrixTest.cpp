@@ -192,7 +192,8 @@ namespace test {
 			a.pushRow(arrObjects, 3);
 			std::cout<<"3 object array pushed" << std::endl;
 
-            
+			WithDistruction b;
+            a.writeRow(1, std::move(b));
         }
         void rDMatrix_test() {
             suite("RDMatrix");

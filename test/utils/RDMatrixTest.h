@@ -17,6 +17,9 @@ namespace test {
 				~WithDistruction() {
 					std::cout << "Call destuction ~WithDistruction class" << std::endl;
 				}
+				WithDistruction(WithDistruction&& v) {
+					std::cout << "Call move constructor WithDistruction class" << std::endl;
+				}
 			private:
 				int value;
 		};

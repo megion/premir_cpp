@@ -177,33 +177,32 @@ namespace utils {
 			return matrix[r].points;
 		}
 
+		void writeRow(size_t rowIndex, const T* points, size_t pointSize) {
+			prepareWriteRow(rowIndex, pointSize);
+			// copy points array
+			memcpy(matrix[rowIndex].points, points, matrix[rowIndex].pointSize * tTypeSizeof);
+		}
+
+		void writeRow(size_t rowIndex, const T& value) {
+			writeRow(rowIndex, &value, 1);
+		}
+
+		/**
+		 * write moved object.
+		 * For example it may be used for store object which contains dynamic allocated resources.
+		 * If you will push moved object then set isCallItemDestructorOnClear=true for 
+		 * auto call destructor on each object when matrix removed 
+		 */
+		void writeRow(size_t rowIndex, T&& value) {
+			std::cout << "call write moved object" << std::endl;
+			prepareWriteRow(rowIndex, 1);
+			*(matrix[rowIndex].points) = value; // should exist move constructor
+		}
+
 		void writeRow(size_t rowIndex, const Row &value) {
 			writeRow(rowIndex, value.points, value.pointSize);
 			// copy data
 			memcpy(&(matrix[rowIndex].data), &(value.data), rTypeSizeof);
-		}
-
-		void writeRow(size_t rowIndex, const T* points, size_t pointSize) {
-			if (rowIndex < rowCapacity) {
-				if (matrix[rowIndex].pointCapacity < pointSize) {
-					// re-initialize points memory
-					initializePointsMemory(matrix[rowIndex], pointSize);
-				} else {
-					matrix[rowIndex].pointSize = pointSize;
-				}
-				if (rowIndex >= rowSize) {
-					rowSize = rowIndex + 1;
-				}
-			} else {
-				// re-initialize row memory
-				size_t newRowSize = rowIndex + 1;
-				initializeRowMemory(newRowSize);
-
-				initializePointsMemory(matrix[rowIndex], pointSize);
-			}
-
-			// copy points array
-			memcpy(matrix[rowIndex].points, points, matrix[rowIndex].pointSize * tTypeSizeof);
 		}
 
 		void pushRow(const Row &value) {
@@ -263,6 +262,10 @@ namespace utils {
 		size_t rTypeSizeof; // saved value sizeof R
 		size_t rowTypeSizeof; // saved value sizeof Row
 
+		/**
+		 * flag for call destructor for each element T in removeAll method
+		 * removeAll method also call in destructor RDMatrix 
+		 */
 		bool isCallItemDestructorOnClear;
 
 		void initializeRowMemory(size_t newRowSize) {
@@ -320,7 +323,26 @@ namespace utils {
 			row.pointSize = newPointsSize;
 			row.pointCapacity = newPointsCapacity;
 		}
-		
+
+		void prepareWriteRow(size_t rowIndex, size_t pointSize) {
+			if (rowIndex < rowCapacity) {
+				if (matrix[rowIndex].pointCapacity < pointSize) {
+					// re-initialize points memory
+					initializePointsMemory(matrix[rowIndex], pointSize);
+				} else {
+					matrix[rowIndex].pointSize = pointSize;
+				}
+				if (rowIndex >= rowSize) {
+					rowSize = rowIndex + 1;
+				}
+			} else {
+				// re-initialize row memory
+				size_t newRowSize = rowIndex + 1;
+				initializeRowMemory(newRowSize);
+
+				initializePointsMemory(matrix[rowIndex], pointSize);
+			}
+		}
 	};
 }
 
