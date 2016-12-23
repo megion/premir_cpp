@@ -20,6 +20,14 @@ namespace test {
 				WithDistruction(WithDistruction&& v) {
 					std::cout << "Call move constructor WithDistruction class" << std::endl;
 				}
+
+				WithDistruction &operator=(WithDistruction&& other) {
+					std::cout << "Call move = operator "<< std::endl;
+				} 
+
+				WithDistruction &operator=(const WithDistruction& other) {
+					std::cout << "Call copy = operator "<< std::endl;
+				} 
 			private:
 				int value;
 		};

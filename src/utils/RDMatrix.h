@@ -193,10 +193,10 @@ namespace utils {
 		 * If you will push moved object then set isCallItemDestructorOnClear=true for 
 		 * auto call destructor on each object when matrix removed 
 		 */
-		void writeRow(size_t rowIndex, T&& value) {
+		void writeRowMove(size_t rowIndex, T&& value) {
 			std::cout << "call write moved object" << std::endl;
 			prepareWriteRow(rowIndex, 1);
-			*(matrix[rowIndex].points) = value; // should exist move constructor
+			*(matrix[rowIndex].points) = std::move(value); // should exist move constructor
 		}
 
 		void writeRow(size_t rowIndex, const Row &value) {
