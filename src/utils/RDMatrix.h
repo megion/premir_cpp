@@ -196,7 +196,7 @@ namespace utils {
 		void writeRowMove(size_t rowIndex, T&& value) {
 			std::cout << "call write moved object" << std::endl;
 			prepareWriteRow(rowIndex, 1);
-			*(matrix[rowIndex].points) = std::move(value); // should exist move constructor
+			(*(matrix[rowIndex].points)) = T(value);//std::move(value); // should exist move constructor
 		}
 
 		void writeRow(size_t rowIndex, const Row &value) {
