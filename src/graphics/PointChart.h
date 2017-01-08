@@ -56,7 +56,8 @@ namespace graphics {
             if (isFatPoint) {
                 for (size_t r = 0; r < data->getOutpoints()->getRowSize(); ++r) {
                     utils::RDMatrix<bool, xcb_point_t>::Row &outPoint = data->getOutpoints()->getRow(r);
-                    utils::CArrayList<xcb_arc_t> arcs(outPoint.pointSize, 1, outPoint.pointSize);
+                    utils::CArrayList<xcb_arc_t> arcs(outPoint.pointSize, 1);
+					arcs.setSize(outPoint.pointSize);
                     for (size_t i = 0; i < outPoint.pointSize; ++i) {
                         xcb_point_t &point = outPoint.points[i];
                         arcs[i].x = point.x - 2;

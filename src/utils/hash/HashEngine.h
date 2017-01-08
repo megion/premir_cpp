@@ -11,11 +11,13 @@ namespace utils {
         class HashEngine {
         public:
 
-            HashEngine(size_t _indexSize=DEFAULT_TABLE_SIZE) : indexSize(_indexSize),
-			doubleSizeof(sizeof(double)),
-			floatSizeof(sizeof(float)),
-			intSizeof(sizeof(int)), 
-			shortSizeof(sizeof(short)) {
+            HashEngine(size_t _indexSize=DEFAULT_TABLE_SIZE) :
+			   	indexSize(_indexSize),
+				doubleSizeof(sizeof(double)),
+				floatSizeof(sizeof(float)),
+				intSizeof(sizeof(int)), 
+				shortSizeof(sizeof(short)),
+				tSizeof(sizeof(short)) {
             }
 
             virtual size_t hashCode(const T& value) const = 0;
@@ -68,6 +70,13 @@ namespace utils {
 				return value ? 1231 : 1237;
 			}
 
+			size_t hashArray(const T* values, const size_t& len) {
+				size_t arrSizeof = len * tSizeof;
+				char temp[arrSizeof];
+				std::memcpy(temp, values, arrSizeof);
+				return hash(temp, arrSizeof);
+			}
+
 			size_t hash(const char* str, const size_t& len) const {
 				return DEKHash(str, len);
 			}
@@ -79,6 +88,7 @@ namespace utils {
 			size_t floatSizeof;	
 			size_t intSizeof;	
 			size_t shortSizeof;
+			size_t tSizeof;
 
 			/**
 			 * An algorithm proposed by Donald E. Knuth in The Art Of Computer Programming Volume 3,

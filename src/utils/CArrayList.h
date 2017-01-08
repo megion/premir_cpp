@@ -33,9 +33,10 @@ namespace utils {
                 typeSizeof(sizeof(T)), array(nullptr) {
         }
 
-        CArrayList(size_t _capacity, size_t _capacityIncrease = 1, size_t _length = 0) :
-                length(_length), capacity(_capacity), //
-                capacityIncrease(_capacityIncrease), typeSizeof(sizeof(T)) {
+        CArrayList(size_t _capacity, size_t _capacityIncrease = 1) :
+                length(0), capacity(_capacity), //
+                capacityIncrease(_capacityIncrease), typeSizeof(sizeof(T)),
+				array(nullptr) {
             if (capacity == 0) {
                 array = nullptr;
             } else {
@@ -84,6 +85,15 @@ namespace utils {
             return length;
         }
 
+		/**
+		 * sometimes need set size.
+		 * For example when array created with specified capacity 
+		 * and fill array without pushing elements
+		 */
+		void setSize(size_t size) {
+            length = size;
+        }
+
         T *getArray() const {
             return array;
         }
@@ -96,7 +106,17 @@ namespace utils {
         CArrayList<T> &operator=(const CArrayList<T> &) = delete;
 
         // = replacement operator: List l3; l3 = std::move(l2);
-        CArrayList<T> &operator=(CArrayList<T> &&) = delete; //
+        CArrayList<T> &operator=(CArrayList<T>&& list) {
+			length = list.length;
+			capacity = list.capacity;
+			capacityIncrease = list.capacityIncrease;
+			array = list.array;
+			typeSizeof = sizeof(T);
+
+            list.length = 0;
+            list.capacity = 0;
+            list.array = nullptr;
+		}	
 
         // [] index operator
         T &operator[](const size_t &index) const {
@@ -123,22 +143,6 @@ namespace utils {
         CArrayList<T> sum(const CArrayList<T> &b) {
             for (size_t i = 0; i < length; ++i) {
                 array[i] = array[i] + b.array[i];
-            }
-            return *this;
-        }
-
-        // a = b - a
-        CArrayList<T> &reverseMinus(const T *b) {
-            for (size_t i = 0; i < length; ++i) {
-                array[i] = b[i] - array[i];
-            }
-            return *this;
-        }
-
-        // * multiply operator: a = a * b
-        CArrayList<T> &multiply(const double &b) {
-            for (size_t i = 0; i < length; ++i) {
-                array[i] = array[i] * b;
             }
             return *this;
         }
@@ -188,60 +192,26 @@ namespace utils {
 
         void push(const T *values, size_t valuesSize) {
             size_t newLength = length + valuesSize;
-            if (newLength > capacity) { // need increase capacity
-                if (newLength > (capacity + capacityIncrease)) {
-                    capacity = newLength;
-                } else {
-                    capacity = capacity + capacityIncrease;
-                }
-
-                size_t amount = capacity * typeSizeof;
-                T *newArray;
-                if (array) {
-                    newArray = (T *) std::realloc(array, amount);
-                } else {
-                    newArray = (T *) std::malloc(amount);
-                }
-
-                if (newArray == NULL) {
-                    throw std::runtime_error(std::strerror(errno));
-                }
-                array = newArray;
-            }
+			size_t oldLength = length;
+			initializeArrayMemory(newLength);
 
             // copy value as bytes. Copy constructor not call.
-            T *last = array + length;
-            memcpy(last, values, valuesSize * typeSizeof);
-            length = newLength;
+            memcpy(array + oldLength, values, valuesSize * typeSizeof);
         }
 
         /**
          * Save copy values begin with specified position
          */
-        void write(size_t position, const T *values,
-                                  size_t valuesSize) {
+        void write(size_t position, const T *values,  size_t valuesSize) {
             size_t newLength = position + valuesSize;
             if (newLength > capacity) { // need increase capacity
-                capacity = newLength;
-                size_t amount = capacity * typeSizeof;
-                T *newArray;
-                if (array) {
-                    newArray = (T *) std::realloc(array, amount);
-                } else {
-                    newArray = (T *) std::malloc(amount);
-                }
-
-                if (newArray == NULL) {
-                    throw std::runtime_error(std::strerror(errno));
-                }
-                array = newArray;
+				initializeArrayMemory(newLength);
             } else if (newLength > length) { // simple update length
                 length = newLength;
             }
 
             // copy value as bytes. Copy constructor not call.
-            T *last = array + position;
-            memcpy(last, values, valuesSize * typeSizeof);
+            memcpy(array + position, values, valuesSize * typeSizeof);
         }
 
         void write(size_t position, const T &value) {
@@ -275,6 +245,29 @@ namespace utils {
         size_t typeSizeof; // saved value sizeof
         size_t capacityIncrease; // increase capacity value, default is 1
 
+		void initializeArrayMemory(size_t newSize) {
+			size_t newCapacity = 0;
+			if (newSize > (capacity + capacityIncrease)) {
+				newCapacity = newSize;
+			} else {
+				newCapacity = capacity + capacityIncrease;
+			}
+
+			size_t amount = typeSizeof * newCapacity;
+			T *newArray;
+			if (array) {
+				newArray = (T *) std::realloc(array, amount);
+			} else {
+				newArray = (T *) std::malloc(amount);
+			}
+
+			if (newArray == NULL) {
+				throw std::runtime_error(std::strerror(errno));
+			}
+			array = newArray;
+			length = newSize;
+			capacity = newCapacity;
+		}
     };
 
 }

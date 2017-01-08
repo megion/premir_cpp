@@ -36,11 +36,13 @@ namespace kohonen {
         typedef utils::ArrayUtils<double, double, double> ArrayUtils;
 
         SammonMap(long _nLen) :
-                nLen(_nLen),
-                randomEngine(new RandomGenerator()),
-                mapPoints(new utils::CArrayList<Point>(nLen, 1, nLen)),
-                correctionPoints(new utils::CArrayList<Point>(nLen)),
-                dd(new utils::CArrayList<double>(nLen * (nLen - 1) / 2)) {
+			nLen(_nLen),
+			randomEngine(new RandomGenerator()),
+			mapPoints(new utils::CArrayList<Point>(nLen, 1)),
+			correctionPoints(new utils::CArrayList<Point>(nLen)),
+			dd(new utils::CArrayList<double>(nLen * (nLen - 1) / 2)) {
+
+			mapPoints->setSize(nLen);
         }
 
         ~SammonMap() {

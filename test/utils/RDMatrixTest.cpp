@@ -3,6 +3,9 @@
 namespace test {
     namespace utils_rdmatrix {
 
+		// initialize static variable
+		common::CallInfo MyArray::callInfo = common::CallInfo();
+
         void test_push_row() {
             utils::RDMatrix<double, int> a;
 
@@ -184,17 +187,61 @@ namespace test {
             assert(ab[15].pointCapacity==19);
         }
 
-		void test_push_with_distruction_class() {
-            utils::RDMatrix<bool, WithDistruction> a;
-			WithDistruction arrObjects[3];
-			std::cout<<"3 objects array is created" << std::endl;
-		
-			a.pushRow(arrObjects, 3);
-			std::cout<<"3 object array pushed" << std::endl;
+		void move_temp_objects(utils::RDMatrix<bool, MyArray>& matrix) {
+			MyArray b;
+			matrix.pushRow(std::move(b));
+		}
 
-			WithDistruction b;
+		void test_push_moved_object() {
+			MyArray::callInfo.reset();
+			assert(MyArray::callInfo.defaultConstructorCallCount==0);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+
+            utils::RDMatrix<bool, MyArray> a;
+			a.setIsCallPointDestructorOnClear(true);
+		
+			MyArray b;
             a.writeRow(1, std::move(b));
-        }
+			assert(b.getValues()==nullptr);
+			
+			assert(MyArray::callInfo.defaultConstructorCallCount==1);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==1);
+
+			assert(MyArray::callInfo.destructorCallCount==0);
+			assert(MyArray::callInfo.destructorAndClearResourcesCallCount==0);
+
+			move_temp_objects(a);
+			move_temp_objects(a);
+			move_temp_objects(a);
+
+			assert(MyArray::callInfo.defaultConstructorCallCount==4);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==4);
+
+			assert(MyArray::callInfo.destructorCallCount==3);
+			assert(MyArray::callInfo.destructorAndClearResourcesCallCount==0);
+
+			MyArray::callInfo.reset();
+			a.removeAll();
+
+			assert(MyArray::callInfo.defaultConstructorCallCount==0);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==4);
+			assert(MyArray::callInfo.destructorAndClearResourcesCallCount==4);
+
+		}
+
         void rDMatrix_test() {
             suite("RDMatrix");
             mytest(push_row);
@@ -203,7 +250,7 @@ namespace test {
             mytest(get_row);
             mytest(append_values);
             mytest(capacity);
-			mytest(push_with_distruction_class);
+			mytest(push_moved_object);
         }
     }
 }

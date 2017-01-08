@@ -62,11 +62,12 @@ namespace utils {
 				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
 				Row &row = (*matrix)[rowIndex];
 				for (size_t i = 0; i < row.pointSize; ++i) {
-					if (row[i] == value) {
+					K& oldValue = row[i];
+					if (oldValue == value) {
 						// найдено значение с уже имеющимся ключом - exit
 						if (updater) {
 							// custom update function
-							updater->update(row[i], value, keySizeof);
+							updater->update(oldValue, value, keySizeof);
 						}
 						return false;
 					}

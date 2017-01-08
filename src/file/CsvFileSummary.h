@@ -34,13 +34,14 @@ namespace file {
     class CsvFileSummary {
     public:
 
-        CsvFileSummary(size_t colSize) {
-            summary = new utils::CArrayList<models::ColSummary>(colSize, 1, colSize);
+        CsvFileSummary(size_t _colSize): colSize(_colSize) {
+            summary = new utils::CArrayList<models::ColSummary>(colSize, 1);
         }
 
         ~CsvFileSummary() {
             delete summary;
             summary = nullptr;
+			colSize = 0;
         }
 
         /**
@@ -49,7 +50,6 @@ namespace file {
         void collectSummary(size_t rowsLimit, file::CsvFileReader *csvReader,
                             file::CsvFileRowParser<Row> *rowParser) {
             file::stream::CsvFileStreamReader<Row> reader(csvReader, rowParser);
-            size_t colSize = summary->size();
             initialization();
 
             Row row;
@@ -102,7 +102,6 @@ namespace file {
          * val = (val - min) / (max - min)
          */
         void scaleSamples(models::DataSample *samples) {
-            size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary &colSummary = (*summary)[i];
                 if (colSummary.isSkip()) {
@@ -122,7 +121,6 @@ namespace file {
 
         // TODO need redevelop
         void skipEmptyColSamples(models::DataSample *samples) {
-            size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary &colSummary = (*summary)[i];
                 if (colSummary.isSkip()) {
@@ -135,7 +133,6 @@ namespace file {
         void writeSummary(const char *filename) {
             file::CsvFileWriter writer(filename);
 
-            size_t colSize = summary->size();
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary &colSummary = (*summary)[i];
                 writer.write(colSummary.average);
@@ -156,7 +153,6 @@ namespace file {
             initialization();
             models::ColSummary row;
             size_t col = 0;
-            size_t colSize = summary->size();
             while ((col < colSize) && dataReader.readNext((*summary)[col], nullptr)) {
                 col++;
             }
@@ -165,9 +161,9 @@ namespace file {
 
     private:
         utils::CArrayList<models::ColSummary> *summary;
+		size_t colSize;
 
         void initialization() {
-            size_t colSize = summary->size();
             double min = -std::numeric_limits<double>::max();
             double max = std::numeric_limits<double>::max();
             // initialization

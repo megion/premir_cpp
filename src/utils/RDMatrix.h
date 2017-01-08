@@ -34,14 +34,14 @@ namespace utils {
 		RDMatrix() :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1), matrix(nullptr),
 			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallItemDestructorOnClear(false) 	{
+			isCallPointDestructorOnClear(false) 	{
 		}
 
 		RDMatrix(size_t _rowSize, size_t _rowCapacityIncrease, size_t _pointCapacityIncrease) :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(_rowCapacityIncrease),
 		   	pointCapacityIncrease(_pointCapacityIncrease), matrix(nullptr), tTypeSizeof(sizeof(T)),
 		   	rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallItemDestructorOnClear(false)	{
+			isCallPointDestructorOnClear(false)	{
 
 			initializeRowMemory(_rowSize);
 		}
@@ -49,7 +49,7 @@ namespace utils {
 		RDMatrix(size_t _rowSize, size_t _pointSize) :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1),	matrix(nullptr),
 			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallItemDestructorOnClear(false)	{
+			isCallPointDestructorOnClear(false)	{
 
 			initializeRowMemory(_rowSize);
 			for (size_t r = 0; r < rowSize; ++r) {
@@ -73,8 +73,8 @@ namespace utils {
 			pointCapacityIncrease = _pointCapacityIncrease;
 		}
 
-		void setIsCallItemDestructorOnClear(bool _isCallItemDestructorOnClear) {
-			isCallItemDestructorOnClear = _isCallItemDestructorOnClear;
+		void setIsCallPointDestructorOnClear(bool _isCallPointDestructorOnClear) {
+			isCallPointDestructorOnClear = _isCallPointDestructorOnClear;
 		}
 
 		void removeAll() {
@@ -83,7 +83,7 @@ namespace utils {
 				for (size_t r = 0; r < rowCapacity; ++r) {
 					Row& row = matrix[r];
 					if (row.points) {
-						if (isCallItemDestructorOnClear) {
+						if (isCallPointDestructorOnClear) {
 							for (size_t p = 0; p < row.pointSize; p++) {
 								// call destructor for each object
 								(row.points[p]).~T();
@@ -190,11 +190,10 @@ namespace utils {
 		/**
 		 * write moved object.
 		 * For example it may be used for store object which contains dynamic allocated resources.
-		 * If you will push moved object then set isCallItemDestructorOnClear=true for 
+		 * If you will push moved object then set isCallPointDestructorOnClear=true for 
 		 * auto call destructor on each object when matrix removed 
 		 */
 		void writeRow(size_t rowIndex, T&& value) {
-			std::cout << "call write moved object" << std::endl;
 			prepareWriteRow(rowIndex, 1);
 			(*(matrix[rowIndex].points)) = std::move(value); // should exist move assignment operator
 		}
@@ -211,6 +210,14 @@ namespace utils {
 
 		void pushRow(const T* points, size_t pointSize) {
 			writeRow(rowSize, points, pointSize);
+		}
+
+		void pushRow(const T& value) {
+			writeRow(rowSize, value);
+		}
+
+		void pushRow(T&& value) {
+			writeRow(rowSize, std::move(value));
 		}
 
 		/**
@@ -233,6 +240,27 @@ namespace utils {
 			} else {
 				// добавить новую строку
 				writeRow(rowIndex, arr, arrSize);
+			}
+		}
+
+		void writeToEndRow(size_t rowIndex, T&& value) {
+			if (rowIndex < rowSize) {
+				Row& row = matrix[rowIndex];
+				// добавим значения в конец существующей строки
+				size_t oldPointSize = row.pointSize;
+				size_t newPointSize = oldPointSize + 1;
+
+				// re-initialize points memory
+				if (row.pointCapacity < newPointSize) {
+					initializePointsMemory(row, newPointSize);
+				} else {
+					row.pointSize = newPointSize;
+				}
+
+				(*(row.points + oldPointSize)) = std::move(value); // should exist move assignment operator
+			} else {
+				// добавить новую строку
+				writeRow(rowIndex, std::move(value));
 			}
 		}
 
@@ -266,7 +294,7 @@ namespace utils {
 		 * flag for call destructor for each element T in removeAll method
 		 * removeAll method also call in destructor RDMatrix 
 		 */
-		bool isCallItemDestructorOnClear;
+		bool isCallPointDestructorOnClear;
 
 		void initializeRowMemory(size_t newRowSize) {
 			size_t newRowCapacity = 0;
@@ -326,11 +354,12 @@ namespace utils {
 
 		void prepareWriteRow(size_t rowIndex, size_t pointSize) {
 			if (rowIndex < rowCapacity) {
-				if (matrix[rowIndex].pointCapacity < pointSize) {
+				Row& row = matrix[rowIndex];
+				if (row.pointCapacity < pointSize) {
 					// re-initialize points memory
-					initializePointsMemory(matrix[rowIndex], pointSize);
-				} else {
-					matrix[rowIndex].pointSize = pointSize;
+					initializePointsMemory(row, pointSize);
+				} else {	
+					row.pointSize = pointSize;
 				}
 				if (rowIndex >= rowSize) {
 					rowSize = rowIndex + 1;
