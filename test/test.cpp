@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 
 
     linkedList_test();
-    cArrayList_test();
+	test::utils_carray_list::cArrayList_test();
     cMatrix_test();
     test::utils_arrayutils::arrayutils_test();
     test::utils_smatrix::sMatrix_test();
