@@ -14,15 +14,11 @@
 namespace utils {
 
 /**
- * Реализация списка в виде массива, которая предназначена для использования
- * только с простыми типами: int, double, и др. а также с простыми структурами
- * или даже классами. Простыми в данном случае называем такие типы которые
- * внутри семя не выделяют динамическую память и не освобождают ее
- * (new и delete).
- * Такое требование к типам хранимых данных определяется тем, что реализация
- * использует для выделения динамической памяти C функции malloc и realloc,
- * а для ее освобождения free.
- * Класс сконструирован исключительно в интересах производительности.
+ * Array list has methods for store simple value:
+ * void push(const T *values, size_t valuesSize)
+ *
+ * for store object contains dynamical allocated resources use:
+ * void push(T&& value)
  */
     template<typename T>
     class CArrayList {
@@ -83,6 +79,10 @@ namespace utils {
 
         size_t size() const {
             return length;
+        }
+
+        size_t getCapacity() const {
+            return capacity;
         }
 
 		/**
@@ -192,11 +192,20 @@ namespace utils {
 
         void push(const T *values, size_t valuesSize) {
             size_t newLength = length + valuesSize;
-			size_t oldLength = length;
+			size_t oldLength = length; // save old length because initializeArrayMemory will change it
 			initializeArrayMemory(newLength);
-
             // copy value as bytes. Copy constructor not call.
             memcpy(array + oldLength, values, valuesSize * typeSizeof);
+        }
+
+		/**
+		 * insert moved object
+		 */
+        void push(T&& value) {
+            size_t newLength = length + 1;
+			size_t oldLength = length; // save old length because initializeArrayMemory will change it
+			initializeArrayMemory(newLength);
+			(*(array + oldLength)) = std::move(value); // should exist move assignment operator
         }
 
         /**
@@ -204,11 +213,7 @@ namespace utils {
          */
         void write(size_t position, const T *values,  size_t valuesSize) {
             size_t newLength = position + valuesSize;
-            if (newLength > capacity) { // need increase capacity
-				initializeArrayMemory(newLength);
-            } else if (newLength > length) { // simple update length
-                length = newLength;
-            }
+			initializeArrayMemory(newLength);
 
             // copy value as bytes. Copy constructor not call.
             memcpy(array + position, values, valuesSize * typeSizeof);
@@ -216,6 +221,16 @@ namespace utils {
 
         void write(size_t position, const T &value) {
             write(position, &value, 1);
+        }
+		
+		/**
+         * Save moved values begin with specified position
+         */
+        void write(size_t position, T&& value) {
+            size_t newLength = position + 1;
+			initializeArrayMemory(newLength);
+
+			(*(array + position)) = std::move(value); // should exist move assignment operator
         }
 
         /**
@@ -246,27 +261,29 @@ namespace utils {
         size_t capacityIncrease; // increase capacity value, default is 1
 
 		void initializeArrayMemory(size_t newSize) {
-			size_t newCapacity = 0;
-			if (newSize > (capacity + capacityIncrease)) {
-				newCapacity = newSize;
-			} else {
-				newCapacity = capacity + capacityIncrease;
-			}
+			if (newSize > capacity) { // need increase capacity
+				size_t newCapacity = 0;
+				if (newSize > (capacity + capacityIncrease)) {
+					newCapacity = newSize;
+				} else {
+					newCapacity = capacity + capacityIncrease;
+				}
 
-			size_t amount = typeSizeof * newCapacity;
-			T *newArray;
-			if (array) {
-				newArray = (T *) std::realloc(array, amount);
-			} else {
-				newArray = (T *) std::malloc(amount);
-			}
+				size_t amount = typeSizeof * newCapacity;
+				T *newArray;
+				if (array) {
+					newArray = (T *) std::realloc(array, amount);
+				} else {
+					newArray = (T *) std::malloc(amount);
+				}
 
-			if (newArray == NULL) {
-				throw std::runtime_error(std::strerror(errno));
-			}
-			array = newArray;
-			length = newSize;
-			capacity = newCapacity;
+				if (newArray == NULL) {
+					throw std::runtime_error(std::strerror(errno));
+				}
+				array = newArray;
+				length = newSize;
+				capacity = newCapacity;
+			} 
 		}
     };
 

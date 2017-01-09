@@ -2,8 +2,13 @@
 
 namespace test {
 	namespace utils_carray_list {
+		
+
+		// initialize static variable
+		common::CallInfo Foo2::callInfo = common::CallInfo();
 
 		void test_push() {
+			Foo2::callInfo.reset();
 			utils::CArrayList<Foo2> list;
 			Foo2 f = Foo2('1', 2);
 			list.push(f);
@@ -47,10 +52,32 @@ namespace test {
 			assert(copyList[0].id == 2); // check no changes in copy
 		}
 
+		void test_capacity_increase() {
+			utils::CArrayList<int> list(3, 5);
+			assert(list.getCapacity()==3);
+			assert(list.size()==0);
+
+			int arr[] = {0,1,2,3,4,5};
+			list.push(arr, 6);
+			assert(list.getCapacity()==8);
+			assert(list.size()==6);
+
+			list.push(arr, 3);
+			assert(list.getCapacity()==13);
+			assert(list.size()==9);
+
+			list.push(arr, 4);
+			std::cout << "list.getCapacity " << list.getCapacity() << std::endl;
+			std::cout << "list.size " << list.size() << std::endl;
+			assert(list.getCapacity()==13);
+			assert(list.size()==13);
+		}
+
 		void cArrayList_test() {
 			suite("CArrayList");
 			mytest(push);
 			mytest(copy_constructor);
+			mytest(capacity_increase);
 		}
 	}
 }

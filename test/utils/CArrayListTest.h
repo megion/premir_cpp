@@ -13,6 +13,9 @@ namespace test {
 		void cArrayList_test();
 
 		struct Foo2 {
+
+			static common::CallInfo callInfo;
+
 			char ch;
 			int id;
 
@@ -26,6 +29,14 @@ namespace test {
 
 			Foo2(char _ch, int _id) : ch(_ch), id(_id) {
 				//		std::cout << "Foo2: Run init constructor" << std::endl;
+			}
+
+			Foo2 &operator=(Foo2&& other) {
+				ch = other.ch;
+				id = other.id;
+				Foo2::callInfo.moveOperatorCallCount++;
+				//std::cout << "Call move = operator "<< std::endl;
+				return *this;
 			}
 		};
 	}
