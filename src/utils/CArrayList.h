@@ -192,10 +192,10 @@ namespace utils {
 
         void push(const T *values, size_t valuesSize) {
             size_t newLength = length + valuesSize;
-			size_t oldLength = length; // save old length because initializeArrayMemory will change it
 			initializeArrayMemory(newLength);
             // copy value as bytes. Copy constructor not call.
-            memcpy(array + oldLength, values, valuesSize * typeSizeof);
+            memcpy(array + length, values, valuesSize * typeSizeof);
+			length = newLength;
         }
 
 		/**
@@ -203,9 +203,9 @@ namespace utils {
 		 */
         void push(T&& value) {
             size_t newLength = length + 1;
-			size_t oldLength = length; // save old length because initializeArrayMemory will change it
 			initializeArrayMemory(newLength);
-			(*(array + oldLength)) = std::move(value); // should exist move assignment operator
+			(*(array + length)) = std::move(value); // should exist move assignment operator
+			length = newLength;
         }
 
         /**
@@ -281,7 +281,6 @@ namespace utils {
 					throw std::runtime_error(std::strerror(errno));
 				}
 				array = newArray;
-				length = newSize;
 				capacity = newCapacity;
 			} 
 		}

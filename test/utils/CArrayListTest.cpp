@@ -54,6 +54,7 @@ namespace test {
 
 		void test_capacity_increase() {
 			utils::CArrayList<int> list(3, 5);
+			//utils::CArrayList
 			assert(list.getCapacity()==3);
 			assert(list.size()==0);
 
@@ -67,8 +68,6 @@ namespace test {
 			assert(list.size()==9);
 
 			list.push(arr, 4);
-			std::cout << "list.getCapacity " << list.getCapacity() << std::endl;
-			std::cout << "list.size " << list.size() << std::endl;
 			assert(list.getCapacity()==13);
 			assert(list.size()==13);
 		}

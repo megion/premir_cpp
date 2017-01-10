@@ -17,7 +17,7 @@ namespace utils {
 				floatSizeof(sizeof(float)),
 				intSizeof(sizeof(int)), 
 				shortSizeof(sizeof(short)),
-				tSizeof(sizeof(short)) {
+				tSizeof(sizeof(T)) {
             }
 
             virtual size_t hashCode(const T& value) const = 0;

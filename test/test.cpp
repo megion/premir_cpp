@@ -1,4 +1,3 @@
-#include <HashSetTest.h>
 #include "utils/LinkedListTest.h"
 #include "utils/CArrayListTest.h"
 #include "utils/CMatrixTest.h"
@@ -6,6 +5,8 @@
 #include "utils/RMatrixTest.h"
 #include "utils/RDMatrixTest.h"
 #include "utils/R3DMatrixTest.h"
+#include "utils/HashEngineTest.h"
+#include "utils/HashSetTest.h"
 #include "utils/HashMapTest.h"
 #include "utils/HashMapArrayTest.h"
 #include "utils/ArrayUtilsTest.h"
@@ -36,6 +37,7 @@ int main(int argc, char **argv) {
     test::utils_rmatrix::rMatrix_test();
     test::utils_rdmatrix::rDMatrix_test();
     test::utils_r3dmatrix::r3DMatrix_test();
+	test::utils_hash_engine::hashEngine_test();
     test::utils_hash_map::hashMap_test();
     test::utils_hash_map_array::hashMapArray_test();
     test::utils_intBitSet::intBitSet_test();
