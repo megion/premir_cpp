@@ -6,7 +6,7 @@
 
 #include "test.h"
 #include "utils/HashMap.h"
-#include "utils/hash/StringHash.h"
+#include "utils/hash/HashEngine.h"
 
 namespace test {
 	namespace utils_hash_map {
@@ -43,14 +43,11 @@ namespace test {
 
 		class MyStringKeyHash: public utils::hash::HashEngine<MyStringKey> {
 		public:
-			MyStringKeyHash() :
-					stringHash(utils::hash::StringHash<const char*>()) {
+			MyStringKeyHash() {
 			}
-			size_t hashCode(const MyStringKey &value) const {
-				return stringHash.hashCode(value.label);
+			size_t hash(const MyStringKey& value) const {
+				return hash(value.label, value.length);
 			}
-		private:
-			utils::hash::StringHash<const char*> stringHash;
 		};
 
 		class MyValueUpdater: public utils::ValueUpdater<MyValue> {

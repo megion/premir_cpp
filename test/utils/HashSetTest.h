@@ -5,8 +5,7 @@
 
 #include "test.h"
 #include "utils/HashSet.h"
-#include "utils/hash/StringHash.h"
-#include "utils/hash/NumberHash.h"
+#include "utils/hash/HashEngine.h"
 
 #include "utils/HashMapArrayTest.h"
 

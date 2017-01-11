@@ -11,7 +11,7 @@
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
-#include "utils/hash/StringHash.h"
+#include "utils/hash/HashEngine.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/DefaultWinnerDistance.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
@@ -76,13 +76,11 @@ namespace test {
 
         class DemoStringKeyHash : public utils::hash::HashEngine<DemoStringKey> {
         public:
-            DemoStringKeyHash() : stringHash(utils::hash::StringHash<const char*>()) {
+            DemoStringKeyHash() {
             }
-            size_t hashCode(const DemoStringKey &value) const {
-                return stringHash.hashCode(value.label);
+            size_t hash(const DemoStringKey& value) const {
+                return hash(value.label, value.length);
             }
-        private:
-            utils::hash::StringHash<const char*> stringHash;
         };
 
         struct DemoInRowFts {

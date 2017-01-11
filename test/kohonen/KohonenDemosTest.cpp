@@ -85,7 +85,7 @@ namespace test {
             kohonen::SomTrainer<DemoInRow> trainer(&alphaFunc, &winnerSearcher, &neiAdap, alpha, radius, xdim, ydim);
 
             // init labeling
-            utils::hash::CharHash cHash;
+            utils::hash::HashEngine<char> cHash(255);
             kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
 
             //
@@ -207,7 +207,7 @@ namespace test {
             kohonen::SomTrainer<DemoInRow> trainer(&alphaFunc, &winnerSearcher, &gausAdap, alpha, radius, xdim, ydim);
 
             // init labeling
-            utils::hash::CharHash cHash;
+            utils::hash::HashEngine<char> cHash(255);
             kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
 
             //

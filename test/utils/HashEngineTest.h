@@ -4,8 +4,7 @@
 #include <iostream>
 
 #include "test.h"
-#include "utils/hash/StringHash.h"
-#include "utils/hash/NumberHash.h"
+#include "utils/hash/HashEngine.h"
 #include "utils/hash/ArrayListHash.h"
 
 #include "graphics/ChartThread.h"

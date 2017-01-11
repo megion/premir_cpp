@@ -15,12 +15,12 @@ namespace utils {
 			   	indexSize(_indexSize),
 				doubleSizeof(sizeof(double)),
 				floatSizeof(sizeof(float)),
-				intSizeof(sizeof(int)), 
-				shortSizeof(sizeof(short)),
 				tSizeof(sizeof(T)) {
             }
 
-            virtual size_t hashCode(const T& value) const = 0;
+            size_t hashCode(const T& value) const {
+			   return hash(value)%indexSize;
+			}	   
 
             void setIndexSize(size_t _indexSize) {
                 indexSize = _indexSize;
@@ -48,34 +48,39 @@ namespace utils {
 			 * int 
 			 */
 			size_t hash(const int& value) const {
-				char temp[intSizeof];
-				std::memcpy(temp, &value, intSizeof);
-				return hash(temp, intSizeof);
+				// simple cast to size_t type
+				return (size_t)value;
 			}
 
 			/**
 			 * short 
 			 */
 			size_t hash(const short& value) const {
-				char temp[shortSizeof];
-				std::memcpy(temp, &value, shortSizeof);
-				return hash(temp, shortSizeof);
+				// simple cast to size_t type
+				return (size_t)value;
+			}
+
+			/**
+			 * char 
+			 */
+			size_t hash(const char& value) const {
+				// simple cast to size_t type
+				return (size_t)value;
 			}
 
 			/**
 			 * bool 
 			 */
 			size_t hash(const bool& value) const {
-				// like java jdk
-				return value ? 1231 : 1237;
+				return value ? 1 : 0;
 			}
 
-			size_t hashArray(const T* values, const size_t& len) {
-				size_t arrSizeof = len * tSizeof;
-				char temp[arrSizeof];
-				std::memcpy(temp, values, arrSizeof);
-				return hash(temp, arrSizeof);
-			}
+			//size_t hashArray(const T* values, const size_t& len) {
+				//size_t arrSizeof = len * tSizeof;
+				//char temp[arrSizeof];
+				//std::memcpy(temp, values, arrSizeof);
+				//return hash(temp, arrSizeof);
+			//}
 
 			size_t hash(const char* str, const size_t& len) const {
 				return DEKHash(str, len);
@@ -86,8 +91,6 @@ namespace utils {
 
 			size_t doubleSizeof;
 			size_t floatSizeof;	
-			size_t intSizeof;	
-			size_t shortSizeof;
 			size_t tSizeof;
 
 			/**

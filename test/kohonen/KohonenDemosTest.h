@@ -12,7 +12,7 @@
 #include "file/stream/CsvFileStreamReader.h"
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
-#include "utils/hash/StringHash.h"
+#include "utils/hash/HashEngine.h"
 
 #include "kohonen/NetworkInitializer.h"
 #include "kohonen/RandomGenerator.h"

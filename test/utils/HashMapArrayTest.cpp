@@ -4,7 +4,7 @@ namespace test {
     namespace utils_hash_map_array {
 
         void test_push_value() {
-            utils::hash::CharHash shash;
+            utils::hash::HashEngine<char> shash;
             shash.setIndexSize(6);
             utils::HashMapArray<char, int> a(10, &shash);
 

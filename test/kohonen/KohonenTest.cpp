@@ -305,7 +305,7 @@ namespace test {
             size_t xdim = 10;
             size_t ydim = 10;
 
-            utils::hash::CharHash cHash;
+            utils::hash::HashEngine<char> cHash(255);
             kohonen::labeling::SomLabeling<char> somLabeling(xdim, ydim, &cHash);
             char labelA = 'A';
             somLabeling.addWinner(2, labelA);

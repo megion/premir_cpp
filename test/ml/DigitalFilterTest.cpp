@@ -73,7 +73,7 @@ namespace test {
         }
 
         void test_entropy_charts() {
-            utils::hash::CharHash shash;
+            utils::hash::HashEngine<char> shash;
             shash.setIndexSize(6);
 
             graphics::PointChart entropyChart(true, 710, 460);
@@ -120,7 +120,7 @@ namespace test {
 
         void decision_tree_test() {
             suite("Decision tree");
-//			mytest(entropy_charts);
+			mytest(entropy_charts);
             mytest(build_tree);
 
         }

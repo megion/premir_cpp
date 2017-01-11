@@ -8,7 +8,7 @@
 #include "utils/HashMapTest.h"
 
 #include "utils/HashMapArray.h"
-#include "utils/hash/StringHash.h"
+#include "utils/hash/HashEngine.h"
 
 namespace test {
     namespace utils_hash_map_array {
