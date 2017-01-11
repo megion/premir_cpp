@@ -18,6 +18,8 @@ namespace utils {
 				tSizeof(sizeof(T)) {
             }
 
+			virtual size_t hash(const T& value) const = 0;
+
             size_t hashCode(const T& value) const {
 			   return hash(value)%indexSize;
 			}	   

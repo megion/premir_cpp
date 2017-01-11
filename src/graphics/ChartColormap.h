@@ -39,9 +39,8 @@ namespace graphics {
     public:
         ColorHash() {
         }
-        size_t hashCode(const Color &value) const {
-            size_t h = value.r + value.g + value.b;
-            return h%utils::hash::HashEngine<Color>::indexSize;
+        size_t hash(const Color &value) const {
+            return (size_t)(value.r + value.g + value.b);
         }
     };
 

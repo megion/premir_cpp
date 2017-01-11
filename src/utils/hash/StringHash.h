@@ -13,31 +13,31 @@
 namespace utils {
     namespace hash {
 
-        template<typename T>
-        class StringHash : public HashEngine<T> {
-        public:
-            StringHash() : HashEngine<T>::HashEngine() {
-            }
+        //template<typename T>
+        //class StringHash : public HashEngine<T> {
+        //public:
+            //StringHash() : HashEngine<T>::HashEngine() {
+            //}
 
-            size_t hashCode(const T &value) const {
-                size_t h = 0, a = 127, index = 0;
-                for (; *(value + index) != 0; ++index) {
-                    h = (a * h + *(value + index)) % HashEngine<T>::indexSize;
-                }
-                return h;
-            }
-        };
+            //size_t hashCode(const T &value) const {
+                //size_t h = 0, a = 127, index = 0;
+                //for (; *(value + index) != 0; ++index) {
+                    //h = (a * h + *(value + index)) % HashEngine<T>::indexSize;
+                //}
+                //return h;
+            //}
+        //};
 
 
-        class CharHash : public HashEngine<char> {
-        public:
-            CharHash() : HashEngine<char>::HashEngine(255) {
-            }
+        //class CharHash : public HashEngine<char> {
+        //public:
+            //CharHash() : HashEngine<char>::HashEngine(255) {
+            //}
 
-            size_t hashCode(const char &value) const {
-                return value % HashEngine<char>::indexSize;
-            }
-        };
+            //size_t hashCode(const char &value) const {
+                //return value % HashEngine<char>::indexSize;
+            //}
+        //};
     }
 }
 
