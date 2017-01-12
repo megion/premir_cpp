@@ -72,7 +72,7 @@ namespace utils {
         }
 
         bool pushValue(size_t rowIndex, const K &key, const V &value, const ValueUpdater<V>* updater = nullptr) {
-            size_t colIndex = hashEngine->hashCode(key);
+            size_t colIndex = hashEngine->hashIndex(key);
             Entry<K, V> entry = {key, value};
 
             if (rowIndex < matrix->getRowSize()) {
@@ -109,7 +109,7 @@ namespace utils {
 
         V* getValue(size_t rowIndex, const K &key) {
             if (rowIndex < matrix->getRowSize()) {
-                size_t colIndex = hashEngine->hashCode(key);
+                size_t colIndex = hashEngine->hashIndex(key);
                 if (colIndex < (*matrix)[rowIndex].cellSize) {
                     // пройти по точкам с одинаковым хэшкодом (значения коллизий)
                     Cell& cell = (*matrix)[rowIndex][colIndex];

@@ -57,7 +57,7 @@ namespace utils {
         }
 
         bool pushValue(const K &key, const V &value, const ValueUpdater<V> *updater = nullptr) {
-            size_t rowIndex = hashEngine->hashCode(key);
+            size_t rowIndex = hashEngine->hashIndex(key);
             Entry<K, V> entry = {key, value};
 
             if (rowIndex < matrix->getRowSize()) {
@@ -87,7 +87,7 @@ namespace utils {
         }
 
         V *getValue(const K &key) {
-            size_t rowIndex = hashEngine->hashCode(key);
+            size_t rowIndex = hashEngine->hashIndex(key);
             if (rowIndex < matrix->getRowSize()) {
                 // пройти по точкам с одинаковым хэшкодом (значения коллизий)
                 Row &row = (*matrix)[rowIndex];

@@ -46,7 +46,7 @@ namespace test {
 			MyStringKeyHash() {
 			}
 			size_t hash(const MyStringKey& value) const {
-				return utils::hash::HashEngine<MyStringKey>::hash(value.label, value.length);
+				return utils::hash::HashEngine<MyStringKey>::charsHash(value.label, value.length);
 			}
 		};
 

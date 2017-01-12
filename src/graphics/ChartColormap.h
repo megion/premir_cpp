@@ -39,7 +39,9 @@ namespace graphics {
     public:
         ColorHash() {
         }
-        size_t hash(const Color &value) const {
+
+	protected:
+        size_t hashCode(const Color &value) const {
             return (size_t)(value.r + value.g + value.b);
         }
     };

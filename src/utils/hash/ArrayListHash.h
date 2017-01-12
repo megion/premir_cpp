@@ -22,9 +22,8 @@ namespace utils {
             ArrayListHash() : HashEngine<List>::HashEngine() {
             }
 
-            size_t hash(const List& value) const {
-				//size_t code = hashArray(value.getArray(), value.size());
-                //return code % HashEngine<List>::indexSize;
+		protected:
+            size_t hashCode(const List& value) const {
 				return 0;
             }
 

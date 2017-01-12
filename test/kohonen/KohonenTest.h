@@ -79,7 +79,7 @@ namespace test {
             DemoStringKeyHash() {
             }
             size_t hash(const DemoStringKey& value) const {
-                return hash(value.label, value.length);
+                return utils::hash::HashEngine<DemoStringKey>::charsHash(value.label, value.length);
             }
         };
 

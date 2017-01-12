@@ -56,7 +56,7 @@ namespace utils {
 		}
 
 		bool push(const K &value, const ValueUpdater<K> *updater = nullptr) {
-			size_t rowIndex = hashEngine->hashCode(value);
+			size_t rowIndex = hashEngine->hashIndex(value);
 
 			if (rowIndex < matrix->getRowSize()) {
 				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
@@ -82,7 +82,7 @@ namespace utils {
 		}
 
 		bool contains(const K &value) {
-			size_t rowIndex = hashEngine->hashCode(value);
+			size_t rowIndex = hashEngine->hashIndex(value);
 			if (rowIndex < matrix->getRowSize()) {
 				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
 				Row &row = (*matrix)[rowIndex];
@@ -98,7 +98,7 @@ namespace utils {
 		}
 
 		K *getValue(const K &value) {
-			size_t rowIndex = hashEngine->hashCode(value);
+			size_t rowIndex = hashEngine->hashIndex(value);
 			if (rowIndex < matrix->getRowSize()) {
 				Row &row = (*matrix)[rowIndex];
 				for (size_t i = 0; i < row.pointSize; ++i) {
