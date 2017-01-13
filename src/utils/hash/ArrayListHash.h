@@ -19,13 +19,23 @@ namespace utils {
         public:
 			typedef typename utils::CArrayList<T> List;
 
-            ArrayListHash() : HashEngine<List>::HashEngine() {
+            ArrayListHash(HashEngine<T> *_elementArrayHashEngine) :
+			   	HashEngine<List>::HashEngine(),
+				elementArrayHashEngine(_elementArrayHashEngine) {
             }
 
 		protected:
             size_t hashCode(const List& value) const {
+				// java ArrayList hashCode
+				//int hashCode = 1;
+				//for (E e : this)
+					//hashCode = 31*hashCode + (e==null ? 0 : e.hashCode());
+				//return hashCode;
 				return 0;
             }
+
+		private:
+			HashEngine<T> *elementArrayHashEngine;
 
         };
     }
