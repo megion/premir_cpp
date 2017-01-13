@@ -12,6 +12,7 @@
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
 #include "utils/hash/HashEngine.h"
+#include "utils/hash/CharHash.h"
 #include "kohonen/RandomGenerator.h"
 #include "kohonen/winner/DefaultWinnerDistance.h"
 #include "kohonen/winner/EuclideanWinnerSearch.h"
@@ -78,7 +79,8 @@ namespace test {
         public:
             DemoStringKeyHash() {
             }
-            size_t hash(const DemoStringKey& value) const {
+		protected:
+            size_t hashCode(const DemoStringKey& value) const {
                 return utils::hash::HashEngine<DemoStringKey>::charsHash(value.label, value.length);
             }
         };

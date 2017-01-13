@@ -7,6 +7,7 @@
 #include "test.h"
 #include "utils/HashMap.h"
 #include "utils/hash/HashEngine.h"
+#include "utils/hash/CharHash.h"
 
 namespace test {
 	namespace utils_hash_map {
@@ -45,7 +46,8 @@ namespace test {
 		public:
 			MyStringKeyHash() {
 			}
-			size_t hash(const MyStringKey& value) const {
+		protected:
+			size_t hashCode(const MyStringKey& value) const {
 				return utils::hash::HashEngine<MyStringKey>::charsHash(value.label, value.length);
 			}
 		};

@@ -17,6 +17,8 @@ namespace utils {
 			CharHash() : HashEngine<char>::HashEngine(255) {
 			}
 
+			CharHash(size_t _indexSize) : HashEngine<char>::HashEngine(_indexSize) {
+			}
 		protected:
 			size_t hashCode(const char &value) const {
 				// simple cast to size_t type

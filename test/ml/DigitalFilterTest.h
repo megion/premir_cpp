@@ -10,7 +10,7 @@
 #include "ml/DigitalFilter.h"
 #include "ml/decisiontree/DecisionTree.h"
 #include "ml/Entropy.h"
-#include "utils/hash/HashEngine.h"
+#include "utils/hash/CharHash.h"
 
 #include "test.h"
 

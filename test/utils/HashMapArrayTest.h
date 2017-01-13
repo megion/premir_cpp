@@ -9,6 +9,7 @@
 
 #include "utils/HashMapArray.h"
 #include "utils/hash/HashEngine.h"
+#include "utils/hash/CharHash.h"
 
 namespace test {
     namespace utils_hash_map_array {
