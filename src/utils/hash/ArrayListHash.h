@@ -53,12 +53,16 @@ namespace utils {
             ArrayListSimpleTypeHash() : HashEngine<List>::HashEngine() {
 				if (typeid(T)==typeid(int)) {
 				}
+
 				if (typeid(T)==typeid(size_t)) {
+				}
+				if (typeid(T)==typeid(long)) {
 				}
             }
 
 		protected:
             size_t hashCode(const List& value) const {
+				// use DEKHash here
 				return 0;
             }
 
