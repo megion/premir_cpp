@@ -28,11 +28,11 @@ namespace utils {
 		protected:
             size_t hashCode(const List& value) const {
 				// java ArrayList hashCode
-				//int hashCode = 1;
-				//for (E e : this)
-					//hashCode = 31*hashCode + (e==null ? 0 : e.hashCode());
-				//return hashCode;
-				return 0;
+				size_t hash = 1;
+				for (size_t i = 0; i<value.size(); i++) {
+					hash = 31*hash + elementArrayHashEngine->hashIndex(value[i]);
+				}
+				return hash;
             }
 
 		private:
@@ -54,6 +54,8 @@ namespace utils {
 				if (typeid(T)==typeid(int)) {
 				}
 				if (typeid(T)==typeid(size_t)) {
+				}
+				if (typeid(T)==typeid(short)) {
 				}
             }
 
