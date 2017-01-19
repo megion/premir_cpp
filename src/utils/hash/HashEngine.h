@@ -7,6 +7,21 @@
 namespace utils {
     namespace hash {
 
+		/**
+		 * An algorithm proposed by Donald E. Knuth in The Art Of Computer Programming Volume 3,
+		 * under the topic of sorting and search chapter 6.4.
+		 * Function is template for simple type:
+		 * char, int, short, float, double, size_t and etc.
+		 */
+        template<typename T>
+		size_t DEKHash(const T* str, const size_t& len) {
+			size_t hash = len;
+			for(size_t i = 0; i < len; str++, i++) {
+				hash = ((hash << 5) ^ (hash >> 27)) ^ (*str);
+			}
+			return hash;
+		}
+		
         template<typename T>
         class HashEngine {
         public:
@@ -20,7 +35,7 @@ namespace utils {
             }
 
 			size_t charsHash(const char* str, const size_t& len) const {
-				return DEKHash(str, len);
+				return DEKHash<char>(str, len);
 			}
 
             size_t hashIndex(const T& value) const {
@@ -32,24 +47,13 @@ namespace utils {
 
 			virtual size_t hashCode(const T& value) const = 0;
 
-			/**
-			 * An algorithm proposed by Donald E. Knuth in The Art Of Computer Programming Volume 3,
-			 * under the topic of sorting and search chapter 6.4.
-			 */
-			size_t DEKHash(const char* str, const size_t& len) const {
-				size_t hash = len;
-				for(size_t i = 0; i < len; str++, i++) {
-					hash = ((hash << 5) ^ (hash >> 27)) ^ (*str);
-				}
-				return hash;
-			}
-			
         public:
             // наилучшее случайное распределние занений хэш функции получается,
             // если размер таблицы индексов равен простому числу
             const static size_t DEFAULT_TABLE_SIZE = 1021;
 
         };
+
     }
 }
 

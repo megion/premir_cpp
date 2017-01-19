@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <typeinfo>
 
+#include "utils/console_colors.h"
 #include "utils/hash/HashEngine.h"
 #include "utils/CArrayList.h"
 
@@ -43,7 +44,7 @@ namespace utils {
 		/**
 		 * Hash code for type array of simple type.
 		 * Use only for simple type (char, int, short, double and etc.) 
-		 * because for Class or struct it may calculate different hash for same objects 
+		 * It is very fast implementations
 		 */
 		template<typename T>
         class ArrayListSimpleTypeHash : public HashEngine<typename utils::CArrayList<T>> {
@@ -51,19 +52,29 @@ namespace utils {
 			typedef typename utils::CArrayList<T> List;
 
             ArrayListSimpleTypeHash() : HashEngine<List>::HashEngine() {
+				checkType();	
+            }
+
+			ArrayListSimpleTypeHash(size_t _indexSize) : HashEngine<List>::HashEngine(_indexSize) {
+				checkType();
+			}
+
+		protected:
+            size_t hashCode(const List& value) const {
+				// use DEKHash here
+				return DEKHash<T>(value.getArray(), value.size());
+            }
+
+		private:
+			void checkType() const {
+				danger_text("error: some error occurs");
 				if (typeid(T)==typeid(int)) {
 				}
 				if (typeid(T)==typeid(size_t)) {
 				}
 				if (typeid(T)==typeid(short)) {
 				}
-            }
-
-		protected:
-            size_t hashCode(const List& value) const {
-				// use DEKHash here
-				return 0;
-            }
+			}
 
         };
 
