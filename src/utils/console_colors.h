@@ -32,7 +32,7 @@
 #define CRIT     0x01
 
 /* current log level */
-#define LOG_LEVEL INFO 
+#define LOG_LEVEL DBG 
 
 #define WHERESTR "%s:%d: " 
 #define WHEREARG __FILE__,__LINE__

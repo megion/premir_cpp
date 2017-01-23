@@ -537,13 +537,13 @@ namespace test {
             mytest(umatrix_hexa);
             mytest(umatrix_hexa_average);
             mytest(umatrix_hexa_median);
-//            mytest(eucw_bubble_hexa_16_12_sammon);
+			//mytest(eucw_bubble_hexa_16_12_sammon);
             mytest(som_labeling);
 
-//            mytest(sammon_visible);
-//            mytest(umatrix_visible);
-//            mytest(umatrix_labeling);
-//            mytest(visible_som_training);
+			//mytest(sammon_visible);
+			//mytest(umatrix_visible);
+			//mytest(umatrix_labeling);
+			//mytest(visible_som_training);
         }
     }
 }

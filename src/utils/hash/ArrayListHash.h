@@ -67,7 +67,6 @@ namespace utils {
 
 		private:
 			void checkType() const {
-				LOG(ERR, "type not supported: %s", typeid(T).name());
 				if (typeid(T)==typeid(int)) {
 				}
 				if (typeid(T)==typeid(size_t)) {
@@ -75,8 +74,11 @@ namespace utils {
 				if (typeid(T)==typeid(short)) {
 				}
 				
-				LOG(INFO, "test info message");
-				LOG(WARN, "test error message: %s number: %f", "message 1", 12.2353454354);
+				LOG(DBG, "debug message");
+				LOG(INFO, "info message");
+				LOG(WARN, "warning message: %s number: %f", "message 1", 12.2353454354);
+				LOG(ERR, "error message: %s", typeid(T).name());
+				LOG(CRIT, "crit message: %ld", 135254252454254l);
 			}
 
         };
