@@ -67,8 +67,7 @@ namespace utils {
 
 		private:
 			void checkType() const {
-				danger_text("error: some error occurs");
-				PRINT_LOG(ERR, "type not supported: %s\n", typeid(T).name());
+				LOG(WARN, "type not supported: %s\n", typeid(T).name());
 				if (typeid(T)==typeid(int)) {
 				}
 				if (typeid(T)==typeid(size_t)) {

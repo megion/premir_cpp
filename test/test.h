@@ -9,24 +9,15 @@
 /*
  * Test the given `fn`.
  */
-
 #define mytest(fn) \
-  printf("    " GREEN "✓ %s" RESET "\n", #fn); \
+  printf("    " GREEN_COLOR "✓ %s" RESET_COLOR "\n", #fn); \
   test_##fn();
 
 /*
  * Test suite title.
  */
-
 #define suite(title) \
-  printf("\n  " CYAN "%s" RESET "\n", title)
-
-/*
- * Report sizeof.
- */
-
-#define print_size(type) \
-  printf("\n  \e[90m%s: %ld bytes\e[0m\n", #type, sizeof(type));
+  printf("\n  " CYAN_COLOR "%s" RESET_COLOR "\n", title)
 
 #define assert_range(val, middle, offset) \
   assert( (middle-offset < val) && (val < middle+offset));
