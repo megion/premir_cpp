@@ -13,6 +13,7 @@
 #include "utils/SMatrix.h"
 #include "utils/RMatrix.h"
 #include "utils/hash/CharHash.h"
+#include "utils/console_colors.h"
 
 #include "kohonen/NetworkInitializer.h"
 #include "kohonen/RandomGenerator.h"
@@ -177,7 +178,7 @@ namespace test {
 
                 if (masked == dim) {
                     /* TODO: can't calculate winner, empty data vector */
-//                    danger_text("can't calculate winner, empty data vector");
+					LOG(ERR, "can't calculate winner, empty data vector");
                     return false;
                 }
 

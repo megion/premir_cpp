@@ -213,7 +213,7 @@ namespace kohonen {
 
             if (mu[0] == 0 || mu[1] == 0) {
                 // ошибка
-                danger_text("error findEigenVectors: mu[0]==0 || mu[1]==0");
+				LOG(ERR, "error findEigenVectors: mu[0]==0 || mu[1]==0");
                 throw std::logic_error("error findEigenVectors: mu[0]==0 || mu[1]==0");
             }
 

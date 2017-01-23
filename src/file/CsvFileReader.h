@@ -75,7 +75,7 @@ namespace file {
                         isEnd = true;
                     } else {
                         // error occurs
-                        danger_text("error: some error occurs");
+						LOG(ERR, "some error occurs");
                         throw std::runtime_error(std::strerror(errno));
                     }
                     return;
@@ -176,7 +176,7 @@ namespace file {
                         isEnd = true; // end of file
                     } else {
                         // error occurs
-                        danger_text("error: some error occurs");
+						LOG(ERR, "some error occurs: %s", std::strerror(errno));
                         throw std::runtime_error(std::strerror(errno));
                     }
                     if (i == 0) {
@@ -187,8 +187,7 @@ namespace file {
                 }
 
                 if (i >= bufferSize) {
-                    std::cout<<"buffer: "<<buffer<< " size: "<< bufferSize << std::endl;
-                    danger_text("buffer is overfull, use dynamic buffer");
+					LOG(ERR, "buffer is overfull, use dynamic buffer. buffer: %s, size: %d", buffer, bufferSize);
                     throw std::runtime_error("local buffer is overfull");
                 }
                 if (ch == '\n') {
@@ -208,7 +207,7 @@ namespace file {
                     for (ch = fgetc(fp); ch!=strQuote && ch != EOF; ++i,
                             ch = fgetc(fp)) {
                         if (i >= bufferSize) {
-                            danger_text("buffer is overfull, use dynamic buffer");
+							LOG(ERR, "buffer is overfull, use dynamic buffer. buffer: %s, size: %d", buffer, bufferSize);
                             throw std::runtime_error("local buffer is overfull");
                         }
                         buffer[i] = ch;

@@ -76,7 +76,7 @@ namespace matrix {
                     // skip iteration because all j column elements is 0
                     // TODO: необходимо переместится на столбец правее
                     // и понизить ранг матрицы
-                    danger_text("All column elements == 0 (MAX|a(k,j)|==0)");
+					LOG(WARN, "All column elements == 0 (MAX|a(k,j)|==0)");
                     return akjMax;
                 }
 
@@ -156,7 +156,7 @@ namespace matrix {
                     // skip iteration because all j column elements is 0
                     // TODO: необходимо переместится на столбец правее
                     // и понизить ранг матрицы
-                    danger_text("All column elements == 0 (MAX|a(k,j)|==0)");
+					LOG(WARN, "All column elements == 0 (MAX|a(k,j)|==0)");
                     return akjMax;
                 }
 

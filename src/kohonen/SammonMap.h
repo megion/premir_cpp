@@ -92,8 +92,9 @@ namespace kohonen {
                         // другими словами среди взаимных расстояний не может быть == 0
                         // если нейрон был удален то уже трудно будет построить линии на графике
                         // (точки при этом строятся в не зависимости был ли удален нейрон или нет)
-                        danger_text("skip identical neuron");
-                        std::cout << "Neuron " << i << " equal neuron " << j << std::endl;
+						LOG(ERR, "Neuron %d equal neuron %d. The identical neuron must be skipped because \
+								if their have not skipped then SammonMap will not be build. However this neurons \
+								now have not skipped because after this deletion we can not draw line on image", i, j);
                         // выйдем из цикла и начнем новую итерацию верхнего
                         // цикла
 //                        break;

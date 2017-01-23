@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 
-
 #define RESET_COLOR   "\033[0m"
 #define BLACK_COLOR   "\033[30m"      /* Black */
 #define RED_COLOR     "\033[31m"      /* Red */
@@ -25,9 +24,6 @@
 #define BOLDWHITE_COLOR   "\033[1m\033[37m"      /* Bold White */
 
 
-#define danger_text(txt) \
-  printf("    " RED_COLOR "%s" RESET_COLOR "\n", txt); \
-
 #define NONE     0x00
 #define DBG      0x1F
 #define INFO     0x0F
@@ -38,17 +34,17 @@
 /* current log level */
 #define LOG_LEVEL INFO 
 
-#define WHERESTR BLUE_COLOR "%s:" GREEN_COLOR "%d" RESET_COLOR ": " 
+#define WHERESTR "%s:%d: " 
 #define WHEREARG __FILE__,__LINE__
 #define PRINT_DEBUG_STR(...)  printf(__VA_ARGS__)
-#define LOG(X, _fmt, ...) if((LOG_LEVEL & X) == X) { \
+#define LOG(X, _fmt, ...) if((LOG_LEVEL & X) == X) {\
                                 if((X == WARN)) {\
-                                    PRINT_DEBUG_STR(WHERESTR YELLOW_COLOR _fmt RESET_COLOR, WHEREARG, __VA_ARGS__);\
+                                    PRINT_DEBUG_STR(WHERESTR YELLOW_COLOR " warining: " _fmt RESET_COLOR "\n", WHEREARG, ##__VA_ARGS__);\
 								} else if((X == ERR) || (X == CRIT)) {\
-                                    PRINT_DEBUG_STR(WHERESTR RED_COLOR _fmt RESET_COLOR, WHEREARG, __VA_ARGS__);\
+                                    PRINT_DEBUG_STR(WHERESTR RED_COLOR " error: " _fmt RESET_COLOR "\n", WHEREARG, ##__VA_ARGS__);\
 								} else {\
-                                    PRINT_DEBUG_STR(WHERESTR _fmt, WHEREARG, __VA_ARGS__);\
+                                    PRINT_DEBUG_STR(WHERESTR _fmt "\n", WHEREARG, ##__VA_ARGS__);\
 								}}
 
-
+	
 #endif

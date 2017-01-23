@@ -67,13 +67,16 @@ namespace utils {
 
 		private:
 			void checkType() const {
-				LOG(WARN, "type not supported: %s\n", typeid(T).name());
+				LOG(ERR, "type not supported: %s", typeid(T).name());
 				if (typeid(T)==typeid(int)) {
 				}
 				if (typeid(T)==typeid(size_t)) {
 				}
 				if (typeid(T)==typeid(short)) {
 				}
+				
+				LOG(INFO, "test info message");
+				LOG(WARN, "test error message: %s number: %f", "message 1", 12.2353454354);
 			}
 
         };

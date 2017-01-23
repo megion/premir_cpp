@@ -49,7 +49,7 @@ namespace kohonen {
 
                     if (!ok) {
                         /* TODO: can't calculate winner, empty data vector */
-                        danger_text("can't calculate winner, empty data vector");
+						LOG(WARN, "can't calculate winner, empty data vector");
                         return false;
                     }
 
@@ -74,7 +74,7 @@ namespace kohonen {
 
                 if (winners[0].index < 0) {
                     /* TODO: can't find winner */
-                    danger_text("KnnWinnerSearch: can't find winner");
+					LOG(WARN, "can't find winner");
                 }
 
                 return true;

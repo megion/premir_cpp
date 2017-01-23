@@ -38,7 +38,7 @@ namespace kohonen {
 
                 if (masked == dim) {
                     /* TODO: can't calculate winner, empty data vector */
-//                    danger_text("can't calculate winner, empty data vector");
+					LOG(DBG, "can't calculate winner, empty data vector");
                     return false;
                 }
 

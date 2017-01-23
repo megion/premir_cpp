@@ -105,8 +105,7 @@ namespace file {
             for (size_t i = 0; i < colSize; ++i) {
                 models::ColSummary &colSummary = (*summary)[i];
                 if (colSummary.isSkip()) {
-                    danger_text("All data column is skip. Empty col should be removed from samples.");
-                    std::cout<< "col " << i <<std::endl;
+                    LOG(WARN, "all data column is skip. Empty col should be removed from samples. Col: %d", i);
                 }
 
                 samples[i].value = (samples[i].value - colSummary.min) / (colSummary.max - colSummary.min);

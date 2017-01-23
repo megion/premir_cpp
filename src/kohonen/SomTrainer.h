@@ -73,8 +73,7 @@ namespace kohonen {
                     hasInRow = inDataStreamReader->readNext(rowData, samples);
                     if (!hasInRow) {
                         /* TODO: couldn't rewind data: NO input data */
-                        danger_text("couldn't rewind data");
-                        fprintf(stderr, "SomTraining: couldn't rewind data(%ld/%ld iterations done)\n", le, teachSize);
+						LOG(WARN, "couldn't rewind data(%ld/%ld iterations done)", le, teachSize);
                         return false;
                     }
                 }
@@ -86,7 +85,7 @@ namespace kohonen {
                 winner::WinnerInfo winners[winnerSize];
                 bool ok = trainingBySample(initializedSom, samples, winners, teachSize, le);
                 if (!ok) {
-                    std::cerr << "skip empty sample " << le << std::endl;
+					LOG(WARN, "skip empty sample %ld", le);
                 }
             }
             return true;
@@ -112,7 +111,7 @@ namespace kohonen {
                 return true;
             } else {
                 // skip inRow for calculation
-//                danger_text("skip empty sample vector");
+				LOG(DBG, "skip empty sample vector");
                 return false;
             }
         }

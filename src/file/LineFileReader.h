@@ -74,7 +74,7 @@ namespace file {
                         isEnd = true;
                     } else {
                         // error occurs
-                        danger_text("error: some error occurs");
+						LOG(ERR, "some error occurs: %s", std::strerror(errno));
                         throw std::runtime_error(std::strerror(errno));
                     }
                     return;
@@ -103,7 +103,7 @@ namespace file {
                 size_t len = std::strlen(p); // std::wcslen
 
                 if (len == 0) {
-                    danger_text("warning: line contains only NUL character");
+					LOG(WARN, "line contains only NUL character");
                     delete buffer;
                     // set empty result
                     result->buffer = nullptr;
@@ -156,7 +156,7 @@ namespace file {
             // check error
             if (!std::feof(fp)) {
                 // error occurs
-                danger_text("error: some error occurs");
+				LOG(ERR, "some error occurs: %s", std::strerror(errno));
                 delete buffer;
                 throw std::runtime_error(std::strerror(errno));
             }
