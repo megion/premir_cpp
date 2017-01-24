@@ -20,6 +20,7 @@
 #include "kohonen/KohonenDemosTest.h"
 #include "coursera/CourseraTest.h"
 #include "comb/CombinatoricsTest.h"
+#include "comb/TypingTextGenerator.h"
 #include "ml/DigitalFilterTest.h"
 #include "ml/LevensteinDistanceTest.h"
 
@@ -59,6 +60,7 @@ int main(int argc, char **argv) {
     test::coursera::coursera_test();
 
     test::combinatorics::combinatorics_test();
+    test::combinatorics::generate_text_test();
 
     return 0;
 

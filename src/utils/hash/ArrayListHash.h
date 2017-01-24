@@ -52,11 +52,9 @@ namespace utils {
 			typedef typename utils::CArrayList<T> List;
 
             ArrayListSimpleTypeHash() : HashEngine<List>::HashEngine() {
-				checkType();	
             }
 
 			ArrayListSimpleTypeHash(size_t _indexSize) : HashEngine<List>::HashEngine(_indexSize) {
-				checkType();
 			}
 
 		protected:
@@ -66,21 +64,7 @@ namespace utils {
             }
 
 		private:
-			void checkType() const {
-				if (typeid(T)==typeid(int)) {
-				}
-				if (typeid(T)==typeid(size_t)) {
-				}
-				if (typeid(T)==typeid(short)) {
-				}
-				
-				LOG(DBG, "debug message");
-				LOG(INFO, "info message");
-				LOG(WARN, "warning message: %s number: %f", "message 1", 12.2353454354);
-				LOG(ERR, "error message: %s", typeid(T).name());
-				LOG(CRIT, "crit message: %ld", 135254252454254l);
-			}
-
+			
         };
 
     }

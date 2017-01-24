@@ -1,5 +1,5 @@
-#ifndef TEST_COMB_COMBINATORICSTEST_H
-#define TEST_COMB_COMBINATORICSTEST_H
+#ifndef TEST_COMB_TYPING_TEXT_GENERATOR_H
+#define TEST_COMB_TYPING_TEXT_GENERATOR_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,17 +18,22 @@
 
 #include "test.h"
 
-#include "comb/SubsetBacktrackSearch.h"
-#include "comb/PermutationBacktrackSearch.h"
-#include "utils/HashSet.h"
-#include "utils/CArrayList.h"
-#include "utils/hash/ArrayListHash.h"
-
 
 namespace test {
     namespace combinatorics {
 
-        void combinatorics_test();
+		struct SplitterInfo {
+			bool isNewLine;
+			bool isNewWord;
+			size_t wordCharIndex;
+			size_t lineCharIndex;
+			size_t wordLen;
+			size_t lineLen;
+			size_t newWordLen; 
+			size_t linesCount;
+		};
+
+        void generate_text_test();
     }
 }
 

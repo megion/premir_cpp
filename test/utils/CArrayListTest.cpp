@@ -34,6 +34,15 @@ namespace test {
 			assert(list[list.size() - 1].id == 28);
 
 		}
+		
+		void test_init_from_array_constructor() {
+			int arr[] = {1,2,3,4,5,6,7};
+			utils::CArrayList<int> list(arr, 7);
+			assert(list.size() == 7);
+
+			assert(list[0] == 1);
+			assert(list[6] == 7);
+		}
 
 		void test_copy_constructor() {
 			utils::CArrayList<Foo2> list;
@@ -77,6 +86,7 @@ namespace test {
 			mytest(push);
 			mytest(copy_constructor);
 			mytest(capacity_increase);
+			mytest(init_from_array_constructor);
 		}
 	}
 }

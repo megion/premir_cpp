@@ -43,6 +43,18 @@ namespace utils {
                 }
             }
         }
+		
+		CArrayList(const T* arr, size_t len) : length(len), capacity(len),
+		capacityIncrease(1), typeSizeof(sizeof(T)) {
+
+			size_t amount = capacity * typeSizeof;
+			array = (T *) std::malloc(amount);
+			if (array == NULL) {
+				throw std::runtime_error(std::strerror(errno));
+			}
+			// copy all array
+			std::memcpy(array, arr, amount);
+        }
 
         // copy constructor: List l1; List l2 = l1;
         CArrayList(const CArrayList<T> &list) :

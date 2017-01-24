@@ -6,48 +6,32 @@ namespace test {
         void test_simple_array_list_hash() {
 
 			utils::CArrayList<long> arr1;
-			//arr1.push(1);
-			//arr1.push(2);
-			//arr1.push(123456);
-			//arr1.push(34535667);
-			//arr1.push(23535345354561);
+			utils::CArrayList<long> arr2;
 
-			utils::hash::ArrayListSimpleTypeHash<long> hashEngine;
+			utils::hash::ArrayListSimpleTypeHash<long> hashEngine1;
+			utils::hash::ArrayListSimpleTypeHash<long> hashEngine2;
 			//hashEngine.hashIndex(arr1);
 
-			graphics::PointChart numberHashChart(false, 710, 460);
-			numberHashChart.setWindowTitle("Number hash");
-			graphics::ChartThread<bool> numberHashChartThread(&numberHashChart);
+			//graphics::PointChart numberHashChart(false, 710, 460);
+			//numberHashChart.setWindowTitle("Number hash");
+			//graphics::ChartThread<bool> numberHashChartThread(&numberHashChart);
 
 			for (size_t i = 0; i < 1000; ++i) {
 				arr1.push(i);
-				size_t h = hashEngine.hashIndex(arr1);
+				arr2.push(i);
+				size_t h1 = hashEngine1.hashIndex(arr1);
+				size_t h2 = hashEngine2.hashIndex(arr2);
 
-				numberHashChart.redrawNewPoint(0, i, h);
-				std::this_thread::sleep_for(std::chrono::milliseconds(2));
+				assert(h1 == h2);
+				//numberHashChart.redrawNewPoint(0, i, h);
+				//std::this_thread::sleep_for(std::chrono::milliseconds(2));
 			}
 
         }
 
-
-        void test_hash_engine() {
-
-            //utils::hash::HashEngine<char*> shash;
-            //char ch1[] = "test";
-            //size_t h = shash.hashCode(ch1);
-//            std::cout << "hash: " << h << std::endl;
-
-        }
-
-		//void test_number_hash_charts() {
-			
-		//}
-
         void hashEngine_test() {
             suite("HashEngine");
 			mytest(simple_array_list_hash);
-            //mytest(hash_engine);
-			//mytest(number_hash_charts);
         }
     }
 }
