@@ -28,8 +28,15 @@ namespace test {
 			for (size_t i=0; i<results.getRowSize(); ++i) {
 				utils::RDMatrix<bool, size_t>::Row& row = results[i];
 				utils::CArrayList<size_t> list(row.points, row.pointSize);
-				assert(uniqueArrays.contains(list) == false);
-				uniqueArrays.push(list);
+				//std::cout << "list: " << list << std::endl;
+				if (uniqueArrays.contains(list)) {
+					std::cout << "already contains ";
+				} else {
+					uniqueArrays.push(list);
+				}
+
+				list.print();
+				//assert();
 			}
 		}
 
