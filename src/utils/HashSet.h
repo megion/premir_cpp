@@ -76,7 +76,33 @@ namespace utils {
 				matrix->writeToEndRow(rowIndex, value);
 				return true;
 			} else {
-				matrix->writeRow(rowIndex, &value, 1);
+				matrix->writeRow(rowIndex, value);
+				return true;
+			}
+		}
+
+		bool push(K&& value, const ValueUpdater<K> *updater = nullptr) {
+			size_t rowIndex = hashEngine->hashIndex(value);
+
+			if (rowIndex < matrix->getRowSize()) {
+				// пройти по точкам с одинаковым хэшкодом (значения коллизий)
+				Row &row = (*matrix)[rowIndex];
+				for (size_t i = 0; i < row.pointSize; ++i) {
+					K& oldValue = row[i];
+					if (oldValue == value) {
+						// найдено значение с уже имеющимся ключом - exit
+						if (updater) {
+							// custom update function
+							updater->update(oldValue, value, keySizeof);
+						}
+						return false;
+					}
+				}
+				// key not found - add entry to end
+				matrix->writeToEndRow(rowIndex, std::move(value));
+				return true;
+			} else {
+				matrix->writeRow(rowIndex, std::move(value));
 				return true;
 			}
 		}

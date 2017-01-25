@@ -115,7 +115,7 @@ namespace utils {
         }
 
         // = assign operator: List l3; l3 = l2;
-        CArrayList<T> &operator=(const CArrayList<T> &) = delete;
+        CArrayList<T> &operator=(const CArrayList<T>& list) = delete;
 
         // = replacement operator: List l3; l3 = std::move(l2);
         CArrayList<T> &operator=(CArrayList<T>&& list) {

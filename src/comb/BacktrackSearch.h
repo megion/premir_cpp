@@ -43,8 +43,8 @@ namespace comb {
 		 */
 		void backtrack(T* const solutionsVector, size_t treeDepth, const size_t& solutionSize,
 				utils::RDMatrix<bool, size_t>* solutionResults) {
-			std::cout << "backtrack k = " << treeDepth << " ";
-			printSolutionsVector(solutionsVector, solutionSize);
+			//std::cout << "backtrack k = " << treeDepth << " ";
+			//printSolutionsVector(solutionsVector, solutionSize);
 			if (isSolution(solutionsVector, treeDepth, solutionSize)) {
 				processSolution(solutionsVector, treeDepth, solutionSize, solutionResults);
 			} else {

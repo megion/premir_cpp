@@ -183,8 +183,23 @@ namespace utils {
 			memcpy(matrix[rowIndex].points, points, matrix[rowIndex].pointSize * tTypeSizeof);
 		}
 
+		/**
+		 * Write copy bytes of value.
+		 * Type T should be simple type or struct whiout dynamicall memory allocation
+		 */
 		void writeRow(size_t rowIndex, const T& value) {
-			writeRow(rowIndex, &value, 1);
+			prepareWriteRow(rowIndex, 1);
+			// copy points array
+			memcpy(matrix[rowIndex].points, &value, tTypeSizeof);
+		}
+		
+		/**
+		 * Write copy object.
+		 * Type T should exist copy assignment operator
+		 */
+		void writeCopyRow(size_t rowIndex, const T& value) {
+			prepareWriteRow(rowIndex, 1);
+			(*(matrix[rowIndex].points)) = value; // should exist copy assignment operator
 		}
 
 		/**
@@ -225,42 +240,51 @@ namespace utils {
 		 */
 		void writeToEndRow(size_t rowIndex, const T* arr, size_t arrSize) {
 			if (rowIndex < rowSize) {
-				// добавим значения в конец существующей строки
-				size_t oldPointSize = matrix[rowIndex].pointSize;
-				size_t newPointSize = oldPointSize + arrSize;
+				Row& row = matrix[rowIndex];
+				
+				size_t oldPointSize = row.pointSize;
+				increaseRowPoints(row, arrSize);
 
-				// re-initialize points memory
-				if (matrix[rowIndex].pointCapacity < newPointSize) {
-					initializePointsMemory(matrix[rowIndex], newPointSize);
-				} else {
-					matrix[rowIndex].pointSize = newPointSize;
-				}
-
-				memcpy(matrix[rowIndex].points + oldPointSize, arr, arrSize * tTypeSizeof);
+				memcpy(row.points + oldPointSize, arr, arrSize * tTypeSizeof);
 			} else {
 				// добавить новую строку
 				writeRow(rowIndex, arr, arrSize);
 			}
 		}
 
+		/**
+		 * Move value to end of row
+		 * Type T should have move assigment operator
+		 */
 		void writeToEndRow(size_t rowIndex, T&& value) {
 			if (rowIndex < rowSize) {
 				Row& row = matrix[rowIndex];
-				// добавим значения в конец существующей строки
-				size_t oldPointSize = row.pointSize;
-				size_t newPointSize = oldPointSize + 1;
 
-				// re-initialize points memory
-				if (row.pointCapacity < newPointSize) {
-					initializePointsMemory(row, newPointSize);
-				} else {
-					row.pointSize = newPointSize;
-				}
+				size_t oldPointSize = row.pointSize;
+				increaseRowPoints(row, 1);
 
 				(*(row.points + oldPointSize)) = std::move(value); // should exist move assignment operator
 			} else {
 				// добавить новую строку
 				writeRow(rowIndex, std::move(value));
+			}
+		}
+
+		/**
+		 * Copy value to end of row
+		 * Type T should have copy assigment operator
+		 */
+		void writeCopyToEndRow(size_t rowIndex, const T& value) {
+			if (rowIndex < rowSize) {
+				Row& row = matrix[rowIndex];
+
+				size_t oldPointSize = row.pointSize;
+				increaseRowPoints(row, 1);
+
+				(*(row.points + oldPointSize)) = value; // should exist copy assignment operator
+			} else {
+				// добавить новую строку
+				writeCopyRow(rowIndex, value);
 			}
 		}
 
@@ -370,6 +394,19 @@ namespace utils {
 				initializeRowMemory(newRowSize);
 
 				initializePointsMemory(matrix[rowIndex], pointSize);
+			}
+		}
+
+		void increaseRowPoints(Row& row, size_t incrSize) {
+			// добавим значения в конец существующей строки
+			size_t oldPointSize = row.pointSize;
+			size_t newPointSize = oldPointSize + incrSize;
+
+			// re-initialize points memory
+			if (row.pointCapacity < newPointSize) {
+				initializePointsMemory(row, newPointSize);
+			} else {
+				row.pointSize = newPointSize;
 			}
 		}
 	};
