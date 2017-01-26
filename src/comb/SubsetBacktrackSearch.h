@@ -10,7 +10,8 @@ namespace comb {
 	/**
 	 * Генерирование всех подмножеств для числа указанного в solutionSize
 	 *
-	 * generate all subset
+	 * Generate all subset. For example for 'treeDepth'=3 will be generate sets: 
+	 * {0, 1, 2} {0, 1} {0, 2} {0} {1, 2} {1} {2} {}
 	 *
 	 * Чтобы сгенерировать все 2^n подмножеств,
 	 * мы создаем массив (вектор) из n ячеек, в котором булево значение a[i], указывает,
