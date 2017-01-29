@@ -201,7 +201,6 @@ namespace test {
 			assert(MyArray::callInfo.moveOperatorCallCount==0);
 
             utils::RDMatrix<bool, MyArray> a;
-			a.setIsCallPointDestructorOnClear(true);
 		
 			MyArray b;
             a.writeRow(1, std::move(b));

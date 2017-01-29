@@ -33,23 +33,20 @@ namespace utils {
 
 		RDMatrix() :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1), matrix(nullptr),
-			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallPointDestructorOnClear(false) 	{
+			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
 		}
 
 		RDMatrix(size_t _rowSize, size_t _rowCapacityIncrease, size_t _pointCapacityIncrease) :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(_rowCapacityIncrease),
 		   	pointCapacityIncrease(_pointCapacityIncrease), matrix(nullptr), tTypeSizeof(sizeof(T)),
-		   	rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallPointDestructorOnClear(false)	{
+		   	rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
 
 			initializeRowMemory(_rowSize);
 		}
 
 		RDMatrix(size_t _rowSize, size_t _pointSize) :
 			rowSize(0), rowCapacity(rowSize), rowCapacityIncrease(1), pointCapacityIncrease(1),	matrix(nullptr),
-			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)),
-			isCallPointDestructorOnClear(false)	{
+			tTypeSizeof(sizeof(T)), rowTypeSizeof(sizeof(Row)), rTypeSizeof(sizeof(R)) {
 
 			initializeRowMemory(_rowSize);
 			for (size_t r = 0; r < rowSize; ++r) {
@@ -73,21 +70,15 @@ namespace utils {
 			pointCapacityIncrease = _pointCapacityIncrease;
 		}
 
-		void setIsCallPointDestructorOnClear(bool _isCallPointDestructorOnClear) {
-			isCallPointDestructorOnClear = _isCallPointDestructorOnClear;
-		}
-
 		void removeAll() {
 			if (matrix) {
 				// remove all row array
 				for (size_t r = 0; r < rowCapacity; ++r) {
 					Row& row = matrix[r];
 					if (row.points) {
-						if (isCallPointDestructorOnClear) {
-							for (size_t p = 0; p < row.pointSize; p++) {
-								// call destructor for each object
-								(row.points[p]).~T();
-							}
+						for (size_t p = 0; p < row.pointSize; p++) {
+							// call destructor for each object
+							(row.points[p]).~T();
 						}
 						std::free(row.points);
 						// set to null each array pointer
@@ -205,8 +196,6 @@ namespace utils {
 		/**
 		 * write moved object.
 		 * For example it may be used for store object which contains dynamic allocated resources.
-		 * If you will push moved object then set isCallPointDestructorOnClear=true for 
-		 * auto call destructor on each object when matrix removed 
 		 */
 		void writeRow(size_t rowIndex, T&& value) {
 			prepareWriteRow(rowIndex, 1);
@@ -313,12 +302,6 @@ namespace utils {
 		size_t tTypeSizeof; // saved value sizeof T
 		size_t rTypeSizeof; // saved value sizeof R
 		size_t rowTypeSizeof; // saved value sizeof Row
-
-		/**
-		 * flag for call destructor for each element T in removeAll method
-		 * removeAll method also call in destructor RDMatrix 
-		 */
-		bool isCallPointDestructorOnClear;
 
 		void initializeRowMemory(size_t newRowSize) {
 			size_t newRowCapacity = 0;
