@@ -4,11 +4,37 @@
 #include <stdio.h>
 #include <iostream>
 
+#ifndef FLEX_ARRAY
+/*
+ * See if our compiler is known to support flexible array members.
+ */
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) && (!defined(__SUNPRO_C) || (__SUNPRO_C > 0x580))
+# define FLEX_ARRAY /* empty */
+#elif defined(__GNUC__)
+# if (__GNUC__ >= 3)
+#  define FLEX_ARRAY /* empty */
+# else
+#  define FLEX_ARRAY 0 /* older GNU extension */
+# endif
+#endif
+
+/*
+ * Otherwise, default to safer but a bit wasteful traditional style
+ */
+#ifndef FLEX_ARRAY
+# define FLEX_ARRAY 1
+#endif
+#endif
+
+/* The length in bytes and in hex digits of an object name (SHA-1 value). */
+#define GIT_SHA1_RAWSZ 20
+#define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
+
+
 namespace cache {
 
-	struct hashmap_entry {
-		struct hashmap_entry *next;
-		unsigned int hash;
+	struct object_id {
+		unsigned char hash[GIT_SHA1_RAWSZ];
 	};
 
 	/*
