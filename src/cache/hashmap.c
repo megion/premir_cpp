@@ -1,6 +1,9 @@
 /*
  * Generic implementation of hash-based key value mappings.
  */
+/*
+ * Copy from git source code
+ */
 #include "cache.h"
 #include "hashmap.h"
 

@@ -31,6 +31,8 @@
 #define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
 
 
+#define read_cache() read_index(&the_index)
+
 namespace cache {
 
 	struct object_id {
@@ -83,6 +85,11 @@ namespace cache {
 		unsigned char sha1[20];
 		struct untracked_cache *untracked;
 	};   
+
+	int read_index(struct index_state *istate)
+	{
+		return read_index_from(istate, get_index_file());
+	}
 }
 
 
