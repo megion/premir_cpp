@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <iostream>
 
+#include "cache/DirCache.h"
+
 namespace cache {
 	
 	class ReadCache {

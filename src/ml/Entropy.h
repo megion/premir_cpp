@@ -37,7 +37,7 @@ namespace ml {
     class Entropy {
 
     public:
-        typedef typename utils::Entry<V, EntropyValueInfo> VEntry;
+        typedef typename utils::MapEntry<V, EntropyValueInfo> VEntry;
         typedef typename utils::RDMatrix<bool, VEntry>::Row VRow;
 
         Entropy(utils::hash::HashEngine<V> *hashEngine) :

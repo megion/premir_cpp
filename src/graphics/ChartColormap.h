@@ -49,7 +49,7 @@ namespace graphics {
     class ChartColormap {
     public:
 
-        typedef typename utils::Entry<Color, xcb_alloc_color_reply_t *> ColorEntry;
+        typedef typename utils::MapEntry<Color, xcb_alloc_color_reply_t *> ColorEntry;
         typedef typename utils::R3DMatrix<bool, bool, ColorEntry>::Row ColorRow;
         typedef typename utils::R3DMatrix<bool, bool, ColorEntry>::Cell ColorCell;
 

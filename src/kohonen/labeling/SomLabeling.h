@@ -47,7 +47,7 @@ namespace kohonen {
         template<typename Label>
         class SomLabeling {
         public:
-            typedef typename utils::Entry<Label, models::LabelInfo> InfoEntry;
+            typedef typename utils::MapEntry<Label, models::LabelInfo> InfoEntry;
             typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Row InfoRow;
             typedef typename utils::R3DMatrix<bool, bool, InfoEntry>::Cell InfoCell;
 

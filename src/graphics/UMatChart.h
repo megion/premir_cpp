@@ -83,7 +83,7 @@ namespace graphics {
         typedef typename OutMatrix::Row OutRow;
 
         typedef utils::HashMapArray<Label, models::LabelInfo> LabelsMatrix;
-        typedef typename utils::Entry<Label, models::LabelInfo> LabelsEntry;
+        typedef typename utils::MapEntry<Label, models::LabelInfo> LabelsEntry;
         typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Row LabelsRow;
         typedef typename utils::R3DMatrix<bool, bool, LabelsEntry>::Cell LabelsCell;
 

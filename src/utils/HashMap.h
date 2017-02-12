@@ -25,11 +25,11 @@ namespace utils {
     class HashMap {
     public:
 
-        typedef typename utils::RDMatrix<bool, Entry<K, V>>::Row Row;
+        typedef typename utils::RDMatrix<bool, MapEntry<K, V>>::Row Row;
 
         HashMap(hash::HashEngine<K> *_hashEngine) :
                 hashEngine(_hashEngine), valueSizeof(sizeof(V)) {
-            matrix = new utils::RDMatrix<bool, Entry<K, V>>();
+            matrix = new utils::RDMatrix<bool, MapEntry<K, V>>();
         }
 
         HashMap<K, V>(const HashMap<K, V> &) = delete; // disable copy constructor
@@ -52,26 +52,27 @@ namespace utils {
             return !((*this) == other);
         }
 
-        utils::RDMatrix<bool, Entry<K, V>> *getMatrix() const {
+        utils::RDMatrix<bool, MapEntry<K, V>> *getMatrix() const {
             return matrix;
         }
 
         bool pushValue(const K &key, const V &value, const ValueUpdater<V> *updater = nullptr) {
             size_t rowIndex = hashEngine->hashIndex(key);
-            Entry<K, V> entry = {key, value};
+            MapEntry<K, V> entry = {key, value};
 
             if (rowIndex < matrix->getRowSize()) {
                 // пройти по точкам с одинаковым хэшкодом (значения коллизий)
                 Row &row = (*matrix)[rowIndex];
                 for (size_t i = 0; i < row.pointSize; ++i) {
-                    if (row[i].key == key) {
+					MapEntry<K, V>& oldEntry = row[i];
+                    if (oldEntry.key == key) {
                         // найдено значение с уже имеющимся ключом - обновить
                         if (updater) {
                             // custom update function
-                            updater->update(row[i].value, value, valueSizeof);
+                            updater->update(oldEntry.value, value, valueSizeof);
                         } else {
                             // simple replace value
-                            std::memcpy(&row[i].value, &value, valueSizeof);
+                            std::memcpy(&(oldEntry.value), &value, valueSizeof);
                         }
                         return false;
                     }
@@ -104,10 +105,10 @@ namespace utils {
 
 
     private:
-        utils::RDMatrix<bool, Entry<K, V>> *matrix;
+        utils::RDMatrix<bool, MapEntry<K, V>> *matrix;
         hash::HashEngine<K> *hashEngine;
 
-        size_t valueSizeof; // saved value sizeof Entry
+        size_t valueSizeof; // saved value sizeof 
 
     };
 }

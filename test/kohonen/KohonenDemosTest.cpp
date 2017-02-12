@@ -294,7 +294,7 @@ namespace test {
             suite("KohonenDemos");
 			//mytest(speech_signal);
 			//mytest(house_votes);
-        }
+		}
     }
 }
 

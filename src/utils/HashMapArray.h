@@ -26,10 +26,10 @@ namespace utils {
     };
 
     template<typename K, typename V>
-    struct Entry {
+    struct MapEntry {
         K key;
         V value;
-        friend std::ostream &operator<<(std::ostream &os, const Entry<K, V> &val) {
+        friend std::ostream &operator<<(std::ostream &os, const MapEntry<K, V> &val) {
             os << "key {" << val.key << "}, value {" << val.value << "}";
             return os;
         }
@@ -40,11 +40,11 @@ namespace utils {
     class HashMapArray {
     public:
 
-        typedef typename utils::R3DMatrix<bool, bool, Entry<K, V>>::Cell Cell;
+        typedef typename utils::R3DMatrix<bool, bool, MapEntry<K, V>>::Cell Cell;
 
         HashMapArray(size_t rowSize, hash::HashEngine<K>* _hashEngine) :
                 hashEngine(_hashEngine), valueSizeof(sizeof(V)) {
-            matrix = new utils::R3DMatrix<bool, bool, Entry<K, V>>(rowSize, 0);
+            matrix = new utils::R3DMatrix<bool, bool, MapEntry<K, V>>(rowSize, 0);
         }
 
         HashMapArray<K, V>(const HashMapArray<K, V> &) = delete; // disable copy constructor
@@ -67,27 +67,28 @@ namespace utils {
             return !((*this) == other);
         }
 
-        utils::R3DMatrix<bool, bool, Entry<K, V>> *getMatrix() const {
+        utils::R3DMatrix<bool, bool, MapEntry<K, V>> *getMatrix() const {
             return matrix;
         }
 
         bool pushValue(size_t rowIndex, const K &key, const V &value, const ValueUpdater<V>* updater = nullptr) {
             size_t colIndex = hashEngine->hashIndex(key);
-            Entry<K, V> entry = {key, value};
+            MapEntry<K, V> entry = {key, value};
 
             if (rowIndex < matrix->getRowSize()) {
                 if (colIndex < (*matrix)[rowIndex].cellSize) {
                     // пройти по точкам с одинаковым хэшкодом (значения коллизий)
                     Cell& cell = (*matrix)[rowIndex][colIndex];
                     for (size_t i = 0; i<cell.pointSize; ++i) {
-                        if (cell[i].key == key) {
+						MapEntry<K, V>& oldEntry = cell[i];
+                        if (oldEntry.key == key) {
                             // найдено значение с уже имеющимся ключом - обновить
                             if (updater) {
                                 // custom update function
-                                updater->update(cell[i].value, value, valueSizeof);
+                                updater->update(oldEntry.value, value, valueSizeof);
                             } else {
                                 // simple replace value
-                                std::memcpy(&cell[i].value, &value, valueSizeof);
+                                std::memcpy(&(oldEntry.value), &value, valueSizeof);
                             }
                             return false;
                         }
@@ -114,8 +115,9 @@ namespace utils {
                     // пройти по точкам с одинаковым хэшкодом (значения коллизий)
                     Cell& cell = (*matrix)[rowIndex][colIndex];
                     for (size_t i = 0; i<cell.pointSize; ++i) {
-                        if (cell[i].key == key) {
-                            return &cell[i].value;
+						MapEntry<K, V>& entry = cell[i];
+                        if (entry.key == key) {
+                            return &(entry.value);
                         }
                     }
                     return nullptr;
@@ -129,10 +131,10 @@ namespace utils {
 
 
     private:
-        utils::R3DMatrix<bool, bool, Entry<K, V>>* matrix;
+        utils::R3DMatrix<bool, bool, MapEntry<K, V>>* matrix;
         hash::HashEngine<K>* hashEngine;
 
-        size_t valueSizeof; // saved value sizeof Entry
+        size_t valueSizeof; // saved value sizeof 
 
     };
 }

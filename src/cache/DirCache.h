@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "cache/hashmap.h"
 
 #ifndef FLEX_ARRAY
 /*
@@ -86,10 +87,10 @@ namespace cache {
 		struct untracked_cache *untracked;
 	};   
 
-	int read_index(struct index_state *istate)
-	{
-		return read_index_from(istate, get_index_file());
-	}
+	//int read_index(struct index_state *istate)
+	//{
+		//return read_index_from(istate, get_index_file());
+	//}
 }
 
 
