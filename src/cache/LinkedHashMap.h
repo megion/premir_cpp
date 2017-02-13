@@ -79,28 +79,14 @@ namespace cache {
 	}
 
 	/* data structures */
-
+	template<typename T>
 	struct hashmap_entry {
-		struct hashmap_entry *next;
+		struct hashmap_entry<T> *next;
 		unsigned int hash;
+		T value;
 	};
 
 	
-
-	typedef int (*hashmap_cmp_fn)(const void *entry, const void *entry_or_key,
-			const void *keydata);
-
-	//struct hashmap {
-		//struct hashmap_entry **table;
-		//hashmap_cmp_fn cmpfn;
-		//unsigned int size, tablesize, grow_at, shrink_at;
-	//};
-
-	//struct hashmap_iter {
-		//struct hashmap *map;
-		//struct hashmap_entry *next;
-		//unsigned int tablepos;
-	//};
 
 	/* hashmap_entry functions */
 
@@ -111,8 +97,12 @@ namespace cache {
 	//}
 	
 
+	template<typename T>
 	class LinkedHashMap {
 		public:
+			typedef int (*hashmap_cmp_fn)(const hashmap_entry<T> *entry,
+				   	const hashmap_entry<T> *entry_or_key, const void *keydata);
+			
 			LinkedHashMap(hashmap_cmp_fn equals_function, size_t initial_size) {
 				unsigned int size = HASHMAP_INITIAL_SIZE;
 				size = 0;
@@ -149,12 +139,12 @@ namespace cache {
 				//memset(map, 0, sizeof(*map));
 			}
 
-			int entry_equals(const struct hashmap_entry *e1, const struct hashmap_entry *e2,
+			int entry_equals(const struct hashmap_entry<T> *e1, const struct hashmap_entry<T> *e2,
 					const void *keydata) {
 				return (e1 == e2) || (e1->hash == e2->hash && !cmpfn(e1, e2, keydata));
 			}
 
-			unsigned int bucket(const struct hashmap_entry *key) {
+			unsigned int bucket(const struct hashmap_entry<T> *key) {
 				return key->hash & (tablesize - 1);
 			}
 			
@@ -277,8 +267,8 @@ namespace cache {
 					}
 
 				public:
-					LinkedHashMap *map;
-					struct hashmap_entry *next;
+					LinkedHashMap<T> *map;
+					struct hashmap_entry<T> *next;
 					unsigned int tablepos;
 			};
 
@@ -287,13 +277,13 @@ namespace cache {
 			}
 		
 		private:
-			hashmap_entry **table;
+			hashmap_entry<T> **table;
 			hashmap_cmp_fn cmpfn;
 			unsigned int size, tablesize, grow_at, shrink_at;
 
 			void alloc_table(unsigned int _size) {
 				tablesize = _size;
-				table = (hashmap_entry **) std::calloc(tablesize, sizeof(struct hashmap_entry *));
+				table = (hashmap_entry<T> **) std::calloc(tablesize, sizeof(struct hashmap_entry<T> *));
 				if (table == NULL) {
 					throw std::runtime_error(std::strerror(errno));
 				}
