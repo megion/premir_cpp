@@ -1,5 +1,5 @@
-#ifndef SRC_CACHE_HASHMAP_H
-#define SRC_CACHE_HASHMAP_H
+#ifndef SRC_CACHE_LINKED_HASH_MAP_H
+#define SRC_CACHE_LINKED_HASH_MAP_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -9,9 +9,6 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
-
-#include "cache/DirCache.h"
-
 
 /*
  * Generic implementation of hash-based key-value mappings.
@@ -138,11 +135,9 @@ namespace cache {
 								nextEntry = (T*)current->next;
 								return (T*)current;
 							}
-
 							if (tablepos >= map->tablesize) {
 								return nullptr;
 							}
-
 							current = (hashmap_entry*)(map->table[tablepos++]);
 						}
 					}
@@ -189,26 +184,15 @@ namespace cache {
 				tablesize = 0;
 				//memset(map, 0, sizeof(*map));
 			}
-
-			bool entry_equals(const T *e1, const T *e2) {
-				hashmap_entry* entry1 = (hashmap_entry*) e1;
-				hashmap_entry* entry2 = (hashmap_entry*) e2;
-				return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
-			}
-
-			unsigned int bucket(unsigned int hash) {
-				return hash & (tablesize - 1);
-			}
-			
+						
 			void rehash(unsigned int newsize) {
 				unsigned int i, oldsize = tablesize;
 				T **oldtable = table;
 
 				alloc_table(newsize);
 				for (i = 0; i < oldsize; i++) {
-					T *entry = oldtable[i];
+					hashmap_entry *e = (hashmap_entry*)oldtable[i];
 					while (e) {
-						hashmap_entry *e = (hashmap_entry*) entry;
 						hashmap_entry *next = e->next;
 						unsigned int b = bucket(e->hash);
 						e->next = table[b];
@@ -218,8 +202,6 @@ namespace cache {
 				}
 				std::free(oldtable);
 			}
-
-			
 
 			/*
 			 * find_entry_ptr
@@ -332,56 +314,19 @@ namespace cache {
 					shrink_at = grow_at / ((1 << HASHMAP_RESIZE_BITS) + 1);
 				}
 			}	
-			
-			
+
+			bool entry_equals(const T *e1, const T *e2) {
+				hashmap_entry* entry1 = (hashmap_entry*) e1;
+				hashmap_entry* entry2 = (hashmap_entry*) e2;
+				return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
+			}
+
+			unsigned int bucket(unsigned int hash) {
+				return hash & (tablesize - 1);
+			}
 
 	};
-
-	
-	/* string interning */
-	struct pool_entry {
-		size_t len;
-		unsigned char data[FLEX_ARRAY];
-	};
-
-	static int pool_entry_cmp(const struct hashmap_entry<pool_entry> *e1,
-			const struct hashmap_entry<pool_entry> *e2,
-			const unsigned char *keydata) {
-		return e1->value.data != keydata &&
-			(e1->value.len != e2->value.len || memcmp(e1->value.data, keydata, e1->value.len));
-	}
-
-	const void *memintern(const void *data, size_t len) {
-		// global static string pool 
-		/* initialize string pool hashmap */
-		static LinkedHashMap<pool_entry> map(pool_entry_cmp, 0);
-
-		//if (!map.tablesize)
-			//hashmap_init(&map, (hashmap_cmp_fn) pool_entry_cmp, 0);
-
-		/* lookup interned string in pool */
-		hashmap_entry<pool_entry> key(memhash(data, len)); 
-		//hashmap_entry_init(&key, memhash(data, len));
-		key.value.len = len;
-		hashmap_entry<pool_entry>* e = map.getEntry(&key, data);
-		if (!e) {
-			/* not found: create it */
-			//FLEX_ALLOC_MEM(e, data, data, len);
-			hashmap_entry_init(e, key.hash);
-			e->len = len;
-			map.hashmap_add(e);
-		}
-		return e->data;
-	}
-
-	static inline const char *strintern(const char *string) {
-		return memintern(string, strlen(string));
-	}
 
 }
-
-
-
-
 
 #endif

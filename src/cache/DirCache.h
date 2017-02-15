@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "cache/hashmap.h"
+#include "cache/LinkedHashMap.h"
 
 #ifndef FLEX_ARRAY
 /*
