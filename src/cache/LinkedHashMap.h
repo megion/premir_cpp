@@ -79,17 +79,11 @@ namespace cache {
 	}
 
 	/* data structures */
-	template<typename T>
 	struct hashmap_entry {
-		hashmap_entry(unsigned int _hash): hash(_hash), next(nullptr) {
-		}
-
-		struct hashmap_entry<T> *next;
+		struct hashmap_entry *next;
 		unsigned int hash;
-		T value;
 	};
 
-	
 
 	/* hashmap_entry functions */
 
@@ -99,16 +93,22 @@ namespace cache {
 		//e->next = NULL;
 	//}
 	
-
+	/*
+	 * T type must be entry exdends hashmap_entry, for example:
+	   struct pool_entry {
+	       struct hashmap_entry ent; // must be first
+		   size_t len;
+		   unsigned char data[FLEX_ARRAY];
+		};
+	 */
 	template<typename T>
 	class LinkedHashMap {
 		public:
-			typedef int (*hashmap_cmp_fn)(const hashmap_entry<T> *entry,
-				   	const hashmap_entry<T> *entry_or_key, const void *keydata);
+			//typedef int (*hashmap_cmp_fn)(const hashmap_entry<T> *entry,
+					   //const hashmap_entry<T> *entry_or_key, const void *keydata);
 			
-			LinkedHashMap(hashmap_cmp_fn equals_function, size_t initial_size) : size(0) {
+			LinkedHashMap(size_t initial_size) : size(0) {
 				unsigned int _size = HASHMAP_INITIAL_SIZE;
-				cmpfn = equals_function ? equals_function : always_equal;
 
 				/* calculate initial table size and allocate the table */
 				initial_size = (unsigned int) ((uint64_t) initial_size * 100
@@ -131,37 +131,37 @@ namespace cache {
 					/*
 					 * hashmap_iter_next
 					 */	
-					hashmap_entry<T> *getNext() {
-						hashmap_entry<T> *current = nextEntry;
+					T *getNext() {
+						hashmap_entry *current = (hashmap_entry*)nextEntry;
 						for (;;) {
 							if (current) {
-								nextEntry = current->next;
-								return current;
+								nextEntry = (T*)current->next;
+								return (T*)current;
 							}
 
 							if (tablepos >= map->tablesize) {
 								return nullptr;
 							}
 
-							current = map->table[tablepos++];
+							current = (hashmap_entry*)(map->table[tablepos++]);
 						}
 					}
 
 					void reset() {
 						tablepos = 0;
-						next = nullptr;
+						nextEntry = nullptr;
 					}
 
 					/* 
 					 * hashmap_iter_first
 					 */ 
-					hashmap_entry<T> *firstIter() {
+					T *firstIter() {
 						reset();
 						return getNext();
 					}
 	
 				public:
-					hashmap_entry<T> *nextEntry;
+					T *nextEntry;
 
 				private:
 					LinkedHashMap<T> *map;
@@ -169,7 +169,7 @@ namespace cache {
 			};
 
 			~LinkedHashMap() {
-				hashmap_free(false);
+				hashmap_free(true);
 			}
 
 			void hashmap_free(bool free_entries) {
@@ -177,7 +177,7 @@ namespace cache {
 					return;
 				}
 				if (free_entries) {
-					hashmap_entry<T> *e;
+					T *e;
 					MapInterator iter(this);
 					while ((e = iter.getNext())) {
 						std::free(e);
@@ -190,9 +190,10 @@ namespace cache {
 				//memset(map, 0, sizeof(*map));
 			}
 
-			int entry_equals(const hashmap_entry<T> *e1, const struct hashmap_entry<T> *e2,
-					const void *keydata) {
-				return (e1 == e2) || (e1->hash == e2->hash && !cmpfn(e1, e2, keydata));
+			bool entry_equals(const T *e1, const T *e2) {
+				hashmap_entry* entry1 = (hashmap_entry*) e1;
+				hashmap_entry* entry2 = (hashmap_entry*) e2;
+				return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
 			}
 
 			unsigned int bucket(unsigned int hash) {
@@ -201,13 +202,14 @@ namespace cache {
 			
 			void rehash(unsigned int newsize) {
 				unsigned int i, oldsize = tablesize;
-				hashmap_entry<T> **oldtable = table;
+				T **oldtable = table;
 
 				alloc_table(newsize);
 				for (i = 0; i < oldsize; i++) {
-					struct hashmap_entry<T> *e = oldtable[i];
+					T *entry = oldtable[i];
 					while (e) {
-						hashmap_ent<T> *next = e->next;
+						hashmap_entry *e = (hashmap_entry*) entry;
+						hashmap_entry *next = e->next;
 						unsigned int b = bucket(e->hash);
 						e->next = table[b];
 						table[b] = e;
@@ -217,33 +219,38 @@ namespace cache {
 				std::free(oldtable);
 			}
 
-			hashmap_entry<T> **find_entry_ptr(const hashmap_entry<T> *key, const void *keydata) {
-				hashmap_entry<T> **e = &table[bucket(key->hash)];
-				while (*e && !entry_equals(*e, key, keydata)) {
-					e = &(*e)->next;
+			
+
+			/*
+			 * find_entry_ptr
+			 * You must set hash field in key pointer. Other fields are optional.
+			 * The each entries compare by == operator
+			 */
+			T** findEntryPtr(const T *key) {
+				const hashmap_entry *keyEntry = (hashmap_entry*) key;
+				T** e = &table[bucket(keyEntry->hash)];
+				while(*e && !entry_equals(*e, key)) {
+					e = &( (T*) (((hashmap_entry*)(*e))->next));
 				}
 				return e;
 			}
 
 			/*
-			 * hashmap_get
+			 * hashmap_get or hashmap_get_from_hash 
 			 */
-			hashmap_entry<T> *getEntry(const hashmap_entry<T> *key, const void *keydata) {
-				return *find_entry_ptr(key, keydata);
+			T* getEntry(const T *key) {
+				return *findEntryPtr(key);
 			}
-
-			hashmap_entry<T> *hashmap_get_from_hash(unsigned int hash, const void *keydata) {
-				hashmap_entry<T> key;
-				key.hash = hash;
-				key.next = nullptr;
-				return getEntry(&key, keydata);
-			}
-
-			hashmap_entry<T> *hashmap_get_next(const hashmap_entry<T> *entry) {
-				hashmap_entry<T> *e = entry->next;
-				for (; e; e = e->next) {
-					if (entry_equals(entry, e, nullptr)) {
-						return e;
+		
+			/*
+			 * hashmap_get_next
+			 */	
+			T* findNext(const T *key) {
+				hashmap_entry *entry = (hashmap_entry*) key;
+				hashmap_entry *ne = entry->next;
+				for (; ne; ne = ne->next) {
+					if (entry_equals(key, (T*)ne)) {
+						return (T*)ne;
 					}
 				}
 				return nullptr;
@@ -251,16 +258,11 @@ namespace cache {
 
 			/*
 			 * hashmap_add
+			 * add entry to hash map. User must allocated memory for entry before add
 			 */
-			void add(unsigned int hash, const T& value) {
-				unsigned int b = bucket(hash);
-
-				hashmap_entry<T>* entry = (hashmap_entry<T>*) std::malloc(sizeof(hashmap_entry));
-                if (entry == NULL) {
-                    throw std::runtime_error(std::strerror(errno));
-                }
-				entry->hash = hash;
-				std::memcpy(entry->value, arr, amount);
+			void add(const T* e) {
+				hashmap_entry *entry = (hashmap_entry*) e;
+				unsigned int b = bucket(entry->hash);
 
 				/* add entry */
 				entry->next = table[b];
@@ -276,16 +278,16 @@ namespace cache {
 			/*
 			 * hashmap_remove
 			 */
-			hashmap_entry<T>* remove(const hashmap_entry<T> *key, const void *keydata) {
-				hashmap_entry<T> *old;
-				hashmap_entry<T> **e = find_entry_ptr(key, keydata);
-				if (!*e) {
+			T* remove(const T *key) {
+				T *old;
+				T **e = findEntryPtr(key);
+				if (*e == nullptr) {
 					return nullptr;
 				}
 
 				/* remove existing entry */
 				old = *e;
-				*e = old->next;
+				*e = (T*) (((hashmap_entry*)old)->next);
 				old->next = nullptr;
 
 				/* fix size and rehash if appropriate */
@@ -299,27 +301,21 @@ namespace cache {
 			/*
 			 * hashmap_put
 			 */
-			hashmap_entry<T>* put(hashmap_entry<T>* entry) {
-				hashmap_entry<T>* old = remove(entry, nullptr);
+			T* put(const T* entry) {
+				T* old = remove(entry);
 				add(entry);
 				return old;
 			}
 
 			
-
-			static int always_equal(const void *unused1, const void *unused2, const void *unused3) {
-				return 0;
-			}
-		
 		private:
-			hashmap_entry<T> **table;
-			hashmap_cmp_fn cmpfn;
+			T** table;
 			unsigned int size, tablesize, grow_at, shrink_at;
 
 			void alloc_table(unsigned int _size) {
 				tablesize = _size;
-				table = (hashmap_entry<T> **) std::calloc(tablesize, sizeof(struct hashmap_entry<T> *));
-				if (table == NULL) {
+				table = (T**) std::calloc(tablesize, sizeof(T*));
+				if (table == nullptr) {
 					throw std::runtime_error(std::strerror(errno));
 				}
 
@@ -336,6 +332,8 @@ namespace cache {
 					shrink_at = grow_at / ((1 << HASHMAP_RESIZE_BITS) + 1);
 				}
 			}	
+			
+			
 
 	};
 
