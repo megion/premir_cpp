@@ -10,13 +10,12 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "cache/hash-utils.h"
+
 /*
  * Generic implementation of hash-based key-value mappings.
  * See Documentation/technical/api-hashmap.txt.
  */
-#define FNV32_BASE ((unsigned int) 0x811c9dc5)
-#define FNV32_PRIME ((unsigned int) 0x01000193)
-
 #define HASHMAP_INITIAL_SIZE 64
 /* grow / shrink by 2^2 */
 #define HASHMAP_RESIZE_BITS 2
@@ -25,71 +24,13 @@
 
 
 namespace cache {
-	/* FNV-1 functions */
-	unsigned int strhash(const char *str) {
-		unsigned int c, hash = FNV32_BASE;
-		while ((c = (unsigned char) *str++))
-			hash = (hash * FNV32_PRIME) ^ c;
-		return hash;
-	}
-
-	unsigned int strihash(const char *str) {
-		unsigned int c, hash = FNV32_BASE;
-		while ((c = (unsigned char) *str++)) {
-			if (c >= 'a' && c <= 'z')
-				c -= 'a' - 'A';
-			hash = (hash * FNV32_PRIME) ^ c;
-		}
-		return hash;
-	}
-
-	unsigned int memhash(const void *buf, size_t len) {
-		unsigned int hash = FNV32_BASE;
-		unsigned char *ucbuf = (unsigned char *) buf;
-		while (len--) {
-			unsigned int c = *ucbuf++;
-			hash = (hash * FNV32_PRIME) ^ c;
-		}
-		return hash;
-	}
-
-	unsigned int memihash(const void *buf, size_t len) {
-		unsigned int hash = FNV32_BASE;
-		unsigned char *ucbuf = (unsigned char *) buf;
-		while (len--) {
-			unsigned int c = *ucbuf++;
-			if (c >= 'a' && c <= 'z')
-				c -= 'a' - 'A';
-			hash = (hash * FNV32_PRIME) ^ c;
-		}
-		return hash;
-	}
-
-	static inline unsigned int sha1hash(const unsigned char *sha1) {
-		/*
-		 * Equivalent to 'return *(unsigned int *)sha1;', but safe on
-		 * platforms that don't support unaligned reads.
-		 */
-		unsigned int hash;
-		memcpy(&hash, sha1, sizeof(hash));
-		return hash;
-	}
-
+	
 	/* data structures */
 	struct hashmap_entry {
 		struct hashmap_entry *next;
 		unsigned int hash;
 	};
 
-
-	/* hashmap_entry functions */
-
-	//static void hashmap_entry_init(hashmap_entry *entry, unsigned int hash) {
-		//struct hashmap_entry *e = entry;
-		//e->hash = hash;
-		//e->next = NULL;
-	//}
-	
 	/*
 	 * T type must be entry exdends hashmap_entry, for example:
 	   struct pool_entry {
@@ -101,8 +42,6 @@ namespace cache {
 	template<typename T>
 	class LinkedHashMap {
 		public:
-			//typedef int (*hashmap_cmp_fn)(const hashmap_entry<T> *entry,
-					   //const hashmap_entry<T> *entry_or_key, const void *keydata);
 			
 			LinkedHashMap(size_t initial_size) : size(0) {
 				unsigned int _size = HASHMAP_INITIAL_SIZE;
@@ -195,8 +134,8 @@ namespace cache {
 					while (e) {
 						hashmap_entry *next = e->next;
 						unsigned int b = bucket(e->hash);
-						e->next = table[b];
-						table[b] = e;
+						e->next = (hashmap_entry*)table[b];
+						table[b] = (T*)e;
 						e = next;
 					}
 				}
@@ -212,7 +151,7 @@ namespace cache {
 				const hashmap_entry *keyEntry = (hashmap_entry*) key;
 				T** e = &table[bucket(keyEntry->hash)];
 				while(*e && !entry_equals(*e, key)) {
-					e = &( (T*) (((hashmap_entry*)(*e))->next));
+					e = (T**)&(((hashmap_entry*)(*e))->next);
 				}
 				return e;
 			}
@@ -247,8 +186,8 @@ namespace cache {
 				unsigned int b = bucket(entry->hash);
 
 				/* add entry */
-				entry->next = table[b];
-				table[b] = entry;
+				entry->next = (hashmap_entry*)table[b];
+				table[b] = (T*)entry;
 
 				/* fix size and rehash if appropriate */
 				size++;

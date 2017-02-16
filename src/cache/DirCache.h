@@ -71,21 +71,21 @@ namespace cache {
 		char name[FLEX_ARRAY]; /* more */
 	};
 	
-	struct index_state {
-		struct cache_entry **cache;
-		unsigned int version;
-		unsigned int cache_nr, cache_alloc, cache_changed;
-		struct string_list *resolve_undo;
-		struct cache_tree *cache_tree;
-		struct split_index *split_index;
-		struct cache_time timestamp;
-		unsigned name_hash_initialized : 1,
-				 initialized : 1;
-		struct hashmap name_hash;
-		struct hashmap dir_hash;
-		unsigned char sha1[20];
-		struct untracked_cache *untracked;
-	};   
+	//struct index_state {
+		//struct cache_entry **cache;
+		//unsigned int version;
+		//unsigned int cache_nr, cache_alloc, cache_changed;
+		//struct string_list *resolve_undo;
+		//struct cache_tree *cache_tree;
+		//struct split_index *split_index;
+		//struct cache_time timestamp;
+		//unsigned name_hash_initialized : 1,
+				 //initialized : 1;
+		//struct hashmap name_hash;
+		//struct hashmap dir_hash;
+		//unsigned char sha1[20];
+		//struct untracked_cache *untracked;
+	//};   
 
 	//int read_index(struct index_state *istate)
 	//{
