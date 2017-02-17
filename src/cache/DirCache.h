@@ -32,7 +32,7 @@
 #define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
 
 
-#define read_cache() read_index(&the_index)
+//#define read_cache() read_index(&the_index)
 
 namespace cache {
 
