@@ -103,10 +103,13 @@ namespace cache {
 			};
 
 			~LinkedHashMap() {
-				hashmap_free(true);
+				freeMap(false);
 			}
 
-			void hashmap_free(bool free_entries) {
+			/*
+			 * hashmap_free
+			 */
+			void freeMap(bool free_entries) {
 				if (!table) {
 					return;
 				}

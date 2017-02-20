@@ -23,6 +23,21 @@ namespace test {
 			cache::hashmap_entry ent;
 			/* key and value as two \0-terminated strings */
 			char *key;
+			test_entry(unsigned int hash) {
+				ent.hash = hash;
+				ent.next = nullptr;
+			}
+			// compare function for hash map
+			bool operator==(const test_entry &other) const {
+				// check same pointer or nullptr
+				if(key==other.key) {
+					return true;
+				}
+				return (std::strcmp(key, other.key)==0);
+			}
+			bool operator!=(const test_entry &other) const {
+				return !((*this) == other);
+			}
 		};
 
         void linkedHashMap_test();

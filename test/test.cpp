@@ -24,6 +24,8 @@
 #include "ml/DigitalFilterTest.h"
 #include "ml/LevensteinDistanceTest.h"
 
+#include "cache/LinkedHashMapTest.h"
+
 int main(int argc, char **argv) {
 
 //    char* curloc = setlocale(LC_ALL,"");
@@ -61,6 +63,8 @@ int main(int argc, char **argv) {
 
     test::combinatorics::combinatorics_test();
     test::combinatorics::generate_text_test();
+
+	test::cache_linked_hash_map::linkedHashMap_test();
 
     return 0;
 
