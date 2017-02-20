@@ -14,7 +14,7 @@
 #include "test.h"
 
 #include "cache/LinkedHashMap.h"
-
+#include "cache/DirCache.h"
 
 namespace test {
     namespace cache_linked_hash_map {
@@ -22,7 +22,7 @@ namespace test {
 		struct test_entry {
 			cache::hashmap_entry ent;
 			/* key and value as two \0-terminated strings */
-			char *key;
+			char key[FLEX_ARRAY];
 			test_entry(unsigned int hash) {
 				ent.hash = hash;
 				ent.next = nullptr;

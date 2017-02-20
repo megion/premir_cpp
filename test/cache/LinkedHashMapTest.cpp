@@ -3,18 +3,19 @@
 namespace test {
 	namespace cache_linked_hash_map {
 		
-		
-
 		const char *get_value(const test_entry *e) {
 			return e->key + std::strlen(e->key) + 1;
 		}
 
 		test_entry *alloc_test_entry(int hash, const char *key, int klen, const char *value, int vlen) {
 			test_entry *entry = (test_entry*)std::malloc(sizeof(test_entry) + klen + vlen + 2);
+			if (entry == nullptr) {
+				throw std::runtime_error(std::strerror(errno));
+			}
 			entry->ent.hash = hash;
 			entry->ent.next = nullptr;
-			memcpy(entry->key, key, klen + 1);
-			memcpy(entry->key + klen + 1, value, vlen + 1);
+			std::memcpy(entry->key, key, klen + 1);
+			std::memcpy(entry->key + klen + 1, value, vlen + 1);
 			return entry;
 		}
 
@@ -58,7 +59,7 @@ namespace test {
 			for (unsigned int i = 0; i < TEST_SIZE; i++) {
 				snprintf(buf, sizeof(buf), "%i", i);
 				test_entry *entry = alloc_test_entry(0, buf, strlen(buf), "", 0);
-				entry->ent.hash = hash(method, i, entries[i]->key);
+				entry->ent.hash = hash(method, i, entry->key);
 				entry->ent.next = nullptr;
 				entries[i] = entry;
 				//hashes[i] = hash(method, i, entries[i]->key);
@@ -84,11 +85,8 @@ namespace test {
 						test_entry *entry2 = map.getEntry(entry);
 						assert(entry2 == nullptr);
 					}
-					
 				}
-
 			}
-
 		}
 
 		void test_read_index() {
