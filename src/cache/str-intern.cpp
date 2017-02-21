@@ -13,7 +13,13 @@ namespace cache {
 		/* lookup interned string in pool */
 		pool_entry key(memhash(data, len)); 
 		key.len = len;
-		key.data = (unsigned char *)data;
+		//char dp[255];
+		//char* dp2 = dp;
+		//dp = (char*) data;	
+		//std::memcpy(key.data, data, 1);
+		//key.data = (unsigned char *)data;
+		//unsigned char *dpp = &(key.data[0]);
+		//key.data[0] = data;
 		pool_entry* e = interningMap.getEntry(&key);
 		if (!e) {
 			/* not found: create it */

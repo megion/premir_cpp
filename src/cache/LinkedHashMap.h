@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "cache/hash-utils.h"
+#include "utils/console_colors.h"
 
 /*
  * Generic implementation of hash-based key-value mappings.
@@ -38,8 +39,11 @@ namespace cache {
 		   size_t len;
 		   unsigned char data[FLEX_ARRAY];
 		};
+
+		D type of data. For example may be 'unsigned char' or other structure.
+		This data is used for find entry.
 	 */
-	template<typename T>
+	template<typename T, typename D>
 	class LinkedHashMap {
 		public:
 			
@@ -61,7 +65,7 @@ namespace cache {
 			class MapInterator {
 				public:
 					// hashmap_iter_init
-					MapInterator(LinkedHashMap<T>* _map): map(_map), nextEntry(nullptr), tablepos(0) {
+					MapInterator(LinkedHashMap<T,D>* _map): map(_map), nextEntry(nullptr), tablepos(0) {
 					}
 
 					/*
@@ -98,7 +102,7 @@ namespace cache {
 					T *nextEntry;
 
 				private:
-					LinkedHashMap<T> *map;
+					LinkedHashMap<T,D> *map;
 					unsigned int tablepos;
 			};
 
@@ -126,6 +130,18 @@ namespace cache {
 				tablesize = 0;
 				//memset(map, 0, sizeof(*map));
 			}
+
+			void printMap() const {
+				size_t cn = 0;
+				for (size_t i = 0; i < tablesize; i++) {
+					hashmap_entry *e = (hashmap_entry*)table[i];
+					while (e) {
+						std::printf("entry %d: tablepos=%d, next=%p, hash=%d\n", cn, i, e->next, e->hash); 
+						e = e->next;
+						cn++;
+					}
+				}
+			}
 						
 			void rehash(unsigned int newsize) {
 				unsigned int i, oldsize = tablesize;
@@ -147,13 +163,10 @@ namespace cache {
 
 			/*
 			 * find_entry_ptr
-			 * You must set hash field in key pointer. Other fields are optional.
-			 * The each entries compare by == operator
 			 */
-			T** findEntryPtr(const T *key) {
-				const hashmap_entry *keyEntry = (hashmap_entry*) key;
-				T** e = &table[bucket(keyEntry->hash)];
-				while(*e && !entry_equals(*e, key)) {
+			T** findEntryPtr(unsigned int hash, const D *keyData) const {
+				T** e = &table[bucket(hash)];
+				while(*e && !entryEquals(*e, hash, keyData)) {
 					e = (T**)&(((hashmap_entry*)(*e))->next);
 				}
 				return e;
@@ -162,8 +175,8 @@ namespace cache {
 			/*
 			 * hashmap_get or hashmap_get_from_hash 
 			 */
-			T* getEntry(const T *key) {
-				return *findEntryPtr(key);
+			T* getEntry(unsigned int hash, const D *keyData) {
+				return *findEntryPtr(hash, keyData);
 			}
 		
 			/*
@@ -173,7 +186,7 @@ namespace cache {
 				hashmap_entry *entry = (hashmap_entry*) key;
 				hashmap_entry *ne = entry->next;
 				for (; ne; ne = ne->next) {
-					if (entry_equals(key, (T*)ne)) {
+					if (entryEquals((T*)ne, key)) {
 						return (T*)ne;
 					}
 				}
@@ -184,13 +197,13 @@ namespace cache {
 			 * hashmap_add
 			 * add entry to hash map. User must allocated memory for entry before add
 			 */
-			void add(const T* e) {
+			void add(T* e) {
 				hashmap_entry *entry = (hashmap_entry*) e;
 				unsigned int b = bucket(entry->hash);
 
 				/* add entry */
 				entry->next = (hashmap_entry*)table[b];
-				table[b] = (T*)entry;
+				table[b] = e;
 
 				/* fix size and rehash if appropriate */
 				size++;
@@ -202,17 +215,16 @@ namespace cache {
 			/*
 			 * hashmap_remove
 			 */
-			T* remove(const T *key) {
-				T *old;
-				T **e = findEntryPtr(key);
+			T* remove(unsigned int hash, const D *keyData) {
+				T **e = findEntryPtr(hash, keyData);
 				if (*e == nullptr) {
 					return nullptr;
 				}
 
 				/* remove existing entry */
-				old = *e;
+				T *old = *e;
 				*e = (T*) (((hashmap_entry*)old)->next);
-				old->next = nullptr;
+				((hashmap_entry*)old)->next = nullptr;
 
 				/* fix size and rehash if appropriate */
 				size--;
@@ -225,12 +237,15 @@ namespace cache {
 			/*
 			 * hashmap_put
 			 */
-			T* put(const T* entry) {
+			T* put(T* entry) {
 				T* old = remove(entry);
 				add(entry);
 				return old;
 			}
 
+			unsigned int getSize() {
+				return size;
+			}
 			
 		private:
 			T** table;

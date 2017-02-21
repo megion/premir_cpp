@@ -17,9 +17,9 @@ namespace cache {
 	
 	/* string interning */
 	struct pool_entry {
-		struct hashmap_entry ent; // must be first
+		hashmap_entry ent; // must be first
 		size_t len;
-		unsigned char *data;
+		unsigned char data[FLEX_ARRAY];
 
 		pool_entry(unsigned int hash) {
 			ent.hash = hash;

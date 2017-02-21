@@ -55,14 +55,17 @@ namespace test {
 
 			const unsigned int TEST_SIZE = 16;
 			test_entry **entries = (test_entry**)std::malloc(TEST_SIZE * sizeof(test_entry *));
-			//unsigned int *hashes = (unsigned int*)std::malloc(TEST_SIZE * sizeof(int));
+			unsigned int *hashes = (unsigned int*)std::malloc(TEST_SIZE * sizeof(unsigned int));
+			cache::LinkedHashMap<test_entry> allValuesMap(0);
 			for (unsigned int i = 0; i < TEST_SIZE; i++) {
 				snprintf(buf, sizeof(buf), "%i", i);
 				test_entry *entry = alloc_test_entry(0, buf, strlen(buf), "", 0);
-				entry->ent.hash = hash(method, i, entry->key);
+				unsigned int h = hash(method, i, entry->key);
+				entry->ent.hash = h;
+				hashes[i] = h;
 				entry->ent.next = nullptr;
 				entries[i] = entry;
-				//hashes[i] = hash(method, i, entries[i]->key);
+				allValuesMap.add(entry);
 			}
 			
 			/* test adding to the map */
@@ -80,132 +83,111 @@ namespace test {
 
 						test_entry *entry2 = map.getEntry(entry);
 						assert(entry2 != nullptr);
-						assert(entry2->ent.hash == entry->ent.hash);
+						assert(entry2->ent.hash == hashes[i]);
 					} else {
 						test_entry *entry2 = map.getEntry(entry);
 						assert(entry2 == nullptr);
 					}
 				}
 			}
+
+			/* free all entries */
+			allValuesMap.freeMap(true);
 		}
 
-		void test_read_index() {
+		void test_perfomance_map() {
 			perf_hashmap(HASH_METHOD_FNV, 3);
 		}
+		
+		void test_add_value() {
+			const char *p1 = "abcd";
+			int l1 = std::strlen(p1);
 
-#define DELIM " \t\r\n"
+			const char *p2 = "qwertyuiop";
+			int l2 = std::strlen(p2);
 
-/*
- * Read stdin line by line and print result of commands to stdout:
- *
- * hash key -> strhash(key) memhash(key) strihash(key) memihash(key)
- * put key value -> NULL / old value
- * get key -> NULL / value
- * remove key -> NULL / old value
- * iterate -> key1 value1\nkey2 value2\n...
- * size -> tablesize numentries
- *
- * perfhashmap method rounds -> test hashmap.[ch] performance
- */
-//int cmd_main(int argc, const char **argv)
-//{
-	//char line[1024];
-	//struct hashmap map;
-	//int icase;
 
-	//[> init hash map <]
-	//icase = argc > 1 && !strcmp("ignorecase", argv[1]);
-	//hashmap_init(&map, (hashmap_cmp_fn) (icase ? test_entry_cmp_icase
-			//: test_entry_cmp), 0);
+			cache::LinkedHashMap<test_entry> map(0);
+			map.add(alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2));
+			assert(map.getSize() == 1);
 
-	//[> process commands from stdin <]
-	//while (fgets(line, sizeof(line), stdin)) {
-		//char *cmd, *p1 = NULL, *p2 = NULL;
-		//int l1 = 0, l2 = 0, hash = 0;
-		//struct test_entry *entry;
+			map.add(alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2));
+			assert(map.getSize() == 2);
 
-		//[> break line into command and up to two parameters <]
-		//cmd = strtok(line, DELIM);
-		//[> ignore empty lines <]
-		//if (!cmd || *cmd == '#')
-			//continue;
+			test_entry *old = map.put(alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2));
+			assert(old != nullptr);
+			std::free(old);
+			assert(map.getSize() == 2);
 
-		//p1 = strtok(NULL, DELIM);
-		//if (p1) {
-			//l1 = strlen(p1);
-			//hash = icase ? strihash(p1) : strhash(p1);
-			//p2 = strtok(NULL, DELIM);
-			//if (p2)
-				//l2 = strlen(p2);
-		//}
+			// try remove
+			test_entry *lookupEntry = alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2);
+			test_entry *removed = map.remove(lookupEntry);
+			assert(removed != nullptr);
+			assert(map.getSize() == 1);
+			std::free(removed);
+			std::free(lookupEntry);
 
-		//if (!strcmp("hash", cmd) && l1) {
+			map.freeMap(true);
+		}
 
-			//[> print results of different hash functions <]
-			//printf("%u %u %u %u\n", strhash(p1), memhash(p1, l1),
-					//strihash(p1), memihash(p1, l1));
+		void test_map_iteration() {
+			const char *p1 = "abcd";
+			int l1 = std::strlen(p1);
+			unsigned int h1 = cache::strhash(p1);
 
-		//} else if (!strcmp("add", cmd) && l1 && l2) {
+			cache::LinkedHashMap<test_entry> map(0);
+			map.add(alloc_test_entry(h1, p1, l1, "", 0));
+			map.add(alloc_test_entry(h1, p1, l1, "", 0));
+			map.add(alloc_test_entry(h1, p1, l1, "", 0));
+			map.add(alloc_test_entry(h1, p1, l1, "", 0));
+			assert(map.getSize() == 4);
 
-			//[> create entry with key = p1, value = p2 <]
-			//entry = alloc_test_entry(hash, p1, l1, p2, l2);
+			const char *p2 = "abcdqerty";
+			int l2 = std::strlen(p1);
+			unsigned int h2 = cache::strhash(p2);
+			map.add(alloc_test_entry(h2, p2, l2, "", 0));
+			map.add(alloc_test_entry(h2, p2, l2, "", 0));
+			map.add(alloc_test_entry(h2, p2, l2, "", 0));
+			map.add(alloc_test_entry(h2, p2, l2, "", 0));
+			map.add(alloc_test_entry(h2, p2, l2, "", 0));
+			assert(map.getSize() == 9);
 
-			//[> add to hashmap <]
-			//hashmap_add(&map, entry);
+			//map.printMap();
 
-		//} else if (!strcmp("put", cmd) && l1 && l2) {
+			test_entry *lookupEntry = alloc_test_entry(cache::strhash(p1), p1, l1, "", 0);
+			test_entry *e = map.getEntry(lookupEntry);
+			assert(e != nullptr);
+			size_t iterCount = 0;
+			while(e) {
+				e = map.findNext(e);
+				iterCount++;
+			}
+			assert(iterCount == 4);
+			std::free(lookupEntry);
 
-			//[> create entry with key = p1, value = p2 <]
-			//entry = alloc_test_entry(hash, p1, l1, p2, l2);
+			lookupEntry = alloc_test_entry(cache::strhash(p2), p2, l2, "", 0);
+			e = map.getEntry(lookupEntry);
+			assert(e != nullptr);
+			iterCount = 0;
+			while(e) {
+				e = map.findNext(e);
+				iterCount++;
+			}
+			assert(iterCount == 5);
+			std::free(lookupEntry);
 
-			//[> add / replace entry <]
-			//entry = hashmap_put(&map, entry);
+			// iterate by all values
+			cache::LinkedHashMap<test_entry>::MapInterator iter(&map);
+			iterCount = 0;
+			while ((e = iter.getNext())) {
+				iterCount++;
+			}
+			assert(iterCount == 9);
 
-			//[> print and free replaced entry, if any <]
-			//puts(entry ? get_value(entry) : "NULL");
-			//free(entry);
+			map.freeMap(true);
+		}
 
-		//} else if (!strcmp("get", cmd) && l1) {
-
-			//[> lookup entry in hashmap <]
-			//entry = hashmap_get_from_hash(&map, hash, p1);
-
-			//[> print result <]
-			//if (!entry)
-				//puts("NULL");
-			//while (entry) {
-				//puts(get_value(entry));
-				//entry = hashmap_get_next(&map, entry);
-			//}
-
-		//} else if (!strcmp("remove", cmd) && l1) {
-
-			//[> setup static key <]
-			//struct hashmap_entry key;
-			//hashmap_entry_init(&key, hash);
-
-			//[> remove entry from hashmap <]
-			//entry = hashmap_remove(&map, &key, p1);
-
-			//[> print result and free entry<]
-			//puts(entry ? get_value(entry) : "NULL");
-			//free(entry);
-
-		//} else if (!strcmp("iterate", cmd)) {
-
-			//struct hashmap_iter iter;
-			//hashmap_iter_init(&map, &iter);
-			//while ((entry = hashmap_iter_next(&iter)))
-				//printf("%s %s\n", entry->key, get_value(entry));
-
-		//} else if (!strcmp("size", cmd)) {
-
-			//[> print table sizes <]
-			//printf("%u %u\n", map.tablesize, map.size);
-
-		//} else if (!strcmp("intern", cmd) && l1) {
-
-			//[> test that strintern works <]
+		void test_string_interning() {
 			//const char *i1 = strintern(p1);
 			//const char *i2 = strintern(p1);
 			//if (strcmp(i1, p1))
@@ -216,25 +198,14 @@ namespace test {
 				//printf("strintern(%s) != strintern(%s)", i1, i2);
 			//else
 				//printf("%s\n", i1);
-
-		//} else if (!strcmp("perfhashmap", cmd) && l1 && l2) {
-
-			//perf_hashmap(atoi(p1), atoi(p2));
-
-		//} else {
-
-			//printf("Unknown command %s\n", cmd);
-
-		//}
-	//}
-
-	//hashmap_free(&map, 1);
-	//return 0;
-//}
+		}
 
 		void linkedHashMap_test() {
 			suite("LinkedHashMap");
-			mytest(read_index);
+			mytest(perfomance_map);
+			mytest(add_value);
+			mytest(map_iteration);
+			mytest(string_interning);
 		}
 
 	}
