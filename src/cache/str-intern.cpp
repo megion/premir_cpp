@@ -3,7 +3,8 @@
 namespace cache {
 	
 	/* initialize global string pool hashmap */
-	static LinkedHashMap<pool_entry> interningMap(0);
+	static PoolEntryComparator interningEntryComp;
+	static LinkedHashMap<pool_entry, pool_entry_data> interningMap(0, &interningEntryComp);
 	
     const void *memintern(const void *data, size_t len) {
 
@@ -11,16 +12,11 @@ namespace cache {
 			//hashmap_init(&map, (hashmap_cmp_fn) pool_entry_cmp, 0);
 
 		/* lookup interned string in pool */
-		pool_entry key(memhash(data, len)); 
+		pool_entry_data key;
+		unsigned int hash = memhash(data, len); 
 		key.len = len;
-		//char dp[255];
-		//char* dp2 = dp;
-		//dp = (char*) data;	
-		//std::memcpy(key.data, data, 1);
-		//key.data = (unsigned char *)data;
-		//unsigned char *dpp = &(key.data[0]);
-		//key.data[0] = data;
-		pool_entry* e = interningMap.getEntry(&key);
+		key.data = (unsigned char*)data;
+		pool_entry* e = interningMap.getEntry(hash, &key);
 		if (!e) {
 			/* not found: create it */
 			/* allocate memory sizeof struct + data length */
@@ -31,7 +27,7 @@ namespace cache {
 			}
 			/* copy data to the end of struct */
 			std::memcpy(e->data, data, len);
-			e->ent.hash = key.ent.hash;
+			e->ent.hash = hash;
 			e->ent.next = nullptr;
 			e->len = len;
 			interningMap.add(e);

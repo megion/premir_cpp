@@ -26,7 +26,10 @@
 
 namespace cache {
 	
-	/* data structures */
+	/*
+	 * data structures
+	 * D is type of data 
+	 */
 	struct hashmap_entry {
 		struct hashmap_entry *next;
 		unsigned int hash;
@@ -46,8 +49,19 @@ namespace cache {
 	template<typename T, typename D>
 	class LinkedHashMap {
 		public:
-			
-			LinkedHashMap(size_t initial_size) : size(0) {
+
+			class EntryComparator {
+				/*
+				 * compare entry with keyHash and keyData
+				 */
+				virtual bool equals(const T* entry, unsigned int keyHash, const D* keyData) const = 0;
+				/*
+				 * compare entry1 with entry2
+				 */
+				virtual bool equals(const T* entry1, const T* entry2) const = 0;
+			};
+
+			LinkedHashMap(size_t initial_size, EntryComparator *_comparator) : size(0), comparator(_comparator) {
 				unsigned int _size = HASHMAP_INITIAL_SIZE;
 
 				/* calculate initial table size and allocate the table */
@@ -58,7 +72,7 @@ namespace cache {
 				}
 				alloc_table(_size);
 			}
-
+			
 			/*
 			 * Iterator 
 			 */
@@ -166,7 +180,18 @@ namespace cache {
 			 */
 			T** findEntryPtr(unsigned int hash, const D *keyData) const {
 				T** e = &table[bucket(hash)];
-				while(*e && !entryEquals(*e, hash, keyData)) {
+				while(*e && !comparator->equals(*e, hash, keyData)) {
+					e = (T**)&(((hashmap_entry*)(*e))->next);
+				}
+				return e;
+			}
+
+			/*
+			 * find_entry_ptr
+			 */
+			T** findEntryPtr(const T *key) const {
+				T** e = &table[bucket(((hashmap_entry*)key)->hash)];
+				while(*e && !comparator->equals(*e, key)) {
 					e = (T**)&(((hashmap_entry*)(*e))->next);
 				}
 				return e;
@@ -178,6 +203,13 @@ namespace cache {
 			T* getEntry(unsigned int hash, const D *keyData) {
 				return *findEntryPtr(hash, keyData);
 			}
+
+			/*
+			 * hashmap_get or hashmap_get_from_hash 
+			 */
+			T* getEntry(const T *key) {
+				return *findEntryPtr(key);
+			}
 		
 			/*
 			 * hashmap_get_next
@@ -186,7 +218,7 @@ namespace cache {
 				hashmap_entry *entry = (hashmap_entry*) key;
 				hashmap_entry *ne = entry->next;
 				for (; ne; ne = ne->next) {
-					if (entryEquals((T*)ne, key)) {
+					if (comparator->equals((T*)ne, key)) {
 						return (T*)ne;
 					}
 				}
@@ -215,8 +247,8 @@ namespace cache {
 			/*
 			 * hashmap_remove
 			 */
-			T* remove(unsigned int hash, const D *keyData) {
-				T **e = findEntryPtr(hash, keyData);
+			T* remove(T *key) {
+				T **e = findEntryPtr(key);
 				if (*e == nullptr) {
 					return nullptr;
 				}
@@ -250,6 +282,7 @@ namespace cache {
 		private:
 			T** table;
 			unsigned int size, tablesize, grow_at, shrink_at;
+			EntryComparator *comparator;
 
 			void alloc_table(unsigned int _size) {
 				tablesize = _size;
@@ -272,11 +305,11 @@ namespace cache {
 				}
 			}	
 
-			bool entry_equals(const T *e1, const T *e2) {
-				hashmap_entry* entry1 = (hashmap_entry*) e1;
-				hashmap_entry* entry2 = (hashmap_entry*) e2;
-				return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
-			}
+			//bool entry_equals(const T *e1, const T *e2) {
+				//hashmap_entry* entry1 = (hashmap_entry*) e1;
+				//hashmap_entry* entry2 = (hashmap_entry*) e2;
+				//return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
+			//}
 
 			unsigned int bucket(unsigned int hash) {
 				return hash & (tablesize - 1);
