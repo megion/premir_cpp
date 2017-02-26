@@ -3,10 +3,6 @@
 namespace test {
 	namespace cache_linked_hash_map {
 		
-		const char *get_value(const test_entry *e) {
-			return e->key + std::strlen(e->key) + 1;
-		}
-
 		test_entry *alloc_test_entry(int hash, const char *key, int klen, const char *value, int vlen) {
 			test_entry *entry = (test_entry*)std::malloc(sizeof(test_entry) + klen + vlen + 2);
 			if (entry == nullptr) {
@@ -42,8 +38,9 @@ namespace test {
 					break;
 			}
 
-			if (method & HASH_METHOD_X2)
+			if (method & HASH_METHOD_X2) {
 				hash = 2 * hash;
+			}
 			return hash;
 		}
 
@@ -56,7 +53,8 @@ namespace test {
 			const unsigned int TEST_SIZE = 16;
 			test_entry **entries = (test_entry**)std::malloc(TEST_SIZE * sizeof(test_entry *));
 			unsigned int *hashes = (unsigned int*)std::malloc(TEST_SIZE * sizeof(unsigned int));
-			cache::LinkedHashMap<test_entry> allValuesMap(0);
+			TestEntryComparator comparator;
+			cache::LinkedHashMap<test_entry, test_entry_data> allValuesMap(0, &comparator);
 			for (unsigned int i = 0; i < TEST_SIZE; i++) {
 				snprintf(buf, sizeof(buf), "%i", i);
 				test_entry *entry = alloc_test_entry(0, buf, strlen(buf), "", 0);
@@ -72,7 +70,7 @@ namespace test {
 
 			const unsigned int TEST_ADD = 8;
 			for (unsigned int j = 0; j < rounds; j++) {
-				cache::LinkedHashMap<test_entry> map(0);
+				cache::LinkedHashMap<test_entry, test_entry_data> map(0, &comparator);
 
 				/* add entries */
 				for (unsigned int i = 0; i < TEST_SIZE; i++) {
@@ -82,6 +80,12 @@ namespace test {
 						map.add(entry);
 
 						test_entry *entry2 = map.getEntry(entry);
+						assert(entry2 != nullptr);
+						assert(entry2->ent.hash == hashes[i]);
+
+						test_entry_data keyData;
+						keyData.key = entry->key;
+						entry2 = map.getEntry(hashes[i], &keyData);
 						assert(entry2 != nullptr);
 						assert(entry2->ent.hash == hashes[i]);
 					} else {
@@ -97,6 +101,9 @@ namespace test {
 
 		void test_perfomance_map() {
 			perf_hashmap(HASH_METHOD_FNV, 3);
+			perf_hashmap(HASH_METHOD_I, 3);
+			perf_hashmap(HASH_METHOD_IDIV10, 3);
+			perf_hashmap(HASH_METHOD_0, 3);
 		}
 		
 		void test_add_value() {
@@ -106,10 +113,17 @@ namespace test {
 			const char *p2 = "qwertyuiop";
 			int l2 = std::strlen(p2);
 
-
-			cache::LinkedHashMap<test_entry> map(0);
-			map.add(alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2));
+			TestEntryComparator comparator;
+			cache::LinkedHashMap<test_entry, test_entry_data> map(0, &comparator);
+			test_entry *entry = alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2);
+			map.add(entry);
 			assert(map.getSize() == 1);
+			test_entry *fe = map.getEntry(entry);
+			assert(fe != nullptr);
+			test_entry_data keyData;
+			keyData.key = entry->key;
+			fe = map.getEntry(entry->ent.hash, &keyData);
+			assert(fe != nullptr);
 
 			map.add(alloc_test_entry(cache::strhash(p1), p1, l1, p2, l2));
 			assert(map.getSize() == 2);
@@ -135,7 +149,8 @@ namespace test {
 			int l1 = std::strlen(p1);
 			unsigned int h1 = cache::strhash(p1);
 
-			cache::LinkedHashMap<test_entry> map(0);
+			TestEntryComparator comparator;
+			cache::LinkedHashMap<test_entry, test_entry_data> map(0, &comparator);
 			map.add(alloc_test_entry(h1, p1, l1, "", 0));
 			map.add(alloc_test_entry(h1, p1, l1, "", 0));
 			map.add(alloc_test_entry(h1, p1, l1, "", 0));
@@ -151,8 +166,6 @@ namespace test {
 			map.add(alloc_test_entry(h2, p2, l2, "", 0));
 			map.add(alloc_test_entry(h2, p2, l2, "", 0));
 			assert(map.getSize() == 9);
-
-			//map.printMap();
 
 			test_entry *lookupEntry = alloc_test_entry(cache::strhash(p1), p1, l1, "", 0);
 			test_entry *e = map.getEntry(lookupEntry);
@@ -177,7 +190,7 @@ namespace test {
 			std::free(lookupEntry);
 
 			// iterate by all values
-			cache::LinkedHashMap<test_entry>::MapInterator iter(&map);
+			cache::LinkedHashMap<test_entry, test_entry_data>::MapInterator iter(&map);
 			iterCount = 0;
 			while ((e = iter.getNext())) {
 				iterCount++;
@@ -188,16 +201,12 @@ namespace test {
 		}
 
 		void test_string_interning() {
-			//const char *i1 = strintern(p1);
-			//const char *i2 = strintern(p1);
-			//if (strcmp(i1, p1))
-				//printf("strintern(%s) returns %s\n", p1, i1);
-			//else if (i1 == p1)
-				//printf("strintern(%s) returns input pointer\n", p1);
-			//else if (i1 != i2)
-				//printf("strintern(%s) != strintern(%s)", i1, i2);
-			//else
-				//printf("%s\n", i1);
+			const char *p1 = "abcd";
+
+			const char *i1 = cache::strintern(p1);
+			const char *i2 = cache::strintern(p1);
+			assert(std::strcmp(i1, p1)==0);
+			assert(i1==i2); // same pointer
 		}
 
 		void linkedHashMap_test() {

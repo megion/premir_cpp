@@ -51,14 +51,15 @@ namespace cache {
 		public:
 
 			class EntryComparator {
-				/*
-				 * compare entry with keyHash and keyData
-				 */
-				virtual bool equals(const T* entry, unsigned int keyHash, const D* keyData) const = 0;
-				/*
-				 * compare entry1 with entry2
-				 */
-				virtual bool equals(const T* entry1, const T* entry2) const = 0;
+				public:
+					/*
+					 * compare entry with keyHash and keyData
+					 */
+					virtual bool equals(const T* entry, unsigned int keyHash, const D* keyData) const = 0;
+					/*
+					 * compare entry1 with entry2
+					 */
+					virtual bool equals(const T* entry1, const T* entry2) const = 0;
 			};
 
 			LinkedHashMap(size_t initial_size, EntryComparator *_comparator) : size(0), comparator(_comparator) {
@@ -207,14 +208,14 @@ namespace cache {
 			/*
 			 * hashmap_get or hashmap_get_from_hash 
 			 */
-			T* getEntry(const T *key) {
+			T* getEntry(const T *key) const {
 				return *findEntryPtr(key);
 			}
 		
 			/*
 			 * hashmap_get_next
 			 */	
-			T* findNext(const T *key) {
+			T* findNext(const T *key) const {
 				hashmap_entry *entry = (hashmap_entry*) key;
 				hashmap_entry *ne = entry->next;
 				for (; ne; ne = ne->next) {
@@ -305,13 +306,7 @@ namespace cache {
 				}
 			}	
 
-			//bool entry_equals(const T *e1, const T *e2) {
-				//hashmap_entry* entry1 = (hashmap_entry*) e1;
-				//hashmap_entry* entry2 = (hashmap_entry*) e2;
-				//return (e1 == e2) || (entry1->hash == entry2->hash && *e1 == *e2);
-			//}
-
-			unsigned int bucket(unsigned int hash) {
+			unsigned int bucket(unsigned int hash) const {
 				return hash & (tablesize - 1);
 			}
 

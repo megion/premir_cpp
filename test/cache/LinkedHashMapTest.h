@@ -15,9 +15,14 @@
 
 #include "cache/LinkedHashMap.h"
 #include "cache/DirCache.h"
+#include "cache/str-intern.h"
 
 namespace test {
     namespace cache_linked_hash_map {
+
+		struct test_entry_data {
+			char *key;
+		};
 
 		struct test_entry {
 			cache::hashmap_entry ent;
@@ -27,17 +32,18 @@ namespace test {
 				ent.hash = hash;
 				ent.next = nullptr;
 			}
-			// compare function for hash map
-			bool operator==(const test_entry &other) const {
-				// check same pointer or nullptr
-				if(key==other.key) {
-					return true;
+		};
+
+		class TestEntryComparator: public cache::LinkedHashMap<test_entry, test_entry_data>::EntryComparator {
+			public:
+				bool equals(const test_entry* entry, unsigned int keyHash, const test_entry_data* keyData) const {
+					return (entry->ent.hash == keyHash && 
+							(std::strcmp(entry->key, keyData->key)==0));
 				}
-				return (std::strcmp(key, other.key)==0);
-			}
-			bool operator!=(const test_entry &other) const {
-				return !((*this) == other);
-			}
+				bool equals(const test_entry* entry1, const test_entry* entry2) const {
+					return (entry1->ent.hash == entry2->ent.hash  && 
+							(std::strcmp(entry1->key, entry2->key)==0));
+				}	
 		};
 
         void linkedHashMap_test();
