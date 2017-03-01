@@ -1,19 +1,19 @@
 " Local project a vimrc file.
 
 " count of space which show tab
-set tabstop=4
+"set tabstop=4
 
 " count of space which show tab when it added
-set softtabstop=4
+"set softtabstop=4
 
 " count of space add by commands '>>' and '<<'
-set shiftwidth=4
+"set shiftwidth=4
 
 "
-set noexpandtab
+"set noexpandtab
 
-set colorcolumn=120
-highlight ColorColumn ctermbg=darkgray
+"set colorcolumn=120
+"highlight ColorColumn ctermbg=darkgray
 
 "augroup project
 "	autocmd!

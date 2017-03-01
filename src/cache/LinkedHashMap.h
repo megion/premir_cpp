@@ -12,6 +12,8 @@
 
 #include "cache/hash-utils.h"
 #include "utils/console_colors.h"
+#include "cache/DirCache.h"
+
 
 /*
  * Generic implementation of hash-based key-value mappings.

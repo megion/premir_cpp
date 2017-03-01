@@ -11,6 +11,8 @@
 #include <iostream>
 
 #include "utils/console_colors.h"
+#include "cache/DirCache.h"
+#include "cache/qsort_s.h"
 
 namespace cache {
 	
@@ -25,9 +27,9 @@ namespace cache {
 
 
 
-#define REALLOC_ARRAY(x, alloc) (x) = xrealloc((x), st_mult(sizeof(*(x)), (alloc)))
+//#define REALLOC_ARRAY(x, alloc) (x) = xrealloc((x), st_mult(sizeof(*(x)), (alloc)))
 
-#define alloc_nr(x) (((x)+16)*3/2)
+//#define alloc_nr(x) (((x)+16)*3/2)
 
 /*
  * Realloc the buffer pointed at by variable 'x' so that it can hold
@@ -36,27 +38,27 @@ namespace cache {
  *
  * DO NOT USE any expression with side-effect for 'x', 'nr', or 'alloc'.
  */
-#define ALLOC_GROW(x, nr, alloc) \
-	do { \
-		if ((nr) > alloc) { \
-			if (alloc_nr(alloc) < (nr)) \
-				alloc = (nr); \
-			else \
-				alloc = alloc_nr(alloc); \
-			REALLOC_ARRAY(x, alloc); \
-		} \
-	} while (0)
+//#define ALLOC_GROW(x, nr, alloc) \
+	//do { \
+		//if ((nr) > alloc) { \
+			//if (alloc_nr(alloc) < (nr)) \
+				//alloc = (nr); \
+			//else \
+				//alloc = alloc_nr(alloc); \
+			//REALLOC_ARRAY(x, alloc); \
+		//} \
+	//} while (0)
 
-#define QSORT_S(base, n, compar, ctx) do {			\
-	if (qsort_s((base), (n), sizeof(*(base)), compar, ctx))	\
-		die("BUG: qsort_s() failed");			\
-} while (0)
+//#define QSORT_S(base, n, compar, ctx) do {			\
+	//if (qsort_s((base), (n), sizeof(*(base)), compar, ctx))	\
+		//die("BUG: qsort_s() failed");			\
+//} while (0)
 
-#ifndef HAVE_ISO_QSORT_S
-int git_qsort_s(void *base, size_t nmemb, size_t size,
-		int (*compar)(const void *, const void *, void *), void *ctx);
-#define qsort_s git_qsort_s
-#endif
+//#ifndef HAVE_ISO_QSORT_S
+//int git_qsort_s(void *base, size_t nmemb, size_t size,
+		//int (*compar)(const void *, const void *, void *), void *ctx);
+//#define qsort_s git_qsort_s
+//#endif
 
 	/*
 	 */
@@ -174,38 +176,40 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
 			}
 
 			// iterator implementation for use in C++11 range-based for loops
+			// example:
+			//for (Foo2 &ff : list) {
+				//ff.id = 8;
+			//}
 			class Iterator {
 				public:
-					Iterator(string_list_item *_arr, unsigned int _pos) :
-						arr(_arr), pos(_pos) {
-						}
+					Iterator(string_list_item *_arr) : arr(_arr) {
+					}
 
 					bool operator!=(const Iterator &other) const {
-						return pos != other.pos;
+						return arr!= other.arr;
 					}
 
 					string_list_item &operator*() const {
-						return arr[pos];
+						return *arr;
 					}
 
 					const Iterator &operator++() {
-						++pos;
+						++arr;
 						return *this;
 					}
 
 				private:
-					unsigned int pos;
 					string_list_item *arr;
 			};
 
 			// begin method range-based for loop
 			Iterator begin() const {
-				return Iterator(items, 0);
+				return Iterator(items);
 			}
 
 			// end method range-based for loop
 			Iterator end() const {
-				return Iterator(items, nr);
+				return Iterator(items + nr);
 			}
 			/////////////////////////////////
 
@@ -270,16 +274,57 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
 				return appendNodup(strdup_strings ? strdup(string) : (char *)string);
 			}
 
-			//static int cmp_items(const void *a, const void *b, void *ctx)
-			//{
-				//compare_strings_fn cmp = ctx;
-				//const struct string_list_item *one = a;
-				//const struct string_list_item *two = b;
-				//return cmp(one->string, two->string);
-			//}
-
 			void sort() {
-				QSORT_S(items, nr, cmp_items, cmp);
+				cache::qsort_s(items, nr, cmp_items, (void*)cmp);
+			}
+
+			string_list_item *unsortedLookup(const char *string) {
+				for(string_list_item &item: (*this)) {
+					if (!cmp(string, item.string)) {
+						return &item;
+					}
+
+				}
+				return nullptr;
+			}
+
+			bool unsortedHasString(const char *string) {
+				return unsortedLookup(string) != nullptr;
+			}
+
+			void unsortedDeleteItem(int i, bool free_util) {
+				if (strdup_strings) {
+					std::free(items[i].string);
+				}
+				if (free_util) {
+					std::free(items[i].util);
+				}
+				items[i] = items[nr-1];
+				nr--;
+			}
+
+			int split(const char *string, int delim, int maxsplit) {
+				int count = 0;
+				const char *p = string, *end;
+
+				if (!strdup_strings) {
+					LOG(ERR, "internal error in split(): strdup_strings must be set");
+				}
+				for (;;) {
+					count++;
+					if (maxsplit >= 0 && count > maxsplit) {
+						append(p);
+						return count;
+					}
+					end = strchr(p, delim);
+					if (end) {
+						appendNodup(xmemdupz(p, end - p));
+						p = end + 1;
+					} else {
+						append(p);
+						return count;
+					}
+				}
 			}
 			
 		private:
@@ -313,6 +358,13 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
 
 			static int item_is_not_empty(string_list_item *item, void *unused) {
 				return *item->string != '\0';
+			}
+
+			static int cmp_items(const void *a, const void *b, void *ctx) {
+				compare_strings_fn cmpfn = (compare_strings_fn)ctx;
+				const string_list_item *one = (string_list_item*)a;
+				const string_list_item *two = (string_list_item*)b;
+				return cmpfn(one->string, two->string);
 			}
 			
 	};

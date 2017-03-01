@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "cache/LinkedHashMap.h"
+//#include "cache/LinkedHashMap.h"
 
 #ifndef FLEX_ARRAY
 /*
@@ -28,48 +28,48 @@
 #endif
 
 /* The length in bytes and in hex digits of an object name (SHA-1 value). */
-#define GIT_SHA1_RAWSZ 20
-#define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
+//#define GIT_SHA1_RAWSZ 20
+//#define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
 
 
 //#define read_cache() read_index(&the_index)
 
 namespace cache {
 
-	struct object_id {
-		unsigned char hash[GIT_SHA1_RAWSZ];
-	};
+	//struct object_id {
+		//unsigned char hash[GIT_SHA1_RAWSZ];
+	//};
 
 	/*
 	 * The "cache_time" is just the low 32 bits of the
 	 * time. It doesn't matter if it overflows - we only
 	 * check it for equality in the 32 bits we save.
 	 */
-	struct cache_time {
-		uint32_t sec;
-		uint32_t nsec;
-	};
+	//struct cache_time {
+		//uint32_t sec;
+		//uint32_t nsec;
+	//};
 
-	struct stat_data {
-		struct cache_time sd_ctime;
-		struct cache_time sd_mtime;
-		unsigned int sd_dev;
-		unsigned int sd_ino;
-		unsigned int sd_uid;
-		unsigned int sd_gid;
-		unsigned int sd_size;
-	};
+	//struct stat_data {
+		//struct cache_time sd_ctime;
+		//struct cache_time sd_mtime;
+		//unsigned int sd_dev;
+		//unsigned int sd_ino;
+		//unsigned int sd_uid;
+		//unsigned int sd_gid;
+		//unsigned int sd_size;
+	//};
 
-	struct cache_entry {
-		struct hashmap_entry ent;
-		struct stat_data ce_stat_data;
-		unsigned int ce_mode;
-		unsigned int ce_flags;
-		unsigned int ce_namelen;
-		unsigned int index;	/* for link extension */
-		struct object_id oid;
-		char name[FLEX_ARRAY]; /* more */
-	};
+	//struct cache_entry {
+		//struct hashmap_entry ent;
+		//struct stat_data ce_stat_data;
+		//unsigned int ce_mode;
+		//unsigned int ce_flags;
+		//unsigned int ce_namelen;
+		//unsigned int index;	[> for link extension <]
+		//struct object_id oid;
+		//char name[FLEX_ARRAY]; [> more <]
+	//};
 	
 	//struct index_state {
 		//struct cache_entry **cache;
