@@ -47,7 +47,7 @@ void *xmalloc(size_t size)
 {
 	return do_xmalloc(size, 0);
 }
-	static void *do_xmallocz(size_t size, int gentle)
+static void *do_xmallocz(size_t size, int gentle)
 {
 	void *ret;
 	if (unsigned_add_overflows(size, 1)) {
