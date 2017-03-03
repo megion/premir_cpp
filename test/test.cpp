@@ -25,6 +25,7 @@
 #include "ml/LevensteinDistanceTest.h"
 
 #include "cache/LinkedHashMapTest.h"
+#include "cache/StringListTest.h"
 
 int main(int argc, char **argv) {
 
@@ -65,6 +66,7 @@ int main(int argc, char **argv) {
     test::combinatorics::generate_text_test();
 
 	test::cache_linked_hash_map::linkedHashMap_test();
+	test::cache_string_list::stringList_test();
 
     return 0;
 

@@ -13,68 +13,36 @@
 #include "utils/console_colors.h"
 #include "cache/DirCache.h"
 #include "cache/qsort_s.h"
+#include "cache/wrapper.h"
 
 namespace cache {
 	
+	template<typename T>
 	struct string_list_item {
 		char *string;
-		void *util;
-
-		bool isNotEmpty() {
-			return *string != '\0';
-		}
+		T *util;
 	};
-
-
-
-//#define REALLOC_ARRAY(x, alloc) (x) = xrealloc((x), st_mult(sizeof(*(x)), (alloc)))
-
-//#define alloc_nr(x) (((x)+16)*3/2)
-
-/*
- * Realloc the buffer pointed at by variable 'x' so that it can hold
- * at least 'nr' entries; the number of entries currently allocated
- * is 'alloc', using the standard growing factor alloc_nr() macro.
- *
- * DO NOT USE any expression with side-effect for 'x', 'nr', or 'alloc'.
- */
-//#define ALLOC_GROW(x, nr, alloc) \
-	//do { \
-		//if ((nr) > alloc) { \
-			//if (alloc_nr(alloc) < (nr)) \
-				//alloc = (nr); \
-			//else \
-				//alloc = alloc_nr(alloc); \
-			//REALLOC_ARRAY(x, alloc); \
-		//} \
-	//} while (0)
-
-//#define QSORT_S(base, n, compar, ctx) do {			\
-	//if (qsort_s((base), (n), sizeof(*(base)), compar, ctx))	\
-		//die("BUG: qsort_s() failed");			\
-//} while (0)
-
-//#ifndef HAVE_ISO_QSORT_S
-//int git_qsort_s(void *base, size_t nmemb, size_t size,
-		//int (*compar)(const void *, const void *, void *), void *ctx);
-//#define qsort_s git_qsort_s
-//#endif
 
 	/*
 	 */
-	class StingList {
-
-		typedef int (*compare_strings_fn)(const char *, const char *);
+	template<typename T>
+	class StringList {
 
 		public:
-
-			StringList(compare_strings_fn _cmp, bool _strdup_strings=true) :
-			items(nullptr), nr(0), alloc(0), strdup_strings(_strdup_strings) {
+			
+			typedef int (*compare_strings_fn)(const char *, const char *);
+		
+			StringList(compare_strings_fn _cmp, bool _strdup_strings = true) : 
+				items(nullptr), nr(0), alloc(0), strdup_strings(_strdup_strings) {
 				if (_cmp == nullptr) {
 					cmp = std::strcmp;
 				} else {
 					cmp = _cmp;
 				}
+			}
+			
+			~StringList() {
+				clear(false);
 			}
 			
 			/* if there is no exact match, point to the index where the entry could be
@@ -113,7 +81,7 @@ namespace cache {
 					reallocArray();
 				}
 				if (index < nr) {
-					std::memmove(items + index + 1, items + index, (nr - index) * sizeof(string_list_item));
+					std::memmove(items + index + 1, items + index, (nr - index) * sizeof(string_list_item<T>));
 				}
 				items[index].string = strdup_strings ? strdup(string) : (char *)string;
 				items[index].util = nullptr;
@@ -122,7 +90,7 @@ namespace cache {
 				return index;
 			}
 
-			string_list_item *insert(const char *string) {
+			string_list_item<T> *insert(const char *string) {
 				int index = addEntry(-1, string);
 
 				if (index < 0) {
@@ -147,7 +115,7 @@ namespace cache {
 				return index;
 			}
 
-			string_list_item *lookup(const char *string) {
+			string_list_item<T> *lookup(const char *string) {
 				int exact_match, i = getEntryIndex(string, &exact_match);
 				if (!exact_match) {
 					return nullptr;
@@ -182,14 +150,14 @@ namespace cache {
 			//}
 			class Iterator {
 				public:
-					Iterator(string_list_item *_arr) : arr(_arr) {
+					Iterator(string_list_item<T> *_arr) : arr(_arr) {
 					}
 
 					bool operator!=(const Iterator &other) const {
 						return arr!= other.arr;
 					}
 
-					string_list_item &operator*() const {
+					string_list_item<T> &operator*() const {
 						return *arr;
 					}
 
@@ -199,7 +167,7 @@ namespace cache {
 					}
 
 				private:
-					string_list_item *arr;
+					string_list_item<T> *arr;
 			};
 
 			// begin method range-based for loop
@@ -215,7 +183,7 @@ namespace cache {
 
 
 			/* Use this function or the macro below to iterate over each item */
-			typedef int (*string_list_each_func_t)(struct string_list_item *, void *);
+			typedef int (*string_list_each_func_t)(struct string_list_item<T> *, void *);
 			int forEach(string_list_each_func_t fn, void *cb_data) {
 				int ret = 0;
 				for (unsigned int i = 0; i < nr; i++)
@@ -255,14 +223,14 @@ namespace cache {
 							std::free(items[i].util);
 						}
 					}
-					free(items);
+					std::free(items);
 				}
 				items = nullptr;
 				nr = alloc = 0;
 			}
 
-			string_list_item *appendNodup(char *string) {
-				struct string_list_item *retval;
+			string_list_item<T> *appendNodup(char *string) {
+				struct string_list_item<T> *retval;
 				allocGrow(nr + 1);
 				retval = &items[nr++];
 				retval->string = string;
@@ -270,7 +238,7 @@ namespace cache {
 				return retval;
 			}
 
-			string_list_item *append(const char *string) {
+			string_list_item<T> *append(const char *string) {
 				return appendNodup(strdup_strings ? strdup(string) : (char *)string);
 			}
 
@@ -278,8 +246,8 @@ namespace cache {
 				cache::qsort_s(items, nr, cmp_items, (void*)cmp);
 			}
 
-			string_list_item *unsortedLookup(const char *string) {
-				for(string_list_item &item: (*this)) {
+			string_list_item<T> *unsortedLookup(const char *string) {
+				for(string_list_item<T> &item: (*this)) {
 					if (!cmp(string, item.string)) {
 						return &item;
 					}
@@ -318,7 +286,32 @@ namespace cache {
 					}
 					end = strchr(p, delim);
 					if (end) {
-						appendNodup(xmemdupz(p, end - p));
+						appendNodup(cache::xmemdupz(p, end - p));
+						p = end + 1;
+					} else {
+						append(p);
+						return count;
+					}
+				}
+			}
+
+			int splitInPlace(char *string, int delim, int maxsplit) {
+				int count = 0;
+				char *p = string, *end;
+
+				if (strdup_strings) {
+					LOG(ERR, "internal error in splitInPlace(): strdup_strings must not be set");
+				}
+				for (;;) {
+					count++;
+					if (maxsplit >= 0 && count > maxsplit) {
+						append(p);
+						return count;
+					}
+					end = strchr(p, delim);
+					if (end) {
+						*end = '\0';
+						append(p);
 						p = end + 1;
 					} else {
 						append(p);
@@ -329,14 +322,14 @@ namespace cache {
 			
 		private:
 
-			string_list_item *items;
+			string_list_item<T> *items;
 			unsigned int nr, alloc;
 			bool strdup_strings;
 			compare_strings_fn cmp; /* NULL uses strcmp() */
 			
 			void reallocArray() {
-				size_t amount = sizeof(string_list_item) * alloc;
-				string_list_item *newItems = (string_list_item *) std::realloc(items, amount);
+				size_t amount = sizeof(string_list_item<T>) * alloc;
+				string_list_item<T> *newItems = (string_list_item<T> *) std::realloc(items, amount);
 
 				if (newItems == nullptr) {
 					throw std::runtime_error(std::strerror(errno));
@@ -356,14 +349,14 @@ namespace cache {
 				} 
 			}
 
-			static int item_is_not_empty(string_list_item *item, void *unused) {
+			static int item_is_not_empty(string_list_item<T> *item, void *unused) {
 				return *item->string != '\0';
 			}
 
 			static int cmp_items(const void *a, const void *b, void *ctx) {
 				compare_strings_fn cmpfn = (compare_strings_fn)ctx;
-				const string_list_item *one = (string_list_item*)a;
-				const string_list_item *two = (string_list_item*)b;
+				const string_list_item<T> *one = (string_list_item<T>*)a;
+				const string_list_item<T> *two = (string_list_item<T>*)b;
 				return cmpfn(one->string, two->string);
 			}
 			
