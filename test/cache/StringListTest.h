@@ -15,6 +15,7 @@
 
 #include "cache/StringList.h"
 #include "cache/DirCache.h"
+#include "cache/strbuf.h"
 
 namespace test {
     namespace cache_string_list {
