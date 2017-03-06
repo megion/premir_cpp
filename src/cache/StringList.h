@@ -256,6 +256,13 @@ namespace cache {
 				return nullptr;
 			}
 
+			void print() {
+				for(string_list_item<T> &item: (*this)) {
+					std::printf("%s, ", item.string);
+				}
+				std::printf("\n");
+			}
+
 			bool unsortedHasString(const char *string) {
 				return unsortedLookup(string) != nullptr;
 			}
@@ -286,7 +293,7 @@ namespace cache {
 					}
 					end = strchr(p, delim);
 					if (end) {
-						appendNodup(cache::xmemdupz(p, end - p));
+						appendNodup((char*)cache::xmemdupz(p, end - p));
 						p = end + 1;
 					} else {
 						append(p);
@@ -318,6 +325,19 @@ namespace cache {
 						return count;
 					}
 				}
+			}
+			
+			unsigned int size() {
+				return nr;
+			}
+			
+			string_list_item<T> *getItems() {
+				return items;
+			}
+			
+			// [] index operator
+			string_list_item<T> &operator[](const size_t &index) const {
+				return items[index];
 			}
 			
 		private:
