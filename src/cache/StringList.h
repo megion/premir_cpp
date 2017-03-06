@@ -291,7 +291,7 @@ namespace cache {
 						append(p);
 						return count;
 					}
-					end = strchr(p, delim);
+					end = std::strchr(p, delim);
 					if (end) {
 						appendNodup((char*)cache::xmemdupz(p, end - p));
 						p = end + 1;
@@ -315,7 +315,7 @@ namespace cache {
 						append(p);
 						return count;
 					}
-					end = strchr(p, delim);
+					end = std::strchr(p, delim);
 					if (end) {
 						*end = '\0';
 						append(p);

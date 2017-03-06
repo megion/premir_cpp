@@ -42,7 +42,7 @@ namespace test {
 		void test_split() {
 			cache::StringList<bool> list(nullptr, true);
 			list.split("abc,defg,hij", ',', 3); 
-			list.print();
+			//list.print();
 			assert(list.size() == 3);
 			assert(std::strcmp(list[0].string, "abc")==0); 
 			assert(std::strcmp(list[2].string, "hij")==0); 
