@@ -21,6 +21,8 @@ namespace cache {
 	 * the program dies.
 	 */
 	void *xmemdupz(const char *data, size_t len);
+	
+	//char *xstrdup(const char *str);
 
 }
 

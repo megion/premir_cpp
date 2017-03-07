@@ -123,6 +123,10 @@ namespace cache {
 				return items + i;
 			}
 
+			/*
+			 * TODO: strange logic! Only clear pointer and is not changed size list.
+			 * Do not use this function.
+			 */
 			void removeDuplicates(bool free_util) {
 				if (nr > 1) {
 					unsigned int src, dst;
@@ -183,7 +187,7 @@ namespace cache {
 
 
 			/* Use this function or the macro below to iterate over each item */
-			typedef int (*string_list_each_func_t)(struct string_list_item<T> *, void *);
+			typedef bool (*string_list_each_func_t)(struct string_list_item<T> *, void *);
 			int forEach(string_list_each_func_t fn, void *cb_data) {
 				int ret = 0;
 				for (unsigned int i = 0; i < nr; i++)
