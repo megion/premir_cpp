@@ -1,4 +1,4 @@
-#include "cache/strbuf.h"
+#include "cache/StringBuffer.h"
 
 namespace cache {
 	
