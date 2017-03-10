@@ -22,7 +22,9 @@ namespace cache {
 	 */
 	void *xmemdupz(const char *data, size_t len);
 	
-	//char *xstrdup(const char *str);
+	char *xstrdup(const char *str);
+	
+	char *xstrndup(const char *str, size_t len);
 
 }
 

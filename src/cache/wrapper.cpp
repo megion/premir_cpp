@@ -26,6 +26,19 @@ namespace cache {
 		return std::memcpy(xmallocz(len), data, len);
 	}
 
+	char *xstrdup(const char *str) {
+		char *ret = strdup(str);
+		if (!ret) {
+			throw std::runtime_error(std::strerror(errno));
+		}
+		return ret;
+	}
+
+	char *xstrndup(const char *str, size_t len) {
+		const char *p = (const char *) std::memchr(str, '\0', len);
+		return (char *)xmemdupz(str, p ? p - str : len);
+	}
+
 }
 
 
