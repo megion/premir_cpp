@@ -9,73 +9,33 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include "utils/console_colors.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
 
 namespace cache {
 
 	bool starts_with(const char *str, const char *prefix);
-
+	
 	class StringBuffer {
 		public:
 			StringBuffer(): alloc(0), len(0), buf(nullptr) {
 			}
 
 			StringBuffer(size_t hint): alloc(0), len(0), buf(nullptr) {
-				grow(hint);
+				if (hint) {
+					grow(hint);
+				}
 			}
+
+//void strbuf_init(struct strbuf *sb, size_t hint)
+//{
+	//sb->alloc = sb->len = 0;
+	//sb->buf = strbuf_slopbuf;
+	//if (hint)
+		//strbuf_grow(sb, hint);
+//}
 			
-			//strbuf_split_buf
-			StringBuffer(const char *str, size_t slen, int terminator, size_t max) {
-				size_t nr = 0, alloc = 0;
-				struct strbuf *t;
-
-				while (slen) {
-					int len = slen;
-					if (max <= 0 || nr + 1 < max) {
-						const char *end = memchr(str, terminator, slen);
-						if (end)
-							len = end - str + 1;
-					}
-					t = xmalloc(sizeof(struct strbuf));
-					strbuf_init(t, len);
-					strbuf_add(t, str, len);
-					ALLOC_GROW(ret, nr + 2, alloc);
-					ret[nr++] = t;
-					str += len;
-					slen -= len;
-				}
-				ALLOC_GROW(ret, nr + 1, alloc); /* In case string was empty */
-				ret[nr] = NULL;
-
-			}
-			struct strbuf **strbuf_split_buf(const char *str, size_t slen,
-					int terminator, int max)
-			{
-				struct strbuf **ret = NULL;
-				size_t nr = 0, alloc = 0;
-				struct strbuf *t;
-
-				while (slen) {
-					int len = slen;
-					if (max <= 0 || nr + 1 < max) {
-						const char *end = memchr(str, terminator, slen);
-						if (end)
-							len = end - str + 1;
-					}
-					t = xmalloc(sizeof(struct strbuf));
-					strbuf_init(t, len);
-					strbuf_add(t, str, len);
-					ALLOC_GROW(ret, nr + 2, alloc);
-					ret[nr++] = t;
-					str += len;
-					slen -= len;
-				}
-				ALLOC_GROW(ret, nr + 1, alloc); /* In case string was empty */
-				ret[nr] = NULL;
-				return ret;
-			}
-
 			~StringBuffer() {
 				release();	
 			}
@@ -86,6 +46,21 @@ namespace cache {
 
 			size_t getLen() const {
 				return len;
+			}
+
+			/**
+			 * Set the length of the buffer to a given value. This function does *not*
+			 * allocate new memory, so you should not perform a `strbuf_setlen()` to a
+			 * length that is larger than `len + strbuf_avail()`. `strbuf_setlen()` is
+			 * just meant as a 'please fix invariants from this strbuf I just messed
+			 * with'.
+			 */
+			void setLen(size_t newLen) {
+				if (newLen > (alloc ? alloc - 1 : 0)) {
+					LOG(ERR, "BUG: setLen() beyond buffer");
+				}
+				len = newLen;
+				buf[len] = '\0';
 			}
 
 			void release() {
@@ -178,6 +153,13 @@ namespace cache {
 					*p = std::tolower(*p);
 				}
 			}
+			
+			// strbuf_add
+			void add(const void *data, size_t dataLen) {
+				grow(dataLen);
+				memcpy(buf + len, data, dataLen);
+				setLen(len + dataLen);
+			}
 
 			void addIndentedText(const char *text, int indent, int indent2) {
 				if (indent < 0) {
@@ -189,7 +171,7 @@ namespace cache {
 						eol++;
 					}
 					strbuf_addchars(buf, ' ', indent);
-					strbuf_add(buf, text, eol - text);
+					add(text, eol - text);
 					text = eol;
 					indent = indent2;
 				}
