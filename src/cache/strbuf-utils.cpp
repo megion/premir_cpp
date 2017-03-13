@@ -12,8 +12,9 @@ namespace cache {
 			int len = slen;
 			if (max <= 0 || nr + 1 < max) {
 				const char *end = memchr(str, terminator, slen);
-				if (end)
+				if (end) {
 					len = end - str + 1;
+				}
 			}
 			t = new StringBuffer();
 			//t = xmalloc(sizeof(struct strbuf));

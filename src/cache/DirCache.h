@@ -5,6 +5,22 @@
 #include <iostream>
 //#include "cache/LinkedHashMap.h"
 
+
+//#define alloc_nr(x) (((x)+16)*3/2)
+
+//#define ALLOC_GROW(x, nr, alloc) \
+	//do { \
+		//if ((nr) > alloc) { \
+			//if (alloc_nr(alloc) < (nr)) \
+				//alloc = (nr); \
+			//else \
+				//alloc = alloc_nr(alloc); \
+			//REALLOC_ARRAY(x, alloc); \
+		//} \
+	//} while (0)
+
+
+
 #ifndef FLEX_ARRAY
 /*
  * See if our compiler is known to support flexible array members.
