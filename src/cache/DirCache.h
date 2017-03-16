@@ -18,6 +18,9 @@
 			//REALLOC_ARRAY(x, alloc); \
 		//} \
 	//} while (0)
+	
+//#define ALLOC_ARRAY(x, alloc) (x) = xmalloc(st_mult(sizeof(*(x)), (alloc)))
+//#define REALLOC_ARRAY(x, alloc) (x) = xrealloc((x), st_mult(sizeof(*(x)), (alloc)))
 
 
 

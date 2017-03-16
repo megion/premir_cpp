@@ -2,6 +2,10 @@
 
 namespace cache {
 
+	/*
+	 * create array of pointer on StringBuffer.
+	 * Last array element is nullptr.
+	 */
 	StringBuffer **splitBuf(const char *str, size_t slen,
 			int terminator, int max) {
 		StringBuffer **ret = nullptr;
@@ -16,7 +20,7 @@ namespace cache {
 					len = end - str + 1;
 				}
 			}
-			t = new StringBuffer();
+			t = new StringBuffer(len);
 			//t = xmalloc(sizeof(struct strbuf));
 			//strbuf_init(t, len);
 			t->add(str, len);
