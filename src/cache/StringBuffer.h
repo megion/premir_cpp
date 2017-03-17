@@ -161,6 +161,38 @@ namespace cache {
 				setLen(len + dataLen);
 			}
 
+			/*
+			 * cut 'removeLen' elements start with 'pos' and insert data
+			 */
+			void splice(size_t pos, size_t removeLen, const void *data, size_t dataLen) {
+				if (pos > len) {
+					LOG(ERR, "`pos' is too far after the end of the buffer");
+					return;
+				}
+				if (pos + removeLen > len) {
+					LOG(ERR, "`pos + removeLen' is too far after the end of the buffer");
+					return;
+				}
+
+				if (dataLen >= removeLen) {
+					grow(dataLen - removeLen);
+				}
+				std::memmove(buf + pos + dataLen, buf + pos + removeLen,
+						len - pos - removeLen);
+				std::memcpy(buf + pos, data, dataLen);
+				setLen(len + dataLen - removeLen);
+			}
+
+void strbuf_insert(struct strbuf *sb, size_t pos, const void *data, size_t len)
+{
+	strbuf_splice(sb, pos, 0, data, len);
+}
+
+void strbuf_remove(struct strbuf *sb, size_t pos, size_t len)
+{
+	strbuf_splice(sb, pos, len, "", 0);
+}
+
 			void addIndentedText(const char *text, int indent, int indent2) {
 				if (indent < 0) {
 					indent = 0;
@@ -179,8 +211,6 @@ namespace cache {
 
 		private:
 			size_t alloc;
-			size_t len;
-			char *buf;
 
 			void reallocBuf() {
 				size_t amount = sizeof(char) * alloc;
@@ -192,8 +222,9 @@ namespace cache {
 				buf = newBuf;
 			}
 
-			
-
+		public:
+			size_t len;
+			char *buf;
 	};
 
 }
