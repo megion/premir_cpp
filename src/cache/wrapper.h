@@ -9,6 +9,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include "utils/console_colors.h"
 
 namespace cache {
 
@@ -25,6 +26,10 @@ namespace cache {
 	char *xstrdup(const char *str);
 	
 	char *xstrndup(const char *str, size_t len);
+	
+	//__attribute__((format (printf, 3, 4)))
+	int xsnprintf(char *dst, size_t max, const char *fmt, ...);
+
 
 }
 

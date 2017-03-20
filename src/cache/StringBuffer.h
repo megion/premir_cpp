@@ -16,6 +16,12 @@
 namespace cache {
 
 	bool starts_with(const char *str, const char *prefix);
+
+	/*
+	 * The character that begins a commented line in user-editable file
+	 * that is subject to stripspace.
+	 */
+	char comment_line_char = '#';
 	
 	class StringBuffer {
 		public:
@@ -154,13 +160,6 @@ namespace cache {
 				}
 			}
 			
-			// strbuf_add
-			void add(const void *data, size_t dataLen) {
-				grow(dataLen);
-				memcpy(buf + len, data, dataLen);
-				setLen(len + dataLen);
-			}
-
 			/*
 			 * cut 'removeLen' elements start with 'pos' and insert data
 			 */
@@ -183,14 +182,138 @@ namespace cache {
 				setLen(len + dataLen - removeLen);
 			}
 
-void strbuf_insert(struct strbuf *sb, size_t pos, const void *data, size_t len)
-{
-	strbuf_splice(sb, pos, 0, data, len);
-}
+			void insert(size_t pos, const void *data, size_t dataLen) {
+				splice(pos, 0, data, dataLen);
+			}
 
-void strbuf_remove(struct strbuf *sb, size_t pos, size_t len)
+			void remove(size_t pos, size_t removeLen) {
+				splice(pos, removeLen, "", 0);
+			}
+			
+			// strbuf_add
+			void add(const void *data, size_t dataLen) {
+				grow(dataLen);
+				memcpy(buf + len, data, dataLen);
+				setLen(len + dataLen);
+			}
+
+			void addbuf(const StringBuffer *sb2) {
+				grow(sb2->len);
+				memcpy(buf + len, sb2->buf, sb2->len);
+				setLen(len + sb2->len);
+			}
+
+			void adddup(size_t pos, size_t dupLen) {
+				grow(dupLen);
+				memcpy(buf + len, buf + pos, dupLen);
+				setLen(len + dupLen);
+			}
+
+			void addchars(int c, size_t num) {
+				grow(num);
+				std::memset(buf + len, c, num);
+				setLen(len + num);
+			}
+
+			void addf(const char *fmt, ...) {
+				va_list ap;
+				va_start(ap, fmt);
+				strbuf_vaddf(sb, fmt, ap);
+				va_end(ap);
+			}
+
+			void addLines(const char *prefix1, const char *prefix2,
+					const char *bufLines, size_t size) {
+				while (size) {
+					const char *prefix;
+					const char *next = memchr(bufLines, '\n', size);
+					next = next ? (next + 1) : (bufLines + size);
+
+					prefix = ((prefix2 && (bufLines[0] == '\n' || bufLines[0] == '\t'))
+							? prefix2 : prefix1);
+					strbuf_addstr(out, prefix);
+					add(bufLines, next - bufLines);
+					size -= next - buf;
+					buf = next;
+				}
+				strbuf_complete_line(out);
+			}
+
+			void addCommentedLines(const char *bufLines, size_t size) {
+				static char prefix1[3];
+				static char prefix2[2];
+
+				if (prefix1[0] != comment_line_char) {
+					xsnprintf(prefix1, sizeof(prefix1), "%c ", comment_line_char);
+					xsnprintf(prefix2, sizeof(prefix2), "%c", comment_line_char);
+				}
+				addLines(prefix1, prefix2, bufLines, size);
+			}
+
+			void commentedAddf(const char *fmt, ...) {
+				va_list params;
+				StringBuffer tempBuf;
+				int incomplete_line = len && buf[len - 1] != '\n';
+
+				va_start(params, fmt);
+				tempBuf.vaddf(fmt, params);
+				va_end(params);
+
+				addCommentedLines(tempBuf.buf, tempBuf.len);
+				if (incomplete_line) {
+					buf[--len] = '\0';
+				}
+			}
+
+			void vaddf(const char *fmt, va_list ap) {
+				int addLen;
+				va_list cp;
+
+				if (!strbuf_avail(sb)) {
+					grow(64);
+				}
+				va_copy(cp, ap);
+				addLen = vsnprintf(buf + len, alloc - len, fmt, cp);
+				va_end(cp);
+				if (addLen < 0) {
+					LOG(ERR, "BUG: your vsnprintf is broken (returned %d)", len);
+					return;
+				}
+				if (addLen > strbuf_avail(sb)) {
+					grow(addLen);
+					addLen = vsnprintf(buf + len, alloc - len, fmt, ap);
+					if (addLen > strbuf_avail(sb)) {
+						LOG(ERR, "BUG: your vsnprintf is broken (insatiable)");
+					}
+				}
+				setLen(len + addLen);
+			}
+
+void strbuf_expand(struct strbuf *sb, const char *format, expand_fn_t fn,
+		   void *context)
 {
-	strbuf_splice(sb, pos, len, "", 0);
+	for (;;) {
+		const char *percent;
+		size_t consumed;
+
+		percent = strchrnul(format, '%');
+		strbuf_add(sb, format, percent - format);
+		if (!*percent)
+			break;
+		format = percent + 1;
+
+		if (*format == '%') {
+			strbuf_addch(sb, '%');
+			format++;
+			continue;
+		}
+
+		consumed = fn(sb, format, context);
+		if (consumed)
+			format += consumed;
+		else
+			strbuf_addch(sb, '%');
+	}
 }
 
 			void addIndentedText(const char *text, int indent, int indent2) {
@@ -202,7 +325,7 @@ void strbuf_remove(struct strbuf *sb, size_t pos, size_t len)
 					if (*eol == '\n') {
 						eol++;
 					}
-					strbuf_addchars(buf, ' ', indent);
+					addchars(' ', indent);
 					add(text, eol - text);
 					text = eol;
 					indent = indent2;
