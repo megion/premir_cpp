@@ -24,6 +24,18 @@ namespace cache {
 	char comment_line_char = '#';
 	
 	class StringBuffer {
+
+		/**
+		 * Used as callback for `strbuf_expand()`, expects an array of
+		 * struct strbuf_expand_dict_entry as context, i.e. pairs of
+		 * placeholder and replacement string.  The array needs to be
+		 * terminated by an entry with placeholder set to NULL.
+		 */
+		struct strbuf_expand_dict_entry {
+			const char *placeholder;
+			const char *value;
+		};
+
 		public:
 			StringBuffer(): alloc(0), len(0), buf(nullptr) {
 			}
@@ -190,19 +202,41 @@ namespace cache {
 				splice(pos, removeLen, "", 0);
 			}
 			
-			// strbuf_add
+			/**
+			 * add data of given length to the buffer.
+			 */
 			void add(const void *data, size_t dataLen) {
 				grow(dataLen);
 				memcpy(buf + len, data, dataLen);
 				setLen(len + dataLen);
 			}
 
+			/**
+			 * Add a NUL-terminated string to the buffer.
+			 *
+			 * NOTE: This function will *always* be implemented as an inline or a macro
+			 * using strlen, meaning that this is efficient to write things like:
+			 *
+			 *     strbuf_addstr(sb, "immediate string");
+			 *
+			 */
+			void addstr(const char *s) {
+				add(s, std::strlen(s));
+			}
+
+			/**
+			 * Copy the contents of another buffer at the end of the current one.
+			 */
 			void addbuf(const StringBuffer *sb2) {
 				grow(sb2->len);
 				memcpy(buf + len, sb2->buf, sb2->len);
 				setLen(len + sb2->len);
 			}
 
+			/**
+			 * Copy part of the buffer from a given position till a given length to the
+			 * end of the buffer.
+			 */
 			void adddup(size_t pos, size_t dupLen) {
 				grow(dupLen);
 				memcpy(buf + len, buf + pos, dupLen);
@@ -239,6 +273,10 @@ namespace cache {
 				strbuf_complete_line(out);
 			}
 
+			/**
+			 * Add a NUL-terminated string to the buffer. Each line will be prepended
+			 * by a comment character and a blank.
+			 */
 			void addCommentedLines(const char *bufLines, size_t size) {
 				static char prefix1[3];
 				static char prefix2[2];
@@ -289,32 +327,73 @@ namespace cache {
 				setLen(len + addLen);
 			}
 
-void strbuf_expand(struct strbuf *sb, const char *format, expand_fn_t fn,
-		   void *context)
-{
-	for (;;) {
-		const char *percent;
-		size_t consumed;
+			/**
+			 * This function can be used to expand a format string containing
+			 * placeholders. To that end, it parses the string and calls the specified
+			 * function for every percent sign found.
+			 *
+			 * The callback function is given a pointer to the character after the `%`
+			 * and a pointer to the struct strbuf.  It is expected to add the expanded
+			 * version of the placeholder to the strbuf, e.g. to add a newline
+			 * character if the letter `n` appears after a `%`.  The function returns
+			 * the length of the placeholder recognized and `strbuf_expand()` skips
+			 * over it.
+			 *
+			 * The format `%%` is automatically expanded to a single `%` as a quoting
+			 * mechanism; callers do not need to handle the `%` placeholder themselves,
+			 * and the callback function will not be invoked for this placeholder.
+			 *
+			 * All other characters (non-percent and not skipped ones) are copied
+			 * verbatim to the strbuf.  If the callback returned zero, meaning that the
+			 * placeholder is unknown, then the percent sign is copied, too.
+			 *
+			 * In order to facilitate caching and to make it possible to give
+			 * parameters to the callback, `strbuf_expand()` passes a context pointer,
+			 * which can be used by the programmer of the callback as she sees fit.
+			 */
+			typedef size_t (*expand_fn_t) (StringBuffer *sb, const char *placeholder,
+				   	void *context);
+			void expand(const char *format, expand_fn_t fn, void *context) {
+				for (;;) {
+					const char *percent;
+					size_t consumed;
 
-		percent = strchrnul(format, '%');
-		strbuf_add(sb, format, percent - format);
-		if (!*percent)
-			break;
-		format = percent + 1;
+					percent = strchrnul(format, '%');
+					add(format, percent - format);
+					if (!*percent) {
+						break;
+					}
+					format = percent + 1;
 
-		if (*format == '%') {
-			strbuf_addch(sb, '%');
-			format++;
-			continue;
-		}
+					if (*format == '%') {
+						addch('%');
+						format++;
+						continue;
+					}
 
-		consumed = fn(sb, format, context);
-		if (consumed)
-			format += consumed;
-		else
-			strbuf_addch(sb, '%');
-	}
-}
+					consumed = fn(sb, format, context);
+					if (consumed) {
+						format += consumed;
+					} else {
+						addch('%');
+					}
+				}
+			}
+
+			size_t expand_dict_cb(const char *placeholder, void *context) {
+				strbuf_expand_dict_entry *e = context;
+				size_t len;
+
+				for (; e->placeholder && (len = strlen(e->placeholder)); e++) {
+					if (!strncmp(placeholder, e->placeholder, len)) {
+						if (e->value) {
+							addstr(e->value);
+						}
+						return len;
+					}
+				}
+				return 0;
+			}
 
 			void addIndentedText(const char *text, int indent, int indent2) {
 				if (indent < 0) {
