@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <limits.h>
 
 #include <exception>
 #include <stdexcept>
@@ -12,6 +13,9 @@
 #include "utils/console_colors.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
+
+
+#define STRBUF_MAXLINK (2*PATH_MAX)
 
 namespace cache {
 
@@ -80,6 +84,14 @@ namespace cache {
 				len = newLen;
 				buf[len] = '\0';
 			}
+		
+			/**
+			 * Empty the buffer by setting the size of it to zero.
+			 * strbuf_reset(sb)  strbuf_setlen(sb, 0)
+			 */
+			void reset() {	
+				setLen(0);
+			}
 
 			void release() {
 				if(buf) {
@@ -88,6 +100,13 @@ namespace cache {
 					len = 0;
 					buf = nullptr;
 				}
+			}
+
+			/**
+			 * Determine the amount of allocated but unused memory.
+			 */
+			size_t avail() const {
+				return alloc ? alloc - len - 1 : 0;
 			}
 			
 			void grow(size_t extra) {
@@ -249,10 +268,13 @@ namespace cache {
 				setLen(len + num);
 			}
 
+			/**
+			 * Add a formatted string to the buffer.
+			 */
 			void addf(const char *fmt, ...) {
 				va_list ap;
 				va_start(ap, fmt);
-				strbuf_vaddf(sb, fmt, ap);
+				vaddf(fmt, ap);
 				va_end(ap);
 			}
 
@@ -260,12 +282,12 @@ namespace cache {
 					const char *bufLines, size_t size) {
 				while (size) {
 					const char *prefix;
-					const char *next = memchr(bufLines, '\n', size);
+					const char *next = (const char *)memchr(bufLines, '\n', size);
 					next = next ? (next + 1) : (bufLines + size);
 
 					prefix = ((prefix2 && (bufLines[0] == '\n' || bufLines[0] == '\t'))
 							? prefix2 : prefix1);
-					strbuf_addstr(out, prefix);
+					addstr(prefix);
 					add(bufLines, next - bufLines);
 					size -= next - buf;
 					buf = next;
@@ -304,23 +326,22 @@ namespace cache {
 			}
 
 			void vaddf(const char *fmt, va_list ap) {
-				int addLen;
 				va_list cp;
 
-				if (!strbuf_avail(sb)) {
+				if (!avail()) {
 					grow(64);
 				}
 				va_copy(cp, ap);
-				addLen = vsnprintf(buf + len, alloc - len, fmt, cp);
+				int addLen = vsnprintf(buf + len, alloc - len, fmt, cp);
 				va_end(cp);
 				if (addLen < 0) {
-					LOG(ERR, "BUG: your vsnprintf is broken (returned %d)", len);
+					LOG(ERR, "BUG: your vsnprintf is broken (returned %d)", addLen);
 					return;
 				}
-				if (addLen > strbuf_avail(sb)) {
+				if (addLen > avail()) {
 					grow(addLen);
 					addLen = vsnprintf(buf + len, alloc - len, fmt, ap);
-					if (addLen > strbuf_avail(sb)) {
+					if (addLen > avail()) {
 						LOG(ERR, "BUG: your vsnprintf is broken (insatiable)");
 					}
 				}
@@ -408,32 +429,33 @@ namespace cache {
 				return res;
 			}
 
-ssize_t strbuf_read(struct strbuf *sb, int fd, size_t hint)
-{
-	size_t oldlen = sb->len;
-	size_t oldalloc = sb->alloc;
+			ssize_t read(int fd, size_t hint) {
+				size_t oldlen = len;
+				size_t oldalloc = alloc;
 
-	strbuf_grow(sb, hint ? hint : 8192);
-	for (;;) {
-		ssize_t want = sb->alloc - sb->len - 1;
-		ssize_t got = read_in_full(fd, sb->buf + sb->len, want);
+				grow(hint ? hint : 8192);
+				for (;;) {
+					ssize_t want = alloc - len - 1;
+					ssize_t got = read_in_full(fd, buf + len, want);
 
-		if (got < 0) {
-			if (oldalloc == 0)
-				strbuf_release(sb);
-			else
-				strbuf_setlen(sb, oldlen);
-			return -1;
-		}
-		sb->len += got;
-		if (got < want)
-			break;
-		strbuf_grow(sb, 8192);
-	}
+					if (got < 0) {
+						if (oldalloc == 0) {
+							release();
+						} else {
+							setLen(oldlen);
+						}
+						return -1;
+					}
+					len += got;
+					if (got < want) {
+						break;
+					}
+					grow(8192);
+				}
 
-	sb->buf[sb->len] = '\0';
-	return sb->len - oldlen;
-}
+				buf[len] = '\0';
+				return len - oldlen;
+			}
 
 			void addbufRercentquote(struct strbuf *dst) {
 				for (size_t i = 0; i < len; i++) {
@@ -459,6 +481,160 @@ ssize_t strbuf_read(struct strbuf *sb, int fd, size_t hint)
 					indent = indent2;
 				}
 			}
+
+			ssize_t readOnce(int fd, size_t hint) {
+				grow(hint ? hint : 8192);
+				ssize_t cnt = xread(fd, buf + len, alloc - len - 1);
+				if (cnt > 0) {
+					setLen(len + cnt);
+				}
+				return cnt;
+			}
+
+			/*
+			 * strbuf_write
+			 */
+			ssize_t writeToFile(FILE *f) {
+				return len ? fwrite(buf, 1, len, f) : 0;
+			}
+
+			/*
+			 * strbuf_readlink
+			 */
+			int readLink(const char *path, size_t hint) {
+				size_t oldalloc = alloc;
+
+				if (hint < 32) {
+					hint = 32;
+				}
+
+				while (hint < STRBUF_MAXLINK) {
+					grow(hint);
+					int newLen = readlink(path, buf, hint);
+					if (newLen < 0) {
+						if (errno != ERANGE) {
+							break;
+						}
+					} else if (newLen < hint) {
+						setLen(newLen);
+						return 0;
+					}
+
+					/* .. the buffer was too small - try again */
+					hint *= 2;
+				}
+				if (oldalloc == 0) {
+					release();
+				}
+				return -1;
+			}
+
+			int getCwd() {
+				size_t oldalloc = alloc;
+				size_t guessed_len = 128;
+
+				for (;; guessed_len *= 2) {
+					grow(guessed_len);
+					if (getcwd(buf, alloc)) {
+						setLen(std::strlen(buf));
+						return 0;
+					}
+					if (errno != ERANGE) {
+						break;
+					}
+				}
+				if (oldalloc == 0) {
+					release();
+				} else {
+					reset();
+				}
+				return -1;
+			}
+
+			/*
+			 * Define HAVE_GETDELIM if your system has the getdelim() function.
+			 */
+#ifdef HAVE_GETDELIM
+			int getWholeLine(FILE *fp, int term) {
+				ssize_t r;
+
+				if (feof(fp)) {
+					return EOF;
+				}
+
+				reset();
+
+				/* Translate slopbuf to NULL, as we cannot call realloc on it */
+				if (!alloc) {
+					buf = nullptr;
+				}
+				r = getdelim(&buf, &alloc, term, fp);
+
+				if (r > 0) {
+					len = r;
+					return 0;
+				}
+				assert(r == -1);
+
+				/*
+				 * Normally we would have called xrealloc, which will try to free
+				 * memory and recover. But we have no way to tell getdelim() to do so.
+				 * Worse, we cannot try to recover ENOMEM ourselves, because we have
+				 * no idea how many bytes were read by getdelim.
+				 *
+				 * Dying here is reasonable. It mirrors what xrealloc would do on
+				 * catastrophic memory failure. We skip the opportunity to free pack
+				 * memory and retry, but that's unlikely to help for a malloc small
+				 * enough to hold a single line of input, anyway.
+				 */
+				if (errno == ENOMEM) {
+					LOG(ERR, "Out of memory, getdelim failed");
+					return -1;
+				}
+
+				/*
+				 * Restore strbuf invariants; if getdelim left us with a NULL pointer,
+				 * we can just re-init, but otherwise we should make sure that our
+				 * length is empty, and that the result is NUL-terminated.
+				 */
+				if (!buf) {
+					buf = nullptr;
+					alloc = len = 0;
+				} else {
+					reset();
+				}
+				return EOF;
+			}
+#else
+			int getWholeLine(FILE *fp, int term) {
+				int ch;
+
+				if (feof(fp)) {
+					return EOF;
+				}
+
+				reset();
+				flockfile(fp);
+				while ((ch = getc_unlocked(fp)) != EOF) {
+					if (!avail()) {
+						grow(1);
+					}
+					buf[len++] = ch;
+					if (ch == term) {
+						break;
+					}
+				}
+				funlockfile(fp);
+				if (ch == EOF && len == 0) {
+					return EOF;
+				}
+
+				buf[len] = '\0';
+				return 0;
+			}
+#endif
+
+
 
 		private:
 			size_t alloc;
