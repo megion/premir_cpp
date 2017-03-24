@@ -10,6 +10,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <fcntl.h>
 #include "utils/console_colors.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
@@ -278,22 +279,7 @@ namespace cache {
 				va_end(ap);
 			}
 
-			void addLines(const char *prefix1, const char *prefix2,
-					const char *bufLines, size_t size) {
-				while (size) {
-					const char *prefix;
-					const char *next = (const char *)memchr(bufLines, '\n', size);
-					next = next ? (next + 1) : (bufLines + size);
-
-					prefix = ((prefix2 && (bufLines[0] == '\n' || bufLines[0] == '\t'))
-							? prefix2 : prefix1);
-					addstr(prefix);
-					add(bufLines, next - bufLines);
-					size -= next - buf;
-					buf = next;
-				}
-				strbuf_complete_line(out);
-			}
+			
 
 			/**
 			 * Add a NUL-terminated string to the buffer. Each line will be prepended
@@ -307,7 +293,7 @@ namespace cache {
 					xsnprintf(prefix1, sizeof(prefix1), "%c ", comment_line_char);
 					xsnprintf(prefix2, sizeof(prefix2), "%c", comment_line_char);
 				}
-				addLines(prefix1, prefix2, bufLines, size);
+				add_lines(prefix1, prefix2, bufLines, size);
 			}
 
 			void commentedAddf(const char *fmt, ...) {
@@ -416,7 +402,7 @@ namespace cache {
 				return 0;
 			}
 
-			size_t fileRead(size_t size, FILE *f) {
+			size_t strbuf_fread(size_t size, FILE *f) {
 				size_t oldalloc = alloc;
 
 				grow(size);
@@ -429,7 +415,7 @@ namespace cache {
 				return res;
 			}
 
-			ssize_t read(int fd, size_t hint) {
+			ssize_t readFile(int fd, size_t hint) {
 				size_t oldlen = len;
 				size_t oldalloc = alloc;
 
@@ -455,6 +441,20 @@ namespace cache {
 
 				buf[len] = '\0';
 				return len - oldlen;
+			}
+
+			ssize_t readFileByPath(const char *path, size_t hint) {
+				int fd = open(path, O_RDONLY);
+				if (fd < 0) {
+					return -1;
+				}
+				ssize_t rlen = readFile(fd, hint);
+				close(fd);
+				if (rlen < 0) {
+					return -1;
+				}
+
+				return rlen;
 			}
 
 			void addbufRercentquote(struct strbuf *dst) {
@@ -494,7 +494,7 @@ namespace cache {
 			/*
 			 * strbuf_write
 			 */
-			ssize_t writeToFile(FILE *f) {
+			ssize_t strbuf_write(FILE *f) {
 				return len ? fwrite(buf, 1, len, f) : 0;
 			}
 
@@ -634,7 +634,83 @@ namespace cache {
 			}
 #endif
 
+			int strbuf_getdelim(FILE *fp, int term) {
+				if (getWholeLine(fp, term)) {
+					return EOF;
+				}
+				if (buf[len - 1] == term) {
+					setLen(len - 1);
+				}
+				return 0;
+			}
 
+			int getLine(FILE *fp) {
+				if (getWholeLine(fp, '\n')) {
+					return EOF;
+				}
+				if (buf[len - 1] == '\n') {
+					setLen(len - 1);
+					if (len && buf[len - 1] == '\r') {
+						setLen(len - 1);
+					}
+				}
+				return 0;
+			}
+
+			int getLineLf(FILE *fp) {
+				return strbuf_getdelim(fp, '\n');
+			}
+
+			int getLineNul(FILE *fp) {
+				return strbuf_getdelim(fp, '\0');
+			}
+
+			int getWholeLineFd(int fd, int term) {
+				reset();
+
+				while (1) {
+					char ch;
+					ssize_t len = xread(fd, &ch, 1);
+					if (len <= 0) {
+						return EOF;
+					}
+					addch(ch);
+					if (ch == term) {
+						break;
+					}
+				}
+				return 0;
+			}
+
+			void addLines(const char *prefix,
+					const char *bufLines, size_t size) {
+				add_lines(prefix, NULL, bufLines, size);
+			}
+
+void addstrXmlQuoted(const char *s) {
+	while (*s) {
+		size_t len = strcspn(s, "\"<>&");
+		add(s, len);
+		s += len;
+		switch (*s) {
+		case '"':
+			strbuf_addstr(buf, "&quot;");
+			break;
+		case '<':
+			strbuf_addstr(buf, "&lt;");
+			break;
+		case '>':
+			strbuf_addstr(buf, "&gt;");
+			break;
+		case '&':
+			strbuf_addstr(buf, "&amp;");
+			break;
+		case 0:
+			return;
+		}
+		s++;
+	}
+}
 
 		private:
 			size_t alloc;
@@ -647,6 +723,28 @@ namespace cache {
 					throw std::runtime_error(std::strerror(errno));
 				}
 				buf = newBuf;
+			}
+
+			/*
+			 * add_lines
+			 */
+			void add_lines(const char *prefix1, 
+					const char *prefix2,
+					const char *bufLines,
+				   	size_t size) {
+				while (size) {
+					const char *prefix;
+					const char *next = (const char *)memchr(bufLines, '\n', size);
+					next = next ? (next + 1) : (bufLines + size);
+
+					prefix = ((prefix2 && (bufLines[0] == '\n' || bufLines[0] == '\t'))
+							? prefix2 : prefix1);
+					addstr(prefix);
+					add(bufLines, next - bufLines);
+					size -= next - bufLines;
+					bufLines = next;
+				}
+				completeLine();
 			}
 
 		public:
