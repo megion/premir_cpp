@@ -14,6 +14,11 @@
 
 namespace cache {
 
+	int is_rfc3986_reserved(char ch); 
+	int is_rfc3986_unreserved(char ch);
+
+	bool starts_with(const char *str, const char *prefix); 
+
 	int strbuf_cmp(const StringBuffer *a, const StringBuffer *b) {
 		int len = a->len < b->len ? a->len: b->len;
 		int cmp = std::memcmp(a->buf, b->buf, len);
@@ -21,6 +26,15 @@ namespace cache {
 			return cmp;
 		}
 		return a->len < b->len ? -1: a->len != b->len;
+	}
+	
+	void strbuf_add_unique_abbrev(struct strbuf *sb, const unsigned char *sha1,
+			int abbrev_len)
+	{
+		int r;
+		strbuf_grow(sb, GIT_SHA1_HEXSZ + 1);
+		r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
+		strbuf_setlen(sb, sb->len + r);
 	}
 
 	class StringSplitter {

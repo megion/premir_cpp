@@ -14,6 +14,8 @@
 #include "utils/console_colors.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
+#include "cache/strbuf-utils.h"
+#include "cache/compat-utils.h"
 
 
 #define STRBUF_MAXLINK (2*PATH_MAX)
@@ -51,6 +53,8 @@ namespace cache {
 				}
 			}
 
+//extern char strbuf_slopbuf[];
+//#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
 //void strbuf_init(struct strbuf *sb, size_t hint)
 //{
 	//sb->alloc = sb->len = 0;
@@ -108,6 +112,17 @@ namespace cache {
 			 */
 			size_t avail() const {
 				return alloc ? alloc - len - 1 : 0;
+			}
+			
+			/**
+			 * Add a single character to the buffer.
+			 */
+			void addch(int c) {
+				if (!avail()) {
+					grow(1);
+				}
+				buf[len++] = c;
+				buf[len] = '\0';
 			}
 			
 			void grow(size_t extra) {
@@ -278,8 +293,6 @@ namespace cache {
 				vaddf(fmt, ap);
 				va_end(ap);
 			}
-
-			
 
 			/**
 			 * Add a NUL-terminated string to the buffer. Each line will be prepended
@@ -687,30 +700,117 @@ namespace cache {
 				add_lines(prefix, NULL, bufLines, size);
 			}
 
-void addstrXmlQuoted(const char *s) {
-	while (*s) {
-		size_t len = strcspn(s, "\"<>&");
-		add(s, len);
-		s += len;
-		switch (*s) {
-		case '"':
-			strbuf_addstr(buf, "&quot;");
-			break;
-		case '<':
-			strbuf_addstr(buf, "&lt;");
-			break;
-		case '>':
-			strbuf_addstr(buf, "&gt;");
-			break;
-		case '&':
-			strbuf_addstr(buf, "&amp;");
-			break;
-		case 0:
-			return;
-		}
-		s++;
-	}
-}
+			void addstrXmlQuoted(const char *s) {
+				while (*s) {
+					size_t len = strcspn(s, "\"<>&");
+					add(s, len);
+					s += len;
+					switch (*s) {
+						case '"':
+							addstr("&quot;");
+							break;
+						case '<':
+							addstr("&lt;");
+							break;
+						case '>':
+							addstr("&gt;");
+							break;
+						case '&':
+							addstr("&amp;");
+							break;
+						case 0:
+							return;
+					}
+					s++;
+				}
+			}
+
+			void addstrUrlencode(const char *s, int reserved) {
+				add_urlencode(s, strlen(s), reserved);
+			}
+
+			void humaniseBytes(off_t bytes) {
+				if (bytes > 1 << 30) {
+					addf("%u.%2.2u GiB",
+							(int)(bytes >> 30),
+							(int)(bytes & ((1 << 30) - 1)) / 10737419);
+				} else if (bytes > 1 << 20) {
+					int x = bytes + 5243;  /* for rounding */
+					addf("%u.%2.2u MiB",
+							x >> 20, ((x & ((1 << 20) - 1)) * 100) >> 20);
+				} else if (bytes > 1 << 10) {
+					int x = bytes + 5;  /* for rounding */
+					addf("%u.%2.2u KiB",
+							x >> 10, ((x & ((1 << 10) - 1)) * 100) >> 10);
+				} else {
+					addf("%u bytes", (int)bytes);
+				}
+			}
+
+			void addAbsolutePath(const char *path) {
+				if (!*path) {
+					LOG(ERR, "The empty string is not a valid path");
+					return;
+				}
+				if (!is_absolute_path(path)) {
+					struct stat cwd_stat, pwd_stat;
+					size_t orig_len = len;
+					char *cwd = xgetcwd();
+					char *pwd = getenv("PWD");
+					if (pwd && strcmp(pwd, cwd) &&
+							!stat(cwd, &cwd_stat) &&
+							(cwd_stat.st_dev || cwd_stat.st_ino) &&
+							!stat(pwd, &pwd_stat) &&
+							pwd_stat.st_dev == cwd_stat.st_dev &&
+							pwd_stat.st_ino == cwd_stat.st_ino) {
+						addstr(pwd);
+					} else {
+						addstr(cwd);
+					}
+					if (len > orig_len && !is_dir_sep(buf[len - 1])) {
+						addch(sb, '/');
+					}
+					free(cwd);
+				}
+				addstr(path);
+			}
+
+			void addftime(const char *fmt, const struct tm *tm) {
+				size_t hint = 128;
+
+				if (!*fmt) {
+					return;
+				}
+
+				grow(hint);
+				size_t newlen = strftime(buf + len, alloc - len, fmt, tm);
+
+				if (!newlen) {
+					/*
+					 * strftime reports "0" if it could not fit the result in the buffer.
+					 * Unfortunately, it also reports "0" if the requested time string
+					 * takes 0 bytes. So our strategy is to munge the format so that the
+					 * output contains at least one character, and then drop the extra
+					 * character before returning.
+					 */
+					StringBuffer munged_fmt;
+					munged_fmt.addf("%s ", fmt);
+					while (!newlen) {
+						hint *= 2;
+						grow(hint);
+						newlen = strftime(buf + len, alloc - len,
+								munged_fmt.buf, tm);
+					}
+					newlen--; /* drop munged space */
+				}
+				setLen(len + newlen);
+			}
+
+			void addUniqueAbbrev(const unsigned char *sha1, int abbrev_len) {
+				grow(GIT_SHA1_HEXSZ + 1);
+				int r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
+				setLen(len + r);
+			}
 
 		private:
 			size_t alloc;
@@ -725,6 +825,19 @@ void addstrXmlQuoted(const char *s) {
 				buf = newBuf;
 			}
 
+			void add_urlencode(const char *s, size_t strlen, int reserved) {
+				grow(strlen);
+				while (strlen--) {
+					char ch = *s++;
+					if (is_rfc3986_unreserved(ch) ||
+							(!reserved && is_rfc3986_reserved(ch))) {
+						addch(ch);
+					} else {
+						addf("%%%02x", ch);
+					}
+				}
+			}
+			
 			/*
 			 * add_lines
 			 */
