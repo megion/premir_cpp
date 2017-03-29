@@ -19,6 +19,8 @@ namespace cache {
 
 	bool starts_with(const char *str, const char *prefix); 
 
+	void addUniqueAbbrev(const StringBuffer *a, const unsigned char *sha1, int abbrev_len);
+
 	int strbuf_cmp(const StringBuffer *a, const StringBuffer *b) {
 		int len = a->len < b->len ? a->len: b->len;
 		int cmp = std::memcmp(a->buf, b->buf, len);

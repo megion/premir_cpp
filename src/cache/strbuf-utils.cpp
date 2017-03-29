@@ -26,6 +26,12 @@ namespace cache {
 			}
 		}
 	}
+
+	void addUniqueAbbrev(StringBuffer *sb, const unsigned char *sha1, int abbrev_len) {
+		sb->grow(GIT_SHA1_HEXSZ + 1);
+		int r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
+		sb->setLen(sb->len + r);
+	}
 }
 
 
