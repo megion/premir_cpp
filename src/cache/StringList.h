@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include "utils/console_colors.h"
-#include "cache/DirCache.h"
+#include "cache/cache.h"
 #include "cache/qsort_s.h"
 #include "cache/wrapper.h"
 

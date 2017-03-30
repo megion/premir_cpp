@@ -1,10 +1,8 @@
-#ifndef SRC_CACHE_DIRCACHE_H
-#define SRC_CACHE_DIRCACHE_H
+#ifndef SRC_CACHE_CACHE_H
+#define SRC_CACHE_CACHE_H
 
 #include <stdio.h>
 #include <iostream>
-//#include "cache/LinkedHashMap.h"
-
 
 //#define alloc_nr(x) (((x)+16)*3/2)
 
@@ -46,18 +44,7 @@
 #endif
 #endif
 
-/* The length in bytes and in hex digits of an object name (SHA-1 value). */
-//#define GIT_SHA1_RAWSZ 20
-//#define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
-
-
-//#define read_cache() read_index(&the_index)
-
 namespace cache {
-
-	//struct object_id {
-		//unsigned char hash[GIT_SHA1_RAWSZ];
-	//};
 
 	/*
 	 * The "cache_time" is just the low 32 bits of the

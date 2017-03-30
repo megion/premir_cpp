@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "cache/DirCache.h"
+#include "cache/cache.h"
 
 namespace cache {
 	

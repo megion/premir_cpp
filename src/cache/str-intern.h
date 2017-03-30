@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include "cache/LinkedHashMap.h"
-#include "cache/DirCache.h"
+#include "cache/cache.h"
 
 namespace cache {
 	

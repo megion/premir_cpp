@@ -12,7 +12,7 @@
 
 #include "cache/hash-utils.h"
 #include "utils/console_colors.h"
-#include "cache/DirCache.h"
+#include "cache/cache.h"
 
 
 /*
