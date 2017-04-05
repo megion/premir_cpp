@@ -14,36 +14,29 @@
 #include "utils/console_colors.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
-#include "cache/strbuf-utils.h"
+#include "cache/str/strbuf-utils.h"
 #include "cache/compat-utils.h"
 
 
 #define STRBUF_MAXLINK (2*PATH_MAX)
 
 namespace cache {
+	namespace str {
 
-	bool starts_with(const char *str, const char *prefix);
+		class StringBuffer {
 
-	/*
-	 * The character that begins a commented line in user-editable file
-	 * that is subject to stripspace.
-	 */
-	char comment_line_char = '#';
-	
-	class StringBuffer {
+			/**
+			 * Used as callback for `strbuf_expand()`, expects an array of
+			 * struct strbuf_expand_dict_entry as context, i.e. pairs of
+			 * placeholder and replacement string.  The array needs to be
+			 * terminated by an entry with placeholder set to NULL.
+			 */
+			//struct strbuf_expand_dict_entry {
+				//const char *placeholder;
+				//const char *value;
+			//};
 
-		/**
-		 * Used as callback for `strbuf_expand()`, expects an array of
-		 * struct strbuf_expand_dict_entry as context, i.e. pairs of
-		 * placeholder and replacement string.  The array needs to be
-		 * terminated by an entry with placeholder set to NULL.
-		 */
-		struct strbuf_expand_dict_entry {
-			const char *placeholder;
-			const char *value;
-		};
-
-		public:
+			public:
 			StringBuffer(): alloc(0), len(0), buf(nullptr) {
 			}
 
@@ -53,26 +46,18 @@ namespace cache {
 				}
 			}
 
-//extern char strbuf_slopbuf[];
-//#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
-//void strbuf_init(struct strbuf *sb, size_t hint)
-//{
-	//sb->alloc = sb->len = 0;
-	//sb->buf = strbuf_slopbuf;
-	//if (hint)
-		//strbuf_grow(sb, hint);
-//}
-			
+			//extern char strbuf_slopbuf[];
+			//#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
+			//void strbuf_init(struct strbuf *sb, size_t hint)
+			//{
+			//sb->alloc = sb->len = 0;
+			//sb->buf = strbuf_slopbuf;
+			//if (hint)
+			//strbuf_grow(sb, hint);
+			//}
+
 			~StringBuffer() {
 				release();	
-			}
-
-			char *getBuf() const {
-				return buf;
-			}
-
-			size_t getLen() const {
-				return len;
 			}
 
 			/**
@@ -89,7 +74,7 @@ namespace cache {
 				len = newLen;
 				buf[len] = '\0';
 			}
-		
+
 			/**
 			 * Empty the buffer by setting the size of it to zero.
 			 * strbuf_reset(sb)  strbuf_setlen(sb, 0)
@@ -113,7 +98,7 @@ namespace cache {
 			size_t avail() const {
 				return alloc ? alloc - len - 1 : 0;
 			}
-			
+
 			/**
 			 * Add a single character to the buffer.
 			 */
@@ -124,7 +109,7 @@ namespace cache {
 				buf[len++] = c;
 				buf[len] = '\0';
 			}
-			
+
 			void grow(size_t extra) {
 				bool new_buf = (alloc==0);
 
@@ -206,7 +191,7 @@ namespace cache {
 					*p = std::tolower(*p);
 				}
 			}
-			
+
 			/*
 			 * cut 'removeLen' elements start with 'pos' and insert data
 			 */
@@ -236,7 +221,7 @@ namespace cache {
 			void remove(size_t pos, size_t removeLen) {
 				splice(pos, removeLen, "", 0);
 			}
-			
+
 			/**
 			 * add data of given length to the buffer.
 			 */
@@ -302,9 +287,9 @@ namespace cache {
 				static char prefix1[3];
 				static char prefix2[2];
 
-				if (prefix1[0] != comment_line_char) {
-					xsnprintf(prefix1, sizeof(prefix1), "%c ", comment_line_char);
-					xsnprintf(prefix2, sizeof(prefix2), "%c", comment_line_char);
+				if (prefix1[0] != COMMENT_LINE_CHAR) {
+					xsnprintf(prefix1, sizeof(prefix1), "%c ", COMMENT_LINE_CHAR);
+					xsnprintf(prefix2, sizeof(prefix2), "%c", COMMENT_LINE_CHAR);
 				}
 				add_lines(prefix1, prefix2, bufLines, size);
 			}
@@ -372,7 +357,7 @@ namespace cache {
 			 * which can be used by the programmer of the callback as she sees fit.
 			 */
 			typedef size_t (*expand_fn_t) (StringBuffer *sb, const char *placeholder,
-				   	void *context);
+					void *context);
 			void expand(const char *format, expand_fn_t fn, void *context) {
 				for (;;) {
 					const char *percent;
@@ -391,7 +376,7 @@ namespace cache {
 						continue;
 					}
 
-					consumed = fn(sb, format, context);
+					consumed = fn(this, format, context);
 					if (consumed) {
 						format += consumed;
 					} else {
@@ -400,20 +385,20 @@ namespace cache {
 				}
 			}
 
-			size_t expand_dict_cb(const char *placeholder, void *context) {
-				strbuf_expand_dict_entry *e = context;
-				size_t len;
+			//size_t expand_dict_cb(const char *placeholder, void *context) {
+				//strbuf_expand_dict_entry *e = context;
+				//size_t len;
 
-				for (; e->placeholder && (len = std::strlen(e->placeholder)); e++) {
-					if (!strncmp(placeholder, e->placeholder, len)) {
-						if (e->value) {
-							addstr(e->value);
-						}
-						return len;
-					}
-				}
-				return 0;
-			}
+				//for (; e->placeholder && (len = std::strlen(e->placeholder)); e++) {
+					//if (!strncmp(placeholder, e->placeholder, len)) {
+						//if (e->value) {
+							//addstr(e->value);
+						//}
+						//return len;
+					//}
+				//}
+				//return 0;
+			//}
 
 			size_t strbuf_fread(size_t size, FILE *f) {
 				size_t oldalloc = alloc;
@@ -470,14 +455,7 @@ namespace cache {
 				return rlen;
 			}
 
-			void addbufRercentquote(struct strbuf *dst) {
-				for (size_t i = 0; i < len; i++) {
-					if (buf[i] == '%') {
-						dst->addch('%');
-					}
-					dst->addch(buf[i]);
-				}
-			}
+			
 
 			void addIndentedText(const char *text, int indent, int indent2) {
 				if (indent < 0) {
@@ -806,14 +784,20 @@ namespace cache {
 				setLen(len + newlen);
 			}
 
-			void addUniqueAbbrev(const unsigned char *sha1, int abbrev_len) {
-				grow(GIT_SHA1_HEXSZ + 1);
-				int r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
-				setLen(len + r);
-			}
+			//void addUniqueAbbrev(const unsigned char *sha1, int abbrev_len) {
+			//grow(GIT_SHA1_HEXSZ + 1);
+			//int r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
+			//setLen(len + r);
+			//}
 
-		private:
+			private:
 			size_t alloc;
+
+			/*
+			 * The character that begins a commented line in user-editable file
+			 * that is subject to stripspace.
+			 */
+			const static char COMMENT_LINE_CHAR = '#';
 
 			void reallocBuf() {
 				size_t amount = sizeof(char) * alloc;
@@ -837,14 +821,14 @@ namespace cache {
 					}
 				}
 			}
-			
+
 			/*
 			 * add_lines
 			 */
 			void add_lines(const char *prefix1, 
 					const char *prefix2,
 					const char *bufLines,
-				   	size_t size) {
+					size_t size) {
 				while (size) {
 					const char *prefix;
 					const char *next = (const char *)memchr(bufLines, '\n', size);
@@ -860,11 +844,12 @@ namespace cache {
 				completeLine();
 			}
 
-		public:
+			public:
 			size_t len;
 			char *buf;
-	};
+		};
 
+	}
 }
 
 #endif
