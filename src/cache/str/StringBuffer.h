@@ -455,8 +455,6 @@ namespace cache {
 				return rlen;
 			}
 
-			
-
 			void addIndentedText(const char *text, int indent, int indent2) {
 				if (indent < 0) {
 					indent = 0;

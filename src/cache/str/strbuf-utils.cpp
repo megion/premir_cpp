@@ -27,6 +27,15 @@ namespace cache {
 				}
 			}
 		}
+		
+		void addbufPercentquote(StringBuffer *dst, const StringBuffer *src) {
+			for (size_t i = 0; i < src->len; i++) {
+				if (src->buf[i] == '%') {
+					dst->addch('%');
+				}
+				dst->addch(src->buf[i]);
+			}
+		}
 
 		//void addUniqueAbbrev(StringBuffer *sb, const unsigned char *sha1, int abbrev_len) {
 		//sb->grow(GIT_SHA1_HEXSZ + 1);

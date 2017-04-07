@@ -18,15 +18,7 @@ namespace cache {
 		int is_rfc3986_unreserved(char ch);
 
 		bool starts_with(const char *str, const char *prefix); 
-		
-void addbufPercentquote(StringBuffer *dst) {
-				for (size_t i = 0; i < len; i++) {
-					if (buf[i] == '%') {
-						dst->addch('%');
-					}
-					dst->addch(buf[i]);
-				}
-			}
+		void addbufPercentquote(StringBuffer *dst, const StringBuffer *src);	
 
 		//void addUniqueAbbrev(const StringBuffer *a, const unsigned char *sha1, int abbrev_len);
 
