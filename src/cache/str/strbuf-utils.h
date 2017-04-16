@@ -32,6 +32,17 @@ namespace cache {
 		//}
 		
 		/**
+		 * Used as callback for `strbuf_expand()`, expects an array of
+		 * struct strbuf_expand_dict_entry as context, i.e. pairs of
+		 * placeholder and replacement string.  The array needs to be
+		 * terminated by an entry with placeholder set to NULL.
+		 */
+		//struct strbuf_expand_dict_entry {
+		//const char *placeholder;
+		//const char *value;
+		//};
+		
+		/**
 		 * This function can be used to expand a format string containing
 		 * placeholders. To that end, it parses the string and calls the specified
 		 * function for every percent sign found.

@@ -25,17 +25,6 @@ namespace cache {
 
 		class StringBuffer {
 
-			/**
-			 * Used as callback for `strbuf_expand()`, expects an array of
-			 * struct strbuf_expand_dict_entry as context, i.e. pairs of
-			 * placeholder and replacement string.  The array needs to be
-			 * terminated by an entry with placeholder set to NULL.
-			 */
-			//struct strbuf_expand_dict_entry {
-				//const char *placeholder;
-				//const char *value;
-			//};
-
 			public:
 			StringBuffer(): alloc(0), len(0), buf(nullptr) {
 			}
@@ -639,10 +628,7 @@ namespace cache {
 			/*
 			 * add_lines
 			 */
-			void add_lines(const char *prefix1, 
-					const char *prefix2,
-					const char *bufLines,
-					size_t size) {
+			void add_lines(const char *prefix1, const char *prefix2, const char *bufLines, size_t size) {
 				while (size) {
 					const char *prefix;
 					const char *next = (const char *)memchr(bufLines, '\n', size);
