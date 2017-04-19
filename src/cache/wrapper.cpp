@@ -24,7 +24,7 @@
 
 
 namespace cache {
-	
+
 	void *xmalloc(size_t size) {
 		void *ret= std::malloc(size);
 		if (ret == nullptr) {

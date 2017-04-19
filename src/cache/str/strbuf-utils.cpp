@@ -189,5 +189,157 @@ namespace cache {
 			return -1;
 		}
 
+		int strbuf_getcwd(StringBuffer *sb) {
+			size_t oldalloc = sb->getAlloc();
+			size_t guessed_len = 128;
+
+			for (;; guessed_len *= 2) {
+				sb->grow(guessed_len);
+				if (getcwd(sb->buf, sb->getAlloc())) {
+					sb->setLen(std::strlen(sb->buf));
+					return 0;
+				}
+				if (errno != ERANGE) {
+					break;
+				}
+			}
+			if (oldalloc == 0) {
+				sb->release();
+			} else {
+				sb->reset();
+			}
+			return -1;
+		}
+
+		void strbuf_addstr_xml_quoted(StringBuffer *sb, const char *s) {
+			while (*s) {
+				size_t len = strcspn(s, "\"<>&");
+				sb->add(s, len);
+				s += len;
+				switch (*s) {
+					case '"':
+						sb->addstr("&quot;");
+						break;
+					case '<':
+						sb->addstr("&lt;");
+						break;
+					case '>':
+						sb->addstr("&gt;");
+						break;
+					case '&':
+						sb->addstr("&amp;");
+						break;
+					case 0:
+						return;
+				}
+				s++;
+			}
+		}
+
+		static void strbuf_add_urlencode(StringBuffer *sb, const char *s,
+			   	size_t strlen, int reserved) {
+			sb->grow(strlen);
+			while (strlen--) {
+				char ch = *s++;
+				if (is_rfc3986_unreserved(ch) ||
+						(!reserved && is_rfc3986_reserved(ch))) {
+					sb->addch(ch);
+				} else {
+					sb->addf("%%%02x", ch);
+				}
+			}
+		}
+
+		void strbuf_addstr_urlencode(StringBuffer *sb, const char *s, int reserved) {
+			strbuf_add_urlencode(sb, s, std::strlen(s), reserved);
+		}
+
+		void strbuf_humanise_bytes(StringBuffer *sb, off_t bytes) {
+			if (bytes > 1 << 30) {
+				sb->addf("%u.%2.2u GiB",
+						(int)(bytes >> 30),
+						(int)(bytes & ((1 << 30) - 1)) / 10737419);
+			} else if (bytes > 1 << 20) {
+				int x = bytes + 5243;  /* for rounding */
+				sb->addf("%u.%2.2u MiB",
+						x >> 20, ((x & ((1 << 20) - 1)) * 100) >> 20);
+			} else if (bytes > 1 << 10) {
+				int x = bytes + 5;  /* for rounding */
+				sb->addf("%u.%2.2u KiB",
+						x >> 10, ((x & ((1 << 10) - 1)) * 100) >> 10);
+			} else {
+				sb->addf("%u bytes", (int)bytes);
+			}
+		}
+
+		char *xgetcwd(void) {
+			StringBuffer sb;
+			if (strbuf_getcwd(&sb)) {
+				LOG(ERR, "unable to get current working directory");
+			}
+			return sb.detach(nullptr);
+		}
+
+		void strbuf_add_absolute_path(StringBuffer *sb, const char *path) {
+			if (!*path) {
+				LOG(ERR, "The empty string is not a valid path");
+				return;
+			}
+			if (!is_absolute_path(path)) {
+				struct stat cwd_stat, pwd_stat;
+				size_t orig_len = sb->len;
+				char *cwd = xgetcwd();
+				char *pwd = getenv("PWD");
+				if (pwd && strcmp(pwd, cwd) &&
+						!stat(cwd, &cwd_stat) &&
+						(cwd_stat.st_dev || cwd_stat.st_ino) &&
+						!stat(pwd, &pwd_stat) &&
+						pwd_stat.st_dev == cwd_stat.st_dev &&
+						pwd_stat.st_ino == cwd_stat.st_ino) {
+					sb->addstr(pwd);
+				} else {
+					sb->addstr(cwd);
+				}
+				if (sb->len > orig_len && !is_dir_sep(sb->buf[sb->len - 1])) {
+					sb->addch(sb, '/');
+				}
+				std::free(cwd);
+			}
+			sb->addstr(path);
+		}
+
+			void addftime(const char *fmt, const struct tm *tm) {
+				size_t hint = 128;
+
+				if (!*fmt) {
+					return;
+				}
+
+				grow(hint);
+				size_t newlen = strftime(buf + len, alloc - len, fmt, tm);
+
+				if (!newlen) {
+					/*
+					 * strftime reports "0" if it could not fit the result in the buffer.
+					 * Unfortunately, it also reports "0" if the requested time string
+					 * takes 0 bytes. So our strategy is to munge the format so that the
+					 * output contains at least one character, and then drop the extra
+					 * character before returning.
+					 */
+					StringBuffer munged_fmt;
+					munged_fmt.addf("%s ", fmt);
+					while (!newlen) {
+						hint *= 2;
+						grow(hint);
+						newlen = strftime(buf + len, alloc - len,
+								munged_fmt.buf, tm);
+					}
+					newlen--; /* drop munged space */
+				}
+				setLen(len + newlen);
+			}
+
+
+
 	}
 }

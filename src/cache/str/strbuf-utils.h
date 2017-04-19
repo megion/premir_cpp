@@ -94,6 +94,11 @@ namespace cache {
 		ssize_t strbuf_readOnce(StringBuffer *sb, int fd, size_t hint);
 		ssize_t strbuf_write(StringBuffer *sb, FILE *f);
 		int strbuf_readlink(StringBuffer *sb, const char *path, size_t hint);
+		int strbuf_getcwd(StringBuffer *sb); 
+		void strbuf_addstr_xml_quoted(StringBuffer *sb, const char *s);
+		void strbuf_addstr_urlencode(StringBuffer *sb, const char *s, int reserved);
+		void strbuf_humanise_bytes(StringBuffer *sb, off_t bytes);
+		char *xgetcwd(void);
 
 	}
 }

@@ -37,13 +37,13 @@ namespace cache {
 
 			//extern char strbuf_slopbuf[];
 			//#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
-			//void strbuf_init(struct strbuf *sb, size_t hint)
-			//{
-			//sb->alloc = sb->len = 0;
-			//sb->buf = strbuf_slopbuf;
-			//if (hint)
-			//strbuf_grow(sb, hint);
-			//}
+			void init(size_t hint) {
+				alloc = len = 0;
+				buf = nullptr;
+				if (hint) {
+					grow(hint);
+				}
+			}
 
 			~StringBuffer() {
 				release();	
@@ -99,41 +99,14 @@ namespace cache {
 				buf[len] = '\0';
 			}
 
-			void grow(size_t extra) {
-				bool new_buf = (alloc==0);
-
-				size_t newLen = len + extra + 1;
-				if (newLen > alloc) {
-					size_t newAlloc = (alloc+16)*3/2;
-					if (newAlloc < newLen) { 
-						alloc = newLen; 
-					} else {
-						alloc = newAlloc;
-					}
-					reallocBuf();
-				}
-				if (new_buf) {
-					buf[0] = '\0';
-				}
-			}
+			void grow(size_t extra);
 
 			/**
 			 * Detach the string from the strbuf and returns it; you now own the
 			 * storage the string occupies and it is your responsibility from then on
 			 * to release it with `free(3)` when you are done with it.
 			 */
-			char *detach(size_t *sz) {
-				char *res;
-				grow(0);
-				res = buf;
-				if (sz) {
-					*sz = len;
-				}
-				alloc = 0;
-				len = 0;
-				buf = nullptr;
-				return res;
-			}
+			char *detach(size_t *sz);
 
 			/**
 			 * Attach a string to a buffer. You should specify the string to attach,
@@ -143,14 +116,7 @@ namespace cache {
 			 * malloc()ed, and after attaching, the pointer cannot be relied upon
 			 * anymore, and neither be free()d directly.
 			 */
-			void attach(char *_buf, size_t _len, size_t _alloc) {
-				release();
-				buf = _buf;
-				len = _len;
-				alloc = _alloc;
-				grow(0);
-				buf[len] = '\0';
-			}
+			void attach(char *_buf, size_t _len, size_t _alloc); 
 
 			void trim() {
 				rtrim();
@@ -184,24 +150,7 @@ namespace cache {
 			/*
 			 * cut 'removeLen' elements start with 'pos' and insert data
 			 */
-			void splice(size_t pos, size_t removeLen, const void *data, size_t dataLen) {
-				if (pos > len) {
-					LOG(ERR, "`pos' is too far after the end of the buffer");
-					return;
-				}
-				if (pos + removeLen > len) {
-					LOG(ERR, "`pos + removeLen' is too far after the end of the buffer");
-					return;
-				}
-
-				if (dataLen >= removeLen) {
-					grow(dataLen - removeLen);
-				}
-				std::memmove(buf + pos + dataLen, buf + pos + removeLen,
-						len - pos - removeLen);
-				std::memcpy(buf + pos, data, dataLen);
-				setLen(len + dataLen - removeLen);
-			}
+			void splice(size_t pos, size_t removeLen, const void *data, size_t dataLen);
 
 			void insert(size_t pos, const void *data, size_t dataLen) {
 				splice(pos, 0, data, dataLen);
@@ -272,164 +221,21 @@ namespace cache {
 			 * Add a NUL-terminated string to the buffer. Each line will be prepended
 			 * by a comment character and a blank.
 			 */
-			void addCommentedLines(const char *bufLines, size_t size) {
-				static char prefix1[3];
-				static char prefix2[2];
+			void addCommentedLines(const char *bufLines, size_t size); 
 
-				if (prefix1[0] != COMMENT_LINE_CHAR) {
-					xsnprintf(prefix1, sizeof(prefix1), "%c ", COMMENT_LINE_CHAR);
-					xsnprintf(prefix2, sizeof(prefix2), "%c", COMMENT_LINE_CHAR);
-				}
-				add_lines(prefix1, prefix2, bufLines, size);
+			void commentedAddf(const char *fmt, ...);
+
+			void vaddf(const char *fmt, va_list ap); 
+
+			void addLines(const char *prefix,
+					const char *bufLines, size_t size) {
+				add_lines(prefix, NULL, bufLines, size);
 			}
 
-			void commentedAddf(const char *fmt, ...) {
-				va_list params;
-				StringBuffer tempBuf;
-				int incomplete_line = len && buf[len - 1] != '\n';
+			int strbuf_getwholeline(FILE *fp, int term);
 
-				va_start(params, fmt);
-				tempBuf.vaddf(fmt, params);
-				va_end(params);
-
-				addCommentedLines(tempBuf.buf, tempBuf.len);
-				if (incomplete_line) {
-					buf[--len] = '\0';
-				}
-			}
-
-			void vaddf(const char *fmt, va_list ap) {
-				va_list cp;
-
-				if (!avail()) {
-					grow(64);
-				}
-				va_copy(cp, ap);
-				int addLen = vsnprintf(buf + len, alloc - len, fmt, cp);
-				va_end(cp);
-				if (addLen < 0) {
-					LOG(ERR, "BUG: your vsnprintf is broken (returned %d)", addLen);
-					return;
-				}
-				if (addLen > avail()) {
-					grow(addLen);
-					addLen = vsnprintf(buf + len, alloc - len, fmt, ap);
-					if (addLen > avail()) {
-						LOG(ERR, "BUG: your vsnprintf is broken (insatiable)");
-					}
-				}
-				setLen(len + addLen);
-			}
-
-			
-
-			int getCwd() {
-				size_t oldalloc = alloc;
-				size_t guessed_len = 128;
-
-				for (;; guessed_len *= 2) {
-					grow(guessed_len);
-					if (getcwd(buf, alloc)) {
-						setLen(std::strlen(buf));
-						return 0;
-					}
-					if (errno != ERANGE) {
-						break;
-					}
-				}
-				if (oldalloc == 0) {
-					release();
-				} else {
-					reset();
-				}
-				return -1;
-			}
-
-			/*
-			 * Define HAVE_GETDELIM if your system has the getdelim() function.
-			 */
-#ifdef HAVE_GETDELIM
-			int getWholeLine(FILE *fp, int term) {
-				ssize_t r;
-
-				if (feof(fp)) {
-					return EOF;
-				}
-
-				reset();
-
-				/* Translate slopbuf to NULL, as we cannot call realloc on it */
-				if (!alloc) {
-					buf = nullptr;
-				}
-				r = getdelim(&buf, &alloc, term, fp);
-
-				if (r > 0) {
-					len = r;
-					return 0;
-				}
-				assert(r == -1);
-
-				/*
-				 * Normally we would have called xrealloc, which will try to free
-				 * memory and recover. But we have no way to tell getdelim() to do so.
-				 * Worse, we cannot try to recover ENOMEM ourselves, because we have
-				 * no idea how many bytes were read by getdelim.
-				 *
-				 * Dying here is reasonable. It mirrors what xrealloc would do on
-				 * catastrophic memory failure. We skip the opportunity to free pack
-				 * memory and retry, but that's unlikely to help for a malloc small
-				 * enough to hold a single line of input, anyway.
-				 */
-				if (errno == ENOMEM) {
-					LOG(ERR, "Out of memory, getdelim failed");
-					return -1;
-				}
-
-				/*
-				 * Restore strbuf invariants; if getdelim left us with a NULL pointer,
-				 * we can just re-init, but otherwise we should make sure that our
-				 * length is empty, and that the result is NUL-terminated.
-				 */
-				if (!buf) {
-					buf = nullptr;
-					alloc = len = 0;
-				} else {
-					reset();
-				}
-				return EOF;
-			}
-#else
-			int getWholeLine(FILE *fp, int term) {
-				int ch;
-
-				if (feof(fp)) {
-					return EOF;
-				}
-
-				reset();
-				flockfile(fp);
-				while ((ch = getc_unlocked(fp)) != EOF) {
-					if (!avail()) {
-						grow(1);
-					}
-					buf[len++] = ch;
-					if (ch == term) {
-						break;
-					}
-				}
-				funlockfile(fp);
-				if (ch == EOF && len == 0) {
-					return EOF;
-				}
-
-				buf[len] = '\0';
-				return 0;
-			}
-#endif
-
-			int strbuf_getdelim(FILE *fp, int term) {
-				if (getWholeLine(fp, term)) {
+			int getDelim(FILE *fp, int term) {
+				if (strbuf_getwholeline(fp, term)) {
 					return EOF;
 				}
 				if (buf[len - 1] == term) {
@@ -439,7 +245,7 @@ namespace cache {
 			}
 
 			int getLine(FILE *fp) {
-				if (getWholeLine(fp, '\n')) {
+				if (strbuf_getwholeline(fp, '\n')) {
 					return EOF;
 				}
 				if (buf[len - 1] == '\n') {
@@ -452,14 +258,14 @@ namespace cache {
 			}
 
 			int getLineLf(FILE *fp) {
-				return strbuf_getdelim(fp, '\n');
+				return getDelim(fp, '\n');
 			}
 
 			int getLineNul(FILE *fp) {
-				return strbuf_getdelim(fp, '\0');
+				return getDelim(fp, '\0');
 			}
 
-			int getWholeLineFd(int fd, int term) {
+			int strbuf_getwholeline_fd(int fd, int term) {
 				reset();
 
 				while (1) {
@@ -475,123 +281,6 @@ namespace cache {
 				}
 				return 0;
 			}
-
-			void addLines(const char *prefix,
-					const char *bufLines, size_t size) {
-				add_lines(prefix, NULL, bufLines, size);
-			}
-
-			void addstrXmlQuoted(const char *s) {
-				while (*s) {
-					size_t len = strcspn(s, "\"<>&");
-					add(s, len);
-					s += len;
-					switch (*s) {
-						case '"':
-							addstr("&quot;");
-							break;
-						case '<':
-							addstr("&lt;");
-							break;
-						case '>':
-							addstr("&gt;");
-							break;
-						case '&':
-							addstr("&amp;");
-							break;
-						case 0:
-							return;
-					}
-					s++;
-				}
-			}
-
-			void addstrUrlencode(const char *s, int reserved) {
-				add_urlencode(s, strlen(s), reserved);
-			}
-
-			void humaniseBytes(off_t bytes) {
-				if (bytes > 1 << 30) {
-					addf("%u.%2.2u GiB",
-							(int)(bytes >> 30),
-							(int)(bytes & ((1 << 30) - 1)) / 10737419);
-				} else if (bytes > 1 << 20) {
-					int x = bytes + 5243;  /* for rounding */
-					addf("%u.%2.2u MiB",
-							x >> 20, ((x & ((1 << 20) - 1)) * 100) >> 20);
-				} else if (bytes > 1 << 10) {
-					int x = bytes + 5;  /* for rounding */
-					addf("%u.%2.2u KiB",
-							x >> 10, ((x & ((1 << 10) - 1)) * 100) >> 10);
-				} else {
-					addf("%u bytes", (int)bytes);
-				}
-			}
-
-			void addAbsolutePath(const char *path) {
-				if (!*path) {
-					LOG(ERR, "The empty string is not a valid path");
-					return;
-				}
-				if (!is_absolute_path(path)) {
-					struct stat cwd_stat, pwd_stat;
-					size_t orig_len = len;
-					char *cwd = xgetcwd();
-					char *pwd = getenv("PWD");
-					if (pwd && strcmp(pwd, cwd) &&
-							!stat(cwd, &cwd_stat) &&
-							(cwd_stat.st_dev || cwd_stat.st_ino) &&
-							!stat(pwd, &pwd_stat) &&
-							pwd_stat.st_dev == cwd_stat.st_dev &&
-							pwd_stat.st_ino == cwd_stat.st_ino) {
-						addstr(pwd);
-					} else {
-						addstr(cwd);
-					}
-					if (len > orig_len && !is_dir_sep(buf[len - 1])) {
-						addch(sb, '/');
-					}
-					free(cwd);
-				}
-				addstr(path);
-			}
-
-			void addftime(const char *fmt, const struct tm *tm) {
-				size_t hint = 128;
-
-				if (!*fmt) {
-					return;
-				}
-
-				grow(hint);
-				size_t newlen = strftime(buf + len, alloc - len, fmt, tm);
-
-				if (!newlen) {
-					/*
-					 * strftime reports "0" if it could not fit the result in the buffer.
-					 * Unfortunately, it also reports "0" if the requested time string
-					 * takes 0 bytes. So our strategy is to munge the format so that the
-					 * output contains at least one character, and then drop the extra
-					 * character before returning.
-					 */
-					StringBuffer munged_fmt;
-					munged_fmt.addf("%s ", fmt);
-					while (!newlen) {
-						hint *= 2;
-						grow(hint);
-						newlen = strftime(buf + len, alloc - len,
-								munged_fmt.buf, tm);
-					}
-					newlen--; /* drop munged space */
-				}
-				setLen(len + newlen);
-			}
-
-			//void addUniqueAbbrev(const unsigned char *sha1, int abbrev_len) {
-			//grow(GIT_SHA1_HEXSZ + 1);
-			//int r = find_unique_abbrev_r(sb->buf + sb->len, sha1, abbrev_len);
-			//setLen(len + r);
-			//}
 
 			private:
 			size_t alloc;
@@ -612,17 +301,21 @@ namespace cache {
 				buf = newBuf;
 			}
 
-			void add_urlencode(const char *s, size_t strlen, int reserved) {
-				grow(strlen);
-				while (strlen--) {
-					char ch = *s++;
-					if (is_rfc3986_unreserved(ch) ||
-							(!reserved && is_rfc3986_reserved(ch))) {
-						addch(ch);
-					} else {
-						addf("%%%02x", ch);
-					}
+			/**
+			 * strbuf_complete
+			 * "Complete" the contents of `sb` by ensuring that either it ends with the
+			 * character `term`, or it is empty.  This can be used, for example,
+			 * to ensure that text ends with a newline, but without creating an empty
+			 * blank line if there is no content in the first place.
+			 */
+			void complete(char term) {
+				if (len && buf[len - 1] != term) {
+					addch(term);
 				}
+			}
+
+			void completeLine() {
+				complete('\n');
 			}
 
 			/*
@@ -651,6 +344,7 @@ namespace cache {
 			size_t getAlloc() const {
 				return alloc;
 			}
+
 		};
 
 	}
