@@ -14,8 +14,8 @@
 #include "test.h"
 
 #include "cache/StringList.h"
-#include "cache/DirCache.h"
-#include "cache/StringBuffer.h"
+#include "cache/cache.h"
+#include "cache/str/StringBuffer.h"
 
 namespace test {
     namespace cache_string_list {

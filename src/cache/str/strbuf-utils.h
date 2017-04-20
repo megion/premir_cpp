@@ -10,6 +10,10 @@
 #include <stdexcept>
 #include <iostream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "cache/str/StringBuffer.h"
 
 namespace cache {
@@ -99,6 +103,7 @@ namespace cache {
 		void strbuf_addstr_urlencode(StringBuffer *sb, const char *s, int reserved);
 		void strbuf_humanise_bytes(StringBuffer *sb, off_t bytes);
 		char *xgetcwd(void);
+		void strbuf_addftime(StringBuffer *sb, const char *fmt, const struct tm *tm); 
 
 	}
 }

@@ -301,45 +301,43 @@ namespace cache {
 					sb->addstr(cwd);
 				}
 				if (sb->len > orig_len && !is_dir_sep(sb->buf[sb->len - 1])) {
-					sb->addch(sb, '/');
+					sb->addch('/');
 				}
 				std::free(cwd);
 			}
 			sb->addstr(path);
 		}
 
-			void addftime(const char *fmt, const struct tm *tm) {
-				size_t hint = 128;
+		void strbuf_addftime(StringBuffer *sb, const char *fmt, const struct tm *tm) {
+			size_t hint = 128;
 
-				if (!*fmt) {
-					return;
-				}
-
-				grow(hint);
-				size_t newlen = strftime(buf + len, alloc - len, fmt, tm);
-
-				if (!newlen) {
-					/*
-					 * strftime reports "0" if it could not fit the result in the buffer.
-					 * Unfortunately, it also reports "0" if the requested time string
-					 * takes 0 bytes. So our strategy is to munge the format so that the
-					 * output contains at least one character, and then drop the extra
-					 * character before returning.
-					 */
-					StringBuffer munged_fmt;
-					munged_fmt.addf("%s ", fmt);
-					while (!newlen) {
-						hint *= 2;
-						grow(hint);
-						newlen = strftime(buf + len, alloc - len,
-								munged_fmt.buf, tm);
-					}
-					newlen--; /* drop munged space */
-				}
-				setLen(len + newlen);
+			if (!*fmt) {
+				return;
 			}
 
+			sb->grow(hint);
+			size_t newlen = strftime(sb->buf + sb->len, sb->getAlloc() - sb->len, fmt, tm);
 
+			if (!newlen) {
+				/*
+				 * strftime reports "0" if it could not fit the result in the buffer.
+				 * Unfortunately, it also reports "0" if the requested time string
+				 * takes 0 bytes. So our strategy is to munge the format so that the
+				 * output contains at least one character, and then drop the extra
+				 * character before returning.
+				 */
+				StringBuffer munged_fmt;
+				munged_fmt.addf("%s ", fmt);
+				while (!newlen) {
+					hint *= 2;
+					sb->grow(hint);
+					newlen = strftime(sb->buf + sb->len, sb->getAlloc() - sb->len,
+							munged_fmt.buf, tm);
+				}
+				newlen--; /* drop munged space */
+			}
+			sb->setLen(sb->len + newlen);
+		}
 
 	}
 }

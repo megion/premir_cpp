@@ -14,7 +14,7 @@
 #include "test.h"
 
 #include "cache/LinkedHashMap.h"
-#include "cache/DirCache.h"
+#include "cache/cache.h"
 #include "cache/str-intern.h"
 
 namespace test {
