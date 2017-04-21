@@ -1,5 +1,5 @@
-#ifndef SRC_CACHE_STRBUF_H
-#define SRC_CACHE_STRBUF_H
+#ifndef SRC_CACHE_STR_STRING_BUFFER_H
+#define SRC_CACHE_STR_STRING_BUFFER_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -35,6 +35,10 @@ namespace cache {
 				}
 			}
 
+			~StringBuffer() {
+				release();	
+			}
+
 			//extern char strbuf_slopbuf[];
 			//#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
 			void init(size_t hint) {
@@ -43,10 +47,6 @@ namespace cache {
 				if (hint) {
 					grow(hint);
 				}
-			}
-
-			~StringBuffer() {
-				release();	
 			}
 
 			/**

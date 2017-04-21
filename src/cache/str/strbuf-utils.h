@@ -1,5 +1,5 @@
-#ifndef SRC_CACHE_STRBUF_UTILS_H
-#define SRC_CACHE_STRBUF_UTILS_H
+#ifndef SRC_CACHE_STR_STRBUF_UTILS_H
+#define SRC_CACHE_STR_STRBUF_UTILS_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -18,6 +18,7 @@
 
 namespace cache {
 	namespace str {
+
 		int is_rfc3986_reserved(char ch); 
 		int is_rfc3986_unreserved(char ch);
 
@@ -70,9 +71,9 @@ namespace cache {
 		 * parameters to the callback, `strbuf_expand()` passes a context pointer,
 		 * which can be used by the programmer of the callback as she sees fit.
 		 */
-		typedef size_t (*expand_fn_t) (StringBuffer *sb, const char *placeholder,
-				void *context);
-		void strbuf_expand(StringBuffer *sb, const char *format, expand_fn_t fn, void *context); 
+		//typedef size_t (*expand_fn_t) (StringBuffer *sb, const char *placeholder,
+				//void *context);
+		//void strbuf_expand(StringBuffer *sb, const char *format, expand_fn_t fn, void *context); 
 
 		//size_t expand_dict_cb(const char *placeholder, void *context) {
 		//strbuf_expand_dict_entry *e = context;

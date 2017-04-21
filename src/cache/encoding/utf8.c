@@ -1,4 +1,4 @@
-#include "cache/utf8.h"
+#include "cache/encoding/utf8.h"
 
 /* This code is originally from http://www.cl.cam.ac.uk/~mgk25/ucs/ */
 

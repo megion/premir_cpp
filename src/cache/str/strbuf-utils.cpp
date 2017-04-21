@@ -37,32 +37,32 @@ namespace cache {
 			}
 		}
 
-		void strbuf_expand(StringBuffer *sb, const char *format, expand_fn_t fn, void *context) {
-			for (;;) {
-				const char *percent;
-				size_t consumed;
+		//void strbuf_expand(StringBuffer *sb, const char *format, expand_fn_t fn, void *context) {
+			//for (;;) {
+				//const char *percent;
+				//size_t consumed;
 
-				percent = strchrnul(format, '%');
-				sb->add(format, percent - format);
-				if (!*percent) {
-					break;
-				}
-				format = percent + 1;
+				//percent = strchrnul(format, '%');
+				//sb->add(format, percent - format);
+				//if (!*percent) {
+					//break;
+				//}
+				//format = percent + 1;
 
-				if (*format == '%') {
-					sb->addch('%');
-					format++;
-					continue;
-				}
+				//if (*format == '%') {
+					//sb->addch('%');
+					//format++;
+					//continue;
+				//}
 
-				consumed = fn(sb, format, context);
-				if (consumed) {
-					format += consumed;
-				} else {
-					sb->addch('%');
-				}
-			}
-		}
+				//consumed = fn(sb, format, context);
+				//if (consumed) {
+					//format += consumed;
+				//} else {
+					//sb->addch('%');
+				//}
+			//}
+		//}
 
 		//void addUniqueAbbrev(StringBuffer *sb, const unsigned char *sha1, int abbrev_len) {
 		//sb->grow(GIT_SHA1_HEXSZ + 1);

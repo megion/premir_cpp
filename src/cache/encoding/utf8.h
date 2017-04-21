@@ -1,5 +1,5 @@
-#ifndef SRC_CACHE_UTF8_H
-#define SRC_CACHE_UTF8_H
+#ifndef SRC_CACHE_ENCODING_UTF8_H
+#define SRC_CACHE_ENCODING_UTF8_H
 
 #include <cstdio>
 #include <cstdlib>
