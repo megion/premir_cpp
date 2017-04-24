@@ -1,4 +1,4 @@
-#include "cache/str-intern.h"
+#include "cache/qsort_s.h"
 
 namespace cache {
 
@@ -8,7 +8,7 @@ namespace cache {
 	 * Added context pointer, safety checks and return value.
 	 */
 
-	static void msort_with_tmp(char *b, size_t n, size_t s,
+	static void msort_with_tmp(void *b, size_t n, size_t s,
 			int (*cmp)(const void *, const void *, void *),
 			char *t, void *ctx) {
 		char *tmp;
@@ -21,7 +21,7 @@ namespace cache {
 
 		n1 = n / 2;
 		n2 = n - n1;
-		b1 = b;
+		b1 = (char *)b;
 		b2 = (char *)b + (n1 * s);
 
 		msort_with_tmp(b1, n1, s, cmp, t, ctx);
@@ -48,7 +48,7 @@ namespace cache {
 		std::memcpy(b, t, (n - n2) * s);
 	}
 
-	int my_qsort_s(char *b, size_t n, size_t s,
+	int my_qsort_s(void *b, size_t n, size_t s,
 			int (*cmp)(const void *, const void *, void *), void *ctx) {
 		const size_t size = n * s;
 		char buf[1024];
@@ -74,12 +74,6 @@ namespace cache {
 		}
 		return 0;
 	}
-
-	int qsort_s(char *b, size_t n,
-			int (*cmp)(const void *, const void *, void *), void *ctx) {
-		return my_qsort_s(b, n, sizeof(*b), cmp, ctx);
-	}
-	
 
 }
 

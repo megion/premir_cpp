@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <stdarg.h>     /* va_list, va_start, va_arg, va_end */
 
 #include <exception>
 #include <stdexcept>

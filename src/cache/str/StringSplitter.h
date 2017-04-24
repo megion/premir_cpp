@@ -13,53 +13,49 @@
 #include "cache/str/StringBuffer.h"
 
 namespace cache {
-	namespace str {
+namespace str {
 
-		class StringSplitter {
-			public:
-				StringSplitter() : array(nullptr), nr(0), alloc(0) {
-				}
+class StringSplitter {
+  public:
+    StringSplitter() : array(nullptr), nr(0), alloc(0) {}
 
-				~StringSplitter() {
-					release();	
-				}
+    ~StringSplitter() { release(); }
 
-				void release(); 
-				/*
-				 * create array of pointer on StringBuffer.
-				 * Last array element is nullptr.
-				 */
-				StringBuffer **splitBuf(const char *str, size_t slen,
-						int terminator, size_t max); 
+    void release();
+    /*
+     * create array of pointer on StringBuffer.
+     * Last array element is nullptr.
+     */
+    StringBuffer** splitBuf(const char* str, size_t slen, int terminator,
+                            size_t max);
 
-			private:
-				StringBuffer **array;
-				size_t nr, alloc;
+  private:
+    StringBuffer** array;
+    size_t nr, alloc;
 
-				void grow(size_t newLen) {
-					if (newLen > alloc) {
-						size_t newAlloc = (alloc+16)*3/2;
-						if (newAlloc < newLen) { 
-							alloc = newLen; 
-						} else {
-							alloc = newAlloc;
-						}
-						reallocArray();
-					}
-				}
+    void grow(size_t newLen) {
+        if (newLen > alloc) {
+            size_t newAlloc = (alloc + 16) * 3 / 2;
+            if (newAlloc < newLen) {
+                alloc = newLen;
+            } else {
+                alloc = newAlloc;
+            }
+            reallocArray();
+        }
+    }
 
-				void reallocArray() {
-					size_t amount = sizeof(StringBuffer*) * alloc;
-					StringBuffer **newArray = (StringBuffer **) std::realloc(array, amount);
+    void reallocArray() {
+        size_t amount = sizeof(StringBuffer*) * alloc;
+        StringBuffer** newArray = (StringBuffer**)std::realloc(array, amount);
 
-					if (newArray == nullptr) {
-						throw std::runtime_error(std::strerror(errno));
-					}
-					array = newArray;
-				}
-
-		};
-	}		
+        if (newArray == nullptr) {
+            throw std::runtime_error(std::strerror(errno));
+        }
+        array = newArray;
+    }
+};
+}
 }
 
 #endif

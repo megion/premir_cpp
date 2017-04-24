@@ -12,10 +12,10 @@ namespace cache {
 		 * Give a rough count of objects in the repository. This sacrifices accuracy
 		 * for speed.
 		 */
-		unsigned long approximate_object_count(void);
+		//unsigned long approximate_object_count(void);
 
 
-		extern void prepare_packed_git(void);
+		//extern void prepare_packed_git(void);
 
 	}
 

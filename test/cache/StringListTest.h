@@ -15,15 +15,14 @@
 
 #include "cache/StringList.h"
 #include "cache/cache.h"
+#include "cache/str/strbuf-utils.h"
 #include "cache/str/StringBuffer.h"
 
 namespace test {
-    namespace cache_string_list {
+namespace cache_string_list {
 
-		void stringList_test();
-
-    }
+void stringList_test();
+}
 }
 
 #endif
-

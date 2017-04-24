@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "cache/str/StringBuffer.h"
+//#include "cache/str/StringBuffer.h"
 #include "cache/encoding/utf8.h"
 
 namespace cache {

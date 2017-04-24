@@ -31,8 +31,8 @@ namespace cache {
 		 * Note that while this version avoids the static buffer, it is not fully
 		 * reentrant, as it calls into other non-reentrant git code.
 		 */
-		extern const char *find_unique_abbrev(const unsigned char *sha1, int len);
-		extern int find_unique_abbrev_r(char *hex, const unsigned char *sha1, int len);
+		//extern const char *find_unique_abbrev(const unsigned char *sha1, int len);
+		//extern int find_unique_abbrev_r(char *hex, const unsigned char *sha1, int len);
 		
 
 	}
