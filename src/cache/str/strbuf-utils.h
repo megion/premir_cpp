@@ -95,12 +95,51 @@ void strbuf_addbufPercentquote(StringBuffer* dst, const StringBuffer* src);
 void strbuf_addIndentedText(StringBuffer* sb, const char* text, int indent,
                             int indent2);
 
+/**
+ * Read a given size of data from a FILE* pointer to the buffer.
+ *
+ * NOTE: The buffer is rewound if the read fails. If -1 is returned,
+ * `errno` must be consulted, like you would do for `read(3)`.
+ * `strbuf_read()`, `strbuf_read_file()` and `strbuf_getline_*()`
+ * family of functions have the same behaviour as well.
+ */
 size_t strbuf_fread(StringBuffer* sb, ssize_t size, FILE* f);
-ssize_t strbuf_readFile(StringBuffer* sb, int fd, size_t hint);
-ssize_t strbuf_readFileByPath(StringBuffer* sb, const char* path, size_t hint);
-ssize_t strbuf_readOnce(StringBuffer* sb, int fd, size_t hint);
-ssize_t strbuf_write(StringBuffer* sb, FILE* f);
+
+/**
+ * Read the contents of a given file descriptor. The third argument can be
+ * used to give a hint about the file size, to avoid reallocs.  If read fails,
+ * any partial read is undone.
+ */
+ssize_t strbuf_read(StringBuffer* sb, int fd, size_t hint);
+
+/**
+ * Read the contents of a given file descriptor partially by using only one
+ * attempt of xread. The third argument can be used to give a hint about the
+ * file size, to avoid reallocs. Returns the number of new bytes appended to
+ * the sb.
+ */
+ssize_t strbuf_read_once(StringBuffer* sb, int fd, size_t hint);
+
+/**
+ * Read the contents of a file, specified by its path. The third argument
+ * can be used to give a hint about the file size, to avoid reallocs.
+ * Return the number of bytes read or a negative value if some error
+ * occurred while opening or reading the file.
+ */
+ssize_t strbuf_read_file(StringBuffer* sb, const char* path, size_t hint);
+
+/**
+ * Read the target of a symbolic link, specified by its path.  The third
+ * argument can be used to give a hint about the size, to avoid reallocs.
+ */
 int strbuf_readlink(StringBuffer* sb, const char* path, size_t hint);
+
+/**
+ * Write the whole content of the strbuf to the stream not stopping at
+ * NUL bytes.
+ */
+ssize_t strbuf_write(StringBuffer* sb, FILE* f);
+
 int strbuf_getcwd(StringBuffer* sb);
 void strbuf_addstr_xml_quoted(StringBuffer* sb, const char* s);
 void strbuf_addstr_urlencode(StringBuffer* sb, const char* s, int reserved);

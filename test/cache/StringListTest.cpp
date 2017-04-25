@@ -3,7 +3,7 @@
 namespace test {
 namespace cache_string_list {
 
-bool prefix_cb(cache::string_list_item<bool>* item, void* cb_data) {
+bool prefix_cb(cache::StringList<bool>::ListItem* item, void* cb_data) {
     const char* prefix = (const char*)cb_data;
     return cache::str::starts_with(item->string, prefix);
 }
@@ -61,14 +61,14 @@ void test_remove_duplicates() {
 
 void test_sort() {
     cache::StringList<bool> list(nullptr, false);
-	cache::str::StringBuffer sb;
-	cache::StringList<bool>::ListItem *item;
-	//char string[] = "abc,defg,hij";
-    //list.splitInPlace(string, ',', 1);
-    //assert(list.size() == 2);
-    //assert(std::strcmp(list[0].string, "abc") == 0);
-    //assert(std::strcmp(list[1].string, "defg,hij") == 0);
-    //list.clear(false);
+    cache::str::StringBuffer sb;
+    cache::StringList<bool>::ListItem* item;
+    // char string[] = "abc,defg,hij";
+    // list.splitInPlace(string, ',', 1);
+    // assert(list.size() == 2);
+    // assert(std::strcmp(list[0].string, "abc") == 0);
+    // assert(std::strcmp(list[1].string, "defg,hij") == 0);
+    // list.clear(false);
 }
 
 // int cmd_main(int argc, const char **argv)
