@@ -59,10 +59,24 @@ void test_remove_duplicates() {
     list.clear(false);
 }
 
-void test_sort() {
+void test_sort_list() {
     cache::StringList<bool> list(nullptr, false);
     cache::str::StringBuffer sb;
     cache::StringList<bool>::ListItem* item;
+
+    // strbuf_read(&sb, 0, 0);
+    sb.addstr("abc\ndefg\nhij\ndefg\n");
+
+    // list.print();
+    //std::printf("sb %s\n", sb.buf);
+    if (sb.buf[sb.len - 1] == '\n') {
+        sb.setLen(sb.len - 1);
+	}
+    //std::printf("sb %s\n", sb.buf);
+    list.splitInPlace(sb.buf, '\n', -1);
+	list.sort();
+    assert(std::strcmp(list[1].string, "defg") == 0);
+    assert(std::strcmp(list[2].string, "defg") == 0);
     // char string[] = "abc,defg,hij";
     // list.splitInPlace(string, ',', 1);
     // assert(list.size() == 2);
@@ -110,6 +124,7 @@ void stringList_test() {
     mytest(split_in_place);
     mytest(filter);
     mytest(remove_duplicates);
+    mytest(sort_list);
 }
 }
 }
