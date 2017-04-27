@@ -1,21 +1,21 @@
 #ifndef SRC_CACHE_STR_STRING_BUFFER_H
 #define SRC_CACHE_STR_STRING_BUFFER_H
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
-#include <cerrno>
 #include <cstring>
 #include <limits.h>
-#include <stdarg.h>     /* va_list, va_start, va_arg, va_end */
+#include <stdarg.h> /* va_list, va_start, va_arg, va_end */
 
-#include <exception>
-#include <stdexcept>
-#include <iostream>
-#include <fcntl.h>
-#include "utils/console_colors.h"
+#include "cache/compat-utils.h"
 #include "cache/encoding/utf8.h"
 #include "cache/wrapper.h"
-#include "cache/compat-utils.h"
+#include "utils/console_colors.h"
+#include <exception>
+#include <fcntl.h>
+#include <iostream>
+#include <stdexcept>
 
 #define STRBUF_MAXLINK (2 * PATH_MAX)
 
@@ -24,10 +24,11 @@ namespace str {
 
 class StringBuffer {
 
-  public:
+    public:
     StringBuffer() : alloc(0), len(0), buf(nullptr) {}
 
-    StringBuffer(size_t hint) : alloc(0), len(0), buf(nullptr) {
+    StringBuffer(size_t hint) : alloc(0), len(0), buf(nullptr)
+    {
         if (hint) {
             grow(hint);
         }
@@ -37,7 +38,8 @@ class StringBuffer {
 
     // extern char strbuf_slopbuf[];
     //#define STRBUF_INIT  { 0, 0, strbuf_slopbuf }
-    void init(size_t hint) {
+    void init(size_t hint)
+    {
         alloc = len = 0;
         buf = nullptr;
         if (hint) {
@@ -52,7 +54,8 @@ class StringBuffer {
      * just meant as a 'please fix invariants from this strbuf I just messed
      * with'.
      */
-    void setLen(size_t newLen) {
+    void setLen(size_t newLen)
+    {
         if (newLen > (alloc ? alloc - 1 : 0)) {
             LOG(ERR, "BUG: setLen() beyond buffer");
         }
@@ -66,7 +69,8 @@ class StringBuffer {
      */
     void reset() { setLen(0); }
 
-    void release() {
+    void release()
+    {
         if (buf) {
             std::free(buf);
             alloc = 0;
@@ -83,7 +87,8 @@ class StringBuffer {
     /**
      * Add a single character to the buffer.
      */
-    void addch(int c) {
+    void addch(int c)
+    {
         if (!avail()) {
             grow(1);
         }
@@ -110,19 +115,22 @@ class StringBuffer {
      */
     void attach(char* _buf, size_t _len, size_t _alloc);
 
-    void trim() {
+    void trim()
+    {
         rtrim();
         ltrim();
     }
 
-    void rtrim() {
+    void rtrim()
+    {
         while (len > 0 && std::isspace(buf[len - 1])) {
             len--;
         }
         buf[len] = '\0';
     }
 
-    void ltrim() {
+    void ltrim()
+    {
         char* b = buf;
         while (len > 0 && std::isspace(*b)) {
             b++;
@@ -132,8 +140,9 @@ class StringBuffer {
         buf[len] = '\0';
     }
 
-    void tolower() {
-        char* p = buf, *end = buf + len;
+    void tolower()
+    {
+        char *p = buf, *end = buf + len;
         for (; p < end; p++) {
             *p = std::tolower(*p);
         }
@@ -144,7 +153,8 @@ class StringBuffer {
      */
     void splice(size_t pos, size_t removeLen, const void* data, size_t dataLen);
 
-    void insert(size_t pos, const void* data, size_t dataLen) {
+    void insert(size_t pos, const void* data, size_t dataLen)
+    {
         splice(pos, 0, data, dataLen);
     }
 
@@ -153,7 +163,8 @@ class StringBuffer {
     /**
      * add data of given length to the buffer.
      */
-    void add(const void* data, size_t dataLen) {
+    void add(const void* data, size_t dataLen)
+    {
         grow(dataLen);
         memcpy(buf + len, data, dataLen);
         setLen(len + dataLen);
@@ -173,7 +184,8 @@ class StringBuffer {
     /**
      * Copy the contents of another buffer at the end of the current one.
      */
-    void addbuf(const StringBuffer* sb2) {
+    void addbuf(const StringBuffer* sb2)
+    {
         grow(sb2->len);
         memcpy(buf + len, sb2->buf, sb2->len);
         setLen(len + sb2->len);
@@ -183,13 +195,15 @@ class StringBuffer {
      * Copy part of the buffer from a given position till a given length to the
      * end of the buffer.
      */
-    void adddup(size_t pos, size_t dupLen) {
+    void adddup(size_t pos, size_t dupLen)
+    {
         grow(dupLen);
         memcpy(buf + len, buf + pos, dupLen);
         setLen(len + dupLen);
     }
 
-    void addchars(int c, size_t num) {
+    void addchars(int c, size_t num)
+    {
         grow(num);
         std::memset(buf + len, c, num);
         setLen(len + num);
@@ -198,7 +212,8 @@ class StringBuffer {
     /**
      * Add a formatted string to the buffer.
      */
-    void addf(const char* fmt, ...) {
+    void addf(const char* fmt, ...)
+    {
         va_list ap;
         va_start(ap, fmt);
         vaddf(fmt, ap);
@@ -215,13 +230,15 @@ class StringBuffer {
 
     void vaddf(const char* fmt, va_list ap);
 
-    void addLines(const char* prefix, const char* bufLines, size_t size) {
+    void addLines(const char* prefix, const char* bufLines, size_t size)
+    {
         add_lines(prefix, NULL, bufLines, size);
     }
 
     int strbuf_getwholeline(FILE* fp, int term);
 
-    int getDelim(FILE* fp, int term) {
+    int getDelim(FILE* fp, int term)
+    {
         if (strbuf_getwholeline(fp, term)) {
             return EOF;
         }
@@ -231,7 +248,8 @@ class StringBuffer {
         return 0;
     }
 
-    int getLine(FILE* fp) {
+    int getLine(FILE* fp)
+    {
         if (strbuf_getwholeline(fp, '\n')) {
             return EOF;
         }
@@ -248,7 +266,8 @@ class StringBuffer {
 
     int getLineNul(FILE* fp) { return getDelim(fp, '\0'); }
 
-    int strbuf_getwholeline_fd(int fd, int term) {
+    int strbuf_getwholeline_fd(int fd, int term)
+    {
         reset();
 
         while (1) {
@@ -265,7 +284,7 @@ class StringBuffer {
         return 0;
     }
 
-  private:
+    private:
     size_t alloc;
 
     /*
@@ -274,7 +293,8 @@ class StringBuffer {
      */
     const static char COMMENT_LINE_CHAR = '#';
 
-    void reallocBuf() {
+    void reallocBuf()
+    {
         size_t amount = sizeof(char) * alloc;
         char* newBuf = (char*)std::realloc(buf, amount);
 
@@ -291,7 +311,8 @@ class StringBuffer {
      * to ensure that text ends with a newline, but without creating an empty
      * blank line if there is no content in the first place.
      */
-    void complete(char term) {
+    void complete(char term)
+    {
         if (len && buf[len - 1] != term) {
             addch(term);
         }
@@ -303,7 +324,8 @@ class StringBuffer {
      * add_lines
      */
     void add_lines(const char* prefix1, const char* prefix2,
-                   const char* bufLines, size_t size) {
+                   const char* bufLines, size_t size)
+    {
         while (size) {
             const char* prefix;
             const char* next = (const char*)memchr(bufLines, '\n', size);
@@ -320,7 +342,7 @@ class StringBuffer {
         completeLine();
     }
 
-  public:
+    public:
     size_t len;
     char* buf;
 

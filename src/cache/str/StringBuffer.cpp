@@ -3,7 +3,8 @@
 namespace cache {
 namespace str {
 
-void StringBuffer::grow(size_t extra) {
+void StringBuffer::grow(size_t extra)
+{
     bool new_buf = (alloc == 0);
 
     size_t newLen = len + extra + 1;
@@ -11,7 +12,8 @@ void StringBuffer::grow(size_t extra) {
         size_t newAlloc = (alloc + 16) * 3 / 2;
         if (newAlloc < newLen) {
             alloc = newLen;
-        } else {
+        }
+        else {
             alloc = newAlloc;
         }
         reallocBuf();
@@ -21,7 +23,8 @@ void StringBuffer::grow(size_t extra) {
     }
 }
 
-char* StringBuffer::detach(size_t* sz) {
+char* StringBuffer::detach(size_t* sz)
+{
     char* res;
     grow(0);
     res = buf;
@@ -34,7 +37,8 @@ char* StringBuffer::detach(size_t* sz) {
     return res;
 }
 
-void StringBuffer::attach(char* _buf, size_t _len, size_t _alloc) {
+void StringBuffer::attach(char* _buf, size_t _len, size_t _alloc)
+{
     release();
     buf = _buf;
     len = _len;
@@ -44,7 +48,8 @@ void StringBuffer::attach(char* _buf, size_t _len, size_t _alloc) {
 }
 
 void StringBuffer::splice(size_t pos, size_t removeLen, const void* data,
-                          size_t dataLen) {
+                          size_t dataLen)
+{
     if (pos > len) {
         LOG(ERR, "`pos' is too far after the end of the buffer");
         return;
@@ -63,7 +68,8 @@ void StringBuffer::splice(size_t pos, size_t removeLen, const void* data,
     setLen(len + dataLen - removeLen);
 }
 
-void StringBuffer::addCommentedLines(const char* bufLines, size_t size) {
+void StringBuffer::addCommentedLines(const char* bufLines, size_t size)
+{
     static char prefix1[3];
     static char prefix2[2];
 
@@ -74,7 +80,8 @@ void StringBuffer::addCommentedLines(const char* bufLines, size_t size) {
     add_lines(prefix1, prefix2, bufLines, size);
 }
 
-void StringBuffer::commentedAddf(const char* fmt, ...) {
+void StringBuffer::commentedAddf(const char* fmt, ...)
+{
     va_list params;
     StringBuffer tempBuf;
     int incomplete_line = len && buf[len - 1] != '\n';
@@ -89,7 +96,8 @@ void StringBuffer::commentedAddf(const char* fmt, ...) {
     }
 }
 
-void StringBuffer::vaddf(const char* fmt, va_list ap) {
+void StringBuffer::vaddf(const char* fmt, va_list ap)
+{
     va_list cp;
 
     if (!avail()) {
@@ -116,7 +124,8 @@ void StringBuffer::vaddf(const char* fmt, va_list ap) {
  * Define HAVE_GETDELIM if your system has the getdelim() function.
  */
 #ifdef HAVE_GETDELIM
-int StringBuffer::strbuf_getwholeline(FILE* fp, int term) {
+int StringBuffer::strbuf_getwholeline(FILE* fp, int term)
+{
     ssize_t r;
 
     if (feof(fp)) {
@@ -160,13 +169,15 @@ int StringBuffer::strbuf_getwholeline(FILE* fp, int term) {
      */
     if (!buf) {
         init(0);
-    } else {
+    }
+    else {
         reset();
     }
     return EOF;
 }
 #else
-int StringBuffer::strbuf_getwholeline(FILE* fp, int term) {
+int StringBuffer::strbuf_getwholeline(FILE* fp, int term)
+{
     int ch;
 
     if (feof(fp)) {

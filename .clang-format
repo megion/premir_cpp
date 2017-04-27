@@ -14,6 +14,7 @@ ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 TabWidth:        4
 UseTab:          Never
+BreakBeforeBraces: Stroustrup
 ---
 Language: JavaScript
 # Use 100 columns for JS.
