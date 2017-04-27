@@ -59,6 +59,20 @@ void test_remove_duplicates() {
     list.clear(false);
 }
 
+const char *byte_to_binary(int x)
+{
+    static char b[9];
+    b[0] = '\0';
+
+    int z;
+    for (z = 128; z > 0; z >>= 1)
+    {
+        strcat(b, ((x & z) == z) ? "1" : "0");
+    }
+
+    return b;
+}
+
 void test_sort_list() {
     cache::StringList<bool> list(nullptr, false);
     cache::str::StringBuffer sb;
@@ -73,6 +87,15 @@ void test_sort_list() {
     list.sort();
     assert(std::strcmp(list[1].string, "defg") == 0);
     assert(std::strcmp(list[2].string, "defg") == 0);
+	
+	int val1 = 1;
+	printf("binary: %s\n", byte_to_binary(val1));
+
+	int val2 = 5;
+	printf("binary: %s\n", byte_to_binary(val2));
+
+	val2 &= val1; 
+	printf("binary: %s\n", byte_to_binary(val2));
 }
 
 void stringList_test() {
