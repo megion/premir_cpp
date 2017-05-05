@@ -3,7 +3,8 @@
 namespace cache {
 namespace str {
 
-int is_rfc3986_reserved(char ch) {
+int is_rfc3986_reserved(char ch)
+{
     switch (ch) {
     case '!':
     case '*':
@@ -28,11 +29,13 @@ int is_rfc3986_reserved(char ch) {
     return 0;
 }
 
-int is_rfc3986_unreserved(char ch) {
+int is_rfc3986_unreserved(char ch)
+{
     return isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~';
 }
 
-bool starts_with(const char* str, const char* prefix) {
+bool starts_with(const char* str, const char* prefix)
+{
     for (;; str++, prefix++) {
         if (!*prefix) {
             return true;
@@ -42,7 +45,8 @@ bool starts_with(const char* str, const char* prefix) {
     }
 }
 
-void strbuf_addbufPercentquote(StringBuffer* dst, const StringBuffer* src) {
+void strbuf_addbufPercentquote(StringBuffer* dst, const StringBuffer* src)
+{
     for (size_t i = 0; i < src->len; i++) {
         if (src->buf[i] == '%') {
             dst->addch('%');
@@ -87,7 +91,8 @@ void strbuf_addbufPercentquote(StringBuffer* dst, const StringBuffer* src) {
 //}
 
 void strbuf_addIndentedText(StringBuffer* sb, const char* text, int indent,
-                            int indent2) {
+                            int indent2)
+{
     if (indent < 0) {
         indent = 0;
     }
@@ -103,7 +108,8 @@ void strbuf_addIndentedText(StringBuffer* sb, const char* text, int indent,
     }
 }
 
-size_t strbuf_fread(StringBuffer* sb, ssize_t size, FILE* f) {
+size_t strbuf_fread(StringBuffer* sb, ssize_t size, FILE* f)
+{
     size_t oldalloc = sb->getAlloc();
 
     sb->grow(size);
@@ -116,7 +122,8 @@ size_t strbuf_fread(StringBuffer* sb, ssize_t size, FILE* f) {
     return res;
 }
 
-ssize_t strbuf_read(StringBuffer* sb, int fd, size_t hint) {
+ssize_t strbuf_read(StringBuffer* sb, int fd, size_t hint)
+{
     size_t oldlen = sb->len;
     size_t oldalloc = sb->getAlloc();
 
@@ -144,7 +151,8 @@ ssize_t strbuf_read(StringBuffer* sb, int fd, size_t hint) {
     return sb->len - oldlen;
 }
 
-ssize_t strbuf_read_once(StringBuffer* sb, int fd, size_t hint) {
+ssize_t strbuf_read_once(StringBuffer* sb, int fd, size_t hint)
+{
     sb->grow(hint ? hint : 8192);
     ssize_t cnt = xread(fd, sb->buf + sb->len, sb->getAlloc() - sb->len - 1);
     if (cnt > 0) {
@@ -153,7 +161,8 @@ ssize_t strbuf_read_once(StringBuffer* sb, int fd, size_t hint) {
     return cnt;
 }
 
-ssize_t strbuf_read_file(StringBuffer* sb, const char* path, size_t hint) {
+ssize_t strbuf_read_file(StringBuffer* sb, const char* path, size_t hint)
+{
     int fd = open(path, O_RDONLY);
     if (fd < 0) {
         return -1;
@@ -167,7 +176,8 @@ ssize_t strbuf_read_file(StringBuffer* sb, const char* path, size_t hint) {
     return rlen;
 }
 
-int strbuf_readlink(StringBuffer* sb, const char* path, size_t hint) {
+int strbuf_readlink(StringBuffer* sb, const char* path, size_t hint)
+{
     size_t oldalloc = sb->getAlloc();
 
     if (hint < 32) {
@@ -195,11 +205,13 @@ int strbuf_readlink(StringBuffer* sb, const char* path, size_t hint) {
     return -1;
 }
 
-ssize_t strbuf_write(StringBuffer* sb, FILE* f) {
+ssize_t strbuf_write(StringBuffer* sb, FILE* f)
+{
     return sb->len ? fwrite(sb->buf, 1, sb->len, f) : 0;
 }
 
-int strbuf_getcwd(StringBuffer* sb) {
+int strbuf_getcwd(StringBuffer* sb)
+{
     size_t oldalloc = sb->getAlloc();
     size_t guessed_len = 128;
 
@@ -221,7 +233,8 @@ int strbuf_getcwd(StringBuffer* sb) {
     return -1;
 }
 
-void strbuf_addstr_xml_quoted(StringBuffer* sb, const char* s) {
+void strbuf_addstr_xml_quoted(StringBuffer* sb, const char* s)
+{
     while (*s) {
         size_t len = strcspn(s, "\"<>&");
         sb->add(s, len);
@@ -247,7 +260,8 @@ void strbuf_addstr_xml_quoted(StringBuffer* sb, const char* s) {
 }
 
 static void strbuf_add_urlencode(StringBuffer* sb, const char* s, size_t strlen,
-                                 int reserved) {
+                                 int reserved)
+{
     sb->grow(strlen);
     while (strlen--) {
         char ch = *s++;
@@ -260,11 +274,13 @@ static void strbuf_add_urlencode(StringBuffer* sb, const char* s, size_t strlen,
     }
 }
 
-void strbuf_addstr_urlencode(StringBuffer* sb, const char* s, int reserved) {
+void strbuf_addstr_urlencode(StringBuffer* sb, const char* s, int reserved)
+{
     strbuf_add_urlencode(sb, s, std::strlen(s), reserved);
 }
 
-void strbuf_humanise_bytes(StringBuffer* sb, off_t bytes) {
+void strbuf_humanise_bytes(StringBuffer* sb, off_t bytes)
+{
     if (bytes > 1 << 30) {
         sb->addf("%u.%2.2u GiB", (int)(bytes >> 30),
                  (int)(bytes & ((1 << 30) - 1)) / 10737419);
@@ -279,7 +295,8 @@ void strbuf_humanise_bytes(StringBuffer* sb, off_t bytes) {
     }
 }
 
-char* xgetcwd(void) {
+char* xgetcwd(void)
+{
     StringBuffer sb;
     if (strbuf_getcwd(&sb)) {
         LOG(ERR, "unable to get current working directory");
@@ -287,7 +304,8 @@ char* xgetcwd(void) {
     return sb.detach(nullptr);
 }
 
-void strbuf_add_absolute_path(StringBuffer* sb, const char* path) {
+void strbuf_add_absolute_path(StringBuffer* sb, const char* path)
+{
     if (!*path) {
         LOG(ERR, "The empty string is not a valid path");
         return;
@@ -313,7 +331,8 @@ void strbuf_add_absolute_path(StringBuffer* sb, const char* path) {
     sb->addstr(path);
 }
 
-void strbuf_addftime(StringBuffer* sb, const char* fmt, const struct tm* tm) {
+void strbuf_addftime(StringBuffer* sb, const char* fmt, const struct tm* tm)
+{
     size_t hint = 128;
 
     if (!*fmt) {
