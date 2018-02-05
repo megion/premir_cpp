@@ -12,7 +12,7 @@
 "
 "set noexpandtab
 
-"set colorcolumn=120
+set colorcolumn=80
 "highlight ColorColumn ctermbg=darkgray
 
 "augroup project
