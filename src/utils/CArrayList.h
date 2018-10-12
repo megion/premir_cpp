@@ -128,6 +128,7 @@ namespace utils {
             list.length = 0;
             list.capacity = 0;
             list.array = nullptr;
+            return *(this);
 		}	
 
         // [] index operator

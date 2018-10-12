@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 	test::cache_linked_hash_map::linkedHashMap_test();
 	test::cache_string_list::stringList_test();
 
-    test::apuebook::fork2_test();
+    //test::apuebook::fork2_test();
 
     return 0;
 
