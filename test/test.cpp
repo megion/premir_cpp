@@ -30,6 +30,8 @@
 
 #include "apuebook/apue-tests.h"
 
+#include "sort/HeapSortTest.h"
+
 int main(int argc, char **argv) {
 
 //    char* curloc = setlocale(LC_ALL,"");
@@ -70,6 +72,8 @@ int main(int argc, char **argv) {
 
 	test::cache_linked_hash_map::linkedHashMap_test();
 	test::cache_string_list::stringList_test();
+
+    test::heap_sort::sort_test();
 
     //test::apuebook::fork2_test();
 
