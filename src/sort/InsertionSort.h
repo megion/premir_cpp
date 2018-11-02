@@ -19,16 +19,23 @@ namespace sort {
 			for (size_t i = 1; i < arrSize; ++i) {
 				for (size_t j = i; ((j > 0) && (arr[j] < arr[j - 1])); j = j - 1) {
 					swap(arr[j], arr[j - 1]);
+					swap(arr[j], arr[j - 1]);
 				}
 			}
 		}
 
 	private:
 		void swap(T* const a, T* const b) {
-			T temp = *a;
-			*a = *b;
-			*b =temp;
+			T temp = *a; // call copy constructor
+			*a = *b; // call copy assign operator
+			*b = temp; // call copy assign operator
 		}
+
+        void swap(const T& a, const T& b) {
+            T temp = a; // call copy constructor
+            a = b; // call copy assign operator
+            b = temp; // call copy assign operator
+        }
 
 	};
 }

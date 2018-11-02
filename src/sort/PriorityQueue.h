@@ -26,7 +26,7 @@ namespace sort {
 template <typename T>
 class PriorityQueue {
     public:
-    PriorityQueue() : length(0) {
+    PriorityQueue() {
         queue = new std::vector<T>();
     }
 
@@ -39,26 +39,51 @@ class PriorityQueue {
     ~PriorityQueue() {
         delete queue;
         queue = nullptr;
-        length = 0;
     }
 
     /**
      * left child = parent*2 + 1
      */
-    inline size_t youngChildIndex(size_t index) const {
+    inline size_t young_child_index(size_t index) const {
         return index*2 + 1;
     }
 
     /**
      * parent = (child - 1) / 2
      */
-    inline size_t parentIndex(size_t index) const {
+    inline size_t parent_index(size_t index) const {
         return ((size_t)(index-1)/2);
+    }
+
+    /**
+     * insert item
+     */
+    void insert(const T &item) {
+        queue->push_back(item);
+        bubble_up(queue->size() - 1);
+    }
+
+    /**
+     * bubble up for item in position index
+     */
+    void bubble_up(size_t index) {
+        if(index == 0) {
+            return; /* root element */
+        }
+
+        size_t parentIndex = parent_index(index);
+        T& parent = *queue[parentIndex];
+        T& item = *queue[index];
+        if(parent > item) {
+            std::swap(parent, item);
+            //queue->assign(parentIndex, item);
+        }
+
+
     }
 
     private:
     std::vector<T>* queue;
-    size_t length; // number contained elements
 };
 } // namespace sort
 

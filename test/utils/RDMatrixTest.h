@@ -48,7 +48,7 @@ namespace test {
 						values[i] = v.values[i];// copy object
 					}
 					MyArray::callInfo.copyConstructorCallCount++;
-					//std::cout << "Call move constructor MyArray class" << std::endl;
+                    std::cout << "Call move constructor MyArray class" << std::endl;
 				}
 
 				MyArray &operator=(const MyArray& other) {
@@ -62,7 +62,7 @@ namespace test {
 						values[i] = other.values[i];// copy object
 					}
 					MyArray::callInfo.copyOperatorCallCount++;
-					//std::cout << "Call copy = operator "<< std::endl;
+                    std::cout << "Call copy = operator "<< std::endl;
 					return *this;
 				}
 

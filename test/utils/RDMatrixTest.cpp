@@ -192,6 +192,42 @@ namespace test {
 			matrix.pushRow(std::move(b));
 		}
 
+        void test_copy_constructor_and_copy_operator() {
+			MyArray::callInfo.reset();
+			assert(MyArray::callInfo.defaultConstructorCallCount==0);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==0);
+
+            MyArray a;
+            assert(MyArray::callInfo.defaultConstructorCallCount==1);
+			assert(MyArray::callInfo.copyConstructorCallCount==0);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==0);
+
+            MyArray b = a; // call copy constructor
+            MyArray c(a); // call copy constructor (variant 2)
+            assert(MyArray::callInfo.defaultConstructorCallCount==1);
+			assert(MyArray::callInfo.copyConstructorCallCount==2);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==0);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==0);
+            
+            MyArray d; // call constructor
+            d = c; // call copy assign operator
+            assert(MyArray::callInfo.defaultConstructorCallCount==2);
+			assert(MyArray::callInfo.copyConstructorCallCount==2);
+			assert(MyArray::callInfo.moveConstructorCallCount==0);
+			assert(MyArray::callInfo.copyOperatorCallCount==1);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==0);
+		}
+
 		void test_push_moved_object() {
 			MyArray::callInfo.reset();
 			assert(MyArray::callInfo.defaultConstructorCallCount==0);
@@ -250,6 +286,8 @@ namespace test {
             mytest(append_values);
             mytest(capacity);
 			mytest(push_moved_object);
+			mytest(copy_constructor_and_copy_operator);
+
         }
     }
 }
