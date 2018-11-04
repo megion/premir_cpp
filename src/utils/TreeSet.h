@@ -1,5 +1,5 @@
 /**
- * Tree set 
+ * Tree set
  */
 #ifndef SRC_UTILS_TREESET_H
 #define SRC_UTILS_TREESET_H
@@ -26,22 +26,16 @@ struct TreeNode {
 template <typename T>
 class TreeSet {
     public:
-
-    TreeSet()
-    {
-    }
+    TreeSet() {}
 
     TreeSet<T>(const TreeSet<T>&) = delete; // disable copy constructor
     TreeSet<T>& operator=(const TreeSet<T>&) = delete; // assign operator
-    TreeSet<T>& operator=(TreeSet<T>&&) = delete; // replacement operator
+    TreeSet<T>& operator=(TreeSet<T>&&) = delete;      // replacement operator
 
-    ~TreeSet()
-    {
-    }
+    ~TreeSet() {}
 
     private:
     TreeNode<T>* node;
-
 };
 } // namespace utils
 
