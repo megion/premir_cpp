@@ -226,6 +226,22 @@ namespace test {
 			assert(MyArray::callInfo.copyOperatorCallCount==1);
 			assert(MyArray::callInfo.moveOperatorCallCount==0);
 			assert(MyArray::callInfo.destructorCallCount==0);
+
+            MyArray f = MyArray(std::move(c)); // call move constructor
+            assert(MyArray::callInfo.defaultConstructorCallCount==2);
+			assert(MyArray::callInfo.copyConstructorCallCount==2);
+			assert(MyArray::callInfo.moveConstructorCallCount==1);
+			assert(MyArray::callInfo.copyOperatorCallCount==1);
+			assert(MyArray::callInfo.moveOperatorCallCount==0);
+			assert(MyArray::callInfo.destructorCallCount==0);
+
+            f = std::move(d); // call move assign operator 
+            assert(MyArray::callInfo.defaultConstructorCallCount==2);
+			assert(MyArray::callInfo.copyConstructorCallCount==2);
+			assert(MyArray::callInfo.moveConstructorCallCount==1);
+			assert(MyArray::callInfo.copyOperatorCallCount==1);
+			assert(MyArray::callInfo.moveOperatorCallCount==1);
+			assert(MyArray::callInfo.destructorCallCount==0);
 		}
 
 		void test_push_moved_object() {
