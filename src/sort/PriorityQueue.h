@@ -1,4 +1,6 @@
 /**
+ * Skiena book 
+ * 4.3. Пирамидальная сортировка
  */
 #ifndef SRC_SORT_PRIORITY_QUEUE_H
 #define SRC_SORT_PRIORITY_QUEUE_H

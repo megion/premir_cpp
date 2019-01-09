@@ -37,6 +37,12 @@ namespace sort {
             b = temp; // call copy assign operator
         }
 
+        void swap_optimal(const T& a, const T& b) {
+            T temp = a; // call copy constructor
+            a = b; // call copy assign operator
+            b = std::move(temp); // call copy replacement operator
+        }
+
 	};
 }
 
