@@ -5,16 +5,12 @@ IndentWidth: 4
 ---
 Language: Cpp
 ColumnLimit:     80
-AccessModifierOffset: 0
-# Force pointers to the type for C++.
-DerivePointerAlignment: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializersBeforeComma: true
 AlwaysBreakTemplateDeclarations: true
-PointerAlignment: Left
-ConstructorInitializerIndentWidth: 4
-ContinuationIndentWidth: 4
-TabWidth:        4
-UseTab:          Never
-BreakBeforeBraces: Stroustrup
+AlignTrailingComments: true
+IndentCaseLabels: false
+AccessModifierOffset: -4
 ---
 Language: JavaScript
 # Use 100 columns for JS.
