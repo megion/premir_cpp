@@ -3,6 +3,8 @@
 
 Build only Linux OS because for visualization has used xcb lib.
 
+## Install dependensies
+  `$ dnf install libpng-devel libxcb-devel`
 
 ## Build
 
