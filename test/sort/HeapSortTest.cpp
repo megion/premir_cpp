@@ -12,13 +12,13 @@ void test_priority_queue_index_navigation() {
     size_t parentIndex = q.parent_index(childIndex);
     assert(parentIndex == 1);
 
-    // + add first comment into master
+    // + add first comment into master; second changes
 
     // parent for right child
     parentIndex = q.parent_index(childIndex + 1);
     assert(parentIndex == 1);
 
-    // + add second comment into master
+    // + add second comment into master; second changes
 
     size_t parent3 = 3;
     childIndex = q.young_child_index(parent3);

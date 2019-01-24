@@ -8,6 +8,9 @@
 namespace test {
 namespace heap_sort {
 
+    /*
+     * master second changes
+     */
 void sort_test();
 }
 } // namespace test
