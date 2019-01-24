@@ -12,7 +12,7 @@ void test_priority_queue_index_navigation() {
     size_t parentIndex = q.parent_index(childIndex);
     assert(parentIndex == 1);
 
-    // + testing branch changes
+    // + testing branch changes, changes number two
 
     // parent for right child
     parentIndex = q.parent_index(childIndex + 1);

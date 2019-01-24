@@ -8,8 +8,11 @@
 namespace test {
 namespace heap_sort {
 
+/**
+ * + testing branch - changes number two
+ */
 void sort_test();
-}
+} // namespace heap_sort
 } // namespace test
 
 #endif
