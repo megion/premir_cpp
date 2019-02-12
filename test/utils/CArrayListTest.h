@@ -20,11 +20,13 @@ namespace test {
 			int id;
 
 			Foo2(const Foo2& f) : ch(f.ch), id(f.id) {
-				std::cout << "Foo2: Run copy constructor" << std::endl;
+				//std::cout << "Foo2: Run copy constructor" << std::endl;
+				Foo2::callInfo.copyConstructorCallCount++;
 			}
 
 			Foo2(Foo2&& f) : ch(f.ch), id(f.id) {
-				std::cout << "Foo2: Run replace constructor" << std::endl;
+				//std::cout << "Foo2: Run replace constructor" << std::endl;
+				Foo2::callInfo.moveConstructorCallCount++;
 			}
 
 			Foo2(char _ch, int _id) : ch(_ch), id(_id) {

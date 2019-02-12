@@ -10,8 +10,12 @@ namespace test {
 		void test_push() {
 			Foo2::callInfo.reset();
 			utils::CArrayList<Foo2> list;
+
 			Foo2 f = Foo2('1', 2);
+			assert(Foo2::callInfo.copyConstructorCallCount == 0);
 			list.push(f);
+			assert(Foo2::callInfo.copyConstructorCallCount == 0);
+
 			assert(list.size() == 1);
 			assert(list[0].ch == '1');
 

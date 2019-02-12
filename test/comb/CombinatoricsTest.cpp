@@ -28,7 +28,7 @@ namespace test {
 			assert(results.getRowSize() == 8);
 
 			results.print();
-			check_unique_results(results);
+            check_unique_results(results);
 		}
 
 		void test_permutation_backtrack_search() {
