@@ -8,6 +8,7 @@ mybuild/*.d
 mybuild/primer
 mybuild/test_runner
 build
+.ccls-cache
 
 # Precompiled Headers
 *.gch

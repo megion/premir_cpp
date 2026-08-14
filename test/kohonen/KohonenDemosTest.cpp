@@ -292,8 +292,8 @@ namespace test {
 
         void kohonen_demos_test() {
             suite("KohonenDemos");
-			//mytest(speech_signal);
-			//mytest(house_votes);
+			// mytest(speech_signal);
+			mytest(house_votes);
 		}
     }
 }

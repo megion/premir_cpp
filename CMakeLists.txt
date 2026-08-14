@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 4.4)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lxcb -g -pthread -lpng")
 project(dummy_project)
 include_directories(src)
-#include_directories(src/graphics)
-#include_directories(src/utils)
-#include_directories(src/ml)
+include_directories(src/graphics)
+include_directories(src/utils)
+include_directories(src/ml)
 include_directories(test)
-#include_directories(test/ml)
-#include_directories(test/utils)
+include_directories(test/ml)
+include_directories(test/utils)
 add_executable(dummy_executable
         test/utils/LinkedListTest.cpp
         test/utils/CArrayListTest.cpp
@@ -20,7 +20,7 @@ add_executable(dummy_executable
         test/utils/HashMapTest.cpp
         test/utils/ArrayUtilsTest.cpp
         test/utils/IntBitSetTest.cpp
-        test/utils/CHashSetTest.cpp
+        test/utils/HashSetTest.cpp
         test/utils/matrix_utils_test.cpp
         test/matrix/DeterminantTest.cpp
         test/matrix/GramSchmidtTest.cpp

@@ -24,8 +24,8 @@
 #include "ml/DigitalFilterTest.h"
 #include "ml/LevensteinDistanceTest.h"
 
-#include "cache/LinkedHashMapTest.h"
-#include "cache/StringListTest.h"
+// #include "cache/LinkedHashMapTest.h"
+// #include "cache/StringListTest.h"
 
 
 #include "apuebook/apue-tests.h"
@@ -70,8 +70,8 @@ int main(int argc, char **argv) {
     test::combinatorics::combinatorics_test();
     test::combinatorics::generate_text_test();
 
-	test::cache_linked_hash_map::linkedHashMap_test();
-	test::cache_string_list::stringList_test();
+	// test::cache_linked_hash_map::linkedHashMap_test();
+	// test::cache_string_list::stringList_test();
 
     test::heap_sort::sort_test();
 

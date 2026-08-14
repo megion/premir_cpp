@@ -540,10 +540,10 @@ namespace test {
 			//mytest(eucw_bubble_hexa_16_12_sammon);
             mytest(som_labeling);
 
-			//mytest(sammon_visible);
-			//mytest(umatrix_visible);
-			//mytest(umatrix_labeling);
-			//mytest(visible_som_training);
+			// mytest(sammon_visible);
+			// mytest(umatrix_visible);
+			// mytest(umatrix_labeling);
+			// mytest(visible_som_training);
         }
     }
 }
